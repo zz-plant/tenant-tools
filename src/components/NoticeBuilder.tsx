@@ -77,6 +77,77 @@ const fieldDefinitions: Record<
   issueDescription: { label: "Issue description (building-wide)", placeholder: "broken elevator" },
 };
 
+const buildingOptions = [
+  {
+    id: "2353 W Wabansia",
+    description: "Brick walk-up with bay windows and a garden entry.",
+    svg: (
+      <svg viewBox="0 0 160 120" role="img" aria-label="2353 W Wabansia building">
+        <rect x="18" y="30" width="124" height="72" rx="6" fill="#f6d5c0" stroke="#c96f52" strokeWidth="2" />
+        <rect x="34" y="45" width="22" height="18" fill="#ffffff" stroke="#c96f52" />
+        <rect x="68" y="45" width="22" height="18" fill="#ffffff" stroke="#c96f52" />
+        <rect x="102" y="45" width="22" height="18" fill="#ffffff" stroke="#c96f52" />
+        <rect x="34" y="70" width="22" height="18" fill="#ffffff" stroke="#c96f52" />
+        <rect x="68" y="70" width="22" height="18" fill="#ffffff" stroke="#c96f52" />
+        <rect x="102" y="70" width="22" height="18" fill="#ffffff" stroke="#c96f52" />
+        <rect x="70" y="88" width="20" height="14" fill="#c96f52" />
+        <path d="M18 30L80 10L142 30" fill="#e8b79f" stroke="#c96f52" strokeWidth="2" />
+      </svg>
+    ),
+  },
+  {
+    id: "2400 W Wabansia",
+    description: "Vintage brick facade with a centered stoop and cornice.",
+    svg: (
+      <svg viewBox="0 0 160 120" role="img" aria-label="2400 W Wabansia building">
+        <rect x="22" y="26" width="116" height="80" rx="6" fill="#fde6bf" stroke="#b9853b" strokeWidth="2" />
+        <rect x="42" y="42" width="20" height="16" fill="#ffffff" stroke="#b9853b" />
+        <rect x="70" y="42" width="20" height="16" fill="#ffffff" stroke="#b9853b" />
+        <rect x="98" y="42" width="20" height="16" fill="#ffffff" stroke="#b9853b" />
+        <rect x="42" y="64" width="20" height="16" fill="#ffffff" stroke="#b9853b" />
+        <rect x="70" y="64" width="20" height="16" fill="#ffffff" stroke="#b9853b" />
+        <rect x="98" y="64" width="20" height="16" fill="#ffffff" stroke="#b9853b" />
+        <rect x="72" y="82" width="16" height="24" fill="#b9853b" />
+        <rect x="30" y="22" width="100" height="10" fill="#b9853b" />
+      </svg>
+    ),
+  },
+  {
+    id: "812 W Adams St",
+    description: "Converted loft with tall windows and a crisp lintel.",
+    svg: (
+      <svg viewBox="0 0 160 120" role="img" aria-label="812 W Adams St building">
+        <rect x="20" y="18" width="120" height="88" rx="4" fill="#d3e3ff" stroke="#4b6fa9" strokeWidth="2" />
+        <rect x="34" y="36" width="24" height="28" fill="#ffffff" stroke="#4b6fa9" />
+        <rect x="68" y="36" width="24" height="28" fill="#ffffff" stroke="#4b6fa9" />
+        <rect x="102" y="36" width="24" height="28" fill="#ffffff" stroke="#4b6fa9" />
+        <rect x="34" y="70" width="24" height="22" fill="#ffffff" stroke="#4b6fa9" />
+        <rect x="68" y="70" width="24" height="22" fill="#ffffff" stroke="#4b6fa9" />
+        <rect x="102" y="70" width="24" height="22" fill="#ffffff" stroke="#4b6fa9" />
+        <rect x="72" y="92" width="16" height="14" fill="#4b6fa9" />
+        <rect x="20" y="18" width="120" height="8" fill="#4b6fa9" />
+      </svg>
+    ),
+  },
+  {
+    id: "159 W North Ave",
+    description: "Mid-rise with wide storefront base and side tower.",
+    svg: (
+      <svg viewBox="0 0 160 120" role="img" aria-label="159 W North Ave building">
+        <rect x="24" y="32" width="84" height="74" rx="4" fill="#dff2e1" stroke="#4a8a61" strokeWidth="2" />
+        <rect x="110" y="22" width="26" height="84" rx="4" fill="#bfe1c7" stroke="#4a8a61" strokeWidth="2" />
+        <rect x="36" y="46" width="18" height="14" fill="#ffffff" stroke="#4a8a61" />
+        <rect x="62" y="46" width="18" height="14" fill="#ffffff" stroke="#4a8a61" />
+        <rect x="36" y="68" width="18" height="14" fill="#ffffff" stroke="#4a8a61" />
+        <rect x="62" y="68" width="18" height="14" fill="#ffffff" stroke="#4a8a61" />
+        <rect x="112" y="36" width="22" height="16" fill="#ffffff" stroke="#4a8a61" />
+        <rect x="112" y="58" width="22" height="16" fill="#ffffff" stroke="#4a8a61" />
+        <rect x="52" y="88" width="24" height="18" fill="#4a8a61" />
+      </svg>
+    ),
+  },
+];
+
 const formatDate = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
 const getCurrentTime = (date: Date) =>
@@ -292,6 +363,29 @@ const NoticeBuilder = () => {
             <form className="form-grid">
               {currentStep === 1 && (
                 <>
+                  <div className="building-gallery">
+                    <div>
+                      <h3>Building gallery</h3>
+                      <p className="helper">Select a building card to prefill the address.</p>
+                    </div>
+                    <div className="building-grid">
+                      {buildingOptions.map((building) => (
+                        <button
+                          key={building.id}
+                          type="button"
+                          className={`building-card ${formState.building === building.id ? "active" : ""}`}
+                          onClick={() => setFormState((prev) => ({ ...prev, building: building.id }))}
+                        >
+                          <div className="building-illustration">{building.svg}</div>
+                          <div>
+                            <p className="building-address">{building.id}</p>
+                            <p className="building-details">{building.description}</p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <label>
                     Building
                     <select
@@ -301,10 +395,9 @@ const NoticeBuilder = () => {
                       className="select"
                     >
                       <option value="">Select building</option>
-                      <option>2353 W Wabansia</option>
-                      <option>2400 W Wabansia</option>
-                      <option>812 W Adams St</option>
-                      <option>159 W North Ave</option>
+                      {buildingOptions.map((building) => (
+                        <option key={building.id}>{building.id}</option>
+                      ))}
                     </select>
                   </label>
 
