@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.8
+- Added: Shared helper for free-text length limits in intake validation.
+
 ## 1.0.7
 - Changed: Export audience presets now use Base UI radio selection for consistent focus and selection styling.
 - Changed: Same-issue dismissal action now uses the Base UI button for consistent focus treatment.

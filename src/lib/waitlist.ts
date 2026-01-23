@@ -1,10 +1,9 @@
 import { portfolioOptions } from "../data/portfolioOptions";
+import { sanitizeLimitedText } from "./validation";
 
 const allowedPortfolios = new Set(portfolioOptions.map((option) => option.id));
 const maxBuildingLength = 140;
 const maxCityLength = 60;
-
-const sanitizeText = (value: string, limit: number) => value.trim().slice(0, limit);
 
 const containsUnitInfo = (value: string) =>
   /(?:\bapt\b|\bunit\b|\bsuite\b|\bste\b|#\s*\w+)/i.test(value);
@@ -23,7 +22,8 @@ export const validateWaitlistInput = (payload: unknown) => {
   const data = payload as Record<string, unknown>;
   const errors: string[] = [];
 
-  const building = typeof data.building === "string" ? sanitizeText(data.building, maxBuildingLength) : "";
+  const building =
+    typeof data.building === "string" ? sanitizeLimitedText(data.building, maxBuildingLength) : "";
   if (!building) {
     errors.push("Building address is required.");
   }
@@ -31,7 +31,7 @@ export const validateWaitlistInput = (payload: unknown) => {
     errors.push("Do not include unit numbers in the building address.");
   }
 
-  const city = typeof data.city === "string" ? sanitizeText(data.city, maxCityLength) : "";
+  const city = typeof data.city === "string" ? sanitizeLimitedText(data.city, maxCityLength) : "";
 
   const portfolio = typeof data.portfolio === "string" ? data.portfolio : "";
   if (!allowedPortfolios.has(portfolio)) {
