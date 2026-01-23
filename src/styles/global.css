@@ -668,8 +668,41 @@ label {
   cursor: pointer;
 }
 
-.preset-card input {
+.preset-radio {
   margin-top: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preset-radio-outer {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 1.5px solid #b2bacf;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.preset-radio-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #4f67ff;
+  transform: scale(0);
+  transition: transform 0.2s ease;
+}
+
+.preset-card[data-state="checked"] .preset-radio-outer {
+  border-color: #4f67ff;
+  box-shadow: 0 0 0 3px rgba(79, 103, 255, 0.2);
+}
+
+.preset-card[data-state="checked"] .preset-radio-indicator {
+  transform: scale(1);
 }
 
 .preset-card.active {

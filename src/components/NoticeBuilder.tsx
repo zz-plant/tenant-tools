@@ -7,7 +7,7 @@ import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { Select } from "@base-ui/react/select";
 import { Slider } from "@base-ui/react/slider";
 import { Switch } from "@base-ui/react/switch";
-import * as Tabs from "@base-ui/react/tabs";
+import { Tabs } from "@base-ui/react/tabs";
 import {
   fieldDefinitions,
   issue311Guidance,
@@ -119,7 +119,6 @@ const detailEntries = Object.entries(fieldDefinitions);
 const RadioGroup = {
   Root: BaseRadioGroup,
   Item: Radio.Root,
-  Indicator: Radio.Indicator,
 };
 
 const buildingOptions = [
@@ -856,14 +855,14 @@ const NoticeBuilder = () => {
             >
               <Tabs.List className="step-nav">
                 {steps.map((step) => (
-                  <Tabs.Trigger
+                  <Tabs.Tab
                     key={step.id}
                     value={String(step.id)}
                     className={`step-button ${currentStep === step.id ? "active" : ""}`}
                   >
                     <span className="step-title">{step.title}</span>
                     <span className="step-label">{step.label}</span>
-                  </Tabs.Trigger>
+                  </Tabs.Tab>
                 ))}
               </Tabs.List>
               <p className="helper">{steps[currentStep - 1].description}</p>
@@ -1067,13 +1066,13 @@ const NoticeBuilder = () => {
                       {similarNotice && <p className="similar-issue-success">{similarNotice}</p>}
                       {similarError && <p className="similar-issue-error">{similarError}</p>}
                       <div className="similar-issue-footer">
-                        <button
-                          className="link-button"
-                          type="button"
-                          onClick={() => setDismissSimilar(true)}
-                        >
-                          Keep this as a new issue
-                        </button>
+                      <Button
+                        className="link-button"
+                        type="button"
+                        onClick={() => setDismissSimilar(true)}
+                      >
+                        Keep this as a new issue
+                      </Button>
                       </div>
                     </div>
                   )}
@@ -1477,26 +1476,35 @@ const NoticeBuilder = () => {
                 </Button>
               </div>
             </div>
-            <div className="export-presets">
+            <RadioGroup.Root
+              className="export-presets"
+              aria-label="Export audience"
+              value={exportAudience}
+              onValueChange={(value) => {
+                if (typeof value === "string") {
+                  setExportAudience(value as ExportAudience);
+                }
+              }}
+            >
               {exportAudienceOptions.map((option) => (
-                <label
+                <RadioGroup.Item
                   key={option.id}
+                  value={option.id}
+                  render={<div />}
                   className={`preset-card ${exportAudience === option.id ? "active" : ""}`}
                 >
-                  <input
-                    type="radio"
-                    name="exportAudience"
-                    value={option.id}
-                    checked={exportAudience === option.id}
-                    onChange={(event) => setExportAudience(event.target.value as ExportAudience)}
-                  />
+                  <span className="preset-radio" aria-hidden="true">
+                    <span className="preset-radio-outer">
+                      <span className="preset-radio-indicator" />
+                    </span>
+                  </span>
                   <div>
                     <p className="preset-title">{option.label}</p>
                     <p className="helper">{option.description}</p>
                   </div>
-                </label>
+                </RadioGroup.Item>
               ))}
-            </div>
+            </RadioGroup.Root>
             <pre className="output output-summary">{exportSummary}</pre>
             <div className="submission-block">
               <div>
