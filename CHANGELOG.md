@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.13
+- Added: Issue gallery with SVG icon cards for faster issue selection.
+- Changed: Coming-soon buildings are visible but not selectable.
+- Changed: Property group selection removed until landlord support is available.
+
 ## 1.0.12
 - Changed: Moved Continuum contact details into a dedicated panel near the notice preview.
 

@@ -128,6 +128,7 @@ const buildingOptions = [
     name: "Bucktown Gateway",
     neighborhood: "Bucktown",
     website: "http://www.bucktowngateway.com/",
+    status: "available",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="2353 W Wabansia building">
         <rect x="18" y="30" width="124" height="72" rx="6" fill="#f6d5c0" stroke="#c96f52" strokeWidth="2" />
@@ -147,6 +148,7 @@ const buildingOptions = [
     name: "The Oasis of Bucktown",
     neighborhood: "Bucktown",
     website: "http://www.oasisofbucktown.com/",
+    status: "available",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="2400 W Wabansia building">
         <rect x="22" y="26" width="116" height="80" rx="6" fill="#fde6bf" stroke="#b9853b" strokeWidth="2" />
@@ -166,6 +168,7 @@ const buildingOptions = [
     name: "West Loop Chicago",
     neighborhood: "West Loop",
     website: "https://www.luxesuiteschicago.com/",
+    status: "coming-soon",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="812 W Adams St building">
         <rect x="20" y="18" width="120" height="88" rx="4" fill="#d3e3ff" stroke="#4b6fa9" strokeWidth="2" />
@@ -185,6 +188,7 @@ const buildingOptions = [
     name: "Old Town Luxury Suites",
     neighborhood: "Old Town",
     website: "http://www.oldtownluxurysuites.com/",
+    status: "coming-soon",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="159 W North Ave building">
         <rect x="24" y="32" width="84" height="74" rx="4" fill="#dff2e1" stroke="#4a8a61" strokeWidth="2" />
@@ -200,6 +204,76 @@ const buildingOptions = [
     ),
   },
 ];
+
+const issueIcons: Record<string, React.ReactNode> = {
+  heat: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Heat issue">
+      <path d="M32 10C24 20 40 26 40 38c0 6-4 12-8 12s-8-6-8-12c0-6 4-10 8-16z" fill="#f6b352" />
+      <path d="M32 10C24 20 40 26 40 38c0 6-4 12-8 12s-8-6-8-12c0-6 4-10 8-16z" fill="none" stroke="#c46a2a" strokeWidth="2" />
+    </svg>
+  ),
+  leak: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Water leak issue">
+      <path d="M32 10C24 22 18 28 18 38a14 14 0 0 0 28 0c0-10-6-16-14-28z" fill="#7bb5ff" />
+      <path d="M32 10C24 22 18 28 18 38a14 14 0 0 0 28 0c0-10-6-16-14-28z" fill="none" stroke="#3a6fb0" strokeWidth="2" />
+    </svg>
+  ),
+  pests: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Pest issue">
+      <ellipse cx="32" cy="34" rx="10" ry="14" fill="#cfe8c6" stroke="#4a7d4f" strokeWidth="2" />
+      <circle cx="26" cy="22" r="4" fill="#cfe8c6" stroke="#4a7d4f" strokeWidth="2" />
+      <circle cx="38" cy="22" r="4" fill="#cfe8c6" stroke="#4a7d4f" strokeWidth="2" />
+      <path d="M22 40l-8 4M42 40l8 4M22 28l-8-4M42 28l8-4" stroke="#4a7d4f" strokeWidth="2" />
+    </svg>
+  ),
+  entry: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Entry issue">
+      <rect x="18" y="12" width="28" height="40" rx="2" fill="#f4d1c5" stroke="#a95b4a" strokeWidth="2" />
+      <circle cx="38" cy="32" r="2" fill="#a95b4a" />
+      <rect x="14" y="10" width="36" height="44" rx="3" fill="none" stroke="#a95b4a" strokeWidth="2" />
+    </svg>
+  ),
+  common: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Common area issue">
+      <rect x="12" y="12" width="40" height="40" rx="4" fill="#d4e1ff" stroke="#4b6fa9" strokeWidth="2" />
+      <rect x="20" y="20" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
+      <rect x="36" y="20" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
+      <rect x="20" y="34" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
+      <rect x="36" y="34" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
+    </svg>
+  ),
+  "no-timeline": (
+    <svg viewBox="0 0 64 64" role="img" aria-label="No timeline issue">
+      <rect x="16" y="10" width="32" height="44" rx="4" fill="#f6e2b8" stroke="#b0823e" strokeWidth="2" />
+      <path d="M22 24h20M22 32h20M22 40h14" stroke="#b0823e" strokeWidth="2" />
+    </svg>
+  ),
+  deposit: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Deposit issue">
+      <circle cx="32" cy="32" r="16" fill="#ffe3a3" stroke="#b67a2b" strokeWidth="2" />
+      <path d="M28 26h8v12h-8z" fill="#b67a2b" />
+      <path d="M32 22v20" stroke="#b67a2b" strokeWidth="2" />
+    </svg>
+  ),
+  lockout: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Lockout issue">
+      <rect x="18" y="28" width="28" height="22" rx="4" fill="#f0ccd1" stroke="#9a4454" strokeWidth="2" />
+      <path d="M24 28v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#9a4454" strokeWidth="2" />
+      <circle cx="32" cy="38" r="3" fill="#9a4454" />
+    </svg>
+  ),
+  building: (
+    <svg viewBox="0 0 64 64" role="img" aria-label="Building-wide issue">
+      <rect x="14" y="14" width="36" height="36" rx="4" fill="#dfe9f5" stroke="#5a7aa6" strokeWidth="2" />
+      <rect x="22" y="22" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
+      <rect x="36" y="22" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
+      <rect x="22" y="34" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
+      <rect x="36" y="34" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
+    </svg>
+  ),
+};
+
+const formatIssueLabel = (label: string) => label.replace(/^[^a-zA-Z0-9]+\s*/, "");
 
 const formatDate = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
@@ -902,6 +976,7 @@ const NoticeBuilder = () => {
                       <h3 id="building-gallery-title">Building gallery</h3>
                       <p className="helper">Select a building card to fill the address. You can also use the dropdown.</p>
                       <p className="helper">Details shown here come from Continuum Brokers listings.</p>
+                      <p className="helper">Buildings marked Coming soon are not selectable yet.</p>
                     </div>
                     <RadioGroup.Root
                       className="building-grid"
@@ -918,13 +993,17 @@ const NoticeBuilder = () => {
                       {buildingOptions.map((building) => {
                         const buildingSlug = building.id.toLowerCase().replace(/[^a-z0-9]+/g, "-");
                         const websiteLabel = building.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
+                        const isComingSoon = building.status === "coming-soon";
                         return (
                           <RadioGroup.Item
                             key={building.id}
                             render={<div />}
-                            className={`building-card ${formState.building === building.id ? "active" : ""}`}
+                            className={`building-card ${formState.building === building.id ? "active" : ""} ${
+                              isComingSoon ? "disabled" : ""
+                            }`}
                             value={building.id}
                             aria-labelledby={`building-${buildingSlug}-label`}
+                            disabled={isComingSoon}
                           >
                             <div className="building-illustration">{building.svg}</div>
                             <div>
@@ -933,6 +1012,7 @@ const NoticeBuilder = () => {
                               </p>
                               <p className="building-name">{building.name}</p>
                               <p className="building-neighborhood">Neighborhood: {building.neighborhood}</p>
+                              {isComingSoon && <p className="building-status">Coming soon</p>}
                               <a className="building-site" href={building.website} target="_blank" rel="noreferrer">
                                 Site: {websiteLabel}
                               </a>
@@ -964,73 +1044,62 @@ const NoticeBuilder = () => {
                       </Select.Trigger>
                       <Select.Portal>
                         <Select.Positioner className="select-positioner">
-                          <Select.Popup className="select-popup">
-                            <Select.List className="select-list">
-                              {buildingOptions.map((building) => (
-                                <Select.Item key={building.id} value={building.id} className="select-item">
-                                  <Select.ItemText>{building.id}</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                              ))}
-                            </Select.List>
-                          </Select.Popup>
-                        </Select.Positioner>
-                      </Select.Portal>
+                            <Select.Popup className="select-popup">
+                              <Select.List className="select-list">
+                                {buildingOptions.map((building) => {
+                                  const isComingSoon = building.status === "coming-soon";
+                                  return (
+                                    <Select.Item
+                                      key={building.id}
+                                      value={building.id}
+                                      className="select-item"
+                                      disabled={isComingSoon}
+                                    >
+                                      <Select.ItemText>
+                                        {building.id} {isComingSoon ? "(Coming soon)" : ""}
+                                      </Select.ItemText>
+                                      <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                    </Select.Item>
+                                  );
+                                })}
+                              </Select.List>
+                            </Select.Popup>
+                          </Select.Positioner>
+                        </Select.Portal>
                     </Select.Root>
                   </label>
 
-                  <label>
-                    Property group
-                    <Select.Root value={formState.portfolio} onValueChange={updateSelect("portfolio")} required>
-                      <Select.Trigger className="select-trigger" aria-label="Property group">
-                        <Select.Value placeholder="Select property group" />
-                        <Select.Icon className="select-icon">
-                          <span aria-hidden="true">▾</span>
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Positioner className="select-positioner">
-                          <Select.Popup className="select-popup">
-                            <Select.List className="select-list">
-                              {portfolioOptions.map((option) => (
-                                <Select.Item key={option.id} value={option.id} className="select-item">
-                                  <Select.ItemText>{option.label}</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                              ))}
-                            </Select.List>
-                          </Select.Popup>
-                        </Select.Positioner>
-                      </Select.Portal>
-                    </Select.Root>
-                    <p className="helper">Choose Other company if your building has different contacts.</p>
-                  </label>
-
-                  <label>
-                    Issue type
-                    <Select.Root value={formState.issue || null} onValueChange={updateSelect("issue")} required>
-                      <Select.Trigger className="select-trigger" aria-label="Issue type">
-                        <Select.Value placeholder="Select issue" />
-                        <Select.Icon className="select-icon">
-                          <span aria-hidden="true">▾</span>
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Positioner className="select-positioner">
-                          <Select.Popup className="select-popup">
-                            <Select.List className="select-list">
-                              {issueOptions.map((option) => (
-                                <Select.Item key={option.id} value={option.id} className="select-item">
-                                  <Select.ItemText>{option.label}</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                              ))}
-                            </Select.List>
-                          </Select.Popup>
-                        </Select.Positioner>
-                      </Select.Portal>
-                    </Select.Root>
-                  </label>
+                  <div className="issue-gallery">
+                    <div>
+                      <h3 id="issue-gallery-title">Issue gallery</h3>
+                      <p className="helper">Select one issue type to unlock the notice templates.</p>
+                    </div>
+                    <RadioGroup.Root
+                      className="issue-grid"
+                      aria-labelledby="issue-gallery-title"
+                      value={formState.issue}
+                      onValueChange={(value) => {
+                        if (typeof value !== "string") {
+                          return;
+                        }
+                        setFormState((prev) => ({ ...prev, issue: value }));
+                      }}
+                      required
+                    >
+                      {issueOptions.map((option) => (
+                        <RadioGroup.Item
+                          key={option.id}
+                          render={<div />}
+                          className={`issue-card ${formState.issue === option.id ? "active" : ""}`}
+                          value={option.id}
+                          aria-label={formatIssueLabel(option.label)}
+                        >
+                          <div className="issue-icon">{issueIcons[option.id]}</div>
+                          <p className="issue-label">{formatIssueLabel(option.label)}</p>
+                        </RadioGroup.Item>
+                      ))}
+                    </RadioGroup.Root>
+                  </div>
 
                   <label>
                     Issue location zone (optional)
