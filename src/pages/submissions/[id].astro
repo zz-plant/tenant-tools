@@ -1,0 +1,119 @@
+---
+import "../../styles/global.css";
+import { fieldDefinitions, issueOptions, stages } from "../../data/noticeData";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
+const submission = id && kv ? await kv.get(`submission:${id}`, { type: "json" }) : null;
+
+const submissionRecord = submission as
+  | {
+      building: string;
+      issue: string;
+      issueLabel: string;
+      stage: "A" | "B" | "C";
+      language: string;
+      startDate: string;
+      reportDate: string;
+      reportCount: number;
+      simpleEnglish: boolean;
+      issueDetails: Record<string, string>;
+    }
+  | null;
+
+const issueLabel =
+  submissionRecord?.issueLabel ||
+  issueOptions.find((issue) => issue.id === submissionRecord?.issue)?.label ||
+  submissionRecord?.issue ||
+  "Issue";
+
+const stageLabel = submissionRecord ? stages[submissionRecord.stage] : "";
+const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDetails || {}) : [];
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submission | Tenant Notice Builder</title>
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div class="hero-main">
+          <p class="eyebrow">Shared ledger entry</p>
+          <h1>Issue submission</h1>
+          <p class="tagline">This permalink shows the saved issue summary.</p>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel-highlight preview-panel">
+          {submissionRecord ? (
+            <>
+              <div class="summary-grid">
+                <div class="summary-card">
+                  <p class="summary-label">Building</p>
+                  <p class="summary-value">{submissionRecord.building}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Issue</p>
+                  <p class="summary-value">{issueLabel}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Stage</p>
+                  <p class="summary-value">{stageLabel}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Start date</p>
+                  <p class="summary-value">{submissionRecord.startDate}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Report date</p>
+                  <p class="summary-value">{submissionRecord.reportDate}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Reports</p>
+                  <p class="summary-value">{submissionRecord.reportCount}</p>
+                </div>
+              </div>
+
+              <div class="export-block">
+                <div>
+                  <h3>Details saved</h3>
+                  <p class="helper">Short factual details only.</p>
+                </div>
+                {detailEntries.length > 0 ? (
+                  <ul class="submission-detail-list">
+                    {detailEntries.map(([key, value]) => {
+                      const label = fieldDefinitions[key as keyof typeof fieldDefinitions]?.label || key;
+                      return (
+                        <li>
+                          <strong>{label}:</strong> {value}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p class="helper">No details were saved.</p>
+                )}
+              </div>
+            </>
+          ) : (
+            <div>
+              <h2>We could not find this submission.</h2>
+              <p class="helper">Check the link or return to the main page.</p>
+              <a class="button" href="/">Back to builder</a>
+            </div>
+          )}
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <p>Safety first: this summary does not include names or unit numbers.</p>
+      </footer>
+    </div>
+  </body>
+</html>

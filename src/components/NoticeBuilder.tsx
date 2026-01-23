@@ -5,7 +5,7 @@ import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
 import { Slider } from "@base-ui/react/slider";
 import { Switch } from "@base-ui/react/switch";
-import { issueFieldMap, issueOptions, meaningMap, stages } from "../data/noticeData";
+import { fieldDefinitions, issueFieldMap, issueOptions, meaningMap, stages } from "../data/noticeData";
 
 const initialState = {
   building: "",
@@ -64,22 +64,7 @@ const steps = [
   },
 ];
 
-const fieldDefinitions: Record<
-  string,
-  { label: string; type?: string; placeholder?: string; helper?: string }
-> = {
-  temp: { label: "Temperature (°F)", type: "number", placeholder: "68" },
-  time: { label: "Time", type: "time" },
-  location: { label: "Location (for leaks)", placeholder: "kitchen ceiling" },
-  eventDate: { label: "Event date", type: "date" },
-  eventDates: { label: "Event date(s)", placeholder: "[DATES]" },
-  eventDateTime: { label: "Event date/time", placeholder: "[DATE/TIME]" },
-  moveOutDate: { label: "Move-out date", type: "date" },
-  pestType: { label: "Pest type (roaches/rats/bedbugs)", placeholder: "ROACHES" },
-  commonArea: { label: "Common area item", placeholder: "ELEVATOR" },
-  lockoutAction: { label: "Lockout or shutoff action", placeholder: "LOCK ME OUT" },
-  issueDescription: { label: "Issue description (building-wide)", placeholder: "broken elevator" },
-};
+const detailEntries = Object.entries(fieldDefinitions);
 
 const buildingOptions = [
   {
@@ -193,6 +178,11 @@ const NoticeBuilder = () => {
   const [meTooAdded, setMeTooAdded] = useState(false);
   const [copyLabel, setCopyLabel] = useState("Copy text");
   const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy summary");
+  const [saveLabel, setSaveLabel] = useState("Save to ledger");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [saveError, setSaveError] = useState("");
+  const [submissionUrl, setSubmissionUrl] = useState("");
+  const [linkCopyLabel, setLinkCopyLabel] = useState("Copy link");
 
   const updateField =
     (key: keyof FormState) =>
@@ -424,6 +414,66 @@ const NoticeBuilder = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleLedgerSave = async () => {
+    if (!formState.building || !formState.issue) {
+      setSaveStatus("error");
+      setSaveError("Select a building and issue before saving.");
+      return;
+    }
+
+    setSaveStatus("saving");
+    setSaveError("");
+    setSaveLabel("Saving...");
+
+    const issueDetails = issueFields.reduce<Record<string, string>>((acc, fieldKey) => {
+      const rawValue = String(formState[fieldKey as keyof FormState] ?? "").trim();
+      if (rawValue) {
+        acc[fieldKey] = rawValue;
+      }
+      return acc;
+    }, {});
+
+    try {
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          building: formState.building,
+          issue: formState.issue,
+          stage: formState.stage,
+          language: formState.language,
+          startDate: formState.startDate,
+          reportDate: formState.today,
+          reportCount: impactCount,
+          simpleEnglish: formState.simpleEnglish,
+          issueDetails,
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload?.error || "Unable to save right now.");
+      }
+
+      setSubmissionUrl(payload.url || "");
+      setSaveStatus("saved");
+      setSaveLabel("Saved");
+    } catch (error) {
+      setSaveStatus("error");
+      setSaveLabel("Save to ledger");
+      setSaveError(error instanceof Error ? error.message : "We could not save the ledger entry.");
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (!submissionUrl) {
+      return;
+    }
+    await navigator.clipboard.writeText(`${window.location.origin}${submissionUrl}`);
+    setLinkCopyLabel("Link copied");
+    setTimeout(() => setLinkCopyLabel("Copy link"), 1500);
+  };
+
   const handleReset = () => {
     const today = new Date();
     const formatted = formatDate(today);
@@ -437,6 +487,11 @@ const NoticeBuilder = () => {
     setPlainMeaningVisible(false);
     setCopyLabel("Copy text");
     setSummaryCopyLabel("Copy summary");
+    setSaveLabel("Save to ledger");
+    setSaveStatus("idle");
+    setSaveError("");
+    setSubmissionUrl("");
+    setLinkCopyLabel("Copy link");
   };
 
   const summaryItems = [
@@ -448,6 +503,20 @@ const NoticeBuilder = () => {
     { label: "Today", value: formState.today || "Add today's date" },
     { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
   ];
+
+  const detailSummaryItems = useMemo(
+    () =>
+      detailEntries
+        .map(([key, field]) => {
+          const value = String(formState[key as keyof FormState] ?? "").trim();
+          if (!value) {
+            return null;
+          }
+          return { label: field.label, value };
+        })
+        .filter(Boolean) as Array<{ label: string; value: string }>,
+    [formState]
+  );
 
   return (
     <div className="page">
@@ -905,6 +974,44 @@ const NoticeBuilder = () => {
               </div>
             </div>
             <pre className="output output-summary">{exportSummary}</pre>
+            <div className="submission-block">
+              <div>
+                <h3>Save to the shared ledger</h3>
+                <p className="helper">
+                  This saves a short summary. It does not include your unit or name.
+                </p>
+              </div>
+              <div className="submission-actions">
+                <Button className="button button-secondary" type="button" onClick={handleLedgerSave} disabled={saveStatus === "saving"}>
+                  {saveLabel}
+                </Button>
+                {submissionUrl && (
+                  <Button className="button button-secondary" type="button" onClick={handleCopyLink}>
+                    {linkCopyLabel}
+                  </Button>
+                )}
+              </div>
+              {saveStatus === "saved" && submissionUrl && (
+                <p className="submission-note">
+                  Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>
+                </p>
+              )}
+              {saveStatus === "error" && (
+                <p className="submission-error">{saveError || "We could not save the ledger entry."}</p>
+              )}
+              {detailSummaryItems.length > 0 && (
+                <div className="submission-details">
+                  <p className="helper">Details saved:</p>
+                  <ul>
+                    {detailSummaryItems.map((item) => (
+                      <li key={item.label}>
+                        <strong>{item.label}:</strong> {item.value}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
           <div className="plain-meaning">
             <Button

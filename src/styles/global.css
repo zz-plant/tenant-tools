@@ -467,6 +467,47 @@ label {
   border-top: 1px solid #e3e7f5;
 }
 
+.submission-block {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  background: #f7f8ff;
+}
+
+.submission-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.submission-note {
+  margin: 0;
+  color: #1d3b2a;
+}
+
+.submission-note a {
+  color: #1b4aaf;
+  font-weight: 600;
+}
+
+.submission-error {
+  margin: 0;
+  color: #9a2b2b;
+}
+
+.submission-details {
+  display: grid;
+  gap: 6px;
+}
+
+.submission-details ul,
+.submission-detail-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #2b3142;
+}
+
 .export-header {
   display: flex;
   align-items: center;
