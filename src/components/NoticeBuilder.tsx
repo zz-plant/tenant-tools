@@ -15,6 +15,8 @@ import {
   stages,
   zoneOptions,
 } from "../data/noticeData";
+import { portfolioOptions } from "../data/portfolioOptions";
+import WaitlistPanel from "./WaitlistPanel";
 
 const initialState = {
   building: "",
@@ -23,6 +25,7 @@ const initialState = {
   issue: "",
   stage: "A",
   language: "en",
+  portfolio: "continuum",
   simpleEnglish: false,
   autoDates: true,
   startDate: "",
@@ -283,6 +286,7 @@ const NoticeBuilder = () => {
   const selectedZone = zoneOptions.find((option) => option.id === formState.zone);
   const selectedAudience =
     exportAudienceOptions.find((option) => option.id === exportAudience) || exportAudienceOptions[0];
+  const selectedPortfolio = portfolioOptions.find((option) => option.id === formState.portfolio);
 
   const buildNoticeText = (state: FormState) => {
     if (!selectedIssue) {
@@ -409,6 +413,7 @@ const NoticeBuilder = () => {
 
   const exportSummary = useMemo(() => {
     const building = formState.building || "[ADDRESS]";
+    const portfolioLabel = selectedPortfolio?.label || "Not listed";
     const issueLabel = selectedIssue?.label || "[ISSUE TYPE]";
     const zoneLabel = selectedZone?.label || "Not listed";
     const issueDetails = issueFields
@@ -473,6 +478,7 @@ const NoticeBuilder = () => {
       config.heading,
       "",
       `Building: ${building}`,
+      `Portfolio: ${portfolioLabel}`,
       `Issue: ${issueLabel}`,
       `Zone: ${zoneLabel}`,
       config.includeStage ? `Stage: ${stageLabel}` : null,
@@ -501,6 +507,7 @@ const NoticeBuilder = () => {
     formState.attachment,
     formState.building,
     formState.language,
+    formState.portfolio,
     formState.startDate,
     formState.today,
     formState.unit,
@@ -513,6 +520,7 @@ const NoticeBuilder = () => {
     formState.ticketDate,
     formState.ticketNumber,
     selectedZone?.label,
+    selectedPortfolio?.label,
   ]);
 
   const handleCopy = async () => {
@@ -571,6 +579,7 @@ const NoticeBuilder = () => {
           issue: formState.issue,
           stage: formState.stage,
           language: formState.language,
+          portfolio: formState.portfolio,
           startDate: formState.startDate,
           reportDate: formState.today,
           reportCount: impactCount,
@@ -679,6 +688,7 @@ const NoticeBuilder = () => {
 
   const summaryItems = [
     { label: "Building", value: formState.building || "Select a building" },
+    { label: "Portfolio", value: selectedPortfolio?.label || "Not listed" },
     { label: "Issue", value: selectedIssue?.label || "Select an issue" },
     { label: "Zone", value: selectedZone?.label || "Not listed" },
     { label: "Stage", value: stageLabel },
@@ -703,6 +713,7 @@ const NoticeBuilder = () => {
   );
 
   const savedMetaItems = [
+    selectedPortfolio?.label ? { label: "Portfolio", value: selectedPortfolio.label } : null,
     selectedZone?.label ? { label: "Zone", value: selectedZone.label } : null,
     formState.ticketDate ? { label: "311 ticket date", value: formState.ticketDate } : null,
     formState.ticketNumber ? { label: "311 ticket number", value: formState.ticketNumber } : null,
@@ -807,6 +818,7 @@ const NoticeBuilder = () => {
           <p><strong>Landlord:</strong> Yelena Bernshtam +1 (773) 678-7636</p>
           <p><strong>Rent issues:</strong> continuumbrokers@yahoo.com</p>
           <p className="contact-note">Use text for urgent safety issues. Email for rent receipts.</p>
+          <p className="contact-note">If your building has different contacts, use the waitlist below.</p>
         </div>
       </header>
 
@@ -852,7 +864,13 @@ const NoticeBuilder = () => {
                           key={building.id}
                           type="button"
                           className={`building-card ${formState.building === building.id ? "active" : ""}`}
-                          onClick={() => setFormState((prev) => ({ ...prev, building: building.id }))}
+                          onClick={() =>
+                            setFormState((prev) => ({
+                              ...prev,
+                              building: building.id,
+                              portfolio: "continuum",
+                            }))
+                          }
                         >
                           <div className="building-illustration">{building.svg}</div>
                           <div>
@@ -868,7 +886,13 @@ const NoticeBuilder = () => {
                     Building
                     <Select.Root
                       value={formState.building || null}
-                      onValueChange={updateSelect("building")}
+                      onValueChange={(value) =>
+                        setFormState((prev) => ({
+                          ...prev,
+                          building: value ?? "",
+                          portfolio: value ? "continuum" : prev.portfolio,
+                        }))
+                      }
                       required
                     >
                       <Select.Trigger className="select-trigger" aria-label="Building">
@@ -892,6 +916,33 @@ const NoticeBuilder = () => {
                         </Select.Positioner>
                       </Select.Portal>
                     </Select.Root>
+                  </label>
+
+                  <label>
+                    Property group
+                    <Select.Root value={formState.portfolio} onValueChange={updateSelect("portfolio")} required>
+                      <Select.Trigger className="select-trigger" aria-label="Property group">
+                        <Select.Value placeholder="Select property group" />
+                        <Select.Icon className="select-icon">
+                          <span aria-hidden="true">▾</span>
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Positioner className="select-positioner">
+                          <Select.Popup className="select-popup">
+                            <Select.List className="select-list">
+                              {portfolioOptions.map((option) => (
+                                <Select.Item key={option.id} value={option.id} className="select-item">
+                                  <Select.ItemText>{option.label}</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                              ))}
+                            </Select.List>
+                          </Select.Popup>
+                        </Select.Positioner>
+                      </Select.Portal>
+                    </Select.Root>
+                    <p className="helper">Choose Other company if your building has different contacts.</p>
                   </label>
 
                   <label>
@@ -1460,6 +1511,8 @@ const NoticeBuilder = () => {
           </div>
         </aside>
       </main>
+
+      <WaitlistPanel />
 
       <footer className="site-footer">
         <p>Safety first: evidence is optional. Public views hide personal details.</p>

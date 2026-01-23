@@ -1,6 +1,9 @@
 # Changelog
 
 ## 1.0.5
+- Added: Waitlist intake and neighbor invite kit for buildings not yet listed.
+- Added: Portfolio tagging to separate Continuum-managed records from other companies in exports.
+- Changed: Ledger submissions now record portfolio group alongside saved summaries.
 - Changed: Notice builder steps now use tabs for clearer keyboard navigation.
 
 ## 1.0.4
