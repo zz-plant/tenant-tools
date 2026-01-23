@@ -394,6 +394,11 @@ label {
   box-shadow: 0 12px 22px rgba(28, 36, 54, 0.12);
 }
 
+.building-card:focus-visible {
+  outline: 3px solid #4f67ff;
+  outline-offset: 2px;
+}
+
 .building-card.active {
   border-color: #4f67ff;
   box-shadow: 0 16px 30px rgba(79, 103, 255, 0.25);

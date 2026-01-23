@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.0.5
+- Changed: Building gallery cards now use radio selection for better keyboard access.
 - Added: Waitlist intake and neighbor invite kit for buildings not yet listed.
 - Added: Portfolio tagging to separate Continuum-managed records from other companies in exports.
 - Changed: Ledger submissions now record portfolio group alongside saved summaries.

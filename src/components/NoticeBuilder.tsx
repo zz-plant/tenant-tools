@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@base-ui/react/button";
 import { Checkbox } from "@base-ui/react/checkbox";
 import { Input } from "@base-ui/react/input";
+import { Radio } from "@base-ui/react/radio";
+import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { Select } from "@base-ui/react/select";
 import { Slider } from "@base-ui/react/slider";
 import { Switch } from "@base-ui/react/switch";
@@ -112,6 +114,12 @@ const exportAudienceOptions: Array<{ id: ExportAudience; label: string; descript
 ];
 
 const detailEntries = Object.entries(fieldDefinitions);
+
+const RadioGroup = {
+  Root: BaseRadioGroup,
+  Item: Radio.Root,
+  Indicator: Radio.Indicator,
+};
 
 const buildingOptions = [
   {
@@ -855,31 +863,45 @@ const NoticeBuilder = () => {
                 <Tabs.Panel value="1">
                   <div className="building-gallery">
                     <div>
-                      <h3>Building gallery</h3>
+                      <h3 id="building-gallery-title">Building gallery</h3>
                       <p className="helper">Select a building card to prefill the address.</p>
                     </div>
-                    <div className="building-grid">
-                      {buildingOptions.map((building) => (
-                        <button
-                          key={building.id}
-                          type="button"
-                          className={`building-card ${formState.building === building.id ? "active" : ""}`}
-                          onClick={() =>
-                            setFormState((prev) => ({
-                              ...prev,
-                              building: building.id,
-                              portfolio: "continuum",
-                            }))
-                          }
-                        >
-                          <div className="building-illustration">{building.svg}</div>
-                          <div>
-                            <p className="building-address">{building.id}</p>
-                            <p className="building-details">{building.description}</p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
+                    <RadioGroup.Root
+                      className="building-grid"
+                      aria-labelledby="building-gallery-title"
+                      value={formState.building}
+                      onValueChange={(value) => {
+                        if (typeof value !== "string") {
+                          return;
+                        }
+                        setFormState((prev) => ({ ...prev, building: value }));
+                      }}
+                      required
+                    >
+                      {buildingOptions.map((building) => {
+                        const buildingSlug = building.id.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                        return (
+                          <RadioGroup.Item
+                            key={building.id}
+                            render={<div />}
+                            className={`building-card ${formState.building === building.id ? "active" : ""}`}
+                            value={building.id}
+                            aria-labelledby={`building-${buildingSlug}-label`}
+                            aria-describedby={`building-${buildingSlug}-details`}
+                          >
+                            <div className="building-illustration">{building.svg}</div>
+                            <div>
+                              <p className="building-address" id={`building-${buildingSlug}-label`}>
+                                {building.id}
+                              </p>
+                              <p className="building-details" id={`building-${buildingSlug}-details`}>
+                                {building.description}
+                              </p>
+                            </div>
+                          </RadioGroup.Item>
+                        );
+                      })}
+                    </RadioGroup.Root>
                   </div>
 
                   <label>
