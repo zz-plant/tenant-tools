@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@base-ui/react/button";
 import { Input } from "@base-ui/react/input";
-import { issueOptions, meaningMap } from "../data/noticeData";
+import { issueFieldMap, issueOptions, meaningMap, stages } from "../data/noticeData";
 
 const initialState = {
   building: "",
@@ -33,6 +33,50 @@ type Stage = "A" | "B" | "C";
 
 type FormState = typeof initialState;
 
+const steps = [
+  {
+    id: 1,
+    title: "Step 1",
+    label: "Basics",
+    description: "Pick your building, issue, and notice stage.",
+  },
+  {
+    id: 2,
+    title: "Step 2",
+    label: "Issue details",
+    description: "Add issue-specific facts that support your request.",
+  },
+  {
+    id: 3,
+    title: "Step 3",
+    label: "Dates & language",
+    description: "Confirm the timeline and language options.",
+  },
+  {
+    id: 4,
+    title: "Step 4",
+    label: "Review & send",
+    description: "Copy the notice and save your records.",
+  },
+];
+
+const fieldDefinitions: Record<
+  string,
+  { label: string; type?: string; placeholder?: string; helper?: string }
+> = {
+  temp: { label: "Temperature (°F)", type: "number", placeholder: "68" },
+  time: { label: "Time", type: "time" },
+  location: { label: "Location (for leaks)", placeholder: "kitchen ceiling" },
+  eventDate: { label: "Event date", type: "date" },
+  eventDates: { label: "Event date(s)", placeholder: "[DATES]" },
+  eventDateTime: { label: "Event date/time", placeholder: "[DATE/TIME]" },
+  moveOutDate: { label: "Move-out date", type: "date" },
+  pestType: { label: "Pest type (roaches/rats/bedbugs)", placeholder: "ROACHES" },
+  commonArea: { label: "Common area item", placeholder: "ELEVATOR" },
+  lockoutAction: { label: "Lockout or shutoff action", placeholder: "LOCK ME OUT" },
+  issueDescription: { label: "Issue description (building-wide)", placeholder: "broken elevator" },
+};
+
 const formatDate = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
 const getCurrentTime = (date: Date) =>
@@ -60,6 +104,7 @@ const NoticeBuilder = () => {
       time: getCurrentTime(today),
     };
   });
+  const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
   const [impactCount, setImpactCount] = useState(3);
   const [copyLabel, setCopyLabel] = useState("Copy text");
@@ -76,6 +121,22 @@ const NoticeBuilder = () => {
     };
 
   const selectedIssue = issueOptions.find((option) => option.id === formState.issue);
+  const issueFields = issueFieldMap[formState.issue] || [];
+  const stageLabel = stages[formState.stage as Stage] || stages.A;
+
+  useEffect(() => {
+    if (!formState.autoDates) {
+      return;
+    }
+    const today = new Date();
+    const formatted = formatDate(today);
+    setFormState((prev) => ({
+      ...prev,
+      today: prev.today || formatted,
+      startDate: prev.startDate || formatted,
+      time: prev.time || getCurrentTime(today),
+    }));
+  }, [formState.autoDates]);
 
   const noticeText = useMemo(() => {
     if (!selectedIssue) {
@@ -149,6 +210,30 @@ const NoticeBuilder = () => {
     setTimeout(() => setCopyLabel("Copy text"), 1500);
   };
 
+  const handleReset = () => {
+    const today = new Date();
+    const formatted = formatDate(today);
+    setFormState({
+      ...initialState,
+      today: formatted,
+      startDate: formatted,
+      time: getCurrentTime(today),
+    });
+    setCurrentStep(1);
+    setPlainMeaningVisible(false);
+    setCopyLabel("Copy text");
+  };
+
+  const summaryItems = [
+    { label: "Building", value: formState.building || "Select a building" },
+    { label: "Issue", value: selectedIssue?.label || "Select an issue" },
+    { label: "Stage", value: stageLabel },
+    { label: "Language", value: formState.language.toUpperCase() },
+    { label: "Start date", value: formState.startDate || "Add a start date" },
+    { label: "Today", value: formState.today || "Add today's date" },
+    { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
+  ];
+
   return (
     <div className="page">
       <header className="hero">
@@ -183,264 +268,273 @@ const NoticeBuilder = () => {
       </header>
 
       <main className="layout">
-        <section className="panel">
-          <h2>Start your notice</h2>
-          <form className="form-grid">
-            <label>
-              Building
-              <select
-                value={formState.building}
-                onChange={updateField("building")}
-                required
-                className="select"
-              >
-                <option value="">Select building</option>
-                <option>2353 W Wabansia</option>
-                <option>2400 W Wabansia</option>
-                <option>812 W Adams St</option>
-                <option>159 W North Ave</option>
-              </select>
-            </label>
-
-            <label>
-              Unit (optional)
-              <Input className="input" value={formState.unit} onChange={updateField("unit")} placeholder="my unit" />
-            </label>
-
-            <label>
-              Issue type
-              <select
-                value={formState.issue}
-                onChange={updateField("issue")}
-                required
-                className="select"
-              >
-                <option value="">Select issue</option>
-                {issueOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              Notice stage
-              <select
-                value={formState.stage}
-                onChange={updateField("stage")}
-                required
-                className="select"
-              >
-                <option value="A">A. Initial notice</option>
-                <option value="B">B. Follow-up</option>
-                <option value="C">C. Final notice</option>
-              </select>
-            </label>
-
-            <label>
-              Language
-              <select
-                value={formState.language}
-                onChange={updateField("language")}
-                required
-                className="select"
-              >
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="hi">हिंदी</option>
-                <option value="pl">Polski</option>
-              </select>
-            </label>
-
-            <div className="checkbox-row">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={formState.simpleEnglish}
-                  onChange={updateField("simpleEnglish")}
-                />
-                Very simple English
-              </label>
-              <label className="checkbox-label">
-                <input type="checkbox" checked={formState.autoDates} onChange={updateField("autoDates")} />
-                Include dates automatically
-              </label>
+        <div className="flow">
+          <section className="panel">
+            <div className="step-header">
+              <h2>Build your notice</h2>
+              <p className="helper">Follow the steps so nothing important is missed.</p>
             </div>
-
-            <label>
-              Start date
-              <Input
-                className="input"
-                type="date"
-                value={formState.startDate}
-                onChange={updateField("startDate")}
-              />
-            </label>
-
-            <label>
-              Date of first message (for follow-ups)
-              <Input
-                className="input"
-                type="date"
-                value={formState.firstMessageDate}
-                onChange={updateField("firstMessageDate")}
-              />
-            </label>
-
-            <div className="inline-fields">
-              <label>
-                Today
-                <Input
-                  className="input"
-                  type="date"
-                  value={formState.today}
-                  onChange={updateField("today")}
-                />
-              </label>
-              <label>
-                Time
-                <Input
-                  className="input"
-                  type="time"
-                  value={formState.time}
-                  onChange={updateField("time")}
-                />
-              </label>
-              <label>
-                Temp (°F)
-                <Input
-                  className="input"
-                  type="number"
-                  value={formState.temp}
-                  onChange={updateField("temp")}
-                  placeholder="68"
-                />
-              </label>
+            <div className="step-nav">
+              {steps.map((step) => (
+                <button
+                  key={step.id}
+                  type="button"
+                  className={`step-button ${currentStep === step.id ? "active" : ""}`}
+                  onClick={() => setCurrentStep(step.id)}
+                >
+                  <span className="step-title">{step.title}</span>
+                  <span className="step-label">{step.label}</span>
+                </button>
+              ))}
             </div>
+            <p className="helper">{steps[currentStep - 1].description}</p>
 
-            <label>
-              Event date (entry/lockout)
-              <Input
-                className="input"
-                type="date"
-                value={formState.eventDate}
-                onChange={updateField("eventDate")}
-              />
-            </label>
+            <form className="form-grid">
+              {currentStep === 1 && (
+                <>
+                  <label>
+                    Building
+                    <select
+                      value={formState.building}
+                      onChange={updateField("building")}
+                      required
+                      className="select"
+                    >
+                      <option value="">Select building</option>
+                      <option>2353 W Wabansia</option>
+                      <option>2400 W Wabansia</option>
+                      <option>812 W Adams St</option>
+                      <option>159 W North Ave</option>
+                    </select>
+                  </label>
 
-            <label>
-              Event date(s) (multiple entries)
-              <Input
-                className="input"
-                value={formState.eventDates}
-                onChange={updateField("eventDates")}
-                placeholder="[DATES]"
-              />
-            </label>
+                  <label>
+                    Unit (optional)
+                    <Input className="input" value={formState.unit} onChange={updateField("unit")} placeholder="my unit" />
+                  </label>
 
-            <label>
-              Event date/time (utilities)
-              <Input
-                className="input"
-                value={formState.eventDateTime}
-                onChange={updateField("eventDateTime")}
-                placeholder="[DATE/TIME]"
-              />
-            </label>
+                  <label>
+                    Issue type
+                    <select
+                      value={formState.issue}
+                      onChange={updateField("issue")}
+                      required
+                      className="select"
+                    >
+                      <option value="">Select issue</option>
+                      {issueOptions.map((option) => (
+                        <option key={option.id} value={option.id}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
 
-            <label>
-              Move-out date (deposit)
-              <Input
-                className="input"
-                type="date"
-                value={formState.moveOutDate}
-                onChange={updateField("moveOutDate")}
-              />
-            </label>
+                  <label>
+                    Notice stage
+                    <select
+                      value={formState.stage}
+                      onChange={updateField("stage")}
+                      required
+                      className="select"
+                    >
+                      <option value="A">A. {stages.A}</option>
+                      <option value="B">B. {stages.B}</option>
+                      <option value="C">C. {stages.C}</option>
+                    </select>
+                  </label>
+                </>
+              )}
 
-            <label>
-              Pest type (roaches/rats/bedbugs)
-              <Input
-                className="input"
-                value={formState.pestType}
-                onChange={updateField("pestType")}
-                placeholder="ROACHES"
-              />
-            </label>
+              {currentStep === 2 && (
+                <>
+                  {issueFields.length === 0 && (
+                    <p className="helper">Select an issue to reveal the specific details to include.</p>
+                  )}
+                  {issueFields.map((fieldKey) => {
+                    const field = fieldDefinitions[fieldKey];
+                    if (!field) {
+                      return null;
+                    }
+                    return (
+                      <label key={fieldKey}>
+                        {field.label}
+                        <Input
+                          className="input"
+                          type={field.type || "text"}
+                          value={String(formState[fieldKey as keyof FormState] ?? "")}
+                          onChange={updateField(fieldKey as keyof FormState)}
+                          placeholder={field.placeholder}
+                        />
+                      </label>
+                    );
+                  })}
+                </>
+              )}
 
-            <label>
-              Common area item
-              <Input
-                className="input"
-                value={formState.commonArea}
-                onChange={updateField("commonArea")}
-                placeholder="ELEVATOR"
-              />
-            </label>
+              {currentStep === 3 && (
+                <>
+                  <label>
+                    Language
+                    <select
+                      value={formState.language}
+                      onChange={updateField("language")}
+                      required
+                      className="select"
+                    >
+                      <option value="en">English</option>
+                      <option value="es">Español</option>
+                      <option value="hi">हिंदी</option>
+                      <option value="pl">Polski</option>
+                    </select>
+                  </label>
 
-            <label>
-              Lockout or shutoff action
-              <Input
-                className="input"
-                value={formState.lockoutAction}
-                onChange={updateField("lockoutAction")}
-                placeholder="LOCK ME OUT"
-              />
-            </label>
+                  <div className="checkbox-row">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={formState.simpleEnglish}
+                        onChange={updateField("simpleEnglish")}
+                      />
+                      Very simple English
+                    </label>
+                    <label className="checkbox-label">
+                      <input type="checkbox" checked={formState.autoDates} onChange={updateField("autoDates")} />
+                      Include dates automatically
+                    </label>
+                  </div>
 
-            <label>
-              Location (for leak entries)
-              <Input
-                className="input"
-                value={formState.location}
-                onChange={updateField("location")}
-                placeholder="kitchen ceiling"
-              />
-            </label>
+                  <label>
+                    Start date
+                    <Input
+                      className="input"
+                      type="date"
+                      value={formState.startDate}
+                      onChange={updateField("startDate")}
+                    />
+                  </label>
 
-            <label>
-              Issue description (for building-wide message)
-              <Input
-                className="input"
-                value={formState.issueDescription}
-                onChange={updateField("issueDescription")}
-                placeholder="broken elevator"
-              />
-            </label>
+                  {(formState.stage === "B" || formState.stage === "C") && (
+                    <label>
+                      Date of first message (for follow-ups)
+                      <Input
+                        className="input"
+                        type="date"
+                        value={formState.firstMessageDate}
+                        onChange={updateField("firstMessageDate")}
+                      />
+                    </label>
+                  )}
 
-            <label>
-              Optional attachment label
-              <Input
-                className="input"
-                value={formState.attachment}
-                onChange={updateField("attachment")}
-                placeholder="photo/video"
-              />
-            </label>
+                  <label>
+                    Today
+                    <Input
+                      className="input"
+                      type="date"
+                      value={formState.today}
+                      onChange={updateField("today")}
+                      disabled={formState.autoDates}
+                    />
+                  </label>
 
-            <label>
-              Your name
-              <Input
-                className="input"
-                value={formState.yourName}
-                onChange={updateField("yourName")}
-                placeholder="[YOUR NAME]"
-              />
-            </label>
+                  <label>
+                    Your name
+                    <Input
+                      className="input"
+                      value={formState.yourName}
+                      onChange={updateField("yourName")}
+                      placeholder="[YOUR NAME]"
+                    />
+                  </label>
+                </>
+              )}
 
-            <p className="helper">
-              You do not need to explain how you feel. Dates and repetition work better than emotion.
-            </p>
-          </form>
-        </section>
+              {currentStep === 4 && (
+                <>
+                  <p className="helper">
+                    Review the preview, copy the text, and keep a copy for your records. Dates and repetition are the
+                    strongest evidence.
+                  </p>
+                  <div className="review-actions">
+                    <Button className="button" type="button" onClick={handleCopy}>
+                      {copyLabel}
+                    </Button>
+                    <Button className="button button-secondary" type="button" onClick={handleReset}>
+                      Reset form
+                    </Button>
+                  </div>
+                </>
+              )}
+            </form>
 
-        <section className="panel panel-highlight">
+            <div className="step-controls">
+              <Button
+                className="button button-secondary"
+                type="button"
+                onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+                disabled={currentStep === 1}
+              >
+                Back
+              </Button>
+              <Button
+                className="button"
+                type="button"
+                onClick={() => setCurrentStep((prev) => Math.min(steps.length, prev + 1))}
+                disabled={currentStep === steps.length}
+              >
+                Next
+              </Button>
+            </div>
+          </section>
+
+          <section className="panel">
+            <h2>What usually happens next</h2>
+            <p className="helper">This shows the normal next step based on how long the issue has been open.</p>
+            <ul className="next-steps">
+              {nextSteps.map((step) => (
+                <li key={step.label} className={step.unlocked ? "" : "locked"}>
+                  {step.unlocked
+                    ? step.label
+                    : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
+                </li>
+              ))}
+            </ul>
+
+            <h3>Community impact</h3>
+            <div className="impact">
+              <div>
+                <span>{impactCount}</span> residents reported this issue.
+              </div>
+              <Button
+                className="button button-secondary"
+                type="button"
+                onClick={() => setImpactCount((count) => count + 1)}
+              >
+                Me too
+              </Button>
+            </div>
+          </section>
+        </div>
+
+        <aside className="panel panel-highlight preview-panel">
           <div className="output-header">
             <h2>Generated notice</h2>
-            <Button className="button" type="button" onClick={handleCopy}>
-              {copyLabel}
-            </Button>
+            <div className="output-actions">
+              <Button className="button" type="button" onClick={handleCopy}>
+                {copyLabel}
+              </Button>
+              <Button className="button button-secondary" type="button" onClick={handleReset}>
+                Reset
+              </Button>
+            </div>
+          </div>
+          <div className="summary-grid">
+            {summaryItems.map((item) => (
+              <div key={item.label} className="summary-card">
+                <p className="summary-label">{item.label}</p>
+                <p className="summary-value">{item.value}</p>
+              </div>
+            ))}
           </div>
           <p className="helper">Preview the message before you send it.</p>
           <pre className="output">{noticeText}</pre>
@@ -460,35 +554,7 @@ const NoticeBuilder = () => {
               </ul>
             )}
           </div>
-        </section>
-
-        <section className="panel">
-          <h2>What usually happens next</h2>
-          <p className="helper">This shows the normal next step based on how long the issue has been open.</p>
-          <ul className="next-steps">
-            {nextSteps.map((step) => (
-              <li key={step.label} className={step.unlocked ? "" : "locked"}>
-                {step.unlocked
-                  ? step.label
-                  : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
-              </li>
-            ))}
-          </ul>
-
-          <h3>Community impact</h3>
-          <div className="impact">
-            <div>
-              <span>{impactCount}</span> residents reported this issue.
-            </div>
-            <Button
-              className="button button-secondary"
-              type="button"
-              onClick={() => setImpactCount((count) => count + 1)}
-            >
-              Me too
-            </Button>
-          </div>
-        </section>
+        </aside>
       </main>
 
       <footer className="site-footer">
