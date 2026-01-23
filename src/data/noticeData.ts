@@ -226,6 +226,18 @@ export const issueOptions = [
   },
 ];
 
+export const issueFieldMap = {
+  heat: ["temp", "time"],
+  leak: ["location"],
+  pests: ["pestType"],
+  entry: ["eventDate", "eventDates"],
+  common: ["commonArea"],
+  "no-timeline": [],
+  deposit: ["moveOutDate"],
+  lockout: ["lockoutAction", "eventDate", "eventDateTime"],
+  building: ["issueDescription"],
+};
+
 export const stages = {
   A: "Initial notice",
   B: "Follow-up",

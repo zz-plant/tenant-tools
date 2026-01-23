@@ -99,8 +99,21 @@ body {
 
 .layout {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
   gap: 24px;
+  align-items: start;
+}
+
+.flow {
+  display: grid;
+  gap: 24px;
+}
+
+.preview-panel {
+  position: sticky;
+  top: 24px;
+  max-height: calc(100vh - 48px);
+  overflow: auto;
 }
 
 .panel {
@@ -121,6 +134,46 @@ body {
 .form-grid {
   display: grid;
   gap: 16px;
+}
+
+.step-header {
+  display: grid;
+  gap: 6px;
+}
+
+.step-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.step-button {
+  border-radius: 14px;
+  border: 1px solid #d7dbe9;
+  background: #f9faff;
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+}
+
+.step-button.active {
+  border-color: #4f67ff;
+  background: #eef0ff;
+  box-shadow: inset 0 0 0 1px rgba(79, 103, 255, 0.2);
+}
+
+.step-title {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.65rem;
+  color: #5f6b87;
+}
+
+.step-label {
+  font-weight: 600;
+  color: #1c2436;
 }
 
 label {
@@ -171,11 +224,55 @@ label {
   margin: 0;
 }
 
+.review-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.step-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .output-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.output-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.summary-card {
+  background: #f2f4ff;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.summary-label {
+  margin: 0 0 6px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #5a647a;
+}
+
+.summary-value {
+  margin: 0;
+  font-weight: 600;
+  color: #1c2436;
 }
 
 .output {
@@ -238,6 +335,13 @@ label {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
 .button:hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(79, 103, 255, 0.3);
@@ -260,6 +364,15 @@ label {
 
   .hero {
     padding: 24px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-panel {
+    position: static;
+    max-height: none;
   }
 
   .output-header {
