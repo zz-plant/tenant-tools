@@ -184,19 +184,72 @@ label {
 }
 
 .input,
-.select {
+.select-trigger {
   border-radius: 12px;
   border: 1px solid #d8dde8;
   padding: 10px 12px;
   font-size: 0.95rem;
   font-family: inherit;
   background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
 }
 
 .input:focus,
-.select:focus {
+.select-trigger:focus-visible {
   outline: 2px solid rgba(70, 90, 255, 0.35);
   border-color: #4f67ff;
+}
+
+.select-icon {
+  color: #5f6b87;
+  font-size: 0.9rem;
+}
+
+.select-positioner {
+  z-index: 20;
+}
+
+.select-popup {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #dfe4f2;
+  box-shadow: 0 18px 40px rgba(15, 25, 45, 0.16);
+  padding: 6px;
+}
+
+.select-list {
+  display: grid;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.select-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.select-item[data-highlighted] {
+  background: #eef1ff;
+}
+
+.select-item[data-selected] {
+  background: #e3e8ff;
+  font-weight: 600;
+}
+
+.select-item-indicator {
+  color: #4f67ff;
+  font-size: 0.9rem;
 }
 
 .checkbox-row {
@@ -210,6 +263,57 @@ label {
   align-items: center;
   gap: 8px;
   font-weight: 500;
+}
+
+.checkbox-root {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid #cfd6ea;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-root[data-checked] {
+  background: #4f67ff;
+  border-color: #4f67ff;
+}
+
+.checkbox-indicator {
+  color: #ffffff;
+  font-size: 0.8rem;
+}
+
+.switch-root {
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: #e1e6f5;
+  border: 1px solid #cfd6ea;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.switch-root[data-checked] {
+  background: #4f67ff;
+  border-color: #4f67ff;
+}
+
+.switch-thumb {
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  transform: translateX(0);
+}
+
+.switch-root[data-checked] .switch-thumb {
+  transform: translateX(18px);
 }
 
 .inline-fields {
@@ -392,6 +496,54 @@ label {
   background: #f8f9fe;
   padding: 12px 16px;
   border-radius: 16px;
+}
+
+.impact-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.impact-slider {
+  display: grid;
+  gap: 6px;
+  min-width: 140px;
+}
+
+.slider-control {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: #dfe5f4;
+}
+
+.slider-track {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #dfe5f4;
+  overflow: hidden;
+}
+
+.slider-indicator {
+  height: 100%;
+  background: linear-gradient(90deg, #4f67ff, #7b8cff);
+}
+
+.slider-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #4f67ff;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.slider-value {
+  font-size: 0.85rem;
+  color: #4f67ff;
+  font-weight: 600;
 }
 
 .button {
