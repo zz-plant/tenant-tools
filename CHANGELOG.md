@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7
+- Changed: Export audience presets now use Base UI radio selection for consistent focus and selection styling.
+- Changed: Same-issue dismissal action now uses the Base UI button for consistent focus treatment.
+
 ## 1.0.6
 - Changed: Moved unit and name fields behind a personal-copy toggle with a not-saved warning.
 
