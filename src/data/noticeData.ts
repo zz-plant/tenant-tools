@@ -1,4 +1,4 @@
-const issueOptions = [
+export const issueOptions = [
   {
     id: "heat",
     label: "🔥 Heat not working / not warm enough",
@@ -226,184 +226,14 @@ const issueOptions = [
   },
 ];
 
-const stages = {
+export const stages = {
   A: "Initial notice",
   B: "Follow-up",
   C: "Final notice",
 };
 
-const meaningMap = {
+export const meaningMap = {
   A: ["States the problem", "Creates a clear written record", "Asks for a repair date"],
   B: ["Repeats the request", "Shows the issue is ongoing", "Asks for a specific date"],
   C: ["Sets urgency", "States the timeline", "Signals a next step if unresolved"],
 };
-
-const form = document.getElementById("notice-form");
-const issueSelect = document.getElementById("issue");
-const stageSelect = document.getElementById("stage");
-const languageSelect = document.getElementById("language");
-const simpleEnglishToggle = document.getElementById("simple-english");
-const autoDatesToggle = document.getElementById("auto-dates");
-const output = document.getElementById("notice-output");
-const nextSteps = document.getElementById("next-steps");
-const meaningBody = document.getElementById("meaning-body");
-const toggleMeaning = document.getElementById("toggle-meaning");
-const copyButton = document.getElementById("copy-button");
-const impactCount = document.getElementById("impact-count");
-const meTooButton = document.getElementById("me-too");
-
-const todayField = document.getElementById("today");
-const startDateField = document.getElementById("start-date");
-const timeField = document.getElementById("time");
-
-issueOptions.forEach((issue) => {
-  const option = document.createElement("option");
-  option.value = issue.id;
-  option.textContent = issue.label;
-  issueSelect.appendChild(option);
-});
-
-const setDefaultDates = () => {
-  const today = new Date();
-  const formatted = today.toISOString().slice(0, 10);
-  if (!todayField.value) {
-    todayField.value = formatted;
-  }
-  if (!startDateField.value) {
-    startDateField.value = formatted;
-  }
-  if (!timeField.value) {
-    timeField.value = `${today.getHours().toString().padStart(2, "0")}:${today
-      .getMinutes()
-      .toString()
-      .padStart(2, "0")}`;
-  }
-};
-
-const getValue = (id, fallback) => {
-  const value = document.getElementById(id).value.trim();
-  return value || fallback;
-};
-
-const fillTemplate = (template, values) => {
-  let text = template;
-  Object.entries(values).forEach(([key, value]) => {
-    text = text.replaceAll(`[${key}]`, value);
-  });
-  return text;
-};
-
-const getNoticeText = () => {
-  const issueId = issueSelect.value;
-  const stage = stageSelect.value;
-  const language = languageSelect.value;
-  const issue = issueOptions.find((option) => option.id === issueId);
-  if (!issue) {
-    return "";
-  }
-
-  if (simpleEnglishToggle.checked) {
-    return issue.simple.en;
-  }
-
-  const templates = issue.notices[stage] || issue.notices.A;
-  return templates[language] || templates.en;
-};
-
-const updateMeaning = () => {
-  const stage = stageSelect.value;
-  const items = meaningMap[stage] || meaningMap.A;
-  meaningBody.innerHTML = `<ul>${items.map((item) => `<li>${item}</li>`).join("")}</ul>`;
-};
-
-const updateNextSteps = () => {
-  const startDate = startDateField.value ? new Date(startDateField.value) : null;
-  const today = todayField.value ? new Date(todayField.value) : new Date();
-  const daysOpen = startDate ? Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) : 0;
-
-  const steps = [
-    { key: "A", label: "Send an initial notice" },
-    { key: "B", label: "Repeat with today's date after a few days" },
-    { key: "C", label: "Final notice if still unresolved" },
-  ];
-
-  nextSteps.innerHTML = "";
-  steps.forEach((step, index) => {
-    const li = document.createElement("li");
-    const unlocked = daysOpen >= index * 3;
-    li.className = unlocked ? "" : "locked";
-    li.textContent = unlocked ? step.label : `${step.label} (unlock in ${(index * 3) - daysOpen} days)`;
-    nextSteps.appendChild(li);
-  });
-};
-
-const updateNotice = () => {
-  const values = {
-    ADDRESS: getValue("building", "[ADDRESS]"),
-    UNIT: getValue("unit", "[UNIT]"),
-    ISSUE: getValue("issue-description", "[ISSUE]"),
-    LOCATION: getValue("location", "[LOCATION]"),
-    "START DATE": getValue("start-date", "[START DATE]"),
-    TODAY: getValue("today", "[TODAY]"),
-    TIME: getValue("time", "[TIME]"),
-    TEMP: getValue("temp", "[TEMP]"),
-    "DATE OF FIRST MESSAGE": getValue("first-message-date", "[DATE OF FIRST MESSAGE]"),
-    "YOUR NAME": getValue("your-name", "[YOUR NAME]"),
-    "MOVE-OUT DATE": getValue("move-out-date", "[MOVE-OUT DATE]"),
-    DATE: getValue("event-date", "[DATE]"),
-    DATES: getValue("event-dates", "[DATES]"),
-    "DATE/TIME": getValue("event-date-time", "[DATE/TIME]"),
-    "PHOTO/VIDEO": getValue("attachment", "[PHOTO/VIDEO]"),
-    "ROACHES/RATS/BEDBUGS": getValue("pest-type", "[ROACHES/RATS/BEDBUGS]"),
-    "ELEVATOR / GARAGE DOOR / HALL LIGHTS / TRASH ROOM": getValue(
-      "common-area",
-      "[ELEVATOR / GARAGE DOOR / HALL LIGHTS / TRASH ROOM]"
-    ),
-    "LOCK ME OUT / SHUT OFF UTILITIES": getValue(
-      "lockout-action",
-      "[LOCK ME OUT / SHUT OFF UTILITIES]"
-    ),
-  };
-
-  let template = getNoticeText();
-
-  if (autoDatesToggle.checked) {
-    const today = todayField.value || new Date().toISOString().slice(0, 10);
-    const start = startDateField.value || today;
-    values["START DATE"] = start;
-    values.TODAY = today;
-  }
-
-  output.textContent = fillTemplate(template, values);
-  updateMeaning();
-  updateNextSteps();
-};
-
-const registerInputs = () => {
-  const inputs = form.querySelectorAll("input, select");
-  inputs.forEach((input) => input.addEventListener("input", updateNotice));
-  inputs.forEach((input) => input.addEventListener("change", updateNotice));
-};
-
-copyButton.addEventListener("click", () => {
-  navigator.clipboard.writeText(output.textContent);
-  copyButton.textContent = "Copied!";
-  setTimeout(() => {
-    copyButton.textContent = "Copy text";
-  }, 1500);
-});
-
-meTooButton.addEventListener("click", () => {
-  impactCount.textContent = String(Number(impactCount.textContent) + 1);
-});
-
-toggleMeaning.addEventListener("click", () => {
-  meaningBody.classList.toggle("hidden");
-  toggleMeaning.textContent = meaningBody.classList.contains("hidden")
-    ? "Show plain meaning"
-    : "Hide plain meaning";
-});
-
-setDefaultDates();
-registerInputs();
-updateNotice();
