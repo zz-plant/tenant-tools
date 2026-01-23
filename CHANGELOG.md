@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.3
+- Fixed: Prevent Cloudflare asset uploads from including server worker output.
+
 ## 1.0.2
 - Added: Save issue submissions to the shared ledger with permalinks.
 - Changed: Added ledger validation and privacy-safe summaries for saved submissions.
