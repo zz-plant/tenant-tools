@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@base-ui/react/button";
+import { Checkbox } from "@base-ui/react/checkbox";
 import { Input } from "@base-ui/react/input";
+import { Select } from "@base-ui/react/select";
+import { Slider } from "@base-ui/react/slider";
+import { Switch } from "@base-ui/react/switch";
 import { issueFieldMap, issueOptions, meaningMap, stages } from "../data/noticeData";
 
 const initialState = {
@@ -196,6 +200,24 @@ const NoticeBuilder = () => {
       setFormState((prev) => ({
         ...prev,
         [key]: isCheckbox ? event.currentTarget.checked : value,
+      }));
+    };
+
+  const updateSelect =
+    (key: keyof FormState) =>
+    (value: string | null) => {
+      setFormState((prev) => ({
+        ...prev,
+        [key]: value ?? "",
+      }));
+    };
+
+  const updateChecked =
+    (key: keyof FormState) =>
+    (checked: boolean) => {
+      setFormState((prev) => ({
+        ...prev,
+        [key]: checked,
       }));
     };
 
@@ -429,17 +451,32 @@ const NoticeBuilder = () => {
 
                   <label>
                     Building
-                    <select
-                      value={formState.building}
-                      onChange={updateField("building")}
+                    <Select.Root
+                      value={formState.building || null}
+                      onValueChange={updateSelect("building")}
                       required
-                      className="select"
                     >
-                      <option value="">Select building</option>
-                      {buildingOptions.map((building) => (
-                        <option key={building.id}>{building.id}</option>
-                      ))}
-                    </select>
+                      <Select.Trigger className="select-trigger" aria-label="Building">
+                        <Select.Value placeholder="Select building" />
+                        <Select.Icon className="select-icon">
+                          <span aria-hidden="true">▾</span>
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Positioner className="select-positioner">
+                          <Select.Popup className="select-popup">
+                            <Select.List className="select-list">
+                              {buildingOptions.map((building) => (
+                                <Select.Item key={building.id} value={building.id} className="select-item">
+                                  <Select.ItemText>{building.id}</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                              ))}
+                            </Select.List>
+                          </Select.Popup>
+                        </Select.Positioner>
+                      </Select.Portal>
+                    </Select.Root>
                   </label>
 
                   <label>
@@ -449,33 +486,60 @@ const NoticeBuilder = () => {
 
                   <label>
                     Issue type
-                    <select
-                      value={formState.issue}
-                      onChange={updateField("issue")}
-                      required
-                      className="select"
-                    >
-                      <option value="">Select issue</option>
-                      {issueOptions.map((option) => (
-                        <option key={option.id} value={option.id}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
+                    <Select.Root value={formState.issue || null} onValueChange={updateSelect("issue")} required>
+                      <Select.Trigger className="select-trigger" aria-label="Issue type">
+                        <Select.Value placeholder="Select issue" />
+                        <Select.Icon className="select-icon">
+                          <span aria-hidden="true">▾</span>
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Positioner className="select-positioner">
+                          <Select.Popup className="select-popup">
+                            <Select.List className="select-list">
+                              {issueOptions.map((option) => (
+                                <Select.Item key={option.id} value={option.id} className="select-item">
+                                  <Select.ItemText>{option.label}</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                              ))}
+                            </Select.List>
+                          </Select.Popup>
+                        </Select.Positioner>
+                      </Select.Portal>
+                    </Select.Root>
                   </label>
 
                   <label>
                     Notice stage
-                    <select
-                      value={formState.stage}
-                      onChange={updateField("stage")}
-                      required
-                      className="select"
-                    >
-                      <option value="A">A. {stages.A}</option>
-                      <option value="B">B. {stages.B}</option>
-                      <option value="C">C. {stages.C}</option>
-                    </select>
+                    <Select.Root value={formState.stage} onValueChange={updateSelect("stage")} required>
+                      <Select.Trigger className="select-trigger" aria-label="Notice stage">
+                        <Select.Value placeholder="Select stage" />
+                        <Select.Icon className="select-icon">
+                          <span aria-hidden="true">▾</span>
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Positioner className="select-positioner">
+                          <Select.Popup className="select-popup">
+                            <Select.List className="select-list">
+                              <Select.Item value="A" className="select-item">
+                                <Select.ItemText>A. {stages.A}</Select.ItemText>
+                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                              </Select.Item>
+                              <Select.Item value="B" className="select-item">
+                                <Select.ItemText>B. {stages.B}</Select.ItemText>
+                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                              </Select.Item>
+                              <Select.Item value="C" className="select-item">
+                                <Select.ItemText>C. {stages.C}</Select.ItemText>
+                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                              </Select.Item>
+                            </Select.List>
+                          </Select.Popup>
+                        </Select.Positioner>
+                      </Select.Portal>
+                    </Select.Root>
                   </label>
                 </>
               )}
@@ -510,30 +574,59 @@ const NoticeBuilder = () => {
                 <>
                   <label>
                     Language
-                    <select
-                      value={formState.language}
-                      onChange={updateField("language")}
-                      required
-                      className="select"
-                    >
-                      <option value="en">English</option>
-                      <option value="es">Español</option>
-                      <option value="hi">हिंदी</option>
-                      <option value="pl">Polski</option>
-                    </select>
+                    <Select.Root value={formState.language} onValueChange={updateSelect("language")} required>
+                      <Select.Trigger className="select-trigger" aria-label="Language">
+                        <Select.Value placeholder="Select language" />
+                        <Select.Icon className="select-icon">
+                          <span aria-hidden="true">▾</span>
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Positioner className="select-positioner">
+                          <Select.Popup className="select-popup">
+                            <Select.List className="select-list">
+                              <Select.Item value="en" className="select-item">
+                                <Select.ItemText>English</Select.ItemText>
+                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                              </Select.Item>
+                              <Select.Item value="es" className="select-item">
+                                <Select.ItemText>Español</Select.ItemText>
+                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                              </Select.Item>
+                              <Select.Item value="hi" className="select-item">
+                                <Select.ItemText>हिंदी</Select.ItemText>
+                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                              </Select.Item>
+                              <Select.Item value="pl" className="select-item">
+                                <Select.ItemText>Polski</Select.ItemText>
+                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                              </Select.Item>
+                            </Select.List>
+                          </Select.Popup>
+                        </Select.Positioner>
+                      </Select.Portal>
+                    </Select.Root>
                   </label>
 
                   <div className="checkbox-row">
                     <label className="checkbox-label">
-                      <input
-                        type="checkbox"
+                      <Checkbox.Root
                         checked={formState.simpleEnglish}
-                        onChange={updateField("simpleEnglish")}
-                      />
+                        onCheckedChange={updateChecked("simpleEnglish")}
+                        className="checkbox-root"
+                      >
+                        <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                      </Checkbox.Root>
                       Very simple English
                     </label>
                     <label className="checkbox-label">
-                      <input type="checkbox" checked={formState.autoDates} onChange={updateField("autoDates")} />
+                      <Switch.Root
+                        checked={formState.autoDates}
+                        onCheckedChange={updateChecked("autoDates")}
+                        className="switch-root"
+                      >
+                        <Switch.Thumb className="switch-thumb" />
+                      </Switch.Root>
                       Include dates automatically
                     </label>
                   </div>
@@ -660,13 +753,31 @@ const NoticeBuilder = () => {
               <div>
                 <span>{impactCount}</span> residents reported this issue.
               </div>
-              <Button
-                className="button button-secondary"
-                type="button"
-                onClick={() => setImpactCount((count) => count + 1)}
-              >
-                Me too
-              </Button>
+              <div className="impact-actions">
+                <Slider.Root
+                  className="impact-slider"
+                  min={1}
+                  max={12}
+                  step={1}
+                  value={impactCount}
+                  onValueChange={(value) => setImpactCount(value as number)}
+                >
+                  <Slider.Control className="slider-control">
+                    <Slider.Track className="slider-track">
+                      <Slider.Indicator className="slider-indicator" />
+                    </Slider.Track>
+                    <Slider.Thumb className="slider-thumb" />
+                  </Slider.Control>
+                  <Slider.Value className="slider-value" />
+                </Slider.Root>
+                <Button
+                  className="button button-secondary"
+                  type="button"
+                  onClick={() => setImpactCount((count) => Math.min(12, count + 1))}
+                >
+                  Me too
+                </Button>
+              </div>
             </div>
           </section>
         </div>
