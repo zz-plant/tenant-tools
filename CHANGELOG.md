@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.5
+- Changed: Building gallery cards now use radio selection for better keyboard access.
+
 ## 1.0.4
 - Added: Same-issue prompt that suggests existing ledger entries and lets residents add a report.
 - Added: Read-only issue timeline and 311 helper guidance card in the notice builder.
