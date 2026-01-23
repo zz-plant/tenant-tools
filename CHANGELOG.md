@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.9
+- Security: Require an access key before rendering saved submission details.
+
 ## 1.0.8
 - Added: Shared helper for free-text length limits in intake validation.
 - Added: Privacy reminder near the notice preview.

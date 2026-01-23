@@ -149,6 +149,15 @@ If you want to enable shared storage, create two KV namespaces and bind them in 
 
 Do not store personal names or unit numbers in KV. Keep only structured issue data.
 
+## Access key (required for submissions)
+
+Set an environment variable named `BUILDING_ACCESS_KEY` to protect resident submissions.
+The submissions page only renders data when the request includes a matching key.
+
+Send the key as either:
+- a query parameter: `?access_key=YOUR_KEY`
+- a request header: `x-building-access-key: YOUR_KEY`
+
 ---
 
 ## Vision
