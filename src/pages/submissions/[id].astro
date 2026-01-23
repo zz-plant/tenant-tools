@@ -2,10 +2,16 @@
 import "../../styles/global.css";
 import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
 import { portfolioOptions } from "../../data/portfolioOptions";
+import { enforceAccessKey } from "../../lib/accessKey";
 
 export const prerender = false;
 
 const { id } = Astro.params;
+const accessGate = enforceAccessKey(Astro.request, Astro.locals.runtime?.env);
+if (!accessGate.ok) {
+  return accessGate.response;
+}
+
 const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
 const submission = id && kv ? await kv.get(`submission:${id}`, { type: "json" }) : null;
 
