@@ -139,13 +139,13 @@ Features that increase risk for vulnerable users will be rejected.
 
 ## Cloudflare KV setup (optional)
 
-Shared ledger sync is planned, but not enabled yet. If you want to prepare a KV namespace now, you can.
+If you want to enable shared storage, create two KV namespaces and bind them in Cloudflare:
 
-1. Create a KV namespace in the Cloudflare dashboard.
-2. Open your project settings and choose **Bindings**.
-3. Add a KV namespace binding.
-4. Use a short variable name like `LEDGER_KV`.
-5. Select your KV namespace and save.
+1. Create a KV namespace in the Cloudflare dashboard for submissions.
+2. Create a second KV namespace for waitlist requests.
+3. Open your project settings and choose **Bindings**.
+4. Add KV namespace bindings for `SUBMISSIONS_KV` and `WAITLIST_KV`.
+5. Select each KV namespace and save.
 
 Do not store personal names or unit numbers in KV. Keep only structured issue data.
 

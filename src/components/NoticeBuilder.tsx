@@ -7,6 +7,7 @@ import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { Select } from "@base-ui/react/select";
 import { Slider } from "@base-ui/react/slider";
 import { Switch } from "@base-ui/react/switch";
+import * as Tabs from "@base-ui/react/tabs";
 import {
   fieldDefinitions,
   issue311Guidance,
@@ -16,6 +17,8 @@ import {
   stages,
   zoneOptions,
 } from "../data/noticeData";
+import { portfolioOptions } from "../data/portfolioOptions";
+import WaitlistPanel from "./WaitlistPanel";
 
 const initialState = {
   building: "",
@@ -24,6 +27,7 @@ const initialState = {
   issue: "",
   stage: "A",
   language: "en",
+  portfolio: "continuum",
   simpleEnglish: false,
   autoDates: true,
   startDate: "",
@@ -290,6 +294,7 @@ const NoticeBuilder = () => {
   const selectedZone = zoneOptions.find((option) => option.id === formState.zone);
   const selectedAudience =
     exportAudienceOptions.find((option) => option.id === exportAudience) || exportAudienceOptions[0];
+  const selectedPortfolio = portfolioOptions.find((option) => option.id === formState.portfolio);
 
   const buildNoticeText = (state: FormState) => {
     if (!selectedIssue) {
@@ -416,6 +421,7 @@ const NoticeBuilder = () => {
 
   const exportSummary = useMemo(() => {
     const building = formState.building || "[ADDRESS]";
+    const portfolioLabel = selectedPortfolio?.label || "Not listed";
     const issueLabel = selectedIssue?.label || "[ISSUE TYPE]";
     const zoneLabel = selectedZone?.label || "Not listed";
     const issueDetails = issueFields
@@ -480,6 +486,7 @@ const NoticeBuilder = () => {
       config.heading,
       "",
       `Building: ${building}`,
+      `Portfolio: ${portfolioLabel}`,
       `Issue: ${issueLabel}`,
       `Zone: ${zoneLabel}`,
       config.includeStage ? `Stage: ${stageLabel}` : null,
@@ -508,6 +515,7 @@ const NoticeBuilder = () => {
     formState.attachment,
     formState.building,
     formState.language,
+    formState.portfolio,
     formState.startDate,
     formState.today,
     formState.unit,
@@ -520,6 +528,7 @@ const NoticeBuilder = () => {
     formState.ticketDate,
     formState.ticketNumber,
     selectedZone?.label,
+    selectedPortfolio?.label,
   ]);
 
   const handleCopy = async () => {
@@ -578,6 +587,7 @@ const NoticeBuilder = () => {
           issue: formState.issue,
           stage: formState.stage,
           language: formState.language,
+          portfolio: formState.portfolio,
           startDate: formState.startDate,
           reportDate: formState.today,
           reportCount: impactCount,
@@ -686,6 +696,7 @@ const NoticeBuilder = () => {
 
   const summaryItems = [
     { label: "Building", value: formState.building || "Select a building" },
+    { label: "Portfolio", value: selectedPortfolio?.label || "Not listed" },
     { label: "Issue", value: selectedIssue?.label || "Select an issue" },
     { label: "Zone", value: selectedZone?.label || "Not listed" },
     { label: "Stage", value: stageLabel },
@@ -710,6 +721,7 @@ const NoticeBuilder = () => {
   );
 
   const savedMetaItems = [
+    selectedPortfolio?.label ? { label: "Portfolio", value: selectedPortfolio.label } : null,
     selectedZone?.label ? { label: "Zone", value: selectedZone.label } : null,
     formState.ticketDate ? { label: "311 ticket date", value: formState.ticketDate } : null,
     formState.ticketNumber ? { label: "311 ticket number", value: formState.ticketNumber } : null,
@@ -814,6 +826,7 @@ const NoticeBuilder = () => {
           <p><strong>Landlord:</strong> Yelena Bernshtam +1 (773) 678-7636</p>
           <p><strong>Rent issues:</strong> continuumbrokers@yahoo.com</p>
           <p className="contact-note">Use text for urgent safety issues. Email for rent receipts.</p>
+          <p className="contact-note">If your building has different contacts, use the waitlist below.</p>
         </div>
       </header>
 
@@ -824,24 +837,30 @@ const NoticeBuilder = () => {
               <h2>Build your notice</h2>
               <p className="helper">Follow the steps so nothing important is missed.</p>
             </div>
-            <div className="step-nav">
-              {steps.map((step) => (
-                <button
-                  key={step.id}
-                  type="button"
-                  className={`step-button ${currentStep === step.id ? "active" : ""}`}
-                  onClick={() => setCurrentStep(step.id)}
-                >
-                  <span className="step-title">{step.title}</span>
-                  <span className="step-label">{step.label}</span>
-                </button>
-              ))}
-            </div>
-            <p className="helper">{steps[currentStep - 1].description}</p>
+            <Tabs.Root
+              value={String(currentStep)}
+              onValueChange={(value) => {
+                if (value) {
+                  setCurrentStep(Number(value));
+                }
+              }}
+            >
+              <Tabs.List className="step-nav">
+                {steps.map((step) => (
+                  <Tabs.Trigger
+                    key={step.id}
+                    value={String(step.id)}
+                    className={`step-button ${currentStep === step.id ? "active" : ""}`}
+                  >
+                    <span className="step-title">{step.title}</span>
+                    <span className="step-label">{step.label}</span>
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+              <p className="helper">{steps[currentStep - 1].description}</p>
 
-            <form className="form-grid">
-              {currentStep === 1 && (
-                <>
+              <form className="form-grid">
+                <Tabs.Panel value="1">
                   <div className="building-gallery">
                     <div>
                       <h3 id="building-gallery-title">Building gallery</h3>
@@ -889,7 +908,13 @@ const NoticeBuilder = () => {
                     Building
                     <Select.Root
                       value={formState.building || null}
-                      onValueChange={updateSelect("building")}
+                      onValueChange={(value) =>
+                        setFormState((prev) => ({
+                          ...prev,
+                          building: value ?? "",
+                          portfolio: value ? "continuum" : prev.portfolio,
+                        }))
+                      }
                       required
                     >
                       <Select.Trigger className="select-trigger" aria-label="Building">
@@ -913,6 +938,33 @@ const NoticeBuilder = () => {
                         </Select.Positioner>
                       </Select.Portal>
                     </Select.Root>
+                  </label>
+
+                  <label>
+                    Property group
+                    <Select.Root value={formState.portfolio} onValueChange={updateSelect("portfolio")} required>
+                      <Select.Trigger className="select-trigger" aria-label="Property group">
+                        <Select.Value placeholder="Select property group" />
+                        <Select.Icon className="select-icon">
+                          <span aria-hidden="true">▾</span>
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Positioner className="select-positioner">
+                          <Select.Popup className="select-popup">
+                            <Select.List className="select-list">
+                              {portfolioOptions.map((option) => (
+                                <Select.Item key={option.id} value={option.id} className="select-item">
+                                  <Select.ItemText>{option.label}</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                              ))}
+                            </Select.List>
+                          </Select.Popup>
+                        </Select.Positioner>
+                      </Select.Portal>
+                    </Select.Root>
+                    <p className="helper">Choose Other company if your building has different contacts.</p>
                   </label>
 
                   <label>
@@ -1053,11 +1105,9 @@ const NoticeBuilder = () => {
                       </Select.Portal>
                     </Select.Root>
                   </label>
-                </>
-              )}
+                </Tabs.Panel>
 
-              {currentStep === 2 && (
-                <>
+                <Tabs.Panel value="2">
                   {issueFields.length === 0 && (
                     <p className="helper">Select an issue to reveal the specific details to include.</p>
                   )}
@@ -1079,11 +1129,9 @@ const NoticeBuilder = () => {
                       </label>
                     );
                   })}
-                </>
-              )}
+                </Tabs.Panel>
 
-              {currentStep === 3 && (
-                <>
+                <Tabs.Panel value="3">
                   <label>
                     Language
                     <Select.Root value={formState.language} onValueChange={updateSelect("language")} required>
@@ -1207,11 +1255,9 @@ const NoticeBuilder = () => {
                       placeholder="[YOUR NAME]"
                     />
                   </label>
-                </>
-              )}
+                </Tabs.Panel>
 
-              {currentStep === 4 && (
-                <>
+                <Tabs.Panel value="4">
                   <p className="helper">
                     Review the preview, copy the text, and keep a copy for your records. Dates and repetition are the
                     strongest evidence.
@@ -1224,9 +1270,9 @@ const NoticeBuilder = () => {
                       Reset form
                     </Button>
                   </div>
-                </>
-              )}
-            </form>
+                </Tabs.Panel>
+              </form>
+            </Tabs.Root>
 
             <div className="step-controls">
               <Button
@@ -1487,6 +1533,8 @@ const NoticeBuilder = () => {
           </div>
         </aside>
       </main>
+
+      <WaitlistPanel />
 
       <footer className="site-footer">
         <p>Safety first: evidence is optional. Public views hide personal details.</p>
