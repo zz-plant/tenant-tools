@@ -1,6 +1,6 @@
 ---
 import "../../styles/global.css";
-import { fieldDefinitions, issueOptions, stages } from "../../data/noticeData";
+import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
 
 export const prerender = false;
 
@@ -19,6 +19,10 @@ const submissionRecord = submission as
       reportDate: string;
       reportCount: number;
       simpleEnglish: boolean;
+      zone?: string;
+      firstMessageDate?: string;
+      ticketDate?: string;
+      ticketNumber?: string;
       issueDetails: Record<string, string>;
     }
   | null;
@@ -31,6 +35,38 @@ const issueLabel =
 
 const stageLabel = submissionRecord ? stages[submissionRecord.stage] : "";
 const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDetails || {}) : [];
+const zoneLabel = zoneOptions.find((option) => option.id === submissionRecord?.zone)?.label || "Not listed";
+
+const timelineEntries = submissionRecord
+  ? [
+      submissionRecord.startDate
+        ? { label: "Issue started", date: submissionRecord.startDate }
+        : null,
+      submissionRecord.stage === "A" && submissionRecord.reportDate
+        ? { label: "Notice sent", date: submissionRecord.reportDate }
+        : null,
+      (submissionRecord.stage === "B" || submissionRecord.stage === "C") && submissionRecord.firstMessageDate
+        ? { label: "First notice sent", date: submissionRecord.firstMessageDate }
+        : null,
+      (submissionRecord.stage === "B" || submissionRecord.stage === "C") && submissionRecord.reportDate
+        ? {
+            label: submissionRecord.stage === "B" ? "Follow-up sent" : "Final notice sent",
+            date: submissionRecord.reportDate,
+          }
+        : null,
+      submissionRecord.ticketDate ? { label: "311 ticket logged", date: submissionRecord.ticketDate } : null,
+    ]
+      .filter(Boolean)
+      .sort((a, b) => (a?.date || "").localeCompare(b?.date || ""))
+  : [];
+
+const formatTimelineDate = (value: string) => {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.valueOf())) {
+    return value;
+  }
+  return parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+};
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -63,6 +99,10 @@ const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDe
                   <p class="summary-value">{issueLabel}</p>
                 </div>
                 <div class="summary-card">
+                  <p class="summary-label">Zone</p>
+                  <p class="summary-value">{zoneLabel}</p>
+                </div>
+                <div class="summary-card">
                   <p class="summary-label">Stage</p>
                   <p class="summary-value">{stageLabel}</p>
                 </div>
@@ -82,9 +122,42 @@ const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDe
 
               <div class="export-block">
                 <div>
+                  <h3>Issue timeline</h3>
+                  <p class="helper">Read-only record of key dates.</p>
+                </div>
+                {timelineEntries.length > 0 ? (
+                  <ul class="timeline">
+                    {timelineEntries.map((entry) => (
+                      <li>
+                        <p class="timeline-date">{formatTimelineDate(entry.date)}</p>
+                        <p class="timeline-label">{entry.label}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p class="helper">No timeline dates were saved.</p>
+                )}
+              </div>
+
+              <div class="export-block">
+                <div>
                   <h3>Details saved</h3>
                   <p class="helper">Short factual details only.</p>
                 </div>
+                {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
+                  <ul class="submission-detail-list">
+                    {submissionRecord.ticketDate && (
+                      <li>
+                        <strong>311 ticket date:</strong> {submissionRecord.ticketDate}
+                      </li>
+                    )}
+                    {submissionRecord.ticketNumber && (
+                      <li>
+                        <strong>311 ticket number:</strong> {submissionRecord.ticketNumber}
+                      </li>
+                    )}
+                  </ul>
+                )}
                 {detailEntries.length > 0 ? (
                   <ul class="submission-detail-list">
                     {detailEntries.map(([key, value]) => {
@@ -96,7 +169,7 @@ const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDe
                       );
                     })}
                   </ul>
-                ) : (
+                ) : submissionRecord.ticketDate || submissionRecord.ticketNumber ? null : (
                   <p class="helper">No details were saved.</p>
                 )}
               </div>

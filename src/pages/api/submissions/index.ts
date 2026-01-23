@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { issueOptions } from "../../../data/noticeData";
+import { enforceRateLimit, getClientIp } from "../../../lib/rateLimit";
 import { validateSubmissionInput } from "../../../lib/submissions";
 
 export const prerender = false;
@@ -32,6 +33,23 @@ export const POST: APIRoute = async ({ request, locals }) => {
       JSON.stringify({ error: "Ledger storage is not configured." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
+  }
+
+  const ip = getClientIp(request);
+  const rateLimit = await enforceRateLimit({
+    kv,
+    key: `rate:submission:${ip}`,
+    limit: 6,
+    windowMs: 60_000,
+  });
+  if (!rateLimit.ok) {
+    return new Response(JSON.stringify({ error: "Too many submissions. Try again soon." }), {
+      status: 429,
+      headers: {
+        "Content-Type": "application/json",
+        "Retry-After": String(rateLimit.retryAfter),
+      },
+    });
   }
 
   await kv.put(`submission:${record.id}`, JSON.stringify(record));

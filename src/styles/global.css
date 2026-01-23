@@ -508,6 +508,161 @@ label {
   color: #2b3142;
 }
 
+.similar-issue-card {
+  border-radius: 16px;
+  border: 1px solid #d8dff0;
+  background: #f7f9ff;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.similar-issue-card h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  color: #1c2436;
+}
+
+.similar-issue-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.similar-issue-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid #e0e6f6;
+}
+
+.similar-issue-title {
+  margin: 0 0 4px;
+  font-weight: 600;
+  color: #1c2436;
+}
+
+.similar-issue-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.similar-issue-success {
+  margin: 0;
+  color: #1d3b2a;
+}
+
+.similar-issue-error {
+  margin: 0;
+  color: #9a2b2b;
+}
+
+.similar-issue-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.link-button {
+  border: none;
+  background: none;
+  color: #1b4aaf;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.timeline li {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f8f9fe;
+  border: 1px solid #e3e7f5;
+}
+
+.timeline-date {
+  margin: 0;
+  font-weight: 700;
+  color: #1b2a5a;
+}
+
+.timeline-label {
+  margin: 0;
+  color: #2b3142;
+}
+
+.helper-card {
+  border-radius: 16px;
+  border: 1px solid #dfe4f2;
+  background: #ffffff;
+  padding: 10px 14px;
+}
+
+.helper-card summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #1c2436;
+}
+
+.helper-card-body {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  color: #2b3142;
+}
+
+.helper-card-body p {
+  margin: 0;
+}
+
+.export-presets {
+  display: grid;
+  gap: 10px;
+}
+
+.preset-card {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #dfe4f2;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.preset-card input {
+  margin-top: 4px;
+}
+
+.preset-card.active {
+  border-color: #4f67ff;
+  box-shadow: inset 0 0 0 1px rgba(79, 103, 255, 0.2);
+  background: #f3f5ff;
+}
+
+.preset-title {
+  margin: 0 0 4px;
+  font-weight: 600;
+  color: #1c2436;
+}
+
 .export-header {
   display: flex;
   align-items: center;
@@ -738,6 +893,11 @@ label {
   }
 
   .next-step-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .similar-issue-list li {
     flex-direction: column;
     align-items: flex-start;
   }
