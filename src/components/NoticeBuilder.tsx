@@ -1452,6 +1452,7 @@ const NoticeBuilder = () => {
             ))}
           </div>
           <p className="helper">Preview the message before you send it.</p>
+          <p className="helper">Privacy reminder: do not include names, unit numbers, or personal details.</p>
           <pre className="output">{noticeText}</pre>
           <div className="export-block">
             <div className="export-header">
