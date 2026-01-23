@@ -23,7 +23,7 @@
       <section class="panel">
         <h2>Start your notice</h2>
         <form id="notice-form">
-          <label>
+          <label class="field">
             Building
             <select id="building" name="building" required>
               <option value="">Select building</option>
@@ -34,19 +34,19 @@
             </select>
           </label>
 
-          <label>
+          <label class="field">
             Unit (optional)
             <input id="unit" name="unit" placeholder="my unit" />
           </label>
 
-          <label>
+          <label class="field">
             Issue type
             <select id="issue" name="issue" required>
               <option value="">Select issue</option>
             </select>
           </label>
 
-          <label>
+          <label class="field">
             Notice stage
             <select id="stage" name="stage" required>
               <option value="A">A. Initial notice</option>
@@ -55,7 +55,7 @@
             </select>
           </label>
 
-          <label>
+          <label class="field">
             Language
             <select id="language" name="language" required>
               <option value="en">English</option>
@@ -66,92 +66,92 @@
           </label>
 
           <div class="checkbox-row">
-            <label>
+            <label class="checkbox-field">
               <input type="checkbox" id="simple-english" />
               Very simple English
             </label>
-            <label>
+            <label class="checkbox-field">
               <input type="checkbox" id="auto-dates" checked />
               Include dates automatically
             </label>
           </div>
 
-          <label>
+          <label class="field">
             Start date
             <input id="start-date" type="date" />
           </label>
 
-          <label>
+          <label class="field">
             Date of first message (for follow-ups)
             <input id="first-message-date" type="date" />
           </label>
 
           <div class="inline-fields">
-            <label>
+            <label class="field">
               Today
               <input id="today" type="date" />
             </label>
-            <label>
+            <label class="field">
               Time
               <input id="time" type="time" />
             </label>
-            <label>
+            <label class="field">
               Temp (°F)
               <input id="temp" type="number" min="0" max="120" placeholder="68" />
             </label>
           </div>
 
-          <label>
+          <label class="field">
             Event date (entry/lockout)
             <input id="event-date" type="date" />
           </label>
 
-          <label>
+          <label class="field">
             Event date(s) (multiple entries)
             <input id="event-dates" placeholder="[DATES]" />
           </label>
 
-          <label>
+          <label class="field">
             Event date/time (utilities)
             <input id="event-date-time" placeholder="[DATE/TIME]" />
           </label>
 
-          <label>
+          <label class="field">
             Move-out date (deposit)
             <input id="move-out-date" type="date" />
           </label>
 
-          <label>
+          <label class="field">
             Pest type (roaches/rats/bedbugs)
             <input id="pest-type" placeholder="ROACHES" />
           </label>
 
-          <label>
+          <label class="field">
             Common area item
             <input id="common-area" placeholder="ELEVATOR" />
           </label>
 
-          <label>
+          <label class="field">
             Lockout or shutoff action
             <input id="lockout-action" placeholder="LOCK ME OUT" />
           </label>
 
-          <label>
+          <label class="field">
             Location (for leak entries)
             <input id="location" placeholder="kitchen ceiling" />
           </label>
 
-          <label>
+          <label class="field">
             Issue description (for building-wide message)
             <input id="issue-description" placeholder="broken elevator" />
           </label>
 
-          <label>
+          <label class="field">
             Optional attachment label
             <input id="attachment" placeholder="photo/video" />
           </label>
 
-          <label>
+          <label class="field">
             Your name
             <input id="your-name" placeholder="[YOUR NAME]" />
           </label>
@@ -163,11 +163,11 @@
       <section class="panel output">
         <div class="output-header">
           <h2>Generated notice</h2>
-          <button id="copy-button" type="button">Copy text</button>
+          <button id="copy-button" class="button primary" type="button">Copy text</button>
         </div>
         <pre id="notice-output"></pre>
         <div class="plain-meaning">
-          <button id="toggle-meaning" type="button">Show plain meaning</button>
+          <button id="toggle-meaning" class="button ghost" type="button">Show plain meaning</button>
           <div id="meaning-body" class="hidden"></div>
         </div>
       </section>
@@ -182,7 +182,7 @@
           <div>
             <span id="impact-count">3</span> residents reported this issue.
           </div>
-          <button id="me-too" type="button">Me too</button>
+          <button id="me-too" class="button ghost" type="button">Me too</button>
         </div>
       </section>
     </main>
