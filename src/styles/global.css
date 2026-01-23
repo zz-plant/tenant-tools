@@ -116,6 +116,16 @@ body {
   overflow: auto;
 }
 
+.notice-hint {
+  border-radius: 12px;
+  border: 1px solid #d8dde8;
+  background: #f5f7ff;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .panel {
   background: #ffffff;
   border-radius: 20px;
@@ -189,6 +199,24 @@ body {
 .step-header {
   display: grid;
   gap: 6px;
+}
+
+.quick-guide {
+  border-radius: 12px;
+  border: 1px solid #e1e6f2;
+  background: #f8f9ff;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.quick-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  color: #2b3142;
+  list-style: disc;
 }
 
 .step-nav {

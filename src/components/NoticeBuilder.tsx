@@ -255,6 +255,17 @@ const NoticeBuilder = () => {
   const [dismissSimilar, setDismissSimilar] = useState(false);
   const [reportingIssueId, setReportingIssueId] = useState<string | null>(null);
 
+  const missingBasics = useMemo(() => {
+    const missing: string[] = [];
+    if (!formState.building) {
+      missing.push("Choose a building");
+    }
+    if (!formState.issue) {
+      missing.push("Choose an issue");
+    }
+    return missing;
+  }, [formState.building, formState.issue]);
+
   const updateField =
     (key: keyof FormState) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -843,6 +854,19 @@ const NoticeBuilder = () => {
             <div className="step-header">
               <h2>Build your notice</h2>
               <p className="helper">Follow the steps so nothing important is missed.</p>
+              <div className="quick-guide">
+                <p className="helper">
+                  <strong>Quick start:</strong> Choose a building and issue to generate a notice. You can add more details
+                  later.
+                </p>
+                {missingBasics.length > 0 && (
+                  <ul className="quick-list">
+                    {missingBasics.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
             <Tabs.Root
               value={String(currentStep)}
@@ -871,7 +895,7 @@ const NoticeBuilder = () => {
                   <div className="building-gallery">
                     <div>
                       <h3 id="building-gallery-title">Building gallery</h3>
-                      <p className="helper">Select a building card to prefill the address.</p>
+                      <p className="helper">Select a building card to fill the address. You can also use the dropdown.</p>
                     </div>
                     <RadioGroup.Root
                       className="building-grid"
@@ -1490,6 +1514,21 @@ const NoticeBuilder = () => {
               </Button>
             </div>
           </div>
+          {missingBasics.length > 0 && (
+            <div className="notice-hint">
+              <p className="helper">
+                <strong>Missing info:</strong> Add the basics to finish the notice.
+              </p>
+              <ul className="quick-list">
+                {missingBasics.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
+                Go to basics
+              </Button>
+            </div>
+          )}
           <div className="summary-grid">
             {summaryItems.map((item) => (
               <div key={item.label} className="summary-card">

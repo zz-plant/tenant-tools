@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.10
+- Added: Quick-start guidance and missing-info callout in the notice builder to reduce friction.
+
 ## 1.0.9
 - Added: Local rules panel powered by the rules pack (heat minimums, RLTO summary, deposit interest, eviction enforcement).
 - Added: Versioned rules pack data for Chicago and Cook County.
