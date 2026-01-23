@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.9
+- Added: Local rules panel powered by the rules pack (heat minimums, RLTO summary, deposit interest, eviction enforcement).
+- Added: Versioned rules pack data for Chicago and Cook County.
+
 ## 1.0.8
 - Added: Shared helper for free-text length limits in intake validation.
 - Added: Privacy reminder near the notice preview.

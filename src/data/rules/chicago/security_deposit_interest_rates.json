@@ -1,0 +1,25 @@
+{
+  "jurisdiction": "Chicago, IL",
+  "rule_id": "chicago.security_deposit_interest_rates",
+  "last_reviewed": "2026-01-23",
+  "sources": [
+    {
+      "title": "Security Deposit Interest Rates (City of Chicago)",
+      "url": "https://www.chicago.gov/city/en/depts/doh/provdrs/landlords/svcs/security-deposit-interest-rates.html"
+    },
+    {
+      "title": "Setting Interest Rate on Rental Agreement Security Deposits (City of Chicago Dept. of Finance)",
+      "url": "https://www.chicago.gov/city/en/depts/fin/supp_info/interest_rate_onrentalsecuritydeposits.html"
+    }
+  ],
+  "rates_by_year": {
+    "2021": 0.01,
+    "2022": 0.01,
+    "2023": 0.01,
+    "2024": 0.01,
+    "2025": 0.01,
+    "2026": 0.01
+  },
+  "units": "percent_per_annum",
+  "notes": "City-published interest rates required to be paid on security deposits under applicable Chicago rules."
+}

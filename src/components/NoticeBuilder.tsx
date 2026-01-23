@@ -17,6 +17,7 @@ import {
   stages,
   zoneOptions,
 } from "../data/noticeData";
+import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
 import WaitlistPanel from "./WaitlistPanel";
 
@@ -766,6 +767,8 @@ const NoticeBuilder = () => {
         .replace("[DATE]", formState.eventDate || "[DATE]")
     : "";
 
+  const ruleCards = useMemo(() => getRuleCardsForIssue(formState.issue), [formState.issue]);
+
   useEffect(() => {
     if (!formState.building || !formState.issue) {
       setSimilarIssues([]);
@@ -1343,6 +1346,50 @@ const NoticeBuilder = () => {
                   </p>
                 </div>
               </details>
+            )}
+
+            {ruleCards.length > 0 && (
+              <div className="rule-cards">
+                <h2>Local rules (Chicago / Cook County)</h2>
+                <p className="helper">Information only. This is not legal advice.</p>
+                <div className="rule-grid">
+                  {ruleCards.map((card) => (
+                    <article key={card.id} className="rule-card">
+                      <div>
+                        <h3>{card.title}</h3>
+                        <p className="helper">{card.summary}</p>
+                        {card.details && (
+                          <ul className="rule-details">
+                            {card.details.map((detail) => (
+                              <li key={detail}>{detail}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <div className="rule-meta">
+                        <p className="helper">
+                          <strong>Jurisdiction:</strong> {card.jurisdiction}
+                        </p>
+                        <p className="helper">
+                          <strong>Last reviewed:</strong> {card.lastReviewed}
+                        </p>
+                        <p className="helper">
+                          <strong>Sources:</strong>
+                        </p>
+                        <ul className="rule-sources">
+                          {card.sources.map((source) => (
+                            <li key={source.url}>
+                              <a href={source.url} target="_blank" rel="noreferrer">
+                                {source.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
             )}
 
             <h2>What usually happens next</h2>

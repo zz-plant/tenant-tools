@@ -1,0 +1,25 @@
+{
+  "jurisdiction": "Chicago, IL",
+  "rule_id": "chicago.rlto_summary_effective_date",
+  "last_reviewed": "2026-01-23",
+  "sources": [
+    {
+      "title": "Residential Landlord and Tenant Ordinance page (City of Chicago)",
+      "url": "https://www.chicago.gov/city/en/depts/doh/provdrs/landlords/svcs/residential-landlord-and-tenant-ordinance.html"
+    },
+    {
+      "title": "RLTO Summary (English PDF)",
+      "url": "https://www.chicago.gov/dam/city/depts/dcd/general/housing/RLTOEnglish.pdf"
+    }
+  ],
+  "effective_periods": [
+    {
+      "start_date": "2024-05-01",
+      "end_date": null,
+      "rlto_summary_pdf": {
+        "en": "https://www.chicago.gov/dam/city/depts/dcd/general/housing/RLTOEnglish.pdf"
+      },
+      "notes": "City page indicates the RLTO summary is effective as of May 1, 2024 and provides links to the summaries."
+    }
+  ]
+}
