@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.0.8
+- Added: Shared helper for free-text length limits in intake validation.
 - Added: Privacy reminder near the notice preview.
 
 ## 1.0.7

@@ -9,6 +9,6 @@ Short list of near-term tasks.
 - Add an "issue status" selector for exports (open/resolved/archived).
 
 ## Engineering
-- Add simple validation helpers for free-text length limits.
+- [x] Add simple validation helpers for free-text length limits.
 - Add unit tests for validation helpers.
 - Add a visual snapshot test for the export summary layout (if available).

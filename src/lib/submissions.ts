@@ -1,4 +1,5 @@
 import { fieldDefinitions, issueOptions } from "../data/noticeData";
+import { sanitizeLimitedText } from "./validation";
 
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
 const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
@@ -42,15 +43,13 @@ const isValidDateString = (value: string) => {
   return !Number.isNaN(parsed.valueOf());
 };
 
-const sanitizeText = (value: string, limit: number) => value.trim().slice(0, limit);
-
 const sanitizeDetails = (details: Record<string, unknown>) => {
   const cleaned: Record<string, string> = {};
   Object.entries(details).forEach(([key, value]) => {
     if (!allowedDetailKeys.has(key) || typeof value !== "string") {
       return;
     }
-    const trimmed = sanitizeText(value, maxDetailLength);
+    const trimmed = sanitizeLimitedText(value, maxDetailLength);
     if (trimmed) {
       cleaned[key] = trimmed;
     }
@@ -66,7 +65,8 @@ export const validateSubmissionInput = (payload: unknown) => {
   const data = payload as Record<string, unknown>;
   const errors: string[] = [];
 
-  const building = typeof data.building === "string" ? sanitizeText(data.building, maxBuildingLength) : "";
+  const building =
+    typeof data.building === "string" ? sanitizeLimitedText(data.building, maxBuildingLength) : "";
   if (!building) {
     errors.push("Building is required.");
   }
@@ -121,7 +121,8 @@ export const validateSubmissionInput = (payload: unknown) => {
     errors.push("311 ticket date is invalid.");
   }
 
-  const ticketNumber = typeof data.ticketNumber === "string" ? sanitizeText(data.ticketNumber, maxTicketNumberLength) : "";
+  const ticketNumber =
+    typeof data.ticketNumber === "string" ? sanitizeLimitedText(data.ticketNumber, maxTicketNumberLength) : "";
 
   const simpleEnglish = Boolean(data.simpleEnglish);
   const issueDetails =
