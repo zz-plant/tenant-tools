@@ -459,6 +459,32 @@ label {
   font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
+.export-block {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #e3e7f5;
+}
+
+.export-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.output-summary {
+  min-height: 140px;
+  background: #111b34;
+}
+
 .plain-meaning {
   display: grid;
   gap: 12px;
@@ -621,6 +647,11 @@ label {
   }
 
   .output-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .export-header {
     flex-direction: column;
     align-items: flex-start;
   }

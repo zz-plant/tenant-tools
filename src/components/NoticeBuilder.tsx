@@ -191,6 +191,7 @@ const NoticeBuilder = () => {
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
   const [impactCount, setImpactCount] = useState(3);
   const [copyLabel, setCopyLabel] = useState("Copy text");
+  const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy summary");
 
   const updateField =
     (key: keyof FormState) =>
@@ -284,6 +285,15 @@ const NoticeBuilder = () => {
 
   const meaningItems = meaningMap[formState.stage] || meaningMap.A;
 
+  const daysOpen = useMemo(() => {
+    const startDate = formState.startDate ? new Date(formState.startDate) : null;
+    const todayDate = formState.today ? new Date(formState.today) : new Date(formatDate(new Date()));
+    if (!startDate) {
+      return 0;
+    }
+    return Math.max(0, Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+  }, [formState.startDate, formState.today]);
+
   const nextSteps = useMemo(() => {
     const startDate = formState.startDate ? new Date(formState.startDate) : null;
     const todayDate = formState.today ? new Date(formState.today) : new Date(formatDate(new Date()));
@@ -335,6 +345,56 @@ const NoticeBuilder = () => {
     });
   }, [formState.startDate, formState.today, formState.building, selectedIssue?.label]);
 
+  const exportSummary = useMemo(() => {
+    const building = formState.building || "[ADDRESS]";
+    const issueLabel = selectedIssue?.label || "[ISSUE TYPE]";
+    const issueDetails = issueFields
+      .map((fieldKey) => {
+        const field = fieldDefinitions[fieldKey];
+        const value = String(formState[fieldKey as keyof FormState] ?? "").trim();
+        if (!field || !value) {
+          return null;
+        }
+        return `- ${field.label}: ${value}`;
+      })
+      .filter(Boolean);
+    const evidence = formState.attachment ? formState.attachment : "None listed";
+
+    return [
+      "Building summary export",
+      "",
+      `Building: ${building}`,
+      formState.unit ? `Unit (optional): ${formState.unit}` : "Unit (optional): Not listed",
+      `Issue: ${issueLabel}`,
+      `Stage: ${stageLabel}`,
+      `Start date: ${formState.startDate || "[START DATE]"}`,
+      `Report date: ${formState.today || "[TODAY]"}`,
+      `Days open: ${daysOpen}`,
+      `Residents reporting: ${impactCount}`,
+      `Evidence noted: ${evidence}`,
+      `Language: ${formState.language.toUpperCase()}`,
+      "",
+      "Issue details:",
+      ...(issueDetails.length > 0 ? issueDetails : ["- Not provided"]),
+      "",
+      "Notes:",
+      "- Generated for inspectors or legal aid.",
+      "- Anonymized by default; avoid adding names here.",
+    ].join("\n");
+  }, [
+    formState.attachment,
+    formState.building,
+    formState.language,
+    formState.startDate,
+    formState.today,
+    formState.unit,
+    impactCount,
+    issueFields,
+    daysOpen,
+    selectedIssue?.label,
+    stageLabel,
+  ]);
+
   const handleCopy = async () => {
     if (!noticeText) {
       return;
@@ -342,6 +402,25 @@ const NoticeBuilder = () => {
     await navigator.clipboard.writeText(noticeText);
     setCopyLabel("Copied!");
     setTimeout(() => setCopyLabel("Copy text"), 1500);
+  };
+
+  const handleSummaryCopy = async () => {
+    await navigator.clipboard.writeText(exportSummary);
+    setSummaryCopyLabel("Copied!");
+    setTimeout(() => setSummaryCopyLabel("Copy summary"), 1500);
+  };
+
+  const handleSummaryDownload = () => {
+    const blob = new Blob([exportSummary], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    const safeBuilding = (formState.building || "building").toLowerCase().replace(/\s+/g, "-");
+    anchor.href = url;
+    anchor.download = `${safeBuilding}-summary-${formatDate(new Date())}.txt`;
+    document.body.append(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   };
 
   const handleReset = () => {
@@ -356,6 +435,7 @@ const NoticeBuilder = () => {
     setCurrentStep(1);
     setPlainMeaningVisible(false);
     setCopyLabel("Copy text");
+    setSummaryCopyLabel("Copy summary");
   };
 
   const summaryItems = [
@@ -804,6 +884,24 @@ const NoticeBuilder = () => {
           </div>
           <p className="helper">Preview the message before you send it.</p>
           <pre className="output">{noticeText}</pre>
+          <div className="export-block">
+            <div className="export-header">
+              <div>
+                <h3>Building summary export</h3>
+                <p className="helper">Use this neutral summary for inspectors or legal aid.</p>
+              </div>
+              <div className="export-actions">
+                <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
+                  {summaryCopyLabel}
+                </Button>
+                <Button className="button button-secondary" type="button" onClick={handleSummaryDownload}>
+                  Download .txt
+                </Button>
+              </div>
+            </div>
+            <pre className="output output-summary">{exportSummary}</pre>
+            <p className="helper">Shared ledger sync (Cloudflare KV) coming next.</p>
+          </div>
           <div className="plain-meaning">
             <Button
               className="button button-secondary"
