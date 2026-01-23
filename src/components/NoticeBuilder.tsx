@@ -190,6 +190,7 @@ const NoticeBuilder = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
   const [impactCount, setImpactCount] = useState(3);
+  const [meTooAdded, setMeTooAdded] = useState(false);
   const [copyLabel, setCopyLabel] = useState("Copy text");
   const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy summary");
 
@@ -830,8 +831,16 @@ const NoticeBuilder = () => {
 
             <h3>Community impact</h3>
             <div className="impact">
-              <div>
-                <span>{impactCount}</span> residents reported this issue.
+              <div className="impact-summary">
+                <p className="impact-count">{impactCount}</p>
+                <div>
+                  <p className="impact-label">Total reports</p>
+                  <p className="impact-hint">
+                    {meTooAdded
+                      ? "Your report is included."
+                      : "Add your report or adjust the total."}
+                  </p>
+                </div>
               </div>
               <div className="impact-actions">
                 <Slider.Root
@@ -851,11 +860,19 @@ const NoticeBuilder = () => {
                   <Slider.Value className="slider-value" />
                 </Slider.Root>
                 <Button
-                  className="button button-secondary"
+                  className={`button ${meTooAdded ? "" : "button-secondary"}`}
                   type="button"
-                  onClick={() => setImpactCount((count) => Math.min(12, count + 1))}
+                  onClick={() => {
+                    setImpactCount((count) => {
+                      if (meTooAdded) {
+                        return Math.max(1, count - 1);
+                      }
+                      return Math.min(12, count + 1);
+                    });
+                    setMeTooAdded((value) => !value);
+                  }}
                 >
-                  Me too
+                  {meTooAdded ? "Remove my report" : "Add my report"}
                 </Button>
               </div>
             </div>
