@@ -1,6 +1,7 @@
 ---
 import "../../styles/global.css";
 import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
+import { portfolioOptions } from "../../data/portfolioOptions";
 
 export const prerender = false;
 
@@ -15,6 +16,7 @@ const submissionRecord = submission as
       issueLabel: string;
       stage: "A" | "B" | "C";
       language: string;
+      portfolio: "continuum" | "other";
       startDate: string;
       reportDate: string;
       reportCount: number;
@@ -36,6 +38,8 @@ const issueLabel =
 const stageLabel = submissionRecord ? stages[submissionRecord.stage] : "";
 const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDetails || {}) : [];
 const zoneLabel = zoneOptions.find((option) => option.id === submissionRecord?.zone)?.label || "Not listed";
+const portfolioLabel =
+  portfolioOptions.find((option) => option.id === submissionRecord?.portfolio)?.label || "Not listed";
 
 const timelineEntries = submissionRecord
   ? [
@@ -93,6 +97,10 @@ const formatTimelineDate = (value: string) => {
                 <div class="summary-card">
                   <p class="summary-label">Building</p>
                   <p class="summary-value">{submissionRecord.building}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Portfolio</p>
+                  <p class="summary-value">{portfolioLabel}</p>
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Issue</p>

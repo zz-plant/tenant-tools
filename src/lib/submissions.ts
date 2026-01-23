@@ -9,12 +9,14 @@ const maxTicketNumberLength = 40;
 const supportedLanguages = new Set(["en", "es", "hi", "pl"]);
 const allowedStages = new Set(["A", "B", "C"]);
 const allowedZones = new Set(["common_area", "hallway", "unit_interior", "entry", "unknown"]);
+const allowedPortfolios = new Set(["continuum", "other"]);
 
 export type SubmissionInput = {
   building: string;
   issue: string;
   stage: "A" | "B" | "C";
   language: "en" | "es" | "hi" | "pl";
+  portfolio: "continuum" | "other";
   startDate: string;
   reportDate: string;
   reportCount: number;
@@ -84,6 +86,11 @@ export const validateSubmissionInput = (payload: unknown) => {
     errors.push("Language is invalid.");
   }
 
+  const portfolio = typeof data.portfolio === "string" ? data.portfolio : "";
+  if (!allowedPortfolios.has(portfolio)) {
+    errors.push("Portfolio is invalid.");
+  }
+
   const startDate = typeof data.startDate === "string" ? data.startDate : "";
   if (!isValidDateString(startDate)) {
     errors.push("Start date is invalid.");
@@ -133,6 +140,7 @@ export const validateSubmissionInput = (payload: unknown) => {
       issue,
       stage: stage as SubmissionInput["stage"],
       language: language as SubmissionInput["language"],
+      portfolio: portfolio as SubmissionInput["portfolio"],
       startDate,
       reportDate,
       reportCount,

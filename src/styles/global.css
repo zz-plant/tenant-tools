@@ -777,6 +777,56 @@ label {
   justify-content: flex-end;
 }
 
+.waitlist-panel {
+  gap: 24px;
+}
+
+.waitlist-header {
+  display: grid;
+  gap: 6px;
+}
+
+.waitlist-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.waitlist-form {
+  display: grid;
+  gap: 16px;
+}
+
+.waitlist-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.waitlist-success {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(79, 103, 255, 0.18);
+  background: #f1f3ff;
+}
+
+.waitlist-code {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(79, 103, 255, 0.1);
+}
+
+.waitlist-invite {
+  display: grid;
+  gap: 12px;
+}
+
 .impact-slider {
   display: grid;
   gap: 6px;
