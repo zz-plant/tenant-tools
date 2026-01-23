@@ -656,6 +656,7 @@ label {
   grid-template-columns: 20px 1fr;
   gap: 10px;
   align-items: start;
+  width: 100%;
   padding: 12px;
   border-radius: 12px;
   border: 1px solid #dfe4f2;
@@ -663,14 +664,50 @@ label {
   cursor: pointer;
 }
 
-.preset-card input {
-  margin-top: 4px;
+.preset-card:focus-visible {
+  outline: 2px solid #4f67ff;
+  outline-offset: 2px;
 }
 
-.preset-card.active {
+.preset-card[data-checked] {
   border-color: #4f67ff;
   box-shadow: inset 0 0 0 1px rgba(79, 103, 255, 0.2);
   background: #f3f5ff;
+}
+
+.preset-indicator {
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  border-radius: 999px;
+  border: 2px solid #c7cee3;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preset-indicator::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #4f67ff;
+  opacity: 0;
+}
+
+.preset-card[data-checked] .preset-indicator {
+  border-color: #4f67ff;
+}
+
+.preset-card[data-checked] .preset-indicator::after {
+  opacity: 1;
+}
+
+.preset-content {
+  margin: 0;
+  display: grid;
+  gap: 4px;
 }
 
 .preset-title {

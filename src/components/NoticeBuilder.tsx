@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@base-ui/react/button";
 import { Checkbox } from "@base-ui/react/checkbox";
+import * as Field from "@base-ui/react/field";
 import { Input } from "@base-ui/react/input";
+import * as Radio from "@base-ui/react/radio";
+import { RadioGroup as RadioGroupRoot } from "@base-ui/react/radio-group";
 import { Select } from "@base-ui/react/select";
 import { Slider } from "@base-ui/react/slider";
 import { Switch } from "@base-ui/react/switch";
@@ -60,6 +63,13 @@ type SimilarIssue = {
 };
 
 type FormState = typeof initialState;
+
+const RadioGroup = {
+  Root: RadioGroupRoot,
+  Item: Radio.Root,
+  Indicator: Radio.Indicator,
+  Label: Field.Label,
+};
 
 const steps = [
   {
@@ -1428,26 +1438,24 @@ const NoticeBuilder = () => {
                 </Button>
               </div>
             </div>
-            <div className="export-presets">
+            <RadioGroup.Root
+              className="export-presets"
+              name="exportAudience"
+              value={exportAudience}
+              onValueChange={(value) => setExportAudience(value as ExportAudience)}
+            >
               {exportAudienceOptions.map((option) => (
-                <label
-                  key={option.id}
-                  className={`preset-card ${exportAudience === option.id ? "active" : ""}`}
-                >
-                  <input
-                    type="radio"
-                    name="exportAudience"
-                    value={option.id}
-                    checked={exportAudience === option.id}
-                    onChange={(event) => setExportAudience(event.target.value as ExportAudience)}
-                  />
-                  <div>
-                    <p className="preset-title">{option.label}</p>
-                    <p className="helper">{option.description}</p>
-                  </div>
-                </label>
+                <Field.Item key={option.id}>
+                  <RadioGroup.Item className="preset-card" value={option.id}>
+                    <RadioGroup.Indicator className="preset-indicator" />
+                    <RadioGroup.Label className="preset-content">
+                      <p className="preset-title">{option.label}</p>
+                      <p className="helper">{option.description}</p>
+                    </RadioGroup.Label>
+                  </RadioGroup.Item>
+                </Field.Item>
               ))}
-            </div>
+            </RadioGroup.Root>
             <pre className="output output-summary">{exportSummary}</pre>
             <div className="submission-block">
               <div>
