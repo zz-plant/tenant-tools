@@ -120,9 +120,9 @@ const NoticeBuilder = () => {
 
   const nextSteps = useMemo(() => {
     const startDate = formState.startDate ? new Date(formState.startDate) : null;
-    const today = formState.today ? new Date(formState.today) : new Date();
+    const todayDate = formState.today ? new Date(formState.today) : new Date(formatDate(new Date()));
     const daysOpen = startDate
-      ? Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+      ? Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
       : 0;
 
     return [
