@@ -64,12 +64,14 @@ const NoticeBuilder = () => {
   const [impactCount, setImpactCount] = useState(3);
   const [copyLabel, setCopyLabel] = useState("Copy text");
 
-  const updateField = (key: keyof FormState) =>
+  const updateField =
+    (key: keyof FormState) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const target = event.target as HTMLInputElement;
+      const { value, type } = event.currentTarget;
+      const isCheckbox = type === "checkbox" && "checked" in event.currentTarget;
       setFormState((prev) => ({
         ...prev,
-        [key]: target.type === "checkbox" ? target.checked : target.value,
+        [key]: isCheckbox ? event.currentTarget.checked : value,
       }));
     };
 
