@@ -5,6 +5,7 @@ import { Input } from "@base-ui/react/input";
 import { Select } from "@base-ui/react/select";
 import { Slider } from "@base-ui/react/slider";
 import { Switch } from "@base-ui/react/switch";
+import * as Tabs from "@base-ui/react/tabs";
 import {
   fieldDefinitions,
   issue311Guidance,
@@ -816,24 +817,30 @@ const NoticeBuilder = () => {
               <h2>Build your notice</h2>
               <p className="helper">Follow the steps so nothing important is missed.</p>
             </div>
-            <div className="step-nav">
-              {steps.map((step) => (
-                <button
-                  key={step.id}
-                  type="button"
-                  className={`step-button ${currentStep === step.id ? "active" : ""}`}
-                  onClick={() => setCurrentStep(step.id)}
-                >
-                  <span className="step-title">{step.title}</span>
-                  <span className="step-label">{step.label}</span>
-                </button>
-              ))}
-            </div>
-            <p className="helper">{steps[currentStep - 1].description}</p>
+            <Tabs.Root
+              value={String(currentStep)}
+              onValueChange={(value) => {
+                if (value) {
+                  setCurrentStep(Number(value));
+                }
+              }}
+            >
+              <Tabs.List className="step-nav">
+                {steps.map((step) => (
+                  <Tabs.Trigger
+                    key={step.id}
+                    value={String(step.id)}
+                    className={`step-button ${currentStep === step.id ? "active" : ""}`}
+                  >
+                    <span className="step-title">{step.title}</span>
+                    <span className="step-label">{step.label}</span>
+                  </Tabs.Trigger>
+                ))}
+              </Tabs.List>
+              <p className="helper">{steps[currentStep - 1].description}</p>
 
-            <form className="form-grid">
-              {currentStep === 1 && (
-                <>
+              <form className="form-grid">
+                <Tabs.Panel value="1">
                   <div className="building-gallery">
                     <div>
                       <h3>Building gallery</h3>
@@ -1025,11 +1032,9 @@ const NoticeBuilder = () => {
                       </Select.Portal>
                     </Select.Root>
                   </label>
-                </>
-              )}
+                </Tabs.Panel>
 
-              {currentStep === 2 && (
-                <>
+                <Tabs.Panel value="2">
                   {issueFields.length === 0 && (
                     <p className="helper">Select an issue to reveal the specific details to include.</p>
                   )}
@@ -1051,11 +1056,9 @@ const NoticeBuilder = () => {
                       </label>
                     );
                   })}
-                </>
-              )}
+                </Tabs.Panel>
 
-              {currentStep === 3 && (
-                <>
+                <Tabs.Panel value="3">
                   <label>
                     Language
                     <Select.Root value={formState.language} onValueChange={updateSelect("language")} required>
@@ -1179,11 +1182,9 @@ const NoticeBuilder = () => {
                       placeholder="[YOUR NAME]"
                     />
                   </label>
-                </>
-              )}
+                </Tabs.Panel>
 
-              {currentStep === 4 && (
-                <>
+                <Tabs.Panel value="4">
                   <p className="helper">
                     Review the preview, copy the text, and keep a copy for your records. Dates and repetition are the
                     strongest evidence.
@@ -1196,9 +1197,9 @@ const NoticeBuilder = () => {
                       Reset form
                     </Button>
                   </div>
-                </>
-              )}
-            </form>
+                </Tabs.Panel>
+              </form>
+            </Tabs.Root>
 
             <div className="step-controls">
               <Button
