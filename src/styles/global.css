@@ -131,6 +131,56 @@ body {
   background: linear-gradient(135deg, #f7f8ff, #ffffff);
 }
 
+.rule-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.rule-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.rule-card {
+  border-radius: 16px;
+  border: 1px solid #e2e6f4;
+  padding: 16px;
+  background: #f8faff;
+  display: grid;
+  gap: 12px;
+}
+
+.rule-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1c2436;
+}
+
+.rule-details,
+.rule-sources {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: #2b3142;
+  list-style: disc;
+  list-style-position: outside;
+}
+
+.rule-meta {
+  display: grid;
+  gap: 6px;
+}
+
+.rule-sources a {
+  color: #4f67ff;
+  text-decoration: none;
+}
+
+.rule-sources a:hover {
+  text-decoration: underline;
+}
+
 .form-grid {
   display: grid;
   gap: 16px;

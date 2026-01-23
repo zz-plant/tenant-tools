@@ -1,0 +1,25 @@
+{
+  "jurisdiction": "Cook County, IL",
+  "rule_id": "cookcounty.sheriff_only_eviction_execution",
+  "last_reviewed": "2026-01-23",
+  "sources": [
+    {
+      "title": "Cook County Sheriff — Eviction Procedure (Plaintiff's Guide)",
+      "url": "https://cookcountysheriffil.gov/evictions/eviction-procedure-plaintiffs-guide/"
+    },
+    {
+      "title": "Cook County Sheriff — Eviction Procedure (Tenant's/Defendant's Guide)",
+      "url": "https://cookcountysheriffil.gov/evictions/eviction-procedure-defendants-guide/"
+    },
+    {
+      "title": "Illinois Legal Aid Online — Understanding eviction (tenant)",
+      "url": "https://www.illinoislegalaid.org/legal-information/understanding-eviction-tenant"
+    }
+  ],
+  "statements": [
+    {
+      "text": "In Cook County, the Cook County Sheriff is the only entity that may physically evict a tenant from a residence (with a court order).",
+      "notes": "Landlords cannot perform 'self-help' evictions (e.g., changing locks or using force)."
+    }
+  ]
+}

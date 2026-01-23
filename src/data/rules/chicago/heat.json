@@ -1,0 +1,38 @@
+{
+  "jurisdiction": "Chicago, IL",
+  "rule_id": "chicago.heat_minimum_temperatures",
+  "last_reviewed": "2026-01-23",
+  "sources": [
+    {
+      "title": "Chicago Heat Ordinance (311 knowledge base)",
+      "url": "https://311.chicago.gov/s/article/Chicago-heat-ordinance?language=en_US"
+    },
+    {
+      "title": "Chicago Heat Ordinance (City of Chicago)",
+      "url": "https://www.chicago.gov/city/en/depts/bldgs/supp_info/chicago-heat-ordinance.html.html"
+    }
+  ],
+  "effective_periods": [
+    {
+      "start_date": "2000-01-01",
+      "end_date": null,
+      "heat_season": {
+        "start": "09-15",
+        "end": "06-01"
+      },
+      "minimum_indoor_temperature": [
+        {
+          "from": "08:30",
+          "to": "22:30",
+          "temp_f": 68
+        },
+        {
+          "from": "22:30",
+          "to": "08:30",
+          "temp_f": 66
+        }
+      ],
+      "notes": "Applies to rental residences during heat season; see sources for details and exceptions."
+    }
+  ]
+}
