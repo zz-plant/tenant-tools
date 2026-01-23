@@ -226,6 +226,22 @@ export const issueOptions = [
   },
 ];
 
+export const fieldDefinitions = {
+  temp: { label: "Temperature (°F)", type: "number", placeholder: "68" },
+  time: { label: "Time", type: "time" },
+  location: { label: "Location (for leaks)", placeholder: "kitchen ceiling" },
+  eventDate: { label: "Event date", type: "date" },
+  eventDates: { label: "Event date(s)", placeholder: "[DATES]" },
+  eventDateTime: { label: "Event date/time", placeholder: "[DATE/TIME]" },
+  moveOutDate: { label: "Move-out date", type: "date" },
+  pestType: { label: "Pest type (roaches/rats/bedbugs)", placeholder: "ROACHES" },
+  commonArea: { label: "Common area item", placeholder: "ELEVATOR" },
+  lockoutAction: { label: "Lockout or shutoff action", placeholder: "LOCK ME OUT" },
+  issueDescription: { label: "Issue description (building-wide)", placeholder: "broken elevator" },
+} as const;
+
+export type FieldDefinitionKey = keyof typeof fieldDefinitions;
+
 export const issueFieldMap = {
   heat: ["temp", "time"],
   leak: ["location"],
