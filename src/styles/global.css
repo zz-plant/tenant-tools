@@ -1,0 +1,269 @@
+:root {
+  color-scheme: light;
+  font-family: "Inter", "SF Pro Text", system-ui, sans-serif;
+  background-color: #f5f6fb;
+  color: #121621;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f5f6fb;
+}
+
+.page {
+  min-height: 100vh;
+  padding: 40px 6vw 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.hero {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  align-items: start;
+  background: linear-gradient(135deg, #101729, #2a3560);
+  color: #f7f8ff;
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(12, 15, 30, 0.25);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0 0 8px;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 3vw, 3rem);
+  margin: 0 0 12px;
+}
+
+.tagline {
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+.metrics {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.metric-value {
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.metric-label {
+  margin: 4px 0 0;
+  opacity: 0.75;
+}
+
+.tag-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.tag-row span {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.contact-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  border-radius: 18px;
+  display: grid;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.contact-note {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.panel {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-highlight {
+  border: 1px solid rgba(71, 85, 105, 0.1);
+  background: linear-gradient(135deg, #f7f8ff, #ffffff);
+}
+
+.form-grid {
+  display: grid;
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 500;
+  color: #2b3142;
+}
+
+.input,
+.select {
+  border-radius: 12px;
+  border: 1px solid #d8dde8;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background-color: #fff;
+}
+
+.input:focus,
+.select:focus {
+  outline: 2px solid rgba(70, 90, 255, 0.35);
+  border-color: #4f67ff;
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.inline-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.helper {
+  font-size: 0.9rem;
+  color: #5a647a;
+  margin: 0;
+}
+
+.output-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.output {
+  background: #101729;
+  color: #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  min-height: 180px;
+  white-space: pre-wrap;
+  font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+}
+
+.plain-meaning {
+  display: grid;
+  gap: 12px;
+}
+
+.meaning-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #2b3142;
+}
+
+.next-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.next-steps li {
+  padding: 10px 12px;
+  background: #f2f4f8;
+  border-radius: 12px;
+}
+
+.next-steps li.locked {
+  opacity: 0.5;
+}
+
+.impact {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #f8f9fe;
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+
+.button {
+  border-radius: 999px;
+  border: none;
+  padding: 10px 18px;
+  font-weight: 600;
+  background: #4f67ff;
+  color: #ffffff;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(79, 103, 255, 0.3);
+}
+
+.button-secondary {
+  background: rgba(79, 103, 255, 0.12);
+  color: #1b2a5a;
+}
+
+.site-footer {
+  text-align: center;
+  color: #6b7280;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 24px;
+  }
+
+  .hero {
+    padding: 24px;
+  }
+
+  .output-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
