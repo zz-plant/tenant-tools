@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.6
+- Changed: Moved unit and name fields behind a personal-copy toggle with a not-saved warning.
+
 ## 1.0.5
 - Changed: Building gallery cards now use radio selection for better keyboard access.
 - Added: Waitlist intake and neighbor invite kit for buildings not yet listed.

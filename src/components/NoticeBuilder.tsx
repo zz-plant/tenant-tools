@@ -48,6 +48,7 @@ const initialState = {
   yourName: "",
   ticketDate: "",
   ticketNumber: "",
+  personalCopyOnly: false,
 };
 
 type Stage = "A" | "B" | "C";
@@ -309,7 +310,7 @@ const NoticeBuilder = () => {
 
     const values: Record<string, string> = {
       ADDRESS: state.building || "[ADDRESS]",
-      UNIT: state.unit || "[UNIT]",
+      UNIT: state.personalCopyOnly ? state.unit || "[UNIT]" : "[UNIT]",
       ISSUE: state.issueDescription || "[ISSUE]",
       LOCATION: state.location || "[LOCATION]",
       "START DATE": state.startDate || "[START DATE]",
@@ -317,7 +318,7 @@ const NoticeBuilder = () => {
       TIME: state.time || "[TIME]",
       TEMP: state.temp || "[TEMP]",
       "DATE OF FIRST MESSAGE": state.firstMessageDate || "[DATE OF FIRST MESSAGE]",
-      "YOUR NAME": state.yourName || "[YOUR NAME]",
+      "YOUR NAME": state.personalCopyOnly ? state.yourName || "[YOUR NAME]" : "[YOUR NAME]",
       "MOVE-OUT DATE": state.moveOutDate || "[MOVE-OUT DATE]",
       DATE: state.eventDate || "[DATE]",
       DATES: state.eventDates || "[DATES]",
@@ -518,7 +519,6 @@ const NoticeBuilder = () => {
     formState.portfolio,
     formState.startDate,
     formState.today,
-    formState.unit,
     impactCount,
     issueFields,
     daysOpen,
@@ -530,6 +530,15 @@ const NoticeBuilder = () => {
     selectedZone?.label,
     selectedPortfolio?.label,
   ]);
+
+  const handlePersonalCopyToggle = (checked: boolean) => {
+    setFormState((prev) => ({
+      ...prev,
+      personalCopyOnly: checked,
+      unit: checked ? prev.unit : "",
+      yourName: checked ? prev.yourName : "",
+    }));
+  };
 
   const handleCopy = async () => {
     if (!noticeText) {
@@ -968,11 +977,6 @@ const NoticeBuilder = () => {
                   </label>
 
                   <label>
-                    Unit (optional)
-                    <Input className="input" value={formState.unit} onChange={updateField("unit")} placeholder="my unit" />
-                  </label>
-
-                  <label>
                     Issue type
                     <Select.Root value={formState.issue || null} onValueChange={updateSelect("issue")} required>
                       <Select.Trigger className="select-trigger" aria-label="Issue type">
@@ -1246,15 +1250,38 @@ const NoticeBuilder = () => {
                   </div>
                   <p className="helper">Use this only if you already called 311.</p>
 
-                  <label>
-                    Your name
-                    <Input
-                      className="input"
-                      value={formState.yourName}
-                      onChange={updateField("yourName")}
-                      placeholder="[YOUR NAME]"
-                    />
-                  </label>
+                  <div className="checkbox-row">
+                    <label className="checkbox-label">
+                      <Switch.Root
+                        checked={formState.personalCopyOnly}
+                        onCheckedChange={handlePersonalCopyToggle}
+                        className="switch-root"
+                      >
+                        <Switch.Thumb className="switch-thumb" />
+                      </Switch.Root>
+                      Personal copy only
+                    </label>
+                  </div>
+                  <p className="helper">
+                    These fields are not saved. Do not include names or unit numbers if you will share this notice.
+                  </p>
+                  {formState.personalCopyOnly && (
+                    <div className="inline-fields">
+                      <label>
+                        Unit (personal copy only)
+                        <Input className="input" value={formState.unit} onChange={updateField("unit")} placeholder="Unit" />
+                      </label>
+                      <label>
+                        Your name (personal copy only)
+                        <Input
+                          className="input"
+                          value={formState.yourName}
+                          onChange={updateField("yourName")}
+                          placeholder="[YOUR NAME]"
+                        />
+                      </label>
+                    </div>
+                  )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="4">
