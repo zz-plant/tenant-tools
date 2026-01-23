@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.12
+- Changed: Moved Continuum contact details into a dedicated panel near the notice preview.
+
+## 1.0.11
+- Added: Building gallery now shows property names, neighborhoods, and official sites from Continuum listings.
+
 ## 1.0.10
 - Added: Quick-start guidance and missing-info callout in the notice builder to reduce friction.
 

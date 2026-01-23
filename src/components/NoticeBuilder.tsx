@@ -125,6 +125,9 @@ const RadioGroup = {
 const buildingOptions = [
   {
     id: "2353 W Wabansia",
+    name: "Bucktown Gateway",
+    neighborhood: "Bucktown",
+    website: "http://www.bucktowngateway.com/",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="2353 W Wabansia building">
         <rect x="18" y="30" width="124" height="72" rx="6" fill="#f6d5c0" stroke="#c96f52" strokeWidth="2" />
@@ -141,6 +144,9 @@ const buildingOptions = [
   },
   {
     id: "2400 W Wabansia",
+    name: "The Oasis of Bucktown",
+    neighborhood: "Bucktown",
+    website: "http://www.oasisofbucktown.com/",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="2400 W Wabansia building">
         <rect x="22" y="26" width="116" height="80" rx="6" fill="#fde6bf" stroke="#b9853b" strokeWidth="2" />
@@ -157,6 +163,9 @@ const buildingOptions = [
   },
   {
     id: "812 W Adams St",
+    name: "West Loop Chicago",
+    neighborhood: "West Loop",
+    website: "https://www.luxesuiteschicago.com/",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="812 W Adams St building">
         <rect x="20" y="18" width="120" height="88" rx="4" fill="#d3e3ff" stroke="#4b6fa9" strokeWidth="2" />
@@ -173,6 +182,9 @@ const buildingOptions = [
   },
   {
     id: "159 W North Ave",
+    name: "Old Town Luxury Suites",
+    neighborhood: "Old Town",
+    website: "http://www.oldtownluxurysuites.com/",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="159 W North Ave building">
         <rect x="24" y="32" width="84" height="74" rx="4" fill="#dff2e1" stroke="#4a8a61" strokeWidth="2" />
@@ -839,13 +851,6 @@ const NoticeBuilder = () => {
             <span>Privacy safe</span>
           </div>
         </div>
-        <div className="contact-card">
-          <p><strong>Maintenance issues SMS:</strong> Ivan (773) 708-2321</p>
-          <p><strong>Landlord:</strong> Yelena Bernshtam +1 (773) 678-7636</p>
-          <p><strong>Rent issues:</strong> continuumbrokers@yahoo.com</p>
-          <p className="contact-note">Use text for urgent safety issues. Email for rent receipts.</p>
-          <p className="contact-note">If your building has different contacts, use the waitlist below.</p>
-        </div>
       </header>
 
       <main className="layout">
@@ -896,6 +901,7 @@ const NoticeBuilder = () => {
                     <div>
                       <h3 id="building-gallery-title">Building gallery</h3>
                       <p className="helper">Select a building card to fill the address. You can also use the dropdown.</p>
+                      <p className="helper">Details shown here come from Continuum Brokers listings.</p>
                     </div>
                     <RadioGroup.Root
                       className="building-grid"
@@ -911,6 +917,7 @@ const NoticeBuilder = () => {
                     >
                       {buildingOptions.map((building) => {
                         const buildingSlug = building.id.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                        const websiteLabel = building.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
                         return (
                           <RadioGroup.Item
                             key={building.id}
@@ -924,6 +931,11 @@ const NoticeBuilder = () => {
                               <p className="building-address" id={`building-${buildingSlug}-label`}>
                                 {building.id}
                               </p>
+                              <p className="building-name">{building.name}</p>
+                              <p className="building-neighborhood">Neighborhood: {building.neighborhood}</p>
+                              <a className="building-site" href={building.website} target="_blank" rel="noreferrer">
+                                Site: {websiteLabel}
+                              </a>
                             </div>
                           </RadioGroup.Item>
                         );
@@ -1645,6 +1657,15 @@ const NoticeBuilder = () => {
               </ul>
             )}
           </div>
+        </aside>
+        <aside className="panel contact-panel">
+          <h2>Continuum contacts</h2>
+          <p className="helper">Use these contacts if your building is listed under Continuum.</p>
+          <p><strong>Maintenance text:</strong> Ivan (773) 708-2321</p>
+          <p><strong>Landlord:</strong> Yelena Bernshtam +1 (773) 678-7636</p>
+          <p><strong>Rent email:</strong> continuumbrokers@yahoo.com</p>
+          <p className="helper">Use text for urgent safety issues. Email for rent receipts.</p>
+          <p className="helper">If your building has different contacts, use the waitlist below.</p>
         </aside>
       </main>
 
