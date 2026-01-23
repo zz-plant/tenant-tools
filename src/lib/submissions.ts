@@ -5,8 +5,10 @@ const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
 
 const maxDetailLength = 200;
 const maxBuildingLength = 120;
+const maxTicketNumberLength = 40;
 const supportedLanguages = new Set(["en", "es", "hi", "pl"]);
 const allowedStages = new Set(["A", "B", "C"]);
+const allowedZones = new Set(["common_area", "hallway", "unit_interior", "entry", "unknown"]);
 
 export type SubmissionInput = {
   building: string;
@@ -17,6 +19,10 @@ export type SubmissionInput = {
   reportDate: string;
   reportCount: number;
   simpleEnglish: boolean;
+  zone: string;
+  firstMessageDate?: string;
+  ticketDate?: string;
+  ticketNumber?: string;
   issueDetails: Record<string, string>;
 };
 
@@ -93,6 +99,23 @@ export const validateSubmissionInput = (payload: unknown) => {
     errors.push("Report count is invalid.");
   }
 
+  const zone = typeof data.zone === "string" ? data.zone : "";
+  if (zone && !allowedZones.has(zone)) {
+    errors.push("Zone is invalid.");
+  }
+
+  const firstMessageDate = typeof data.firstMessageDate === "string" ? data.firstMessageDate : "";
+  if (firstMessageDate && !isValidDateString(firstMessageDate)) {
+    errors.push("First message date is invalid.");
+  }
+
+  const ticketDate = typeof data.ticketDate === "string" ? data.ticketDate : "";
+  if (ticketDate && !isValidDateString(ticketDate)) {
+    errors.push("311 ticket date is invalid.");
+  }
+
+  const ticketNumber = typeof data.ticketNumber === "string" ? sanitizeText(data.ticketNumber, maxTicketNumberLength) : "";
+
   const simpleEnglish = Boolean(data.simpleEnglish);
   const issueDetails =
     data.issueDetails && typeof data.issueDetails === "object"
@@ -114,6 +137,10 @@ export const validateSubmissionInput = (payload: unknown) => {
       reportDate,
       reportCount,
       simpleEnglish,
+      zone,
+      firstMessageDate: firstMessageDate || undefined,
+      ticketDate: ticketDate || undefined,
+      ticketNumber: ticketNumber || undefined,
       issueDetails,
     },
   } as const;

@@ -226,6 +226,49 @@ export const issueOptions = [
   },
 ];
 
+export const zoneOptions = [
+  { id: "common_area", label: "Common area" },
+  { id: "hallway", label: "Hallway or stairwell" },
+  { id: "unit_interior", label: "Inside unit" },
+  { id: "entry", label: "Entry or lobby" },
+  { id: "unknown", label: "Not sure" },
+];
+
+export const issue311Guidance: Record<
+  string,
+  {
+    category: string;
+    script: string;
+    nextStep: string;
+  }
+> = {
+  heat: {
+    category: "No heat",
+    script: "The heat has not been warm enough since [START DATE].",
+    nextStep: "An inspector may visit after you submit the report.",
+  },
+  leak: {
+    category: "Water leak",
+    script: "There is ongoing water leaking at [LOCATION] since [START DATE].",
+    nextStep: "An inspector may visit after you submit the report.",
+  },
+  pests: {
+    category: "Pest issue",
+    script: "I have seen pests since [START DATE] and the problem is still happening.",
+    nextStep: "An inspector may visit after you submit the report.",
+  },
+  entry: {
+    category: "Entry without notice",
+    script: "Someone entered without notice on [DATE].",
+    nextStep: "An inspector or city staff may follow up.",
+  },
+  common: {
+    category: "Common area problem",
+    script: "There is a common area problem since [START DATE].",
+    nextStep: "An inspector may visit after you submit the report.",
+  },
+};
+
 export const fieldDefinitions = {
   temp: { label: "Temperature (°F)", type: "number", placeholder: "68" },
   time: { label: "Time", type: "time" },
