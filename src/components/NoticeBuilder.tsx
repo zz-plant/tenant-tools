@@ -150,11 +150,19 @@ const buildingOptions = [
 
 const formatDate = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
+const formatCalendarDate = (date: Date) => date.toISOString().slice(0, 10).replaceAll("-", "");
+
 const getCurrentTime = (date: Date) =>
   `${date.getHours().toString().padStart(2, "0")}:${date
     .getMinutes()
     .toString()
     .padStart(2, "0")}`;
+
+const addDays = (date: Date, days: number) => {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+};
 
 const fillTemplate = (template: string, values: Record<string, string>) => {
   let text = template;
@@ -260,17 +268,50 @@ const NoticeBuilder = () => {
     const daysOpen = startDate
       ? Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
       : 0;
+    const issueLabel = selectedIssue?.label || "maintenance issue";
+    const buildingLabel = formState.building || "your building";
 
-    return [
-      { label: "Send an initial notice", unlockDay: 0 },
-      { label: "Repeat with today's date after a few days", unlockDay: 3 },
-      { label: "Final notice if still unresolved", unlockDay: 6 },
-    ].map((step) => ({
-      ...step,
-      unlocked: daysOpen >= step.unlockDay,
-      remaining: step.unlockDay - daysOpen,
-    }));
-  }, [formState.startDate, formState.today]);
+    const steps = [
+      {
+        label: "Send an initial notice",
+        unlockDay: 0,
+        calendarLabel: "Send initial notice",
+        detail: "If there is no response, send the first written notice today.",
+      },
+      {
+        label: "Repeat with today's date after a few days",
+        unlockDay: 3,
+        calendarLabel: "Send follow-up notice",
+        detail: "If still unresolved, follow up with today's date and keep the thread.",
+      },
+      {
+        label: "Final notice if still unresolved",
+        unlockDay: 6,
+        calendarLabel: "Send final notice",
+        detail: "If still unresolved, send a final written notice and save your records.",
+      },
+    ];
+
+    return steps.map((step) => {
+      const reminderDate = startDate ? addDays(startDate, step.unlockDay) : null;
+      const calendarDate = reminderDate ? formatCalendarDate(reminderDate) : "";
+      const calendarLink = reminderDate
+        ? `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+            `${step.calendarLabel}: ${issueLabel}`
+          )}&details=${encodeURIComponent(
+            `${step.detail}\nBuilding: ${buildingLabel}\nIssue: ${issueLabel}`
+          )}&dates=${calendarDate}/${calendarDate}`
+        : "";
+
+      return {
+        ...step,
+        unlocked: daysOpen >= step.unlockDay,
+        remaining: step.unlockDay - daysOpen,
+        calendarLink,
+        reminderDateLabel: reminderDate ? formatDate(reminderDate) : "Add a start date",
+      };
+    });
+  }, [formState.startDate, formState.today, formState.building, selectedIssue?.label]);
 
   const handleCopy = async () => {
     if (!noticeText) {
@@ -586,9 +627,30 @@ const NoticeBuilder = () => {
             <ul className="next-steps">
               {nextSteps.map((step) => (
                 <li key={step.label} className={step.unlocked ? "" : "locked"}>
-                  {step.unlocked
-                    ? step.label
-                    : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
+                  <div className="next-step-row">
+                    <div>
+                      <p className="next-step-title">
+                        {step.unlocked
+                          ? step.label
+                          : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
+                      </p>
+                      <p className="helper">Reminder date: {step.reminderDateLabel}</p>
+                    </div>
+                    <a
+                      className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
+                      href={step.calendarLink || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-disabled={!step.calendarLink}
+                      onClick={(event) => {
+                        if (!step.calendarLink) {
+                          event.preventDefault();
+                        }
+                      }}
+                    >
+                      Add to Google Calendar
+                    </a>
+                  </div>
                 </li>
               ))}
             </ul>
