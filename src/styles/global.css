@@ -425,12 +425,6 @@ label {
   color: #1c2436;
 }
 
-.building-details {
-  margin: 4px 0 0;
-  color: #5a647a;
-  font-size: 0.85rem;
-}
-
 .output-header {
   display: flex;
   align-items: center;

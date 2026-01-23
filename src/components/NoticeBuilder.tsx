@@ -124,7 +124,6 @@ const RadioGroup = {
 const buildingOptions = [
   {
     id: "2353 W Wabansia",
-    description: "Brick walk-up with bay windows and a garden entry.",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="2353 W Wabansia building">
         <rect x="18" y="30" width="124" height="72" rx="6" fill="#f6d5c0" stroke="#c96f52" strokeWidth="2" />
@@ -141,7 +140,6 @@ const buildingOptions = [
   },
   {
     id: "2400 W Wabansia",
-    description: "Vintage brick facade with a centered stoop and cornice.",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="2400 W Wabansia building">
         <rect x="22" y="26" width="116" height="80" rx="6" fill="#fde6bf" stroke="#b9853b" strokeWidth="2" />
@@ -158,7 +156,6 @@ const buildingOptions = [
   },
   {
     id: "812 W Adams St",
-    description: "Converted loft with tall windows and a crisp lintel.",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="812 W Adams St building">
         <rect x="20" y="18" width="120" height="88" rx="4" fill="#d3e3ff" stroke="#4b6fa9" strokeWidth="2" />
@@ -175,7 +172,6 @@ const buildingOptions = [
   },
   {
     id: "159 W North Ave",
-    description: "Mid-rise with wide storefront base and side tower.",
     svg: (
       <svg viewBox="0 0 160 120" role="img" aria-label="159 W North Ave building">
         <rect x="24" y="32" width="84" height="74" rx="4" fill="#dff2e1" stroke="#4a8a61" strokeWidth="2" />
@@ -895,15 +891,11 @@ const NoticeBuilder = () => {
                             className={`building-card ${formState.building === building.id ? "active" : ""}`}
                             value={building.id}
                             aria-labelledby={`building-${buildingSlug}-label`}
-                            aria-describedby={`building-${buildingSlug}-details`}
                           >
                             <div className="building-illustration">{building.svg}</div>
                             <div>
                               <p className="building-address" id={`building-${buildingSlug}-label`}>
                                 {building.id}
-                              </p>
-                              <p className="building-details" id={`building-${buildingSlug}-details`}>
-                                {building.description}
                               </p>
                             </div>
                           </RadioGroup.Item>
