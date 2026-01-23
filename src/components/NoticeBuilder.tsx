@@ -31,7 +31,7 @@ const initialState = {
 
 type FormState = typeof initialState;
 
-const formatDate = (date: Date) => date.toISOString().slice(0, 10);
+const formatDate = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
 const getCurrentTime = (date: Date) =>
   `${date.getHours().toString().padStart(2, "0")}:${date
