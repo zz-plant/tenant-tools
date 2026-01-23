@@ -527,19 +527,7 @@ const NoticeBuilder = () => {
           <p className="tagline">
             Draft clear, dated messages that keep your documentation strong and easy to share.
           </p>
-          <div className="metrics">
-            <div>
-              <p className="metric-value">24 hrs</p>
-              <p className="metric-label">Average response time</p>
-            </div>
-            <div>
-              <p className="metric-value">5 steps</p>
-              <p className="metric-label">Typical resolution flow</p>
-            </div>
-          </div>
           <div className="tag-row">
-            <span>Clear paper trail</span>
-            <span>Plain-language mode</span>
             <span>Privacy safe</span>
           </div>
         </div>
