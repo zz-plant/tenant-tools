@@ -11,11 +11,27 @@
       <div>
         <h1>Tenant Notice Builder</h1>
         <p class="tagline">This is normal to report.</p>
+        <div class="header-metrics">
+          <div>
+            <p class="metric-value">24 hrs</p>
+            <p class="metric-label">Average response time</p>
+          </div>
+          <div>
+            <p class="metric-value">5 steps</p>
+            <p class="metric-label">Typical resolution flow</p>
+          </div>
+        </div>
+        <div class="header-tags">
+          <span>Clear paper trail</span>
+          <span>Plain-language mode</span>
+          <span>Privacy safe</span>
+        </div>
       </div>
       <div class="contact-card">
         <p><strong>Maintenance issues SMS:</strong> Ivan (773) 708-2321</p>
         <p><strong>Landlord:</strong> Yelena Bernshtam +1 (773) 678-7636</p>
         <p><strong>Rent issues:</strong> continuumbrokers@yahoo.com</p>
+        <p class="contact-note">Use text for urgent safety issues. Email for rent receipts.</p>
       </div>
     </header>
 
@@ -160,14 +176,17 @@
         </form>
       </section>
 
-      <section class="panel output">
+      <section class="panel panel-highlight output">
         <div class="output-header">
           <h2>Generated notice</h2>
           <button id="copy-button" type="button">Copy text</button>
         </div>
+        <p class="helper">Preview the message before you send it.</p>
         <pre id="notice-output"></pre>
         <div class="plain-meaning">
-          <button id="toggle-meaning" type="button">Show plain meaning</button>
+          <button id="toggle-meaning" type="button" class="button-secondary">
+            Show plain meaning
+          </button>
           <div id="meaning-body" class="hidden"></div>
         </div>
       </section>
@@ -182,7 +201,7 @@
           <div>
             <span id="impact-count">3</span> residents reported this issue.
           </div>
-          <button id="me-too" type="button">Me too</button>
+          <button id="me-too" type="button" class="button-secondary">Me too</button>
         </div>
       </section>
     </main>

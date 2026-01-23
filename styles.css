@@ -1,12 +1,13 @@
 :root {
   color-scheme: light;
   font-family: "Inter", "Segoe UI", system-ui, sans-serif;
-  background: #f7f6f3;
-  color: #1e1e1e;
+  background: #f5f4f0;
+  color: #1b1b1b;
 }
 
 body {
   margin: 0;
+  background: #f5f4f0;
 }
 
 .site-header {
@@ -15,8 +16,8 @@ body {
   justify-content: space-between;
   gap: 1.5rem;
   padding: 2rem 3rem 1.5rem;
-  background: #ffffff;
-  border-bottom: 1px solid #e1e0dc;
+  background: linear-gradient(120deg, #ffffff 0%, #f3f6ff 50%, #ffffff 100%);
+  border-bottom: 1px solid #dde4ef;
 }
 
 .site-header h1 {
@@ -30,11 +31,52 @@ body {
 }
 
 .contact-card {
-  background: #f0efe9;
+  background: #f7f7f2;
   padding: 1rem 1.5rem;
   border-radius: 12px;
-  box-shadow: inset 0 0 0 1px #e4e1d8;
+  box-shadow: inset 0 0 0 1px #e0e3eb;
   font-size: 0.95rem;
+}
+
+.contact-note {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  color: #4a4a46;
+}
+
+.header-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 1rem 0 0.75rem;
+}
+
+.metric-value {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.metric-label {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: #4b4b47;
+}
+
+.header-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.header-tags span {
+  background: #e8eefc;
+  color: #1e3a8a;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
 }
 
 .layout {
@@ -49,6 +91,12 @@ body {
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 10px 30px rgba(32, 32, 32, 0.08);
+  border: 1px solid transparent;
+}
+
+.panel-highlight {
+  border-color: #dbe7ff;
+  background: #fdfdff;
 }
 
 .panel h2 {
@@ -69,6 +117,15 @@ select {
   border: 1px solid #d2d1cc;
   border-radius: 8px;
   font-size: 0.95rem;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
 .inline-fields {
@@ -127,10 +184,22 @@ button {
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 button:hover {
   background: #163ca8;
+  box-shadow: 0 6px 12px rgba(29, 78, 216, 0.2);
+  transform: translateY(-1px);
+}
+
+.button-secondary {
+  background: #e8eefc;
+  color: #1e3a8a;
+}
+
+.button-secondary:hover {
+  background: #d5e0fb;
 }
 
 .plain-meaning {
@@ -158,7 +227,7 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f4f3ee;
+  background: #f4f5fb;
   padding: 0.75rem 1rem;
   border-radius: 10px;
 }
