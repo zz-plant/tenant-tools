@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { createReportEntry, REPORT_ENTRY_TTL_SECONDS } from "../../../../lib/reports";
 import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
+import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../../../lib/access";
 
 export const prerender = false;
 
@@ -18,6 +19,16 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   if (!Number.isFinite(increment) || increment < 1 || increment > 5) {
     return new Response(JSON.stringify({ error: "Invalid increment." }), {
       status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const env = locals.runtime?.env ?? {};
+  const url = new URL(request.url);
+  const providedKey = request.headers.get("x-building-key") || url.searchParams.get("key");
+  if (!isResidentKeyRecognized(providedKey, env)) {
+    return new Response(JSON.stringify({ error: "Resident access is required." }), {
+      status: 403,
       headers: { "Content-Type": "application/json" },
     });
   }
@@ -50,11 +61,20 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   const record = (await kv.get(`submission:${id}`, { type: "json" })) as
     | {
         id: string;
+        building: string;
         reportCount: number;
       }
     | null;
 
   if (!record) {
+    return new Response(JSON.stringify({ error: "Submission not found." }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const allowedBuildings = getBuildingIdsForKey(providedKey, env);
+  if (!allowedBuildings.includes("*") && record.building && !allowedBuildings.includes(record.building)) {
     return new Response(JSON.stringify({ error: "Submission not found." }), {
       status: 404,
       headers: { "Content-Type": "application/json" },

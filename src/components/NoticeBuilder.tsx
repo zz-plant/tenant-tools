@@ -22,7 +22,6 @@ import WaitlistPanel from "./WaitlistPanel";
 
 const initialState = {
   building: "",
-  unit: "",
   zone: "",
   issue: "",
   stage: "A",
@@ -45,10 +44,8 @@ const initialState = {
   location: "",
   issueDescription: "",
   attachment: "",
-  yourName: "",
   ticketDate: "",
   ticketNumber: "",
-  personalCopyOnly: false,
   planChoice: "keep_open",
 };
 
@@ -266,6 +263,12 @@ const NoticeBuilder = () => {
       time: getCurrentTime(today),
     };
   });
+  const [buildingKey, setBuildingKey] = useState("");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get("key") || "";
+    setBuildingKey(key.trim());
+  }, []);
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
   const [impactCount] = useState(1);
@@ -349,7 +352,6 @@ const NoticeBuilder = () => {
 
     const values: Record<string, string> = {
       ADDRESS: state.building || "[ADDRESS]",
-      UNIT: state.personalCopyOnly ? state.unit || "[UNIT]" : "[UNIT]",
       ISSUE: state.issueDescription || "[ISSUE]",
       LOCATION: state.location || "[LOCATION]",
       "START DATE": state.startDate || "[START DATE]",
@@ -357,7 +359,6 @@ const NoticeBuilder = () => {
       TIME: state.time || "[TIME]",
       TEMP: state.temp || "[TEMP]",
       "DATE OF FIRST MESSAGE": state.firstMessageDate || "[DATE OF FIRST MESSAGE]",
-      "YOUR NAME": state.personalCopyOnly ? state.yourName || "[YOUR NAME]" : "[YOUR NAME]",
       "MOVE-OUT DATE": state.moveOutDate || "[MOVE-OUT DATE]",
       DATE: state.eventDate || "[DATE]",
       DATES: state.eventDates || "[DATES]",
@@ -573,15 +574,6 @@ const NoticeBuilder = () => {
     selectedPortfolio?.label,
   ]);
 
-  const handlePersonalCopyToggle = (checked: boolean) => {
-    setFormState((prev) => ({
-      ...prev,
-      personalCopyOnly: checked,
-      unit: checked ? prev.unit : "",
-      yourName: checked ? prev.yourName : "",
-    }));
-  };
-
   const handleCopy = async () => {
     if (!noticeText) {
       return;
@@ -616,6 +608,12 @@ const NoticeBuilder = () => {
       setSaveError("Select a building and issue before saving.");
       return;
     }
+    if (!buildingKey) {
+      setSaveStatus("error");
+      setSaveLabel("Save to ledger");
+      setSaveError("Add your building key to the URL before saving.");
+      return;
+    }
 
     setSaveStatus("saving");
     setSaveError("");
@@ -630,9 +628,13 @@ const NoticeBuilder = () => {
     }, {});
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (buildingKey) {
+        headers["x-building-key"] = buildingKey;
+      }
       const response = await fetch("/api/submissions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           building: formState.building,
           issue: formState.issue,
@@ -653,7 +655,11 @@ const NoticeBuilder = () => {
 
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(payload?.error || "Unable to save right now.");
+        const details = Array.isArray(payload?.details)
+          ? payload.details.filter((item): item is string => typeof item === "string")
+          : [];
+        const detailText = details.length > 0 ? ` ${details.join(" ")}` : "";
+        throw new Error(`${payload?.error || "Unable to save right now."}${detailText}`);
       }
 
       setSubmissionUrl(payload.url || "");
@@ -721,10 +727,17 @@ const NoticeBuilder = () => {
     setReportingIssueId(id);
     setSimilarNotice("");
     setSimilarError("");
+    if (!buildingKey) {
+      setSimilarError("Add your building key to the URL before adding a report.");
+      setReportingIssueId(null);
+      return;
+    }
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      headers["x-building-key"] = buildingKey;
       const response = await fetch(`/api/submissions/${id}/report`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ increment: 1 }),
       });
       const payload = await response.json().catch(() => ({}));
@@ -840,6 +853,11 @@ const NoticeBuilder = () => {
       setSimilarError("");
       return;
     }
+    if (!buildingKey) {
+      setSimilarIssues([]);
+      setSimilarError("Add your building key to the URL to check for similar issues.");
+      return;
+    }
 
     const controller = new AbortController();
     const params = new URLSearchParams({
@@ -850,35 +868,42 @@ const NoticeBuilder = () => {
     if (formState.zone) {
       params.set("zone", formState.zone);
     }
+    params.set("key", buildingKey);
 
     setSimilarLoading(true);
     setSimilarError("");
-    fetch(`/api/submissions/similar?${params.toString()}`, { signal: controller.signal })
-      .then((response) => response.json())
-      .then((payload) => {
+    const run = async () => {
+      try {
+        const response = await fetch(`/api/submissions/similar?${params.toString()}`, {
+          signal: controller.signal,
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload?.error || "We could not check for similar issues right now.");
+        }
         if (Array.isArray(payload?.matches)) {
           setSimilarIssues(payload.matches);
           return;
         }
         setSimilarIssues([]);
-      })
-      .catch((error) => {
-        if (error?.name === "AbortError") {
+      } catch (error) {
+        if ((error as { name?: string })?.name === "AbortError") {
           return;
         }
-        setSimilarError("We could not check for similar issues right now.");
-      })
-      .finally(() => {
+        setSimilarError(error instanceof Error ? error.message : "We could not check for similar issues right now.");
+      } finally {
         setSimilarLoading(false);
-      });
+      }
+    };
+    run();
 
     return () => controller.abort();
-  }, [formState.building, formState.issue, formState.startDate, formState.zone]);
+  }, [buildingKey, formState.building, formState.issue, formState.startDate, formState.zone]);
 
   useEffect(() => {
     setDismissSimilar(false);
     setSimilarNotice("");
-  }, [formState.building, formState.issue, formState.zone, formState.startDate]);
+  }, [buildingKey, formState.building, formState.issue, formState.zone, formState.startDate]);
 
   return (
     <div className="page">
@@ -1264,39 +1289,6 @@ const NoticeBuilder = () => {
                     </label>
                   </div>
                   <p className="helper">Use this only if you already called 311.</p>
-
-                  <div className="checkbox-row">
-                    <label className="checkbox-label">
-                      <Switch.Root
-                        checked={formState.personalCopyOnly}
-                        onCheckedChange={handlePersonalCopyToggle}
-                        className="switch-root"
-                      >
-                        <Switch.Thumb className="switch-thumb" />
-                      </Switch.Root>
-                      Personal copy only
-                    </label>
-                  </div>
-                  <p className="helper">
-                    These fields are not saved. Do not include names or unit numbers if you will share this notice.
-                  </p>
-                  {formState.personalCopyOnly && (
-                    <div className="inline-fields">
-                      <label>
-                        Unit (personal copy only)
-                        <Input className="input" value={formState.unit} onChange={updateField("unit")} placeholder="Unit" />
-                      </label>
-                      <label>
-                        Your name (personal copy only)
-                        <Input
-                          className="input"
-                          value={formState.yourName}
-                          onChange={updateField("yourName")}
-                          placeholder="[YOUR NAME]"
-                        />
-                      </label>
-                    </div>
-                  )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="4">
@@ -1570,9 +1562,10 @@ const NoticeBuilder = () => {
             <div className="submission-block">
               <div>
                 <h3>Save to the shared ledger</h3>
-                <p className="helper">
-                  This saves a short summary. It does not include your unit or name.
-                </p>
+                <p className="helper">This saves a short summary. It does not save personal details.</p>
+                {!buildingKey && (
+                  <p className="helper">Add your building key to the URL before saving.</p>
+                )}
               </div>
               <div className="submission-actions">
                 <Button className="button button-secondary" type="button" onClick={handleLedgerSave} disabled={saveStatus === "saving"}>

@@ -2,32 +2,42 @@
 import "../../styles/global.css";
 import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
 import { portfolioOptions } from "../../data/portfolioOptions";
+import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../lib/access";
 
 export const prerender = false;
 
 const { id } = Astro.params;
 const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
-const submission = id && kv ? await kv.get(`submission:${id}`, { type: "json" }) : null;
+const url = new URL(Astro.request.url);
+const accessKey = url.searchParams.get("key");
+const env = Astro.locals.runtime?.env ?? {};
+const hasAccess = isResidentKeyRecognized(accessKey, env);
+const submission = id && kv && hasAccess ? await kv.get(`submission:${id}`, { type: "json" }) : null;
 
-const submissionRecord = submission as
-  | {
-      building: string;
-      issue: string;
-      issueLabel: string;
-      stage: "A" | "B" | "C";
-      language: string;
-      portfolio: "continuum" | "other";
-      startDate: string;
-      reportDate: string;
-      reportCount: number;
-      simpleEnglish: boolean;
-      zone?: string;
-      firstMessageDate?: string;
-      ticketDate?: string;
-      ticketNumber?: string;
-      issueDetails: Record<string, string>;
-    }
-  | null;
+type SubmissionShape = {
+  building: string;
+  issue: string;
+  issueLabel: string;
+  stage: "A" | "B" | "C";
+  language: string;
+  portfolio: "continuum" | "other";
+  startDate: string;
+  reportDate: string;
+  reportCount: number;
+  simpleEnglish: boolean;
+  zone?: string;
+  firstMessageDate?: string;
+  ticketDate?: string;
+  ticketNumber?: string;
+  issueDetails: Record<string, string>;
+};
+
+const rawSubmissionRecord = submission as SubmissionShape | null;
+const allowedBuildingIds = getBuildingIdsForKey(accessKey, env);
+const hasBuildingAccess = rawSubmissionRecord
+  ? allowedBuildingIds.includes("*") || allowedBuildingIds.includes(rawSubmissionRecord.building)
+  : false;
+const submissionRecord = hasAccess && hasBuildingAccess ? rawSubmissionRecord : null;
 
 const issueLabel =
   submissionRecord?.issueLabel ||
@@ -91,7 +101,12 @@ const formatTimelineDate = (value: string) => {
 
       <main class="layout">
         <section class="panel panel-highlight preview-panel">
-          {submissionRecord ? (
+          {!hasAccess ? (
+            <div>
+              <h2>Access key required</h2>
+              <p class="helper">Add your building key to the URL to view this submission.</p>
+            </div>
+          ) : submissionRecord ? (
             <>
               <div class="summary-grid">
                 <div class="summary-card">
@@ -185,7 +200,7 @@ const formatTimelineDate = (value: string) => {
           ) : (
             <div>
               <h2>We could not find this submission.</h2>
-              <p class="helper">Check the link or return to the main page.</p>
+              <p class="helper">Check the link, or confirm you used the correct building key.</p>
               <a class="button" href="/">Back to builder</a>
             </div>
           )}
