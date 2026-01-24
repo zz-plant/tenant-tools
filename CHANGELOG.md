@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.15
+- Changed: Reframed notice builder next steps and 311 guidance as common tenant paths with risk and documentation gap context.
+
 ## 1.0.14
 - Added: Anonymous report entries are recorded when residents add a “me too” report.
 - Changed: The notice builder impact count starts at 1 and points residents to real “me too” actions.

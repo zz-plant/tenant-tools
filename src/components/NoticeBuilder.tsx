@@ -501,22 +501,25 @@ const NoticeBuilder = () => {
 
     const steps = [
       {
-        label: "Send an initial notice",
+        label: "Common path: first written notice window",
         unlockDay: 0,
-        calendarLabel: "Send initial notice",
-        detail: "If there is no response, send the first written notice today.",
+        calendarLabel: "Initial notice window",
+        detail:
+          "Common paths tenants encounter start with a written record. A risk is missing dates, copies, or who received it.",
       },
       {
-        label: "Repeat with today's date after a few days",
+        label: "Common path: follow-up window after a few days",
         unlockDay: 3,
-        calendarLabel: "Send follow-up notice",
-        detail: "If still unresolved, follow up with today's date and keep the thread.",
+        calendarLabel: "Follow-up notice window",
+        detail:
+          "Common paths tenants encounter include a follow-up. A risk is a documentation gap when dates or prior messages are not linked.",
       },
       {
-        label: "Final notice if still unresolved",
+        label: "Common path: final reminder window",
         unlockDay: 6,
-        calendarLabel: "Send final notice",
-        detail: "If still unresolved, send a final written notice and save your records.",
+        calendarLabel: "Final reminder window",
+        detail:
+          "Common paths tenants encounter include a last reminder. A risk is unclear timelines when records are incomplete.",
       },
     ];
 
