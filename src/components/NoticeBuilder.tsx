@@ -16,15 +16,18 @@ import {
   stages,
   zoneOptions,
 } from "../data/noticeData";
+import { defaultBuildingOptions, type BuildingOption } from "../data/buildings";
 import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
 import WaitlistPanel from "./WaitlistPanel";
+import type { SubmissionStatus } from "../lib/submissions";
 
 const initialState = {
   building: "",
   zone: "",
   issue: "",
   stage: "A",
+  exportStatus: "open",
   language: "en",
   portfolio: "continuum",
   simpleEnglish: false,
@@ -113,6 +116,24 @@ const exportAudienceOptions: Array<{ id: ExportAudience; label: string; descript
   },
 ];
 
+const exportStatusOptions: Array<{ id: SubmissionStatus; label: string; description: string }> = [
+  {
+    id: "open",
+    label: "Open",
+    description: "The issue is still happening.",
+  },
+  {
+    id: "resolved",
+    label: "Resolved",
+    description: "Repairs are confirmed complete.",
+  },
+  {
+    id: "archived",
+    label: "Archived",
+    description: "The record is closed for now.",
+  },
+];
+
 const planChoiceOptions: Array<{ id: PlanChoice; label: string; description: string; caution?: string }> = [
   {
     id: "keep_open",
@@ -140,11 +161,10 @@ const RadioGroup = {
   Item: Radio.Root,
 };
 
-const buildingOptions = [
-  { id: "2353 W Wabansia", status: "available" },
-  { id: "2400 W Wabansia", status: "available" },
-  { id: "812 W Adams St", status: "coming-soon" },
-  { id: "159 W North Ave", status: "coming-soon" },
+const evidenceSafetyChecklist = [
+  "Do not upload faces.",
+  "Do not upload names, mail labels, or unit numbers.",
+  "Do not upload leases or ID documents.",
 ];
 
 const issueIcons: Record<string, React.ReactNode> = {
@@ -252,7 +272,11 @@ const formatTimelineDate = (value: string) => {
   return parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
-const NoticeBuilder = () => {
+type NoticeBuilderProps = {
+  buildingOptions?: BuildingOption[];
+};
+
+const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuilderProps) => {
   const [formState, setFormState] = useState<FormState>(() => {
     const today = new Date();
     const formatted = formatDate(today);
@@ -335,6 +359,8 @@ const NoticeBuilder = () => {
   const selectedZone = zoneOptions.find((option) => option.id === formState.zone);
   const selectedAudience =
     exportAudienceOptions.find((option) => option.id === exportAudience) || exportAudienceOptions[0];
+  const selectedExportStatus =
+    exportStatusOptions.find((option) => option.id === formState.exportStatus) || exportStatusOptions[0];
   const selectedPortfolio = portfolioOptions.find((option) => option.id === formState.portfolio);
   const selectedPlanChoice =
     planChoiceOptions.find((option) => option.id === formState.planChoice) || planChoiceOptions[0];
@@ -468,17 +494,7 @@ const NoticeBuilder = () => {
     const portfolioLabel = selectedPortfolio?.label || "Not listed";
     const issueLabel = selectedIssue?.label || "[ISSUE TYPE]";
     const zoneLabel = selectedZone?.label || "Not listed";
-    const issueDetails = issueFields
-      .map((fieldKey) => {
-        const field = fieldDefinitions[fieldKey];
-        const value = String(formState[fieldKey as keyof FormState] ?? "").trim();
-        if (!field || !value) {
-          return null;
-        }
-        return `- ${field.label}: ${value}`;
-      })
-      .filter(Boolean);
-    const evidence = formState.attachment ? formState.attachment : "None listed";
+    const statusLabel = selectedExportStatus.label;
 
     const audienceConfigs: Record<
       ExportAudience,
@@ -526,12 +542,27 @@ const NoticeBuilder = () => {
     };
 
     const config = audienceConfigs[exportAudience];
+    const issueDetails = issueFields
+      .map((fieldKey) => {
+        if (fieldKey === "attachment" && !config.includeEvidence) {
+          return null;
+        }
+        const field = fieldDefinitions[fieldKey];
+        const value = String(formState[fieldKey as keyof FormState] ?? "").trim();
+        if (!field || !value) {
+          return null;
+        }
+        return `- ${field.label}: ${value}`;
+      })
+      .filter(Boolean);
+    const evidence = formState.attachment ? formState.attachment : "None listed";
     const lines = [
       config.heading,
       "",
       `Building: ${building}`,
       `Portfolio: ${portfolioLabel}`,
       `Issue: ${issueLabel}`,
+      `Status: ${statusLabel}`,
       `Zone: ${zoneLabel}`,
       config.includeStage ? `Stage: ${stageLabel}` : null,
       `Start date: ${formState.startDate || "[START DATE]"}`,
@@ -558,6 +589,7 @@ const NoticeBuilder = () => {
   }, [
     formState.attachment,
     formState.building,
+    formState.exportStatus,
     formState.language,
     formState.portfolio,
     formState.startDate,
@@ -572,6 +604,7 @@ const NoticeBuilder = () => {
     formState.ticketNumber,
     selectedZone?.label,
     selectedPortfolio?.label,
+    selectedExportStatus.label,
   ]);
 
   const handleCopy = async () => {
@@ -764,6 +797,7 @@ const NoticeBuilder = () => {
     { label: "Issue", value: selectedIssue?.label || "Select an issue" },
     { label: "Zone", value: selectedZone?.label || "Not listed" },
     { label: "Stage", value: stageLabel },
+    { label: "Export status", value: selectedExportStatus.label },
     { label: "Language", value: formState.language.toUpperCase() },
     { label: "Start date", value: formState.startDate || "Add a start date" },
     { label: "Today", value: formState.today || "Add today's date" },
@@ -1160,9 +1194,20 @@ const NoticeBuilder = () => {
                     if (!field) {
                       return null;
                     }
+                    const isAttachmentField = fieldKey === "attachment";
                     return (
                       <label key={fieldKey}>
                         {field.label}
+                        {isAttachmentField && (
+                          <div className="evidence-warning" role="note">
+                            <p className="evidence-warning-title">Evidence safety check</p>
+                            <ul className="evidence-warning-list">
+                              {evidenceSafetyChecklist.map((item) => (
+                                <li key={item}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                         <Input
                           className="input"
                           type={field.type || "text"}
@@ -1528,6 +1573,35 @@ const NoticeBuilder = () => {
                   Download .txt
                 </Button>
               </div>
+            </div>
+            <div className="export-status">
+              <label>
+                Issue status
+                <Select.Root value={formState.exportStatus} onValueChange={updateSelect("exportStatus")} required>
+                  <Select.Trigger className="select-trigger" aria-label="Issue status">
+                    <Select.Value placeholder="Select status" />
+                    <Select.Icon className="select-icon">
+                      <span aria-hidden="true">▾</span>
+                    </Select.Icon>
+                  </Select.Trigger>
+                  <Select.Portal>
+                    <Select.Positioner className="select-positioner">
+                      <Select.Popup className="select-popup">
+                        <Select.List className="select-list">
+                          {exportStatusOptions.map((option) => (
+                            <Select.Item key={option.id} value={option.id} className="select-item">
+                              <Select.ItemText>
+                                {option.label} — {option.description}
+                              </Select.ItemText>
+                              <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                            </Select.Item>
+                          ))}
+                        </Select.List>
+                      </Select.Popup>
+                    </Select.Positioner>
+                  </Select.Portal>
+                </Select.Root>
+              </label>
             </div>
             <RadioGroup.Root
               className="export-presets"

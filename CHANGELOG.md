@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.20 - 2026-01-24
+
+- Added: Evidence safety checklist before the evidence note field.
+- Added: Validation helper unit tests and sensitive-content coverage for evidence notes.
+- Changed: Building options now derive from configured building keys when available.
+- Changed: Export summary now includes an issue status selector (open/resolved/archived).
+- Fixed: Management exports no longer list evidence notes when evidence is excluded.
+- Security: Evidence warnings now appear immediately before evidence notes.
+
 ## 1.0.19 - 2026-01-24
 
 - Added: Per-building access keys via `BUILDING_KEYS_JSON`.

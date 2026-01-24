@@ -28,6 +28,15 @@ describe("submission validation sensitive content checks", () => {
     assert.ok(result.errors.includes("Building: Remove unit numbers."));
   });
 
+  it("rejects unit hints in evidence notes", () => {
+    const result = validateSubmissionInput({
+      ...basePayload,
+      issueDetails: { attachment: "Photo from Apt 2B" },
+    });
+    assert.equal(result.ok, false);
+    assert.ok(result.errors.includes("Details: Remove unit numbers."));
+  });
+
   it("rejects phone numbers in details", () => {
     const result = validateSubmissionInput({
       ...basePayload,
