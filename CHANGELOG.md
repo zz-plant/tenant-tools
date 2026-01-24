@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.13
+- Added: Resident-only building dashboard with status grouping, filters, and “me too” actions.
+- Added: Steward status updates for submissions (key-gated).
+- Security: Building dashboard access now requires a building access key.
+
 ## 1.0.12
 - Changed: Moved Continuum contact details into a dedicated panel near the notice preview.
 

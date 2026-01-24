@@ -1,0 +1,397 @@
+---
+import "../../styles/global.css";
+import { issueOptions } from "../../data/noticeData";
+import { isAccessKeyValid } from "../../lib/access";
+import { normalizeSubmissionStatus, type SubmissionStatus } from "../../lib/submissions";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
+const url = new URL(Astro.request.url);
+const accessKey = url.searchParams.get("key");
+const stewardKey = url.searchParams.get("stewardKey");
+const requiredAccessKey = Astro.locals.runtime?.env?.BUILDING_ACCESS_KEY;
+const requiredStewardKey = Astro.locals.runtime?.env?.STEWARD_KEY;
+
+const hasAccess = isAccessKeyValid(accessKey, requiredAccessKey);
+const isSteward = isAccessKeyValid(stewardKey, requiredStewardKey);
+
+const buildingId = decodeURIComponent(id ?? "");
+const issueIds = new Set(issueOptions.map((issue) => issue.id));
+const statusIds: SubmissionStatus[] = ["open", "resolved", "archived"];
+
+const issueFilterRaw = url.searchParams.get("issue") || "all";
+const issueFilter = issueIds.has(issueFilterRaw) ? issueFilterRaw : "all";
+const statusFilterRaw = url.searchParams.get("status") || "all";
+const statusFilter = statusIds.includes(statusFilterRaw as SubmissionStatus) ? statusFilterRaw : "all";
+
+const statusLabels: Record<SubmissionStatus, string> = {
+  open: "Open",
+  resolved: "Resolved",
+  archived: "Archived",
+};
+
+type BuildingSubmission = {
+  id: string;
+  issue: string;
+  issueLabel: string;
+  building: string;
+  startDate: string;
+  reportDate: string;
+  reportCount: number;
+  createdAt: string;
+  status: SubmissionStatus;
+};
+
+const submissions: BuildingSubmission[] = [];
+
+if (hasAccess && kv && buildingId) {
+  let cursor: string | undefined;
+  do {
+    const listResult = await kv.list({ prefix: "submission:", cursor, limit: 50 });
+    cursor = listResult.list_complete ? undefined : listResult.cursor;
+
+    for (const key of listResult.keys) {
+      const record = (await kv.get(key.name, { type: "json" })) as Record<string, unknown> | null;
+      if (!record) {
+        continue;
+      }
+      if (record.building !== buildingId) {
+        continue;
+      }
+
+      const reportCount =
+        typeof record.reportCount === "number" ? record.reportCount : Number(record.reportCount) || 0;
+
+      submissions.push({
+        id: String(record.id || ""),
+        issue: String(record.issue || ""),
+        issueLabel: String(record.issueLabel || record.issue || "Issue"),
+        building: String(record.building || ""),
+        startDate: String(record.startDate || ""),
+        reportDate: String(record.reportDate || ""),
+        reportCount,
+        createdAt: String(record.createdAt || ""),
+        status: normalizeSubmissionStatus(record.status),
+      });
+
+      if (submissions.length >= 200) {
+        cursor = undefined;
+        break;
+      }
+    }
+  } while (cursor);
+}
+
+const filtered = submissions
+  .filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter))
+  .filter((record) => (statusFilter === "all" ? true : record.status === statusFilter))
+  .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+
+const maxVisible = 60;
+const visibleSubmissions = filtered.slice(0, maxVisible);
+
+const grouped: Record<SubmissionStatus, BuildingSubmission[]> = {
+  open: [],
+  resolved: [],
+  archived: [],
+};
+
+for (const record of visibleSubmissions) {
+  grouped[record.status].push(record);
+}
+
+const totalVisible = visibleSubmissions.length;
+const totalFiltered = filtered.length;
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Building Dashboard | Building Ledger</title>
+  </head>
+  <body>
+    <div class="page">
+      <header class="hero">
+        <div class="hero-main">
+          <p class="eyebrow">Building ledger</p>
+          <h1>Resident dashboard</h1>
+          <p class="tagline">
+            This page groups recent submissions by status and helps residents add a report without writing.
+          </p>
+          <div class="tag-row">
+            <span>Building: {buildingId || "Not listed"}</span>
+            <span>Access: {hasAccess ? "Resident key verified" : "Access key needed"}</span>
+            <span>Mode: {isSteward ? "Steward" : "Resident"}</span>
+          </div>
+        </div>
+        <div class="contact-panel">
+          <h2>Safety reminder</h2>
+          <p class="helper">Keep details short. Do not include names or unit numbers.</p>
+          <p class="helper">Evidence stays private and is not shown here.</p>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel-highlight dashboard-grid">
+          {!hasAccess ? (
+            <div>
+              <h2>Access key required</h2>
+              <p class="helper">
+                Add your building access key to the URL to view this dashboard.
+              </p>
+            </div>
+          ) : !kv ? (
+            <div>
+              <h2>Ledger storage is not configured.</h2>
+              <p class="helper">Connect the submission store to load building activity.</p>
+            </div>
+          ) : (
+            <>
+              <div class="summary-grid">
+                <div class="summary-card">
+                  <p class="summary-label">Total (filtered)</p>
+                  <p class="summary-value">{totalFiltered}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Visible now</p>
+                  <p class="summary-value">{totalVisible}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Open</p>
+                  <p class="summary-value">{grouped.open.length}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Resolved</p>
+                  <p class="summary-value">{grouped.resolved.length}</p>
+                </div>
+                <div class="summary-card">
+                  <p class="summary-label">Archived</p>
+                  <p class="summary-value">{grouped.archived.length}</p>
+                </div>
+              </div>
+
+              <div>
+                <h2>Recent submissions</h2>
+                <p class="helper">
+                  Showing the latest {totalVisible} of {totalFiltered} matching submissions.
+                </p>
+              </div>
+
+              {totalFiltered === 0 ? (
+                <p class="helper">No submissions match these filters yet.</p>
+              ) : (
+                statusIds.map((status) => (
+                  <section class="status-group">
+                    <div class="status-header">
+                      <h3>{statusLabels[status]}</h3>
+                      <span class="status-pill">{grouped[status].length}</span>
+                    </div>
+                    {grouped[status].length === 0 ? (
+                      <p class="helper">No submissions in this status.</p>
+                    ) : (
+                      grouped[status].map((record) => (
+                        <article class="issue-card" data-submission-id={record.id}>
+                          <div>
+                            <p class="issue-title">{record.issueLabel}</p>
+                            <p class="issue-meta">
+                              Started {record.startDate || "Date not listed"}. Reports:{" "}
+                              <span data-report-count={record.id}>{record.reportCount}</span>.
+                            </p>
+                            <p class="issue-meta">
+                              Last update saved on {record.reportDate || record.createdAt || "Date not listed"}.
+                            </p>
+                          </div>
+                          <div class="issue-actions">
+                            <button
+                              class="button button-secondary button-compact"
+                              type="button"
+                              data-report-button
+                              data-submission-id={record.id}
+                            >
+                              Me too
+                            </button>
+                            <a
+                              class="button button-secondary button-compact"
+                              href={`/submissions/${record.id}`}
+                            >
+                              View details
+                            </a>
+                          </div>
+                          <p class="helper" data-report-status={record.id}></p>
+                          {isSteward && (
+                            <div class="steward-row">
+                              <label class="steward-inline">
+                                <span>Update status</span>
+                                <select
+                                  class="input"
+                                  data-status-select
+                                  data-submission-id={record.id}
+                                >
+                                  {statusIds.map((option) => (
+                                    <option value={option} selected={record.status === option}>
+                                      {statusLabels[option]}
+                                    </option>
+                                  ))}
+                                </select>
+                                <button
+                                  class="button button-compact"
+                                  type="button"
+                                  data-status-save
+                                  data-submission-id={record.id}
+                                >
+                                  Save
+                                </button>
+                              </label>
+                              <p class="helper" data-status-note={record.id}></p>
+                            </div>
+                          )}
+                        </article>
+                      ))
+                    )}
+                  </section>
+                ))
+              )}
+            </>
+          )}
+        </section>
+
+        <aside class="panel">
+          <div>
+            <h2>Filters</h2>
+            <p class="helper">Filter by issue type or status.</p>
+          </div>
+          <form class="filter-grid" method="get">
+            {accessKey && <input type="hidden" name="key" value={accessKey} />}
+            {stewardKey && <input type="hidden" name="stewardKey" value={stewardKey} />}
+            <label>
+              <span>Issue type</span>
+              <select class="input" name="issue">
+                <option value="all" selected={issueFilter === "all"}>All issues</option>
+                {issueOptions.map((issue) => (
+                  <option value={issue.id} selected={issueFilter === issue.id}>
+                    {issue.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>Status</span>
+              <select class="input" name="status">
+                <option value="all" selected={statusFilter === "all"}>All statuses</option>
+                {statusIds.map((status) => (
+                  <option value={status} selected={statusFilter === status}>
+                    {statusLabels[status]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button class="button" type="submit">Apply filters</button>
+          </form>
+          <div class="export-block">
+            <h3>Notes</h3>
+            <ul class="submission-detail-list">
+              <li>Use “Me too” to add your report without writing.</li>
+              <li>Stewards can update status for clean records.</li>
+              <li>Counts are resident-reported and not verified.</li>
+            </ul>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="site-footer">
+        <p>Safety first: this dashboard does not show names, unit numbers, or evidence files.</p>
+      </footer>
+    </div>
+
+    {hasAccess && kv && (
+      <script define:vars={{ stewardKey }}>
+        const stewardKeyValue = stewardKey || "";
+
+        const updateReportCount = (id, nextCount) => {
+          const countEl = document.querySelector(`[data-report-count="${id}"]`);
+          if (countEl) {
+            countEl.textContent = String(nextCount);
+          }
+        };
+
+        const setReportStatus = (id, message, isError = false) => {
+          const statusEl = document.querySelector(`[data-report-status="${id}"]`);
+          if (!statusEl) return;
+          statusEl.textContent = message;
+          statusEl.style.color = isError ? "#9a2b2b" : "#1d3b2a";
+        };
+
+        document.querySelectorAll("[data-report-button]").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const id = button.getAttribute("data-submission-id");
+            if (!id) return;
+            button.setAttribute("disabled", "true");
+            setReportStatus(id, "Saving your report...");
+            try {
+              const response = await fetch(`/api/submissions/${id}/report`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ increment: 1 }),
+              });
+              const payload = await response.json().catch(() => ({}));
+              if (!response.ok) {
+                throw new Error(payload?.error || "We could not update the report count.");
+              }
+              updateReportCount(id, payload.reportCount ?? 0);
+              setReportStatus(id, "Your report was added.");
+            } catch (error) {
+              setReportStatus(
+                id,
+                error instanceof Error ? error.message : "We could not add your report.",
+                true
+              );
+            } finally {
+              button.removeAttribute("disabled");
+            }
+          });
+        });
+
+        document.querySelectorAll("[data-status-save]").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const id = button.getAttribute("data-submission-id");
+            if (!id) return;
+            const select = document.querySelector(`[data-status-select][data-submission-id="${id}"]`);
+            const note = document.querySelector(`[data-status-note="${id}"]`);
+            const nextStatus = select?.value;
+            if (!nextStatus) return;
+            button.setAttribute("disabled", "true");
+            if (note) {
+              note.textContent = "Saving status...";
+              note.style.color = "";
+            }
+            try {
+              const response = await fetch(`/api/submissions/${id}/status?stewardKey=${encodeURIComponent(stewardKeyValue)}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: nextStatus }),
+              });
+              const payload = await response.json().catch(() => ({}));
+              if (!response.ok) {
+                throw new Error(payload?.error || "We could not update the status.");
+              }
+              if (note) {
+                note.textContent = "Status saved. Refreshing...";
+              }
+              window.location.reload();
+            } catch (error) {
+              if (note) {
+                note.textContent = error instanceof Error ? error.message : "We could not update the status.";
+                note.style.color = "#9a2b2b";
+              }
+            } finally {
+              button.removeAttribute("disabled");
+            }
+          });
+        });
+      </script>
+    )}
+  </body>
+</html>
