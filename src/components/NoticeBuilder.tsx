@@ -5,7 +5,6 @@ import { Input } from "@base-ui/react/input";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import { Select } from "@base-ui/react/select";
-import { Slider } from "@base-ui/react/slider";
 import { Switch } from "@base-ui/react/switch";
 import { Tabs } from "@base-ui/react/tabs";
 import {
@@ -323,8 +322,7 @@ const NoticeBuilder = () => {
   });
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
-  const [impactCount, setImpactCount] = useState(3);
-  const [meTooAdded, setMeTooAdded] = useState(false);
+  const [impactCount] = useState(1);
   const [copyLabel, setCopyLabel] = useState("Copy text");
   const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy summary");
   const [saveLabel, setSaveLabel] = useState("Save to ledger");
@@ -1156,7 +1154,7 @@ const NoticeBuilder = () => {
                                 onClick={() => handleAddToExisting(issue.id)}
                                 disabled={reportingIssueId === issue.id}
                               >
-                                {reportingIssueId === issue.id ? "Adding..." : "Add my report"}
+                                {reportingIssueId === issue.id ? "Adding..." : "Me too"}
                               </Button>
                             </div>
                           </li>
@@ -1537,44 +1535,9 @@ const NoticeBuilder = () => {
                 <div>
                   <p className="impact-label">Total reports</p>
                   <p className="impact-hint">
-                    {meTooAdded
-                      ? "Your report is included."
-                      : "Add your report or adjust the total."}
+                    Reports start at 1. Use “Me too” on an existing issue to add your report.
                   </p>
                 </div>
-              </div>
-              <div className="impact-actions">
-                <Slider.Root
-                  className="impact-slider"
-                  min={1}
-                  max={12}
-                  step={1}
-                  value={impactCount}
-                  onValueChange={(value) => setImpactCount(value as number)}
-                >
-                  <Slider.Control className="slider-control">
-                    <Slider.Track className="slider-track">
-                      <Slider.Indicator className="slider-indicator" />
-                    </Slider.Track>
-                    <Slider.Thumb className="slider-thumb" />
-                  </Slider.Control>
-                  <Slider.Value className="slider-value" />
-                </Slider.Root>
-                <Button
-                  className={`button ${meTooAdded ? "" : "button-secondary"}`}
-                  type="button"
-                  onClick={() => {
-                    setImpactCount((count) => {
-                      if (meTooAdded) {
-                        return Math.max(1, count - 1);
-                      }
-                      return Math.min(12, count + 1);
-                    });
-                    setMeTooAdded((value) => !value);
-                  }}
-                >
-                  {meTooAdded ? "Remove my report" : "Add my report"}
-                </Button>
               </div>
             </div>
           </section>

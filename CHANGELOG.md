@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.14
+- Added: Anonymous report entries are recorded when residents add a “me too” report.
+- Changed: The notice builder impact count starts at 1 and points residents to real “me too” actions.
+
 ## 1.0.13
 - Added: Issue gallery with SVG icon cards for faster issue selection.
 - Changed: Coming-soon buildings are visible but not selectable.
