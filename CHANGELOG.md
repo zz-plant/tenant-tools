@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.16
+- Changed: Local rules now appear as a short, collapsed source list to keep the notice flow focused.
+
 ## 1.0.15
 - Changed: Reframed notice builder next steps and 311 guidance as common tenant paths with risk and documentation gap context.
 - Changed: Removed the rent holdback plan choice and shifted the default plan to documentation-only.
