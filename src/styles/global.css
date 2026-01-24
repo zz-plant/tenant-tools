@@ -462,9 +462,20 @@ label {
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
+.building-card.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
 .building-card:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 22px rgba(28, 36, 54, 0.12);
+}
+
+.building-card.disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .building-card:focus-visible {
@@ -510,12 +521,92 @@ label {
   color: #4a5568;
 }
 
+.building-status {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
 .building-site {
   display: inline-block;
   margin-top: 4px;
   font-size: 0.85rem;
   color: #2f4ed7;
   text-decoration: none;
+}
+
+.issue-gallery {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f7ff;
+  border-radius: 16px;
+  border: 1px solid #e0e6f6;
+}
+
+.issue-gallery h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  color: #1c2436;
+}
+
+.issue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.issue-card {
+  border-radius: 14px;
+  border: 1px solid #d8dde8;
+  background: #ffffff;
+  padding: 12px;
+  text-align: center;
+  display: grid;
+  gap: 8px;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.issue-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(28, 36, 54, 0.12);
+}
+
+.issue-card:focus-visible {
+  outline: 3px solid #4f67ff;
+  outline-offset: 2px;
+}
+
+.issue-card.active {
+  border-color: #4f67ff;
+  box-shadow: 0 16px 30px rgba(79, 103, 255, 0.2);
+}
+
+.issue-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto;
+  background: #f7f8ff;
+  border-radius: 14px;
+}
+
+.issue-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.issue-label {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #1c2436;
+  font-weight: 600;
 }
 
 .building-site:hover {
