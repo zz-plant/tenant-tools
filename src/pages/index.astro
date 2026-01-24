@@ -1,6 +1,12 @@
 ---
 import "../styles/global.css";
 import NoticeBuilder from "../components/NoticeBuilder";
+import { getBuildingOptions } from "../data/buildings";
+import { parseBuildingKeys } from "../lib/access";
+
+const env = Astro.locals.runtime?.env ?? {};
+const buildingKeys = parseBuildingKeys(env.BUILDING_KEYS_JSON);
+const buildingOptions = getBuildingOptions(buildingKeys);
 ---
 
 <!DOCTYPE html>
@@ -11,6 +17,6 @@ import NoticeBuilder from "../components/NoticeBuilder";
     <title>Tenant Notice Builder</title>
   </head>
   <body>
-    <NoticeBuilder client:load />
+    <NoticeBuilder client:load buildingOptions={buildingOptions} />
   </body>
 </html>

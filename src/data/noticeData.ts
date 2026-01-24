@@ -278,6 +278,7 @@ export const fieldDefinitions = {
   temp: { label: "Temperature (°F)", type: "number", placeholder: "68" },
   time: { label: "Time", type: "time" },
   location: { label: "Location (for leaks)", placeholder: "kitchen ceiling" },
+  attachment: { label: "Evidence note (optional)", placeholder: "photo of ceiling leak" },
   eventDate: { label: "Event date", type: "date" },
   eventDates: { label: "Event date(s)", placeholder: "[DATES]" },
   eventDateTime: { label: "Event date/time", placeholder: "[DATE/TIME]" },
@@ -292,14 +293,14 @@ export type FieldDefinitionKey = keyof typeof fieldDefinitions;
 
 export const issueFieldMap = {
   heat: ["temp", "time"],
-  leak: ["location"],
-  pests: ["pestType"],
-  entry: ["eventDate", "eventDates"],
-  common: ["commonArea"],
+  leak: ["location", "attachment"],
+  pests: ["pestType", "attachment"],
+  entry: ["eventDate", "eventDates", "attachment"],
+  common: ["commonArea", "attachment"],
   "no-timeline": [],
   deposit: ["moveOutDate"],
-  lockout: ["lockoutAction", "eventDate", "eventDateTime"],
-  building: ["issueDescription"],
+  lockout: ["lockoutAction", "eventDate", "eventDateTime", "attachment"],
+  building: ["issueDescription", "attachment"],
 };
 
 export const stages = {
