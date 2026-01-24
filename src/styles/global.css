@@ -670,6 +670,82 @@ label {
   border-top: 1px solid #e3e7f5;
 }
 
+.dashboard-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.filter-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.status-group {
+  display: grid;
+  gap: 12px;
+}
+
+.status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.status-pill {
+  background: #e8ecfb;
+  color: #1f2a44;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.issue-card {
+  border-radius: 16px;
+  border: 1px solid #dde4f3;
+  background: #ffffff;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.issue-title {
+  margin: 0;
+  font-weight: 600;
+  color: #1c2436;
+}
+
+.issue-meta {
+  margin: 0;
+  color: #5a647a;
+  font-size: 0.9rem;
+}
+
+.issue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.button-compact {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.steward-row {
+  display: grid;
+  gap: 8px;
+}
+
+.steward-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 .submission-block {
   display: grid;
   gap: 10px;
