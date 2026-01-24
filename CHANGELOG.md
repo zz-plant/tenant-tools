@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.17
+- Changed: Simplified building selection to the dropdown and removed the gallery cards to reduce screen clutter.
+
 ## 1.0.16
 - Changed: Updated dashboard status labels to describe verified restoration instead of resolved.
 - Changed: Local rules now appear as a short, collapsed source list to keep the notice flow focused.
