@@ -23,6 +23,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const record = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
+    status: "open",
     issueLabel,
     ...validation.data,
   };

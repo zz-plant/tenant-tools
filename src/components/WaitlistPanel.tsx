@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@base-ui/react/button";
 import { Input } from "@base-ui/react/input";
-import { Select } from "@base-ui/react/select";
-import { portfolioOptions, type PortfolioId } from "../data/portfolioOptions";
+import { type PortfolioId } from "../data/portfolioOptions";
 
 const initialWaitlistState = {
   building: "",
   city: "",
-  portfolio: "other" as PortfolioId,
+  portfolio: "continuum" as PortfolioId,
 };
 
 const WaitlistPanel = () => {
@@ -42,12 +41,6 @@ const WaitlistPanel = () => {
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.currentTarget;
       setWaitlistState((prev) => ({ ...prev, [key]: value }));
-    };
-
-  const handleWaitlistSelect =
-    (key: keyof typeof initialWaitlistState) =>
-    (value: string | null) => {
-      setWaitlistState((prev) => ({ ...prev, [key]: (value ?? "") as PortfolioId }));
     };
 
   const handleWaitlistSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -156,31 +149,6 @@ const WaitlistPanel = () => {
               onChange={handleWaitlistChange("city")}
               placeholder="City"
             />
-          </label>
-          <label>
-            Property group
-            <Select.Root value={waitlistState.portfolio} onValueChange={handleWaitlistSelect("portfolio")} required>
-              <Select.Trigger className="select-trigger" aria-label="Property group">
-                <Select.Value placeholder="Select property group" />
-                <Select.Icon className="select-icon">
-                  <span aria-hidden="true">▾</span>
-                </Select.Icon>
-              </Select.Trigger>
-              <Select.Portal>
-                <Select.Positioner className="select-positioner">
-                  <Select.Popup className="select-popup">
-                    <Select.List className="select-list">
-                      {portfolioOptions.map((option) => (
-                        <Select.Item key={option.id} value={option.id} className="select-item">
-                          <Select.ItemText>{option.label}</Select.ItemText>
-                          <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                        </Select.Item>
-                      ))}
-                    </Select.List>
-                  </Select.Popup>
-                </Select.Positioner>
-              </Select.Portal>
-            </Select.Root>
           </label>
           <div className="waitlist-actions">
             <Button className="button" type="submit" disabled={waitlistStatus === "saving"}>

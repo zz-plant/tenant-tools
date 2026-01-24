@@ -2,6 +2,12 @@
 
 ## 1.0.13
 - Added: Plan goal options to track next-step preferences alongside the notice workflow.
+- Added: Issue gallery with SVG icon cards for faster issue selection.
+- Changed: Coming-soon buildings are visible but not selectable.
+- Changed: Property group selection removed until landlord support is available.
+- Added: Resident-only building dashboard with status grouping, filters, and “me too” actions.
+- Added: Steward status updates for submissions (key-gated).
+- Security: Building dashboard access now requires a building access key.
 
 ## 1.0.12
 - Changed: Moved Continuum contact details into a dedicated panel near the notice preview.

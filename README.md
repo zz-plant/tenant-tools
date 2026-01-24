@@ -149,6 +149,13 @@ If you want to enable shared storage, create two KV namespaces and bind them in 
 
 Do not store personal names or unit numbers in KV. Keep only structured issue data.
 
+## Access keys (optional)
+
+Building dashboards are private by default. Set the following environment variables to enable access:
+
+- `BUILDING_ACCESS_KEY` — required to view `/buildings/[id]` dashboards (pass with `?key=...`).
+- `STEWARD_KEY` — required to enable steward status updates (pass with `?stewardKey=...`).
+
 ---
 
 ## Vision
