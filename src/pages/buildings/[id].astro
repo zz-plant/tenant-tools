@@ -2,7 +2,11 @@
 import "../../styles/global.css";
 import { issueOptions } from "../../data/noticeData";
 import { isAccessKeyValid } from "../../lib/access";
-import { normalizeSubmissionStatus, type SubmissionStatus } from "../../lib/submissions";
+import {
+  normalizeSubmissionStatus,
+  submissionStatusLabels,
+  type SubmissionStatus,
+} from "../../lib/submissions";
 
 export const prerender = false;
 
@@ -26,11 +30,7 @@ const issueFilter = issueIds.has(issueFilterRaw) ? issueFilterRaw : "all";
 const statusFilterRaw = url.searchParams.get("status") || "all";
 const statusFilter = statusIds.includes(statusFilterRaw as SubmissionStatus) ? statusFilterRaw : "all";
 
-const statusLabels: Record<SubmissionStatus, string> = {
-  open: "Open",
-  resolved: "Resolved",
-  archived: "Archived",
-};
+const statusLabels = submissionStatusLabels;
 
 type BuildingSubmission = {
   id: string;
@@ -164,7 +164,7 @@ const totalFiltered = filtered.length;
                   <p class="summary-value">{grouped.open.length}</p>
                 </div>
                 <div class="summary-card">
-                  <p class="summary-label">Resolved</p>
+                  <p class="summary-label">{statusLabels.resolved}</p>
                   <p class="summary-value">{grouped.resolved.length}</p>
                 </div>
                 <div class="summary-card">
