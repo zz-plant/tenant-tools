@@ -1,5 +1,5 @@
 import { fieldDefinitions, issueOptions } from "../data/noticeData";
-import { sanitizeLimitedText } from "./validation";
+import { getSensitiveContentMessages, sanitizeLimitedText } from "./validation";
 
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
 const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
@@ -73,6 +73,12 @@ const sanitizeDetails = (details: Record<string, unknown>) => {
   return cleaned;
 };
 
+const pushSensitiveErrors = (label: string, value: string, errors: string[]) => {
+  getSensitiveContentMessages(value).forEach((message) => {
+    errors.push(`${label}: ${message}`);
+  });
+};
+
 export const validateSubmissionInput = (payload: unknown) => {
   if (!payload || typeof payload !== "object") {
     return { ok: false, errors: ["Payload must be an object."] } as const;
@@ -85,6 +91,8 @@ export const validateSubmissionInput = (payload: unknown) => {
     typeof data.building === "string" ? sanitizeLimitedText(data.building, maxBuildingLength) : "";
   if (!building) {
     errors.push("Building is required.");
+  } else {
+    pushSensitiveErrors("Building", building, errors);
   }
 
   const issue = typeof data.issue === "string" ? data.issue : "";
@@ -139,12 +147,23 @@ export const validateSubmissionInput = (payload: unknown) => {
 
   const ticketNumber =
     typeof data.ticketNumber === "string" ? sanitizeLimitedText(data.ticketNumber, maxTicketNumberLength) : "";
+  if (ticketNumber) {
+    pushSensitiveErrors("Ticket number", ticketNumber, errors);
+  }
 
   const simpleEnglish = Boolean(data.simpleEnglish);
   const issueDetails =
     data.issueDetails && typeof data.issueDetails === "object"
       ? sanitizeDetails(data.issueDetails as Record<string, unknown>)
       : {};
+
+  if (Object.keys(issueDetails).length > 0) {
+    const detailMessages = new Set<string>();
+    Object.values(issueDetails).forEach((value) => {
+      getSensitiveContentMessages(value).forEach((message) => detailMessages.add(message));
+    });
+    detailMessages.forEach((message) => errors.push(`Details: ${message}`));
+  }
 
   if (errors.length > 0) {
     return { ok: false, errors } as const;

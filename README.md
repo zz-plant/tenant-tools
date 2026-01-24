@@ -151,9 +151,24 @@ Do not store personal names or unit numbers in KV. Keep only structured issue da
 
 ## Access keys (optional)
 
-Building dashboards are private by default. Set the following environment variables to enable access:
+Resident pages are private by default. Add the building key to the URL with `?key=...`.
 
-- `BUILDING_ACCESS_KEY` — required to view `/buildings/[id]` dashboards (pass with `?key=...`).
+Use per-building keys when possible:
+
+- `BUILDING_KEYS_JSON` — JSON map of building id to key.
+
+Example:
+
+```json
+{
+  "2400 W Wabansia": "17000",
+  "2353 W Wabansia": "16000"
+}
+```
+
+Fallback options:
+
+- `BUILDING_ACCESS_KEY` — optional global fallback when a building is not listed in `BUILDING_KEYS_JSON`.
 - `STEWARD_KEY` — required to enable steward status updates (pass with `?stewardKey=...`).
 
 ---

@@ -1,7 +1,7 @@
 ---
 import "../../styles/global.css";
 import { issueOptions } from "../../data/noticeData";
-import { isAccessKeyValid } from "../../lib/access";
+import { isAccessKeyValid, isBuildingAccessValid } from "../../lib/access";
 import {
   normalizeSubmissionStatus,
   submissionStatusLabels,
@@ -15,13 +15,12 @@ const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
 const url = new URL(Astro.request.url);
 const accessKey = url.searchParams.get("key");
 const stewardKey = url.searchParams.get("stewardKey");
-const requiredAccessKey = Astro.locals.runtime?.env?.BUILDING_ACCESS_KEY;
 const requiredStewardKey = Astro.locals.runtime?.env?.STEWARD_KEY;
+const buildingId = decodeURIComponent(id ?? "");
 
-const hasAccess = isAccessKeyValid(accessKey, requiredAccessKey);
+const hasAccess = isBuildingAccessValid(buildingId, accessKey, Astro.locals.runtime?.env ?? {});
 const isSteward = isAccessKeyValid(stewardKey, requiredStewardKey);
 
-const buildingId = decodeURIComponent(id ?? "");
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
 const statusIds: SubmissionStatus[] = ["open", "resolved", "archived"];
 

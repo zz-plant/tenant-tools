@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { issueOptions, zoneOptions } from "../../../data/noticeData";
+import { isBuildingAccessValid, isResidentKeyRecognized } from "../../../lib/access";
 
 export const prerender = false;
 
@@ -26,11 +27,26 @@ export const GET: APIRoute = async ({ request, locals }) => {
   const issue = url.searchParams.get("issue") || "";
   const zone = url.searchParams.get("zone") || "";
   const startDate = url.searchParams.get("startDate") || "";
+  const providedKey = request.headers.get("x-building-key") || url.searchParams.get("key");
   const windowDays = 21;
 
   if (!building || !issue || !issueIds.has(issue) || (zone && !zoneIds.has(zone))) {
     return new Response(JSON.stringify({ matches: [] }), {
       status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const env = locals.runtime?.env ?? {};
+  if (!isResidentKeyRecognized(providedKey, env)) {
+    return new Response(JSON.stringify({ error: "Resident access is required.", matches: [] }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+  if (!isBuildingAccessValid(building, providedKey, env)) {
+    return new Response(JSON.stringify({ error: "This key does not match the building.", matches: [] }), {
+      status: 403,
       headers: { "Content-Type": "application/json" },
     });
   }
