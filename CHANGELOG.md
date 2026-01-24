@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.18
+- Changed: Refined the generated notice preview layout with clearer tags and a lighter reading panel.
+
 ## 1.0.17
 - Changed: Simplified building selection to the dropdown and removed the gallery cards to reduce screen clutter.
 
