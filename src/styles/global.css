@@ -747,6 +747,16 @@ label {
   gap: 10px;
 }
 
+.plan-options {
+  display: grid;
+  gap: 10px;
+}
+
+.plan-caution {
+  color: #6a4c1a;
+  font-weight: 600;
+}
+
 .preset-card {
   display: grid;
   grid-template-columns: 20px 1fr;

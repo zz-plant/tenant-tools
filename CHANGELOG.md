@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.13
+- Added: Plan goal options to track next-step preferences alongside the notice workflow.
+
 ## 1.0.12
 - Changed: Moved Continuum contact details into a dedicated panel near the notice preview.
 
