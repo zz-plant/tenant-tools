@@ -11,6 +11,9 @@ const supportedLanguages = new Set(["en", "es", "hi", "pl"]);
 const allowedStages = new Set(["A", "B", "C"]);
 const allowedZones = new Set(["common_area", "hallway", "unit_interior", "entry", "unknown"]);
 const allowedPortfolios = new Set(["continuum", "other"]);
+const allowedStatuses = new Set(["open", "resolved", "archived"]);
+
+export type SubmissionStatus = "open" | "resolved" | "archived";
 
 export type SubmissionInput = {
   building: string;
@@ -33,7 +36,14 @@ export type SubmissionRecord = SubmissionInput & {
   id: string;
   createdAt: string;
   issueLabel: string;
+  status: SubmissionStatus;
 };
+
+export const isValidSubmissionStatus = (value: unknown): value is SubmissionStatus =>
+  typeof value === "string" && allowedStatuses.has(value);
+
+export const normalizeSubmissionStatus = (value: unknown): SubmissionStatus =>
+  isValidSubmissionStatus(value) ? value : "open";
 
 const isValidDateString = (value: string) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
