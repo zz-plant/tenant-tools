@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.0.13
+- Added: Plan goal options to track next-step preferences alongside the notice workflow.
 - Added: Issue gallery with SVG icon cards for faster issue selection.
 - Changed: Coming-soon buildings are visible but not selectable.
 - Changed: Property group selection removed until landlord support is available.
