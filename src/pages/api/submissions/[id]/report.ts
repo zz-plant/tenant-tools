@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { createReportEntry, REPORT_ENTRY_TTL_SECONDS } from "../../../../lib/reports";
 import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
 
 export const prerender = false;
@@ -63,6 +64,10 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   const nextCount = Math.min(50, record.reportCount + increment);
   const updated = { ...record, reportCount: nextCount };
   await kv.put(`submission:${id}`, JSON.stringify(updated));
+  const entry = createReportEntry(id);
+  await kv.put(`report:${id}:${entry.id}`, JSON.stringify(entry), {
+    expirationTtl: REPORT_ENTRY_TTL_SECONDS,
+  });
 
   return new Response(JSON.stringify({ reportCount: nextCount }), {
     status: 200,
