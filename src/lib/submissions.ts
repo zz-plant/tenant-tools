@@ -15,6 +15,12 @@ const allowedStatuses = new Set(["open", "resolved", "archived"]);
 
 export type SubmissionStatus = "open" | "resolved" | "archived";
 
+export const submissionStatusLabels: Record<SubmissionStatus, string> = {
+  open: "Open",
+  resolved: "Verified restored",
+  archived: "Archived",
+};
+
 export type SubmissionInput = {
   building: string;
   issue: string;
