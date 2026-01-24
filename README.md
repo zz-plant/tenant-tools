@@ -161,10 +161,12 @@ Example:
 
 ```json
 {
-  "2400 W Wabansia": "17000",
-  "2353 W Wabansia": "16000"
+  "2400 W Wabansia": "REPLACE_WITH_PRIVATE_KEY_2400",
+  "2353 W Wabansia": "REPLACE_WITH_PRIVATE_KEY_2353"
 }
 ```
+
+Do not commit real keys to the repository. Set them only in environment variables.
 
 Fallback options:
 

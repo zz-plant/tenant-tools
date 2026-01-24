@@ -32,29 +32,29 @@ describe("isAccessKeyValid", () => {
 
 describe("building key helpers", () => {
   const BUILDING_KEYS_JSON = JSON.stringify({
-    "2400 W Wabansia": "17000",
-    "2353 W Wabansia": "16000",
+    "2400 W Wabansia": "key-2400-test",
+    "2353 W Wabansia": "key-2353-test",
   });
 
   it("parses building keys safely", () => {
     assert.deepEqual(parseBuildingKeys(BUILDING_KEYS_JSON), {
-      "2400 W Wabansia": "17000",
-      "2353 W Wabansia": "16000",
+      "2400 W Wabansia": "key-2400-test",
+      "2353 W Wabansia": "key-2353-test",
     });
     assert.deepEqual(parseBuildingKeys("{"), {});
   });
 
   it("recognizes resident keys from the mapping", () => {
     const env = { BUILDING_KEYS_JSON };
-    assert.equal(isResidentKeyRecognized("17000", env), true);
-    assert.equal(isResidentKeyRecognized("16000", env), true);
+    assert.equal(isResidentKeyRecognized("key-2400-test", env), true);
+    assert.equal(isResidentKeyRecognized("key-2353-test", env), true);
     assert.equal(isResidentKeyRecognized("99999", env), false);
   });
 
   it("validates the correct key for each building", () => {
     const env = { BUILDING_KEYS_JSON };
-    assert.equal(isBuildingAccessValid("2400 W Wabansia", "17000", env), true);
-    assert.equal(isBuildingAccessValid("2400 W Wabansia", "16000", env), false);
+    assert.equal(isBuildingAccessValid("2400 W Wabansia", "key-2400-test", env), true);
+    assert.equal(isBuildingAccessValid("2400 W Wabansia", "key-2353-test", env), false);
   });
 
   it("falls back to the global key only when a building key is missing", () => {
@@ -65,7 +65,7 @@ describe("building key helpers", () => {
 
   it("returns building ids for a given key", () => {
     const envWithMapping = { BUILDING_KEYS_JSON };
-    assert.deepEqual(getBuildingIdsForKey("17000", envWithMapping), ["2400 W Wabansia"]);
+    assert.deepEqual(getBuildingIdsForKey("key-2400-test", envWithMapping), ["2400 W Wabansia"]);
 
     const envWithFallback = { BUILDING_ACCESS_KEY: "fallback" };
     assert.deepEqual(getBuildingIdsForKey("fallback", envWithFallback), ["*"]);
