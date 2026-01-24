@@ -662,6 +662,54 @@ label {
   font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
 }
 
+.notice-preview {
+  border-radius: 16px;
+  border: 1px solid #dbe2f3;
+  background: #ffffff;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.notice-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.notice-preview-title {
+  margin: 0;
+  font-weight: 600;
+  color: #1c2436;
+}
+
+.notice-preview-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.notice-tag {
+  background: #edf1ff;
+  color: #2a3550;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.output-notice {
+  margin: 0;
+  background: #f9fafc;
+  color: #1e293b;
+  border: 1px solid #e1e6f3;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 220px;
+}
+
 .export-block {
   display: grid;
   gap: 12px;

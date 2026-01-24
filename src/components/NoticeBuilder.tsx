@@ -757,6 +757,11 @@ const NoticeBuilder = () => {
     { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
     { label: "Plan goal", value: selectedPlanChoice.label },
   ];
+  const noticeLanguageLabel = formState.simpleEnglish
+    ? "Very simple English"
+    : formState.language === "en"
+      ? "English"
+      : formState.language.toUpperCase();
 
   const detailSummaryItems = useMemo(
     () =>
@@ -1503,7 +1508,20 @@ const NoticeBuilder = () => {
           </div>
           <p className="helper">Preview the message before you send it.</p>
           <p className="helper">Privacy reminder: do not include names, unit numbers, or personal details.</p>
-          <pre className="output">{noticeText}</pre>
+          <div className="notice-preview">
+            <div className="notice-preview-header">
+              <div>
+                <p className="notice-preview-title">Notice message</p>
+                <p className="helper">Copy and send this text.</p>
+              </div>
+              <div className="notice-preview-tags">
+                <span className="notice-tag">{selectedIssue?.label || "Issue"}</span>
+                <span className="notice-tag">{stageLabel}</span>
+                <span className="notice-tag">{noticeLanguageLabel}</span>
+              </div>
+            </div>
+            <pre className="output output-notice">{noticeText}</pre>
+          </div>
           <div className="export-block">
             <div className="export-header">
               <div>
