@@ -2,6 +2,7 @@
 
 ## 1.0.16
 - Changed: Updated dashboard status labels to describe verified restoration instead of resolved.
+- Changed: Local rules now appear as a short, collapsed source list to keep the notice flow focused.
 
 ## 1.0.15
 - Changed: Reframed notice builder next steps and 311 guidance as common tenant paths with risk and documentation gap context.
