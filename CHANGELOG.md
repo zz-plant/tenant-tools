@@ -2,6 +2,8 @@
 
 ## 1.0.15
 - Changed: Reframed notice builder next steps and 311 guidance as common tenant paths with risk and documentation gap context.
+- Changed: Removed the rent holdback plan choice and shifted the default plan to documentation-only.
+- Changed: Export summaries no longer include the plan goal label.
 
 ## 1.0.14
 - Added: Anonymous report entries are recorded when residents add a “me too” report.
