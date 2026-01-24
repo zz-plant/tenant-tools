@@ -7,8 +7,8 @@ import { POST as reportSubmission } from "../src/pages/api/submissions/[id]/repo
 type MockKv = ReturnType<typeof createMockKv>;
 
 const BUILDING_KEYS_JSON = JSON.stringify({
-  "2400 W Wabansia": "17000",
-  "2353 W Wabansia": "16000",
+  "2400 W Wabansia": "key-2400-test",
+  "2353 W Wabansia": "key-2353-test",
 });
 
 const basePayload = {
@@ -85,7 +85,7 @@ describe("resident key gating on submission routes", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-building-key": "17000",
+        "x-building-key": "key-2400-test",
         "x-forwarded-for": "1.1.1.1",
       },
       body: JSON.stringify(basePayload),
@@ -97,7 +97,7 @@ describe("resident key gating on submission routes", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-building-key": "16000",
+        "x-building-key": "key-2353-test",
         "x-forwarded-for": "1.1.1.1",
       },
       body: JSON.stringify(basePayload),
@@ -106,7 +106,7 @@ describe("resident key gating on submission routes", () => {
     assert.equal(validKeyResponse.status, 201);
     const createdPayload = await readJson(validKeyResponse);
     assert.ok(typeof createdPayload.id === "string");
-    assert.ok(String(createdPayload.url).includes("?key=16000"));
+    assert.ok(String(createdPayload.url).includes("?key=key-2353-test"));
 
     const submissionId = createdPayload.id as string;
     const invalidKeyGetCount = kv.getCallCount();
@@ -117,13 +117,13 @@ describe("resident key gating on submission routes", () => {
     assert.equal(invalidKeyResponse.status, 403);
     assert.equal(kv.getCallCount(), invalidKeyGetCount);
 
-    const otherBuildingRequest = new Request(`http://localhost/api/submissions/${submissionId}?key=17000`, {
+    const otherBuildingRequest = new Request(`http://localhost/api/submissions/${submissionId}?key=key-2400-test`, {
       method: "GET",
     });
     const otherBuildingResponse = await getSubmission({ params: { id: submissionId }, request: otherBuildingRequest, locals } as Parameters<typeof getSubmission>[0]);
     assert.equal(otherBuildingResponse.status, 404);
 
-    const correctBuildingRequest = new Request(`http://localhost/api/submissions/${submissionId}?key=16000`, {
+    const correctBuildingRequest = new Request(`http://localhost/api/submissions/${submissionId}?key=key-2353-test`, {
       method: "GET",
     });
     const correctBuildingResponse = await getSubmission({ params: { id: submissionId }, request: correctBuildingRequest, locals } as Parameters<typeof getSubmission>[0]);
@@ -139,7 +139,7 @@ describe("resident key gating on submission routes", () => {
 
     const otherBuildingReportRequest = new Request(`http://localhost/api/submissions/${submissionId}/report`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-building-key": "17000" },
+      headers: { "Content-Type": "application/json", "x-building-key": "key-2400-test" },
       body: JSON.stringify({ increment: 1 }),
     });
     const otherBuildingReportResponse = await reportSubmission({ params: { id: submissionId }, request: otherBuildingReportRequest, locals } as Parameters<typeof reportSubmission>[0]);
@@ -149,7 +149,7 @@ describe("resident key gating on submission routes", () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-building-key": "16000",
+        "x-building-key": "key-2353-test",
         "x-forwarded-for": "1.1.1.1",
       },
       body: JSON.stringify({ increment: 1 }),
