@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.15
+- Changed: Removed the rent holdback plan choice and shifted the default plan to documentation-only.
+- Changed: Export summaries no longer include the plan goal label.
+
 ## 1.0.14
 - Added: Anonymous report entries are recorded when residents add a “me too” report.
 - Changed: The notice builder impact count starts at 1 and points residents to real “me too” actions.

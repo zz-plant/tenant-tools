@@ -54,7 +54,7 @@ const initialState = {
 
 type Stage = "A" | "B" | "C";
 type ExportAudience = "inspector" | "legal" | "management" | "personal";
-type PlanChoice = "keep_open" | "hire_professional" | "rent_holdback" | "end_lease";
+type PlanChoice = "keep_open" | "hire_professional" | "end_lease";
 
 type SimilarIssue = {
   id: string;
@@ -119,20 +119,14 @@ const exportAudienceOptions: Array<{ id: ExportAudience; label: string; descript
 const planChoiceOptions: Array<{ id: PlanChoice; label: string; description: string; caution?: string }> = [
   {
     id: "keep_open",
-    label: "Keep options open",
-    description: "I want to keep documenting the issue before choosing a next step.",
+    label: "Documentation only",
+    description: "I want to document the issue before choosing a next step.",
   },
   {
     id: "hire_professional",
     label: "Consider hiring a professional",
     description: "I may want to arrange a repair and request reimbursement later.",
     caution: "Only do this if local rules allow. Get advice first.",
-  },
-  {
-    id: "rent_holdback",
-    label: "Consider a rent reduction or holdback",
-    description: "I may want information about a temporary rent reduction.",
-    caution: "Rules are strict. Talk to legal aid before changing rent payments.",
   },
   {
     id: "end_lease",
@@ -566,7 +560,6 @@ const NoticeBuilder = () => {
         includeReportCount: boolean;
         includeEvidence: boolean;
         includeTicket: boolean;
-        includePlanChoice: boolean;
         notes: string[];
       }
     > = {
@@ -576,7 +569,6 @@ const NoticeBuilder = () => {
         includeReportCount: true,
         includeEvidence: true,
         includeTicket: true,
-        includePlanChoice: true,
         notes: ["Resident-reported. Not verified.", "Evidence files are stored privately."],
       },
       legal: {
@@ -585,7 +577,6 @@ const NoticeBuilder = () => {
         includeReportCount: true,
         includeEvidence: true,
         includeTicket: true,
-        includePlanChoice: true,
         notes: ["Resident-reported. Dates are recorded below.", "Evidence files are stored privately."],
       },
       management: {
@@ -594,7 +585,6 @@ const NoticeBuilder = () => {
         includeReportCount: false,
         includeEvidence: false,
         includeTicket: false,
-        includePlanChoice: false,
         notes: ["Request: Please share a repair plan and timeline."],
       },
       personal: {
@@ -603,7 +593,6 @@ const NoticeBuilder = () => {
         includeReportCount: true,
         includeEvidence: true,
         includeTicket: true,
-        includePlanChoice: true,
         notes: ["Saved for personal records. No names are included."],
       },
     };
@@ -622,7 +611,6 @@ const NoticeBuilder = () => {
       `Days open: ${daysOpen}`,
       config.includeReportCount ? `Residents reporting: ${impactCount}` : null,
       config.includeEvidence ? `Evidence noted: ${evidence}` : null,
-      config.includePlanChoice ? `Plan goal: ${selectedPlanChoice.label}` : null,
       config.includeTicket && formState.ticketDate
         ? `311 ticket date: ${formState.ticketDate}`
         : null,
@@ -656,8 +644,6 @@ const NoticeBuilder = () => {
     formState.ticketNumber,
     selectedZone?.label,
     selectedPortfolio?.label,
-    formState.planChoice,
-    selectedPlanChoice.label,
   ]);
 
   const handlePersonalCopyToggle = (checked: boolean) => {
