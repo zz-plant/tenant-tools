@@ -437,6 +437,41 @@ Before finalizing a change, confirm:
 
 ---
 
+## 21) AGENTS.md Best Practices (for maintainers)
+
+Use these practices when you update this file.
+
+### 21.1 Structure and scope
+- Keep a clear table of sections and numbers.
+- Keep each section focused on one topic.
+- State the scope for each instruction. Example: “applies to UI copy only.”
+- Put higher priority rules earlier in the document.
+
+### 21.2 Clarity and format
+- Use short sentences.
+- Use plain words. Avoid jargon.
+- Use “must / must not / should / may” for rules.
+- Provide examples for risky areas (privacy, public mode).
+- Keep lists short and readable.
+
+### 21.3 Change management
+- Record the reason for a change in the PR summary.
+- Note any new risks in the PR security section.
+- Keep changes small when possible.
+- Do not change two unrelated policies in one PR.
+
+### 21.4 Consistency checks
+- Check for conflicts between sections.
+- Keep terms consistent (example: “public mode”).
+- Ensure new rules match the project summary and threat model.
+
+### 21.5 Maintenance
+- Remove outdated rules when the product changes.
+- Keep examples accurate and safe.
+- Keep copy ESL-first and non-idiomatic.
+
+---
+
 ## Appendix A — Canonical Enums (suggested)
 
 Issue types (MVP):
