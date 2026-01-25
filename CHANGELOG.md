@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.21 - 2026-01-24
+
+- Added: Base UI primitives re-exported from `src/components/ui`.
+- Changed: Components now import Base UI primitives from shared UI index.
+
 ## 1.0.20 - 2026-01-24
 
 - Added: Evidence safety checklist before the evidence note field.

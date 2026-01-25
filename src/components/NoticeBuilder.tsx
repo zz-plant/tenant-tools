@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button } from "@base-ui/react/button";
-import { Checkbox } from "@base-ui/react/checkbox";
-import { Input } from "@base-ui/react/input";
-import { Radio } from "@base-ui/react/radio";
-import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
-import { Select } from "@base-ui/react/select";
-import { Switch } from "@base-ui/react/switch";
-import { Tabs } from "@base-ui/react/tabs";
+import {
+  Button,
+  Checkbox,
+  Input,
+  Radio,
+  RadioGroup as BaseRadioGroup,
+  Select,
+  Switch,
+  Tabs,
+} from "./ui";
 import {
   fieldDefinitions,
   issue311Guidance,
