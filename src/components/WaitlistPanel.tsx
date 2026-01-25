@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Button } from "@base-ui/react/button";
-import { Input } from "@base-ui/react/input";
+import { Button, Input } from "./ui";
 import { type PortfolioId } from "../data/portfolioOptions";
 
 const initialWaitlistState = {
