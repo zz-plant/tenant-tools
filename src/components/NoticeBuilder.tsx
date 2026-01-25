@@ -330,6 +330,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
   const isStep1Complete = Boolean(formState.building && formState.issue);
   const isNoticeReady = missingBasics.length === 0;
+  const noticeReadiness = isNoticeReady
+    ? {
+        title: "Notice ready",
+        detail: "Review the summary and copy the message when you are ready.",
+      }
+    : {
+        title: "Finish the basics",
+        detail: "Choose a building and issue to unlock the notice preview.",
+      };
   const canSaveLedger = Boolean(formState.building && formState.issue && buildingKey);
 
   const updateField =
@@ -968,13 +977,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       </a>
       <header className="hero">
         <div className="hero-main">
-          <p className="eyebrow">Tenant support toolkit</p>
+          <p className="eyebrow">Building Ledger</p>
           <h1>Tenant Notice Builder</h1>
           <p className="tagline">
-            Draft clear, dated messages that keep your documentation strong and easy to share.
+            Write clear, dated messages that are easy to share.
           </p>
           <div className="tag-row">
-            <span>Privacy safe</span>
+            <span>No names saved</span>
+            <span>Short facts only</span>
           </div>
         </div>
       </header>
@@ -985,22 +995,32 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <div className="step-header">
               <h2>Build your notice</h2>
               <p className="helper">Follow the steps so nothing important is missed.</p>
-              <p className="helper">
-                Step {currentStep} of {steps.length}
-              </p>
+              <p className="helper">Step {currentStep} of {steps.length}</p>
               <div className="quick-guide">
-                <p className="helper">
-                  <strong>Start here:</strong> Choose a building and issue. You can add more details later.
-                </p>
-                <p className="helper">
-                  <strong>Safety note:</strong> Write short facts only. Do not include names or unit numbers.
-                </p>
-                {missingBasics.length > 0 && (
+                <div>
+                  <p className="quick-title">Quick start</p>
                   <ul className="quick-list">
-                    {missingBasics.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
+                    <li>Choose a building.</li>
+                    <li>Choose an issue type.</li>
+                    <li>Confirm the notice stage.</li>
                   </ul>
+                </div>
+                <div className="quick-warning">
+                  <p className="helper">
+                    <strong>Safety note:</strong> Write short facts only. Do not include names or unit numbers.
+                  </p>
+                </div>
+                {missingBasics.length > 0 && (
+                  <div className="quick-needed">
+                    <p className="helper">
+                      <strong>Needed to continue:</strong>
+                    </p>
+                    <ul className="quick-list">
+                      {missingBasics.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
             </div>
@@ -1568,21 +1588,26 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <p className="helper" role="status" aria-live="polite">
             {noticeStatusMessage}
           </p>
-          {missingBasics.length > 0 && (
-            <div className="notice-hint">
-              <p className="helper">
-                <strong>Missing info:</strong> Add the basics to finish the notice.
-              </p>
+          <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
+            <p className="notice-status-title">{noticeReadiness.title}</p>
+            <p className="helper">{noticeReadiness.detail}</p>
+            {missingBasics.length > 0 && (
               <ul className="quick-list">
                 {missingBasics.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
+            )}
+            {!isNoticeReady && (
               <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                Go to basics
+                Go to step 1
               </Button>
-            </div>
-          )}
+            )}
+          </div>
+          <div className="summary-header">
+            <h3>Notice summary</h3>
+            <p className="helper">Check the key facts before you share.</p>
+          </div>
           <div className="summary-grid">
             {summaryItems.map((item) => (
               <div key={item.label} className="summary-card">
@@ -1591,7 +1616,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               </div>
             ))}
           </div>
-          <p className="helper">Preview the message before you send it.</p>
+          <p className="helper">Preview the message before you share it.</p>
           <p className="helper">Privacy reminder: do not include names, unit numbers, or personal details.</p>
           <div className="notice-preview">
             <div className="notice-preview-header">

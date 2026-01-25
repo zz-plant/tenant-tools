@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.25 - 2026-01-24
+
+- Changed: Notice builder now highlights readiness status, clarifies the quick-start checklist, and aligns header copy with Building Ledger branding.
+- Changed: Dashboard and submission access states now show step-by-step key instructions and clearer privacy notes.
+
 ## 1.0.24 - 2026-01-24
 
 - Changed: Submission summary warning now asks residents to review for names or unit numbers.
