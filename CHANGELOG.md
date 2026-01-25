@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.23 - 2026-01-24
+
+- Changed: Notice builder quick start now highlights the first step and adds a safety reminder.
+- Changed: Building dashboard clarifies filter behavior and makes “Me too” the primary action.
+- Changed: Submission details use a clearer list layout and restate the privacy reminder.
+
 ## 1.0.22 - 2026-01-24
 
 - Added: Skip-to-content links and a return link to the building dashboard for quicker navigation.

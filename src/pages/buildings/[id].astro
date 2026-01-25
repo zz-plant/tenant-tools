@@ -185,6 +185,7 @@ const totalFiltered = filtered.length;
                 <p class="helper">
                   Showing the latest {totalVisible} of {totalFiltered} matching submissions.
                 </p>
+                <p class="helper">Filters on the right update this list.</p>
               </div>
 
               {totalFiltered === 0 ? (
@@ -213,7 +214,7 @@ const totalFiltered = filtered.length;
                           </div>
                           <div class="issue-actions">
                             <button
-                              class="button button-secondary button-compact"
+                              class="button button-compact"
                               type="button"
                               data-report-button
                               data-submission-id={record.id}
