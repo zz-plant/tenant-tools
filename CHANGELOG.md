@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.24 - 2026-01-24
+
+- Changed: Submission summary warning now asks residents to review for names or unit numbers.
+
 ## 1.0.23 - 2026-01-24
 
 - Changed: Notice builder quick start now highlights the first step and adds a safety reminder.
