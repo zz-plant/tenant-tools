@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.22 - 2026-01-24
+
+- Added: Skip-to-content links and a return link to the building dashboard for quicker navigation.
+- Changed: Step flow shows progress, disables forward actions until basics are set, and surfaces live status messages.
+- Fixed: Dashboard and similar-issue links now keep access keys, filters can be cleared, and empty dates show as “Not listed”.
+
 ## 1.0.21 - 2026-01-24
 
 - Added: Base UI primitives re-exported from `src/components/ui`.

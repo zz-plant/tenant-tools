@@ -50,6 +50,16 @@ const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDe
 const zoneLabel = zoneOptions.find((option) => option.id === submissionRecord?.zone)?.label || "Not listed";
 const portfolioLabel =
   portfolioOptions.find((option) => option.id === submissionRecord?.portfolio)?.label || "Not listed";
+const startDateLabel = submissionRecord?.startDate || "Not listed";
+const reportDateLabel = submissionRecord?.reportDate || "Not listed";
+const reportCountLabel =
+  typeof submissionRecord?.reportCount === "number" ? submissionRecord.reportCount : "Not listed";
+
+const accessKeyParam = accessKey ? `key=${encodeURIComponent(accessKey)}` : "";
+const dashboardUrl =
+  submissionRecord?.building
+    ? `/buildings/${encodeURIComponent(submissionRecord.building)}${accessKeyParam ? `?${accessKeyParam}` : ""}`
+    : "";
 
 const timelineEntries = submissionRecord
   ? [
@@ -91,6 +101,7 @@ const formatTimelineDate = (value: string) => {
   </head>
   <body>
     <div class="page">
+      <a class="skip-link" href="#main">Skip to main content</a>
       <header class="hero">
         <div class="hero-main">
           <p class="eyebrow">Shared ledger entry</p>
@@ -99,7 +110,7 @@ const formatTimelineDate = (value: string) => {
         </div>
       </header>
 
-      <main class="layout">
+      <main class="layout" id="main">
         <section class="panel panel-highlight preview-panel">
           {!hasAccess ? (
             <div>
@@ -131,17 +142,22 @@ const formatTimelineDate = (value: string) => {
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Start date</p>
-                  <p class="summary-value">{submissionRecord.startDate}</p>
+                  <p class="summary-value">{startDateLabel}</p>
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Report date</p>
-                  <p class="summary-value">{submissionRecord.reportDate}</p>
+                  <p class="summary-value">{reportDateLabel}</p>
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Reports</p>
-                  <p class="summary-value">{submissionRecord.reportCount}</p>
+                  <p class="summary-value">{reportCountLabel}</p>
                 </div>
               </div>
+              {dashboardUrl && (
+                <a class="button button-secondary" href={dashboardUrl}>
+                  Back to building dashboard
+                </a>
+              )}
 
               <div class="export-block">
                 <div>

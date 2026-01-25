@@ -313,6 +313,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [similarError, setSimilarError] = useState("");
   const [dismissSimilar, setDismissSimilar] = useState(false);
   const [reportingIssueId, setReportingIssueId] = useState<string | null>(null);
+  const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
+  const [exportStatusMessage, setExportStatusMessage] = useState("");
+  const [linkStatusMessage, setLinkStatusMessage] = useState("");
 
   const missingBasics = useMemo(() => {
     const missing: string[] = [];
@@ -324,6 +327,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     }
     return missing;
   }, [formState.building, formState.issue]);
+
+  const isStep1Complete = Boolean(formState.building && formState.issue);
+  const isNoticeReady = missingBasics.length === 0;
+  const canSaveLedger = Boolean(formState.building && formState.issue && buildingKey);
 
   const updateField =
     (key: keyof FormState) =>
@@ -615,13 +622,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     }
     await navigator.clipboard.writeText(noticeText);
     setCopyLabel("Copied!");
+    setNoticeStatusMessage("Notice copied.");
     setTimeout(() => setCopyLabel("Copy text"), 1500);
+    setTimeout(() => setNoticeStatusMessage(""), 2000);
   };
 
   const handleSummaryCopy = async () => {
     await navigator.clipboard.writeText(exportSummary);
     setSummaryCopyLabel("Copied!");
+    setExportStatusMessage("Summary copied.");
     setTimeout(() => setSummaryCopyLabel("Copy summary"), 1500);
+    setTimeout(() => setExportStatusMessage(""), 2000);
   };
 
   const handleSummaryDownload = () => {
@@ -635,6 +646,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
+    setExportStatusMessage("Download started.");
+    setTimeout(() => setExportStatusMessage(""), 2000);
   };
 
   const handleLedgerSave = async () => {
@@ -713,7 +726,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     }
     await navigator.clipboard.writeText(`${window.location.origin}${submissionUrl}`);
     setLinkCopyLabel("Link copied");
+    setLinkStatusMessage("Permalink copied.");
     setTimeout(() => setLinkCopyLabel("Copy link"), 1500);
+    setTimeout(() => setLinkStatusMessage(""), 2000);
   };
 
   const handleReset = () => {
@@ -734,6 +749,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     setSaveError("");
     setSubmissionUrl("");
     setLinkCopyLabel("Copy link");
+    setNoticeStatusMessage("");
+    setExportStatusMessage("");
+    setLinkStatusMessage("");
     setRepeatLabel("Repeat with today's date");
     setExportAudience("inspector");
     setSimilarIssues([]);
@@ -755,7 +773,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     await navigator.clipboard.writeText(repeatedText);
     setFormState(nextState);
     setRepeatLabel("Copied with today's date");
+    setNoticeStatusMessage("Notice copied with today's date.");
     setTimeout(() => setRepeatLabel("Repeat with today's date"), 1600);
+    setTimeout(() => setNoticeStatusMessage(""), 2000);
   };
 
   const handleAddToExisting = async (id: string) => {
@@ -943,6 +963,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
   return (
     <div className="page">
+      <a className="skip-link" href="#main">
+        Skip to main content
+      </a>
       <header className="hero">
         <div className="hero-main">
           <p className="eyebrow">Tenant support toolkit</p>
@@ -956,12 +979,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         </div>
       </header>
 
-      <main className="layout">
+      <main className="layout" id="main">
         <div className="flow">
           <section className="panel">
             <div className="step-header">
               <h2>Build your notice</h2>
               <p className="helper">Follow the steps so nothing important is missed.</p>
+              <p className="helper">
+                Step {currentStep} of {steps.length}
+              </p>
               <div className="quick-guide">
                 <p className="helper">
                   <strong>Quick start:</strong> Choose a building and issue to generate a notice. You can add more details
@@ -990,6 +1016,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     key={step.id}
                     value={String(step.id)}
                     className={`step-button ${currentStep === step.id ? "active" : ""}`}
+                    aria-current={currentStep === step.id ? "step" : undefined}
                   >
                     <span className="step-title">{step.title}</span>
                     <span className="step-label">{step.label}</span>
@@ -1124,7 +1151,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                               </p>
                             </div>
                             <div className="similar-issue-actions">
-                              <a className="button button-secondary" href={`/submissions/${issue.id}`}>
+                              <a
+                                className="button button-secondary"
+                                href={`/submissions/${issue.id}${buildingKey ? `?key=${encodeURIComponent(buildingKey)}` : ""}`}
+                              >
                                 View summary
                               </a>
                               <Button
@@ -1140,16 +1170,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         ))}
                       </ul>
                       {similarLoading && <p className="helper">Checking recent issues...</p>}
-                      {similarNotice && <p className="similar-issue-success">{similarNotice}</p>}
-                      {similarError && <p className="similar-issue-error">{similarError}</p>}
+                      {similarNotice && (
+                        <p className="similar-issue-success" role="status" aria-live="polite">
+                          {similarNotice}
+                        </p>
+                      )}
+                      {similarError && (
+                        <p className="similar-issue-error" role="alert">
+                          {similarError}
+                        </p>
+                      )}
                       <div className="similar-issue-footer">
-                      <Button
-                        className="link-button"
-                        type="button"
-                        onClick={() => setDismissSimilar(true)}
-                      >
-                        Keep this as a new issue
-                      </Button>
+                        <Button
+                          className="link-button"
+                          type="button"
+                          onClick={() => setDismissSimilar(true)}
+                        >
+                          Keep this as a new issue
+                        </Button>
                       </div>
                     </div>
                   )}
@@ -1344,7 +1382,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     strongest evidence.
                   </p>
                   <div className="review-actions">
-                    <Button className="button" type="button" onClick={handleCopy}>
+                    <Button className="button" type="button" onClick={handleCopy} disabled={!isNoticeReady}>
                       {copyLabel}
                     </Button>
                     <Button className="button button-secondary" type="button" onClick={handleReset}>
@@ -1368,11 +1406,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 className="button"
                 type="button"
                 onClick={() => setCurrentStep((prev) => Math.min(steps.length, prev + 1))}
-                disabled={currentStep === steps.length}
+                disabled={currentStep === steps.length || (currentStep === 1 && !isStep1Complete)}
               >
                 Next
               </Button>
             </div>
+            {currentStep === 1 && !isStep1Complete && (
+              <p className="helper">Choose a building and issue to continue.</p>
+            )}
           </section>
 
           <section className="panel">
@@ -1511,10 +1552,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <div className="output-header">
             <h2>Generated notice</h2>
             <div className="output-actions">
-              <Button className="button" type="button" onClick={handleCopy}>
+              <Button className="button" type="button" onClick={handleCopy} disabled={!isNoticeReady}>
                 {copyLabel}
               </Button>
-              <Button className="button button-secondary" type="button" onClick={handleRepeatNotice}>
+              <Button className="button button-secondary" type="button" onClick={handleRepeatNotice} disabled={!isNoticeReady}>
                 {repeatLabel}
               </Button>
               <Button className="button button-secondary" type="button" onClick={handleReset}>
@@ -1522,6 +1563,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               </Button>
             </div>
           </div>
+          <p className="helper" role="status" aria-live="polite">
+            {noticeStatusMessage}
+          </p>
           {missingBasics.length > 0 && (
             <div className="notice-hint">
               <p className="helper">
@@ -1576,6 +1620,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </Button>
               </div>
             </div>
+            <p className="helper" role="status" aria-live="polite">
+              {exportStatusMessage}
+            </p>
             <div className="export-status">
               <label>
                 Issue status
@@ -1642,9 +1689,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 {!buildingKey && (
                   <p className="helper">Add your building key to the URL before saving.</p>
                 )}
+                {!formState.building || !formState.issue ? (
+                  <p className="helper">Choose a building and issue to enable saving.</p>
+                ) : null}
               </div>
               <div className="submission-actions">
-                <Button className="button button-secondary" type="button" onClick={handleLedgerSave} disabled={saveStatus === "saving"}>
+                <Button
+                  className="button button-secondary"
+                  type="button"
+                  onClick={handleLedgerSave}
+                  disabled={!canSaveLedger || saveStatus === "saving"}
+                >
                   {saveLabel}
                 </Button>
                 {submissionUrl && (
@@ -1654,12 +1709,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 )}
               </div>
               {saveStatus === "saved" && submissionUrl && (
-                <p className="submission-note">
+                <p className="submission-note" role="status" aria-live="polite">
                   Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>
                 </p>
               )}
               {saveStatus === "error" && (
-                <p className="submission-error">{saveError || "We could not save the ledger entry."}</p>
+                <p className="submission-error" role="alert">
+                  {saveError || "We could not save the ledger entry."}
+                </p>
+              )}
+              {linkStatusMessage && (
+                <p className="helper" role="status" aria-live="polite">
+                  {linkStatusMessage}
+                </p>
               )}
               {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
                 <div className="submission-details">
