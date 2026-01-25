@@ -28,6 +28,13 @@ const issueFilterRaw = url.searchParams.get("issue") || "all";
 const issueFilter = issueIds.has(issueFilterRaw) ? issueFilterRaw : "all";
 const statusFilterRaw = url.searchParams.get("status") || "all";
 const statusFilter = statusIds.includes(statusFilterRaw as SubmissionStatus) ? statusFilterRaw : "all";
+const hasFilters = issueFilter !== "all" || statusFilter !== "all";
+
+const keyParam = accessKey ? `key=${encodeURIComponent(accessKey)}` : "";
+const stewardParam = stewardKey ? `stewardKey=${encodeURIComponent(stewardKey)}` : "";
+const baseQuery = [keyParam, stewardParam].filter(Boolean).join("&");
+const linkSuffix = baseQuery ? `?${baseQuery}` : "";
+const clearFiltersUrl = `/buildings/${encodeURIComponent(buildingId)}${baseQuery ? `?${baseQuery}` : ""}`;
 
 const statusLabels = submissionStatusLabels;
 
@@ -113,6 +120,7 @@ const totalFiltered = filtered.length;
   </head>
   <body>
     <div class="page">
+      <a class="skip-link" href="#main">Skip to main content</a>
       <header class="hero">
         <div class="hero-main">
           <p class="eyebrow">Building ledger</p>
@@ -133,7 +141,7 @@ const totalFiltered = filtered.length;
         </div>
       </header>
 
-      <main class="layout">
+      <main class="layout" id="main">
         <section class="panel panel-highlight dashboard-grid">
           {!hasAccess ? (
             <div>
@@ -209,17 +217,18 @@ const totalFiltered = filtered.length;
                               type="button"
                               data-report-button
                               data-submission-id={record.id}
+                              data-default-label="Me too"
                             >
                               Me too
                             </button>
                             <a
                               class="button button-secondary button-compact"
-                              href={`/submissions/${record.id}`}
+                              href={`/submissions/${record.id}${linkSuffix}`}
                             >
                               View details
                             </a>
                           </div>
-                          <p class="helper" data-report-status={record.id}></p>
+                          <p class="helper" data-report-status={record.id} role="status" aria-live="polite"></p>
                           {isSteward && (
                             <div class="steward-row">
                               <label class="steward-inline">
@@ -240,11 +249,12 @@ const totalFiltered = filtered.length;
                                   type="button"
                                   data-status-save
                                   data-submission-id={record.id}
+                                  data-default-label="Save"
                                 >
                                   Save
                                 </button>
                               </label>
-                              <p class="helper" data-status-note={record.id}></p>
+                              <p class="helper" data-status-note={record.id} role="status" aria-live="polite"></p>
                             </div>
                           )}
                         </article>
@@ -288,6 +298,11 @@ const totalFiltered = filtered.length;
               </select>
             </label>
             <button class="button" type="submit">Apply filters</button>
+            {hasFilters && (
+              <a class="button button-secondary" href={clearFiltersUrl}>
+                Clear filters
+              </a>
+            )}
           </form>
           <div class="export-block">
             <h3>Notes</h3>
@@ -327,7 +342,9 @@ const totalFiltered = filtered.length;
           button.addEventListener("click", async () => {
             const id = button.getAttribute("data-submission-id");
             if (!id) return;
+            const defaultLabel = button.getAttribute("data-default-label") || "Me too";
             button.setAttribute("disabled", "true");
+            button.textContent = "Saving...";
             setReportStatus(id, "Saving your report...");
             try {
               const response = await fetch(`/api/submissions/${id}/report`, {
@@ -349,6 +366,7 @@ const totalFiltered = filtered.length;
               );
             } finally {
               button.removeAttribute("disabled");
+              button.textContent = defaultLabel;
             }
           });
         });
@@ -357,11 +375,13 @@ const totalFiltered = filtered.length;
           button.addEventListener("click", async () => {
             const id = button.getAttribute("data-submission-id");
             if (!id) return;
+            const defaultLabel = button.getAttribute("data-default-label") || "Save";
             const select = document.querySelector(`[data-status-select][data-submission-id="${id}"]`);
             const note = document.querySelector(`[data-status-note="${id}"]`);
             const nextStatus = select?.value;
             if (!nextStatus) return;
             button.setAttribute("disabled", "true");
+            button.textContent = "Saving...";
             if (note) {
               note.textContent = "Saving status...";
               note.style.color = "";
@@ -387,6 +407,7 @@ const totalFiltered = filtered.length;
               }
             } finally {
               button.removeAttribute("disabled");
+              button.textContent = defaultLabel;
             }
           });
         });
