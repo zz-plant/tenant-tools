@@ -113,9 +113,15 @@ const formatTimelineDate = (value: string) => {
       <main class="layout" id="main">
         <section class="panel panel-highlight preview-panel">
           {!hasAccess ? (
-            <div>
+            <div class="access-panel">
               <h2>Access key required</h2>
-              <p class="helper">Add your building key to the URL to view this submission.</p>
+              <p class="helper">This entry is private to residents in the building.</p>
+              <ol class="helper-list">
+                <li>Ask a resident steward for the building key.</li>
+                <li>Add <code>?key=YOUR_KEY</code> to this link.</li>
+                <li>Reload to view the saved summary.</li>
+              </ol>
+              <a class="button button-secondary" href="/">Back to notice builder</a>
             </div>
           ) : submissionRecord ? (
             <>

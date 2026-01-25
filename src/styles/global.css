@@ -128,14 +128,68 @@ body {
   overflow: auto;
 }
 
-.notice-hint {
-  border-radius: 12px;
-  border: 1px solid #d8dde8;
-  background: #f5f7ff;
-  padding: 12px;
+.quick-guide {
+  border-radius: 16px;
+  border: 1px solid #e0e6f6;
+  background: #f4f6ff;
+  padding: 16px;
   display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: 12px;
+}
+
+.quick-title {
+  margin: 0 0 8px;
+  font-weight: 600;
+  color: #1c2436;
+}
+
+.quick-warning {
+  border-radius: 12px;
+  border: 1px solid #f1d5a6;
+  background: #fff4e2;
+  padding: 10px 12px;
+}
+
+.quick-needed {
+  border-radius: 12px;
+  border: 1px solid #d5dbea;
+  background: #ffffff;
+  padding: 10px 12px;
+}
+
+.notice-status {
+  border-radius: 16px;
+  border: 1px solid #d8dde8;
+  background: #f6f7ff;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.notice-status.ready {
+  border-color: #c3dcc6;
+  background: #f1fbf3;
+}
+
+.notice-status.needs {
+  border-color: #f0d2b0;
+  background: #fff5e8;
+}
+
+.notice-status-title {
+  margin: 0;
+  font-weight: 600;
+  color: #1c2436;
+}
+
+.summary-header {
+  display: grid;
+  gap: 4px;
+}
+
+.summary-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
 }
 
 .panel {
@@ -211,15 +265,6 @@ body {
 .step-header {
   display: grid;
   gap: 6px;
-}
-
-.quick-guide {
-  border-radius: 12px;
-  border: 1px solid #e1e6f2;
-  background: #f8f9ff;
-  padding: 12px;
-  display: grid;
-  gap: 8px;
 }
 
 .quick-list {
@@ -432,6 +477,29 @@ label {
   font-size: 0.9rem;
   color: #5a647a;
   margin: 0;
+}
+
+code {
+  font-family: "SF Mono", "JetBrains Mono", "Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  background: #f1f3fa;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #2b3142;
+}
+
+.access-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.helper-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: #2b3142;
 }
 
 .evidence-warning {

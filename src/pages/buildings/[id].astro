@@ -144,11 +144,15 @@ const totalFiltered = filtered.length;
       <main class="layout" id="main">
         <section class="panel panel-highlight dashboard-grid">
           {!hasAccess ? (
-            <div>
+            <div class="access-panel">
               <h2>Access key required</h2>
-              <p class="helper">
-                Add your building access key to the URL to view this dashboard.
-              </p>
+              <p class="helper">This dashboard is private for residents.</p>
+              <ol class="helper-list">
+                <li>Ask a resident steward for the building key.</li>
+                <li>Add <code>?key=YOUR_KEY</code> to the URL.</li>
+                <li>Reload to view the dashboard.</li>
+              </ol>
+              <a class="button button-secondary" href="/">Back to notice builder</a>
             </div>
           ) : !kv ? (
             <div>
@@ -269,50 +273,73 @@ const totalFiltered = filtered.length;
         </section>
 
         <aside class="panel">
-          <div>
-            <h2>Filters</h2>
-            <p class="helper">Filter by issue type or status.</p>
-          </div>
-          <form class="filter-grid" method="get">
-            {accessKey && <input type="hidden" name="key" value={accessKey} />}
-            {stewardKey && <input type="hidden" name="stewardKey" value={stewardKey} />}
-            <label>
-              <span>Issue type</span>
-              <select class="input" name="issue">
-                <option value="all" selected={issueFilter === "all"}>All issues</option>
-                {issueOptions.map((issue) => (
-                  <option value={issue.id} selected={issueFilter === issue.id}>
-                    {issue.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              <span>Status</span>
-              <select class="input" name="status">
-                <option value="all" selected={statusFilter === "all"}>All statuses</option>
-                {statusIds.map((status) => (
-                  <option value={status} selected={statusFilter === status}>
-                    {statusLabels[status]}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button class="button" type="submit">Apply filters</button>
-            {hasFilters && (
-              <a class="button button-secondary" href={clearFiltersUrl}>
-                Clear filters
-              </a>
-            )}
-          </form>
-          <div class="export-block">
-            <h3>Notes</h3>
-            <ul class="submission-detail-list">
-              <li>Use “Me too” to add your report without writing.</li>
-              <li>Stewards can update status for clean records.</li>
-              <li>Counts are resident-reported and not verified.</li>
-            </ul>
-          </div>
+          {!hasAccess ? (
+            <>
+              <div>
+                <h2>Access help</h2>
+                <p class="helper">Keys keep resident reports private.</p>
+              </div>
+              <ol class="helper-list">
+                <li>Get the building key from a resident steward.</li>
+                <li>Add <code>?key=YOUR_KEY</code> to this link.</li>
+                <li>Reload to view filters and reports.</li>
+              </ol>
+              <div class="export-block">
+                <h3>Safety notes</h3>
+                <ul class="submission-detail-list">
+                  <li>This page never shows names or unit numbers.</li>
+                  <li>Evidence files stay private.</li>
+                </ul>
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <h2>Filters</h2>
+                <p class="helper">Filter by issue type or status.</p>
+              </div>
+              <form class="filter-grid" method="get">
+                {accessKey && <input type="hidden" name="key" value={accessKey} />}
+                {stewardKey && <input type="hidden" name="stewardKey" value={stewardKey} />}
+                <label>
+                  <span>Issue type</span>
+                  <select class="input" name="issue">
+                    <option value="all" selected={issueFilter === "all"}>All issues</option>
+                    {issueOptions.map((issue) => (
+                      <option value={issue.id} selected={issueFilter === issue.id}>
+                        {issue.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Status</span>
+                  <select class="input" name="status">
+                    <option value="all" selected={statusFilter === "all"}>All statuses</option>
+                    {statusIds.map((status) => (
+                      <option value={status} selected={statusFilter === status}>
+                        {statusLabels[status]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button class="button" type="submit">Apply filters</button>
+                {hasFilters && (
+                  <a class="button button-secondary" href={clearFiltersUrl}>
+                    Clear filters
+                  </a>
+                )}
+              </form>
+              <div class="export-block">
+                <h3>Notes</h3>
+                <ul class="submission-detail-list">
+                  <li>Use “Me too” to add your report without writing.</li>
+                  <li>Stewards can update status for clean records.</li>
+                  <li>Counts are resident-reported and not verified.</li>
+                </ul>
+              </div>
+            </>
+          )}
         </aside>
       </main>
 
