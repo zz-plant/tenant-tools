@@ -875,6 +875,19 @@ label {
   color: #2b3142;
 }
 
+.detail-grid {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.detail-grid strong {
+  display: inline-block;
+  min-width: 140px;
+  color: #1c2436;
+}
+
 .similar-issue-card {
   border-radius: 16px;
   border: 1px solid #d8dff0;

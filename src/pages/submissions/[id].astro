@@ -182,9 +182,10 @@ const formatTimelineDate = (value: string) => {
                 <div>
                   <h3>Details saved</h3>
                   <p class="helper">Short factual details only.</p>
+                  <p class="helper">This summary hides names and unit numbers.</p>
                 </div>
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
-                  <ul class="submission-detail-list">
+                  <ul class="submission-detail-list detail-grid">
                     {submissionRecord.ticketDate && (
                       <li>
                         <strong>311 ticket date:</strong> {submissionRecord.ticketDate}
@@ -198,7 +199,7 @@ const formatTimelineDate = (value: string) => {
                   </ul>
                 )}
                 {detailEntries.length > 0 ? (
-                  <ul class="submission-detail-list">
+                  <ul class="submission-detail-list detail-grid">
                     {detailEntries.map(([key, value]) => {
                       const label = fieldDefinitions[key as keyof typeof fieldDefinitions]?.label || key;
                       return (

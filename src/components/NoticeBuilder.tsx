@@ -990,8 +990,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               </p>
               <div className="quick-guide">
                 <p className="helper">
-                  <strong>Quick start:</strong> Choose a building and issue to generate a notice. You can add more details
-                  later.
+                  <strong>Start here:</strong> Choose a building and issue. You can add more details later.
+                </p>
+                <p className="helper">
+                  <strong>Safety note:</strong> Write short facts only. Do not include names or unit numbers.
                 </p>
                 {missingBasics.length > 0 && (
                   <ul className="quick-list">
