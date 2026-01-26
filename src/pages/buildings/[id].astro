@@ -147,12 +147,13 @@ const totalFiltered = filtered.length;
             <div class="access-panel">
               <h2>Access key required</h2>
               <p class="helper">This dashboard is private for residents.</p>
-              <p class="helper">Need a key? Ask a resident steward.</p>
-              <ol class="helper-list">
-                <li>Ask a resident steward for the building key.</li>
-                <li>Add <code>?key=YOUR_KEY</code> to the URL.</li>
-                <li>Reload to view the dashboard.</li>
-              </ol>
+              <p class="helper">Ask a resident steward for the building key.</p>
+              <div class="access-sample">
+                <p class="access-sample-title">Example link</p>
+                <code>?key=YOUR_KEY</code>
+                <p class="helper">Add the key to the end of the address bar.</p>
+              </div>
+              <p class="access-warning">Do not share the key in public.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>
             </div>
           ) : !kv ? (

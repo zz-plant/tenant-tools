@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.27 - 2026-01-24
+
+- Changed: Notice builder intro copy now emphasizes the first steps and shorter safety guidance.
+- Changed: Access-gated pages add shorter instructions, example key placement, and a key-sharing warning.
+
 ## 1.0.26 - 2026-01-24
 
 - Changed: Notice builder now shows a privacy reminder near the step header.
