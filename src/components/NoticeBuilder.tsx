@@ -996,6 +996,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               <h2>Build your notice</h2>
               <p className="helper">Follow the steps so nothing important is missed.</p>
               <p className="helper">Step {currentStep} of {steps.length}</p>
+              <p className="helper">Privacy reminder: Do not include names or unit numbers.</p>
               <div className="quick-guide">
                 <div>
                   <p className="quick-title">Quick start</p>
