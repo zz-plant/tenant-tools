@@ -494,6 +494,27 @@ code {
   gap: 12px;
 }
 
+.access-sample {
+  border: 1px solid #d9e0f5;
+  background: #f6f8ff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.access-sample-title {
+  margin: 0;
+  font-weight: 600;
+  color: #2b3142;
+}
+
+.access-warning {
+  margin: 0;
+  font-weight: 600;
+  color: #8a3b3b;
+}
+
 .helper-list {
   margin: 0;
   padding-left: 18px;

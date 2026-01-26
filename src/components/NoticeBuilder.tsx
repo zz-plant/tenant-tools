@@ -979,9 +979,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         <div className="hero-main">
           <p className="eyebrow">Building Ledger</p>
           <h1>Tenant Notice Builder</h1>
-          <p className="tagline">
-            Write clear, dated messages that are easy to share.
-          </p>
+          <p className="tagline">Write a short, dated notice in four steps.</p>
           <div className="tag-row">
             <span>No names saved</span>
             <span>Short facts only</span>
@@ -994,12 +992,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <section className="panel">
             <div className="step-header">
               <h2>Build your notice</h2>
-              <p className="helper">Follow the steps so nothing important is missed.</p>
+              <p className="helper">Start with the basics and move step by step.</p>
               <p className="helper">Step {currentStep} of {steps.length}</p>
               <p className="helper">Privacy reminder: Do not include names or unit numbers.</p>
               <div className="quick-guide">
                 <div>
-                  <p className="quick-title">Quick start</p>
+                  <p className="quick-title">Start here</p>
                   <ul className="quick-list">
                     <li>Choose a building.</li>
                     <li>Choose an issue type.</li>
@@ -1008,7 +1006,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </div>
                 <div className="quick-warning">
                   <p className="helper">
-                    <strong>Safety note:</strong> Write short facts only. Do not include names or unit numbers.
+                    <strong>Safety note:</strong> Write short facts. Do not include names or unit numbers.
                   </p>
                 </div>
                 {missingBasics.length > 0 && (
