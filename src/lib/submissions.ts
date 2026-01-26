@@ -21,11 +21,11 @@ const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
 const maxDetailLength = 200;
 const maxBuildingLength = 120;
 const maxTicketNumberLength = 40;
-const supportedLanguageSet = new Set(supportedLanguages);
-const allowedStageSet = new Set(noticeStages);
-const allowedZoneSet = new Set(allowedZones);
-const allowedPortfolioSet = new Set(allowedPortfolios);
-const allowedStatusSet = new Set(submissionStatuses);
+const supportedLanguageSet = new Set<SupportedLanguage>(supportedLanguages);
+const allowedStageSet = new Set<NoticeStage>(noticeStages);
+const allowedZoneSet = new Set<ZoneId>(allowedZones);
+const allowedPortfolioSet = new Set<PortfolioId>(allowedPortfolios);
+const allowedStatusSet = new Set<SubmissionStatus>(submissionStatuses);
 
 export type { SubmissionStatus } from "../data/submissionOptions";
 
@@ -64,6 +64,18 @@ export const isValidSubmissionStatus = (value: unknown): value is SubmissionStat
 
 export const normalizeSubmissionStatus = (value: unknown): SubmissionStatus =>
   isValidSubmissionStatus(value) ? value : "open";
+
+const isValidNoticeStage = (value: unknown): value is NoticeStage =>
+  typeof value === "string" && allowedStageSet.has(value as NoticeStage);
+
+const isValidSupportedLanguage = (value: unknown): value is SupportedLanguage =>
+  typeof value === "string" && supportedLanguageSet.has(value as SupportedLanguage);
+
+const isValidPortfolioId = (value: unknown): value is PortfolioId =>
+  typeof value === "string" && allowedPortfolioSet.has(value as PortfolioId);
+
+const isValidZoneId = (value: unknown): value is ZoneId =>
+  typeof value === "string" && allowedZoneSet.has(value as ZoneId);
 
 const isValidDateString = (value: string) => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -114,18 +126,18 @@ export const validateSubmissionInput = (payload: unknown) => {
     errors.push("Issue type is invalid.");
   }
 
-  const stage = typeof data.stage === "string" ? data.stage : "";
-  if (!allowedStageSet.has(stage)) {
+  const stage = isValidNoticeStage(data.stage) ? data.stage : "";
+  if (!stage) {
     errors.push("Stage is invalid.");
   }
 
-  const language = typeof data.language === "string" ? data.language : "";
-  if (!supportedLanguageSet.has(language)) {
+  const language = isValidSupportedLanguage(data.language) ? data.language : "";
+  if (!language) {
     errors.push("Language is invalid.");
   }
 
-  const portfolio = typeof data.portfolio === "string" ? data.portfolio : "";
-  if (!allowedPortfolioSet.has(portfolio)) {
+  const portfolio = isValidPortfolioId(data.portfolio) ? data.portfolio : "";
+  if (!portfolio) {
     errors.push("Portfolio is invalid.");
   }
 
@@ -145,7 +157,7 @@ export const validateSubmissionInput = (payload: unknown) => {
   }
 
   const zone = typeof data.zone === "string" ? data.zone : "";
-  if (zone && !allowedZoneSet.has(zone)) {
+  if (zone && !isValidZoneId(zone)) {
     errors.push("Zone is invalid.");
   }
 
