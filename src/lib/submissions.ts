@@ -1,4 +1,18 @@
 import { fieldDefinitions, issueOptions } from "../data/noticeData";
+import {
+  allowedPortfolios,
+  allowedZones,
+  noticeStages,
+  submissionStatuses,
+  supportedLanguages,
+} from "../data/submissionOptions";
+import type {
+  NoticeStage,
+  PortfolioId,
+  SubmissionStatus,
+  SupportedLanguage,
+  ZoneId,
+} from "../data/submissionOptions";
 import { getSensitiveContentMessages, sanitizeLimitedText } from "./validation";
 
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
@@ -7,13 +21,13 @@ const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
 const maxDetailLength = 200;
 const maxBuildingLength = 120;
 const maxTicketNumberLength = 40;
-const supportedLanguages = new Set(["en", "es", "hi", "pl"]);
-const allowedStages = new Set(["A", "B", "C"]);
-const allowedZones = new Set(["common_area", "hallway", "unit_interior", "entry", "unknown"]);
-const allowedPortfolios = new Set(["continuum", "other"]);
-const allowedStatuses = new Set(["open", "resolved", "archived"]);
+const supportedLanguageSet = new Set(supportedLanguages);
+const allowedStageSet = new Set(noticeStages);
+const allowedZoneSet = new Set(allowedZones);
+const allowedPortfolioSet = new Set(allowedPortfolios);
+const allowedStatusSet = new Set(submissionStatuses);
 
-export type SubmissionStatus = "open" | "resolved" | "archived";
+export type { SubmissionStatus } from "../data/submissionOptions";
 
 export const submissionStatusLabels: Record<SubmissionStatus, string> = {
   open: "Open",
@@ -24,14 +38,14 @@ export const submissionStatusLabels: Record<SubmissionStatus, string> = {
 export type SubmissionInput = {
   building: string;
   issue: string;
-  stage: "A" | "B" | "C";
-  language: "en" | "es" | "hi" | "pl";
-  portfolio: "continuum" | "other";
+  stage: NoticeStage;
+  language: SupportedLanguage;
+  portfolio: PortfolioId;
   startDate: string;
   reportDate: string;
   reportCount: number;
   simpleEnglish: boolean;
-  zone: string;
+  zone: ZoneId | "";
   firstMessageDate?: string;
   ticketDate?: string;
   ticketNumber?: string;
@@ -46,7 +60,7 @@ export type SubmissionRecord = SubmissionInput & {
 };
 
 export const isValidSubmissionStatus = (value: unknown): value is SubmissionStatus =>
-  typeof value === "string" && allowedStatuses.has(value);
+  typeof value === "string" && allowedStatusSet.has(value);
 
 export const normalizeSubmissionStatus = (value: unknown): SubmissionStatus =>
   isValidSubmissionStatus(value) ? value : "open";
@@ -101,17 +115,17 @@ export const validateSubmissionInput = (payload: unknown) => {
   }
 
   const stage = typeof data.stage === "string" ? data.stage : "";
-  if (!allowedStages.has(stage)) {
+  if (!allowedStageSet.has(stage)) {
     errors.push("Stage is invalid.");
   }
 
   const language = typeof data.language === "string" ? data.language : "";
-  if (!supportedLanguages.has(language)) {
+  if (!supportedLanguageSet.has(language)) {
     errors.push("Language is invalid.");
   }
 
   const portfolio = typeof data.portfolio === "string" ? data.portfolio : "";
-  if (!allowedPortfolios.has(portfolio)) {
+  if (!allowedPortfolioSet.has(portfolio)) {
     errors.push("Portfolio is invalid.");
   }
 
@@ -131,7 +145,7 @@ export const validateSubmissionInput = (payload: unknown) => {
   }
 
   const zone = typeof data.zone === "string" ? data.zone : "";
-  if (zone && !allowedZones.has(zone)) {
+  if (zone && !allowedZoneSet.has(zone)) {
     errors.push("Zone is invalid.");
   }
 
