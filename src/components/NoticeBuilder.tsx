@@ -22,7 +22,8 @@ import { defaultBuildingOptions, type BuildingOption } from "../data/buildings";
 import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
 import WaitlistPanel from "./WaitlistPanel";
-import type { SubmissionStatus } from "../lib/submissions";
+import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
+import { detailCharacterLimit, type SubmissionStatus } from "../lib/submissions";
 
 const initialState = {
   building: "",
@@ -55,7 +56,6 @@ const initialState = {
 };
 
 type Stage = "A" | "B" | "C";
-type ExportAudience = "inspector" | "legal" | "management" | "personal";
 type PlanChoice = "keep_open" | "hire_professional" | "end_lease";
 
 type SimilarIssue = {
@@ -168,6 +168,8 @@ const evidenceSafetyChecklist = [
   "Do not upload names, mail labels, or unit numbers.",
   "Do not upload leases or ID documents.",
 ];
+
+const detailWarningThreshold = detailCharacterLimit - 40;
 
 const issueIcons: Record<string, React.ReactNode> = {
   heat: (
@@ -514,96 +516,35 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     const zoneLabel = selectedZone?.label || "Not listed";
     const statusLabel = selectedExportStatus.label;
 
-    const audienceConfigs: Record<
-      ExportAudience,
-      {
-        heading: string;
-        includeStage: boolean;
-        includeReportCount: boolean;
-        includeEvidence: boolean;
-        includeTicket: boolean;
-        notes: string[];
-      }
-    > = {
-      inspector: {
-        heading: "Inspector summary",
-        includeStage: true,
-        includeReportCount: true,
-        includeEvidence: true,
-        includeTicket: true,
-        notes: ["Resident-reported. Not verified.", "Evidence files are stored privately."],
-      },
-      legal: {
-        heading: "Legal aid summary",
-        includeStage: true,
-        includeReportCount: true,
-        includeEvidence: true,
-        includeTicket: true,
-        notes: ["Resident-reported. Dates are recorded below.", "Evidence files are stored privately."],
-      },
-      management: {
-        heading: "Management summary",
-        includeStage: false,
-        includeReportCount: false,
-        includeEvidence: false,
-        includeTicket: false,
-        notes: ["Request: Please share a repair plan and timeline."],
-      },
-      personal: {
-        heading: "Personal records summary",
-        includeStage: true,
-        includeReportCount: true,
-        includeEvidence: true,
-        includeTicket: true,
-        notes: ["Saved for personal records. No names are included."],
-      },
-    };
-
-    const config = audienceConfigs[exportAudience];
     const issueDetails = issueFields
       .map((fieldKey) => {
-        if (fieldKey === "attachment" && !config.includeEvidence) {
-          return null;
-        }
         const field = fieldDefinitions[fieldKey];
         const value = String(formState[fieldKey as keyof FormState] ?? "").trim();
         if (!field || !value) {
           return null;
         }
-        return `- ${field.label}: ${value}`;
+        return { key: fieldKey, label: field.label, value };
       })
-      .filter(Boolean);
-    const evidence = formState.attachment ? formState.attachment : "None listed";
-    const lines = [
-      config.heading,
-      "",
-      `Building: ${building}`,
-      `Portfolio: ${portfolioLabel}`,
-      `Issue: ${issueLabel}`,
-      `Status: ${statusLabel}`,
-      `Zone: ${zoneLabel}`,
-      config.includeStage ? `Stage: ${stageLabel}` : null,
-      `Start date: ${formState.startDate || "[START DATE]"}`,
-      `Report date: ${formState.today || "[TODAY]"}`,
-      `Days open: ${daysOpen}`,
-      config.includeReportCount ? `Residents reporting: ${impactCount}` : null,
-      config.includeEvidence ? `Evidence noted: ${evidence}` : null,
-      config.includeTicket && formState.ticketDate
-        ? `311 ticket date: ${formState.ticketDate}`
-        : null,
-      config.includeTicket && formState.ticketNumber
-        ? `311 ticket number: ${formState.ticketNumber}`
-        : null,
-      `Language: ${formState.language.toUpperCase()}`,
-      "",
-      "Issue details:",
-      ...(issueDetails.length > 0 ? issueDetails : ["- Not provided"]),
-      "",
-      "Notes:",
-      ...config.notes.map((note) => `- ${note}`),
-    ].filter(Boolean);
+      .filter((detail): detail is { key: string; label: string; value: string } => Boolean(detail));
 
-    return lines.join("\n");
+    return buildExportSummary({
+      exportAudience,
+      building,
+      portfolioLabel,
+      issueLabel,
+      zoneLabel,
+      statusLabel,
+      stageLabel,
+      startDate: formState.startDate || "[START DATE]",
+      reportDate: formState.today || "[TODAY]",
+      daysOpen,
+      impactCount,
+      language: formState.language,
+      issueDetails,
+      evidence: formState.attachment ? formState.attachment : "None listed",
+      ticketDate: formState.ticketDate || undefined,
+      ticketNumber: formState.ticketNumber || undefined,
+    });
   }, [
     formState.attachment,
     formState.building,
@@ -1256,6 +1197,13 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       return null;
                     }
                     const isAttachmentField = fieldKey === "attachment";
+                    const fieldValue = String(formState[fieldKey as keyof FormState] ?? "");
+                    const trimmedLength = fieldValue.trim().length;
+                    const isTextField = !field.type;
+                    const showLimitWarning = isTextField && trimmedLength >= detailWarningThreshold;
+                    const limitText = isTextField
+                      ? `Limit: ${detailCharacterLimit} characters${trimmedLength > 0 ? ` (${trimmedLength}/${detailCharacterLimit})` : "."}`
+                      : "";
                     return (
                       <label key={fieldKey}>
                         {field.label}
@@ -1272,10 +1220,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         <Input
                           className="input"
                           type={field.type || "text"}
-                          value={String(formState[fieldKey as keyof FormState] ?? "")}
+                          value={fieldValue}
                           onChange={updateField(fieldKey as keyof FormState)}
                           placeholder={field.placeholder}
                         />
+                        {isTextField && (
+                          <p className={`helper${showLimitWarning ? " helper-warning" : ""}`}>
+                            {limitText}
+                            {trimmedLength > detailCharacterLimit && " Extra text is removed when saving."}
+                          </p>
+                        )}
                       </label>
                     );
                   })}
