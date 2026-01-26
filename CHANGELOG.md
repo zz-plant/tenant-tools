@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.26 - 2026-01-24
+
+- Changed: Notice builder now shows a privacy reminder near the step header.
+- Changed: Access-gated pages add clearer next-step guidance and privacy context.
+
 ## 1.0.25 - 2026-01-24
 
 - Changed: Notice builder now highlights readiness status, clarifies the quick-start checklist, and aligns header copy with Building Ledger branding.
