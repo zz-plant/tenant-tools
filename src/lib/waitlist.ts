@@ -2,7 +2,7 @@ import { allowedPortfolios } from "../data/submissionOptions";
 import type { PortfolioId } from "../data/submissionOptions";
 import { sanitizeLimitedText } from "./validation";
 
-const allowedPortfolioSet = new Set(allowedPortfolios);
+const allowedPortfolioSet = new Set<PortfolioId>(allowedPortfolios);
 const maxBuildingLength = 140;
 const maxCityLength = 60;
 
@@ -14,6 +14,9 @@ export type WaitlistInput = {
   city?: string;
   portfolio: PortfolioId;
 };
+
+const isValidPortfolioId = (value: unknown): value is PortfolioId =>
+  typeof value === "string" && allowedPortfolioSet.has(value as PortfolioId);
 
 export const validateWaitlistInput = (payload: unknown) => {
   if (!payload || typeof payload !== "object") {
@@ -34,8 +37,8 @@ export const validateWaitlistInput = (payload: unknown) => {
 
   const city = typeof data.city === "string" ? sanitizeLimitedText(data.city, maxCityLength) : "";
 
-  const portfolio = typeof data.portfolio === "string" ? data.portfolio : "";
-  if (!allowedPortfolioSet.has(portfolio)) {
+  const portfolio = isValidPortfolioId(data.portfolio) ? data.portfolio : "";
+  if (!portfolio) {
     errors.push("Property group is invalid.");
   }
 
