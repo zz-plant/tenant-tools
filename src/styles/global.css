@@ -479,6 +479,11 @@ label {
   margin: 0;
 }
 
+.helper-warning {
+  color: #8a3b3b;
+  font-weight: 600;
+}
+
 code {
   font-family: "SF Mono", "JetBrains Mono", "Fira Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;

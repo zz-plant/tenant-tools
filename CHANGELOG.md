@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.28 - 2026-01-24
+
+- Added: Character limit guidance for issue detail fields to keep entries short.
+- Added: Export summary formatting snapshot coverage.
+- Changed: Export summary assembly now runs through a shared helper.
+
 ## 1.0.27 - 2026-01-24
 
 - Changed: Notice builder intro copy now emphasizes the first steps and shorter safety guidance.

@@ -18,7 +18,7 @@ import { getSensitiveContentMessages, sanitizeLimitedText } from "./validation";
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
 const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
 
-const maxDetailLength = 200;
+export const detailCharacterLimit = 200;
 const maxBuildingLength = 120;
 const maxTicketNumberLength = 40;
 const supportedLanguageSet = new Set<SupportedLanguage>(supportedLanguages);
@@ -91,7 +91,7 @@ const sanitizeDetails = (details: Record<string, unknown>) => {
     if (!allowedDetailKeys.has(key) || typeof value !== "string") {
       return;
     }
-    const trimmed = sanitizeLimitedText(value, maxDetailLength);
+    const trimmed = sanitizeLimitedText(value, detailCharacterLimit);
     if (trimmed) {
       cleaned[key] = trimmed;
     }
