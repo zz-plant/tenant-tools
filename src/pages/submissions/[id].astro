@@ -121,7 +121,7 @@ const formatTimelineDate = (value: string) => {
               <div class="access-sample">
                 <p class="access-sample-title">Example link</p>
                 <code>?key=YOUR_KEY</code>
-                <p class="helper">Add the key to the end of the address bar.</p>
+                <p class="helper">Add the key to the end of the link.</p>
               </div>
               <p class="access-warning">Do not share the key or link in public.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>
@@ -191,7 +191,8 @@ const formatTimelineDate = (value: string) => {
                 <div>
                   <h3>Details saved</h3>
                   <p class="helper">Short factual details only.</p>
-                  <p class="helper">Review this summary before sharing. It may include names or unit numbers.</p>
+                  <p class="helper">Review this summary before sharing. Remove names or unit numbers.</p>
+                  <p class="helper">Evidence files are not shown here.</p>
                 </div>
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
                   <ul class="submission-detail-list detail-grid">

@@ -151,7 +151,7 @@ const totalFiltered = filtered.length;
               <div class="access-sample">
                 <p class="access-sample-title">Example link</p>
                 <code>?key=YOUR_KEY</code>
-                <p class="helper">Add the key to the end of the address bar.</p>
+                <p class="helper">Add the key to the end of the link.</p>
               </div>
               <p class="access-warning">Do not share the key in public.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>
@@ -188,14 +188,12 @@ const totalFiltered = filtered.length;
 
               <div>
                 <h2>Recent submissions</h2>
-                <p class="helper">
-                  Showing the latest {totalVisible} of {totalFiltered} matching submissions.
-                </p>
-                <p class="helper">Filters on the right update this list.</p>
+                <p class="helper">Showing {totalVisible} of {totalFiltered} submissions.</p>
+                <p class="helper">Use the filters on the right to change this list.</p>
               </div>
 
               {totalFiltered === 0 ? (
-                <p class="helper">No submissions match these filters yet.</p>
+                <p class="helper">No submissions match these filters.</p>
               ) : (
                 statusIds.map((status) => (
                   <section class="status-group">

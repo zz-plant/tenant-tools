@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.29 - 2026-01-24
+
+- Added: Waitlist inputs now enforce length limits and accessibility hints.
+- Changed: Notice builder inputs align with character limits and use simpler helper copy.
+- Changed: 311 guidance and dashboard/submission copy now use shorter, clearer sentences.
+- Changed: Home page metadata now matches Building Ledger branding.
+
 ## 1.0.28 - 2026-01-24
 
 - Added: Character limit guidance for issue detail fields to keep entries short.
