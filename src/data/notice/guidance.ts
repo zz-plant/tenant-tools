@@ -24,30 +24,30 @@ export const issue311Guidance: Record<
     category: "No heat",
     script: "The heat has not been warm enough since [START DATE].",
     nextStep:
-      "Common paths tenants encounter include an inspection request. A risk is unclear timing and documentation gaps if dates or photos are missing.",
+      "A common next step is to request an inspection. Missing dates or photos can make timing unclear.",
   },
   leak: {
     category: "Water leak",
     script: "There is ongoing water leaking at [LOCATION] since [START DATE].",
     nextStep:
-      "Common paths tenants encounter include an inspection request. A risk is unclear timing and documentation gaps if dates or photos are missing.",
+      "A common next step is to request an inspection. Missing dates or photos can make timing unclear.",
   },
   pests: {
     category: "Pest issue",
     script: "I have seen pests since [START DATE] and the problem is still happening.",
     nextStep:
-      "Common paths tenants encounter include an inspection request. A risk is unclear timing and documentation gaps if dates or photos are missing.",
+      "A common next step is to request an inspection. Missing dates or photos can make timing unclear.",
   },
   entry: {
     category: "Entry without notice",
     script: "Someone entered without notice on [DATE].",
     nextStep:
-      "Common paths tenants encounter include a city follow-up. A risk is a documentation gap if dates or prior notices are missing.",
+      "A common next step is a city follow-up. Missing dates or prior notices can leave gaps.",
   },
   common: {
     category: "Common area problem",
     script: "There is a common area problem since [START DATE].",
     nextStep:
-      "Common paths tenants encounter include an inspection request. A risk is unclear timing and documentation gaps if dates or photos are missing.",
+      "A common next step is to request an inspection. Missing dates or photos can make timing unclear.",
   },
 };

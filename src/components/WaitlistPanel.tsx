@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, Input } from "./ui";
 import { type PortfolioId } from "../data/portfolioOptions";
+import { waitlistBuildingLimit, waitlistCityLimit } from "../lib/waitlist";
 
 const initialWaitlistState = {
   building: "",
@@ -17,6 +18,7 @@ const WaitlistPanel = () => {
   const [requestCopyLabel, setRequestCopyLabel] = useState("Copy request code");
   const [inviteCopyLabel, setInviteCopyLabel] = useState("Copy invite text");
   const [origin, setOrigin] = useState("");
+  const buildingHelperId = "waitlist-building-helper";
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -29,7 +31,7 @@ const WaitlistPanel = () => {
       "Neighbor note",
       "",
       `I want Building Ledger to support ${buildingLabel}.`,
-      "It is a private tool for tracking repairs and notices.",
+      "It is a private tool for repair tracking and notices.",
       `If you want it too, add the building to the waitlist at ${siteLabel}.`,
       "Do not include names or unit numbers.",
     ].join("\n");
@@ -136,10 +138,15 @@ const WaitlistPanel = () => {
               value={waitlistState.building}
               onChange={handleWaitlistChange("building")}
               placeholder="123 Main St"
+              maxLength={waitlistBuildingLimit}
+              autoComplete="street-address"
+              aria-describedby={buildingHelperId}
               required
             />
           </label>
-          <p className="helper">Do not include unit numbers or resident names.</p>
+          <p className="helper" id={buildingHelperId}>
+            Do not include unit numbers or resident names.
+          </p>
           <label>
             City (optional)
             <Input
@@ -147,6 +154,8 @@ const WaitlistPanel = () => {
               value={waitlistState.city}
               onChange={handleWaitlistChange("city")}
               placeholder="City"
+              maxLength={waitlistCityLimit}
+              autoComplete="address-level2"
             />
           </label>
           <div className="waitlist-actions">
@@ -159,7 +168,9 @@ const WaitlistPanel = () => {
           </div>
           {waitlistStatus === "saved" && requestId && (
             <div className="waitlist-success">
-              <p className="helper">Saved. Keep this request code so you can check back later.</p>
+              <p className="helper" role="status" aria-live="polite">
+                Saved. Keep this request code so you can check back later.
+              </p>
               <div className="waitlist-actions">
                 <span className="waitlist-code">{requestId}</span>
                 <Button className="button button-secondary" type="button" onClick={handleCopyRequestId}>
@@ -168,7 +179,11 @@ const WaitlistPanel = () => {
               </div>
             </div>
           )}
-          {waitlistStatus === "error" && <p className="submission-error">{waitlistError}</p>}
+          {waitlistStatus === "error" && (
+            <p className="submission-error" role="alert">
+              {waitlistError}
+            </p>
+          )}
         </form>
         <div className="waitlist-invite">
           <h3>Invite neighbors</h3>

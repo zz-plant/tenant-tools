@@ -23,7 +23,7 @@ import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
 import WaitlistPanel from "./WaitlistPanel";
 import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
-import { detailCharacterLimit, type SubmissionStatus } from "../lib/submissions";
+import { detailCharacterLimit, ticketNumberCharacterLimit, type SubmissionStatus } from "../lib/submissions";
 
 const initialState = {
   building: "",
@@ -1204,6 +1204,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     const limitText = isTextField
                       ? `Limit: ${detailCharacterLimit} characters${trimmedLength > 0 ? ` (${trimmedLength}/${detailCharacterLimit})` : "."}`
                       : "";
+                    const helperId = isTextField ? `detail-${fieldKey}-helper` : undefined;
                     return (
                       <label key={fieldKey}>
                         {field.label}
@@ -1223,9 +1224,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           value={fieldValue}
                           onChange={updateField(fieldKey as keyof FormState)}
                           placeholder={field.placeholder}
+                          maxLength={isTextField ? detailCharacterLimit : undefined}
+                          aria-describedby={helperId}
                         />
                         {isTextField && (
-                          <p className={`helper${showLimitWarning ? " helper-warning" : ""}`}>
+                          <p
+                            className={`helper${showLimitWarning ? " helper-warning" : ""}`}
+                            id={helperId}
+                          >
                             {limitText}
                             {trimmedLength > detailCharacterLimit && " Extra text is removed when saving."}
                           </p>
@@ -1345,16 +1351,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         value={formState.ticketNumber}
                         onChange={updateField("ticketNumber")}
                         placeholder="Ticket number"
+                        maxLength={ticketNumberCharacterLimit}
                       />
                     </label>
                   </div>
-                  <p className="helper">Use this only if you already called 311.</p>
+                  <p className="helper">Use this only if you already called 311. Do not include names.</p>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="4">
                   <p className="helper">
-                    Review the preview, copy the text, and keep a copy for your records. Dates and repetition are the
-                    strongest evidence.
+                    Review the preview. Copy the text and save it for your records. Dates and repeated reports help
+                    most.
                   </p>
                   <div className="review-actions">
                     <Button className="button" type="button" onClick={handleCopy} disabled={!isNoticeReady}>
@@ -1742,8 +1749,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         <aside className="panel contact-panel">
           <h2>Continuum contacts</h2>
           <p className="helper">Use these contacts if your building is listed under Continuum.</p>
-          <p><strong>Maintenance text:</strong> Ivan (773) 708-2321</p>
-          <p><strong>Landlord:</strong> Yelena Bernshtam +1 (773) 678-7636</p>
+          <p><strong>Maintenance text line:</strong> (773) 708-2321</p>
+          <p><strong>Landlord line:</strong> +1 (773) 678-7636</p>
           <p><strong>Rent email:</strong> continuumbrokers@yahoo.com</p>
           <p className="helper">Use text for urgent safety issues. Email for rent receipts.</p>
           <p className="helper">If your building has different contacts, use the waitlist below.</p>

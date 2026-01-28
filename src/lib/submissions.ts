@@ -20,7 +20,7 @@ const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
 
 export const detailCharacterLimit = 200;
 const maxBuildingLength = 120;
-const maxTicketNumberLength = 40;
+export const ticketNumberCharacterLimit = 40;
 const supportedLanguageSet = new Set<SupportedLanguage>(supportedLanguages);
 const allowedStageSet = new Set<NoticeStage>(noticeStages);
 const allowedZoneSet = new Set<ZoneId>(allowedZones);
@@ -172,7 +172,9 @@ export const validateSubmissionInput = (payload: unknown) => {
   }
 
   const ticketNumber =
-    typeof data.ticketNumber === "string" ? sanitizeLimitedText(data.ticketNumber, maxTicketNumberLength) : "";
+    typeof data.ticketNumber === "string"
+      ? sanitizeLimitedText(data.ticketNumber, ticketNumberCharacterLimit)
+      : "";
   if (ticketNumber) {
     pushSensitiveErrors("Ticket number", ticketNumber, errors);
   }
