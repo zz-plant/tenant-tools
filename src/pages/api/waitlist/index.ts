@@ -1,29 +1,21 @@
 import type { APIRoute } from "astro";
 import { enforceRateLimit, getClientIp } from "../../../lib/rateLimit";
 import { validateWaitlistInput } from "../../../lib/waitlist";
+import { jsonError, jsonResponse, parseJsonBody } from "../../../lib/http";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const payload = await request.json().catch(() => null);
+  const payload = await parseJsonBody(request, null);
   const validation = validateWaitlistInput(payload);
 
   if (!validation.ok) {
-    return new Response(
-      JSON.stringify({
-        error: "We could not save this waitlist request.",
-        details: validation.errors,
-      }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+    return jsonError("We could not save this waitlist request.", 400, { details: validation.errors });
   }
 
   const kv = locals.runtime?.env?.WAITLIST_KV;
   if (!kv) {
-    return new Response(JSON.stringify({ error: "Waitlist storage is not configured." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Waitlist storage is not configured.", 500);
   }
 
   const ip = getClientIp(request);
@@ -34,13 +26,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     windowMs: 60_000,
   });
   if (!rateLimit.ok) {
-    return new Response(JSON.stringify({ error: "Too many waitlist requests. Try again soon." }), {
-      status: 429,
-      headers: {
-        "Content-Type": "application/json",
-        "Retry-After": String(rateLimit.retryAfter),
-      },
-    });
+    return jsonError(
+      "Too many waitlist requests. Try again soon.",
+      429,
+      {},
+      { "Retry-After": String(rateLimit.retryAfter) }
+    );
   }
 
   const record = {
@@ -51,8 +42,5 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   await kv.put(`waitlist:${record.id}`, JSON.stringify(record));
 
-  return new Response(JSON.stringify({ id: record.id }), {
-    status: 201,
-    headers: { "Content-Type": "application/json" },
-  });
+  return jsonResponse({ id: record.id }, 201);
 };

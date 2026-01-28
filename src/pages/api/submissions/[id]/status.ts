@@ -2,43 +2,31 @@ import type { APIRoute } from "astro";
 import { isAccessKeyValid } from "../../../../lib/access";
 import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
 import { isValidSubmissionStatus } from "../../../../lib/submissions";
+import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../../lib/http";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const id = params.id;
   if (!id) {
-    return new Response(JSON.stringify({ error: "Submission id is required." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Submission id is required.", 400);
   }
 
   const requiredKey = locals.runtime?.env?.STEWARD_KEY;
-  const url = new URL(request.url);
-  const providedKey = request.headers.get("x-steward-key") || url.searchParams.get("stewardKey");
+  const providedKey = getRequestKey(request, "x-steward-key", "stewardKey");
   if (!isAccessKeyValid(providedKey, requiredKey)) {
-    return new Response(JSON.stringify({ error: "Steward access is required." }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Steward access is required.", 403);
   }
 
-  const payload = await request.json().catch(() => ({}));
+  const payload = await parseJsonBody(request, {});
   const status = payload?.status;
   if (!isValidSubmissionStatus(status)) {
-    return new Response(JSON.stringify({ error: "Status is invalid." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Status is invalid.", 400);
   }
 
   const kv = locals.runtime?.env?.SUBMISSIONS_KV;
   if (!kv) {
-    return new Response(JSON.stringify({ error: "Ledger storage is not configured." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Ledger storage is not configured.", 500);
   }
 
   const ip = getClientIp(request);
@@ -49,28 +37,21 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     windowMs: 60_000,
   });
   if (!rateLimit.ok) {
-    return new Response(JSON.stringify({ error: "Too many status updates. Try again soon." }), {
-      status: 429,
-      headers: {
-        "Content-Type": "application/json",
-        "Retry-After": String(rateLimit.retryAfter),
-      },
-    });
+    return jsonError(
+      "Too many status updates. Try again soon.",
+      429,
+      {},
+      { "Retry-After": String(rateLimit.retryAfter) }
+    );
   }
 
   const record = await kv.get(`submission:${id}`, { type: "json" });
   if (!record || typeof record !== "object") {
-    return new Response(JSON.stringify({ error: "Submission not found." }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Submission not found.", 404);
   }
 
   const updated = { ...(record as Record<string, unknown>), status };
   await kv.put(`submission:${id}`, JSON.stringify(updated));
 
-  return new Response(JSON.stringify({ status }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  return jsonResponse({ status });
 };

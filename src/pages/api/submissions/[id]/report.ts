@@ -2,43 +2,31 @@ import type { APIRoute } from "astro";
 import { createReportEntry, REPORT_ENTRY_TTL_SECONDS } from "../../../../lib/reports";
 import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../../../lib/access";
+import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../../lib/http";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const id = params.id;
   if (!id) {
-    return new Response(JSON.stringify({ error: "Submission id is required." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Submission id is required.", 400);
   }
 
-  const payload = await request.json().catch(() => ({}));
+  const payload = await parseJsonBody(request, {});
   const increment = typeof payload?.increment === "number" ? payload.increment : 1;
   if (!Number.isFinite(increment) || increment < 1 || increment > 5) {
-    return new Response(JSON.stringify({ error: "Invalid increment." }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Invalid increment.", 400);
   }
 
   const env = locals.runtime?.env ?? {};
-  const url = new URL(request.url);
-  const providedKey = request.headers.get("x-building-key") || url.searchParams.get("key");
+  const providedKey = getRequestKey(request, "x-building-key", "key");
   if (!isResidentKeyRecognized(providedKey, env)) {
-    return new Response(JSON.stringify({ error: "Resident access is required." }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Resident access is required.", 403);
   }
 
   const kv = locals.runtime?.env?.SUBMISSIONS_KV;
   if (!kv) {
-    return new Response(JSON.stringify({ error: "Ledger storage is not configured." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Ledger storage is not configured.", 500);
   }
 
   const ip = getClientIp(request);
@@ -49,13 +37,12 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     windowMs: 60_000,
   });
   if (!rateLimit.ok) {
-    return new Response(JSON.stringify({ error: "Too many report updates. Try again soon." }), {
-      status: 429,
-      headers: {
-        "Content-Type": "application/json",
-        "Retry-After": String(rateLimit.retryAfter),
-      },
-    });
+    return jsonError(
+      "Too many report updates. Try again soon.",
+      429,
+      {},
+      { "Retry-After": String(rateLimit.retryAfter) }
+    );
   }
 
   const record = (await kv.get(`submission:${id}`, { type: "json" })) as
@@ -67,18 +54,12 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     | null;
 
   if (!record) {
-    return new Response(JSON.stringify({ error: "Submission not found." }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Submission not found.", 404);
   }
 
   const allowedBuildings = getBuildingIdsForKey(providedKey, env);
   if (!allowedBuildings.includes("*") && record.building && !allowedBuildings.includes(record.building)) {
-    return new Response(JSON.stringify({ error: "Submission not found." }), {
-      status: 404,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Submission not found.", 404);
   }
 
   const nextCount = Math.min(50, record.reportCount + increment);
@@ -89,8 +70,5 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     expirationTtl: REPORT_ENTRY_TTL_SECONDS,
   });
 
-  return new Response(JSON.stringify({ reportCount: nextCount }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  return jsonResponse({ reportCount: nextCount });
 };

@@ -13,7 +13,7 @@ import type {
   SupportedLanguage,
   ZoneId,
 } from "../data/submissionOptions";
-import { getSensitiveContentMessages, sanitizeLimitedText } from "./validation";
+import { getSensitiveContentMessages, isValidDateString, sanitizeLimitedText } from "./validation";
 
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
 const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
@@ -76,14 +76,6 @@ const isValidPortfolioId = (value: unknown): value is PortfolioId =>
 
 const isValidZoneId = (value: unknown): value is ZoneId =>
   typeof value === "string" && allowedZoneSet.has(value as ZoneId);
-
-const isValidDateString = (value: string) => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false;
-  }
-  const parsed = new Date(value);
-  return !Number.isNaN(parsed.valueOf());
-};
 
 const sanitizeDetails = (details: Record<string, unknown>) => {
   const cleaned: Record<string, string> = {};

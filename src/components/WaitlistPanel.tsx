@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Input } from "./ui";
 import { type PortfolioId } from "../data/portfolioOptions";
 import { waitlistBuildingLimit, waitlistCityLimit } from "../lib/waitlist";
@@ -19,9 +19,27 @@ const WaitlistPanel = () => {
   const [inviteCopyLabel, setInviteCopyLabel] = useState("Copy invite text");
   const [origin, setOrigin] = useState("");
   const buildingHelperId = "waitlist-building-helper";
+  const timeoutHandles = useRef<Map<string, number>>(new Map());
+  const scheduleTimeout = (key: string, callback: () => void, delay: number) => {
+    const existing = timeoutHandles.current.get(key);
+    if (existing) {
+      window.clearTimeout(existing);
+    }
+    const id = window.setTimeout(() => {
+      timeoutHandles.current.delete(key);
+      callback();
+    }, delay);
+    timeoutHandles.current.set(key, id);
+  };
 
   useEffect(() => {
     setOrigin(window.location.origin);
+  }, []);
+  useEffect(() => {
+    return () => {
+      timeoutHandles.current.forEach((id) => window.clearTimeout(id));
+      timeoutHandles.current.clear();
+    };
   }, []);
 
   const inviteText = useMemo(() => {
@@ -87,13 +105,13 @@ const WaitlistPanel = () => {
     }
     await navigator.clipboard.writeText(requestId);
     setRequestCopyLabel("Request code copied");
-    setTimeout(() => setRequestCopyLabel("Copy request code"), 1500);
+    scheduleTimeout("request-copy-label", () => setRequestCopyLabel("Copy request code"), 1500);
   };
 
   const handleCopyInvite = async () => {
     await navigator.clipboard.writeText(inviteText);
     setInviteCopyLabel("Invite text copied");
-    setTimeout(() => setInviteCopyLabel("Copy invite text"), 1500);
+    scheduleTimeout("invite-copy-label", () => setInviteCopyLabel("Copy invite text"), 1500);
   };
 
   const handleInviteDownload = () => {
