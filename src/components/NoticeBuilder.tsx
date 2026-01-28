@@ -278,9 +278,13 @@ const formatTimelineDate = (value: string) => {
 
 type NoticeBuilderProps = {
   buildingOptions?: BuildingOption[];
+  shareReadiness?: {
+    hasResidentKeys: boolean;
+    hasSubmissionStore: boolean;
+  };
 };
 
-const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuilderProps) => {
+const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadiness }: NoticeBuilderProps) => {
   const [formState, setFormState] = useState<FormState>(() => {
     const today = new Date();
     const formatted = formatDate(today);
@@ -318,6 +322,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
   const [exportStatusMessage, setExportStatusMessage] = useState("");
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
+  const shareNeeds = [
+    ...(shareReadiness && !shareReadiness.hasResidentKeys ? ["Set a resident access key."] : []),
+    ...(shareReadiness && !shareReadiness.hasSubmissionStore ? ["Connect ledger storage to save issues."] : []),
+  ];
+  const isShareReady = Boolean(shareReadiness && shareNeeds.length === 0);
 
   const missingBasics = useMemo(() => {
     const missing: string[] = [];
@@ -960,6 +969,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         <li key={item}>{item}</li>
                       ))}
                     </ul>
+                  </div>
+                )}
+                {shareReadiness && (
+                  <div className="quick-needed">
+                    <p className="helper">
+                      <strong>Sharing status:</strong>{" "}
+                      {isShareReady ? "Ready to share with neighbors." : "Setup needed before sharing."}
+                    </p>
+                    {shareNeeds.length > 0 && (
+                      <>
+                        <ul className="quick-list">
+                          {shareNeeds.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                        <p className="helper">You can still build a notice without saving.</p>
+                      </>
+                    )}
                   </div>
                 )}
               </div>

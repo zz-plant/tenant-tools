@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.30 - 2026-01-24
+
+- Added: Share readiness checklist and setup status callout before sharing with neighbors.
+
 ## 1.0.29 - 2026-01-24
 
 - Added: Waitlist inputs now enforce length limits and accessibility hints.
