@@ -1,19 +1,13 @@
 import type { APIRoute } from "astro";
 import { issueOptions, zoneOptions } from "../../../data/noticeData";
 import { isBuildingAccessValid, isResidentKeyRecognized } from "../../../lib/access";
+import { jsonError, jsonResponse, getRequestKey } from "../../../lib/http";
+import { isValidDateString } from "../../../lib/validation";
 
 export const prerender = false;
 
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
 const zoneIds = new Set(zoneOptions.map((zone) => zone.id));
-
-const isValidDateString = (value: string) => {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    return false;
-  }
-  const parsed = new Date(value);
-  return !Number.isNaN(parsed.valueOf());
-};
 
 const daysBetween = (left: string, right: string) => {
   const leftDate = new Date(left);
@@ -27,37 +21,25 @@ export const GET: APIRoute = async ({ request, locals }) => {
   const issue = url.searchParams.get("issue") || "";
   const zone = url.searchParams.get("zone") || "";
   const startDate = url.searchParams.get("startDate") || "";
-  const providedKey = request.headers.get("x-building-key") || url.searchParams.get("key");
+  const providedKey = getRequestKey(request, "x-building-key", "key", url);
   const windowDays = 21;
 
   if (!building || !issue || !issueIds.has(issue) || (zone && !zoneIds.has(zone))) {
-    return new Response(JSON.stringify({ matches: [] }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ matches: [] });
   }
 
   const env = locals.runtime?.env ?? {};
   if (!isResidentKeyRecognized(providedKey, env)) {
-    return new Response(JSON.stringify({ error: "Resident access is required.", matches: [] }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("Resident access is required.", 403, { matches: [] });
   }
   if (!isBuildingAccessValid(building, providedKey, env)) {
-    return new Response(JSON.stringify({ error: "This key does not match the building.", matches: [] }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonError("This key does not match the building.", 403, { matches: [] });
   }
 
   const referenceDate = isValidDateString(startDate) ? startDate : "";
   const kv = locals.runtime?.env?.SUBMISSIONS_KV;
   if (!kv) {
-    return new Response(JSON.stringify({ matches: [] }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse({ matches: [] });
   }
 
   const matches: Array<{
@@ -112,8 +94,5 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   matches.sort((a, b) => a.startDate.localeCompare(b.startDate));
 
-  return new Response(JSON.stringify({ matches }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  return jsonResponse({ matches });
 };

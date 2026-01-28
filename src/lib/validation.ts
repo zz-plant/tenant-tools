@@ -27,3 +27,11 @@ export const detectSensitiveContent = (value: string) => {
 
 export const getSensitiveContentMessages = (value: string) =>
   detectSensitiveContent(value).map((flag) => sensitiveMessages[flag]);
+
+export const isValidDateString = (value: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+  const parsed = new Date(value);
+  return !Number.isNaN(parsed.valueOf());
+};

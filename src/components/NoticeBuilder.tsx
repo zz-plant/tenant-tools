@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -322,6 +322,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
   const [exportStatusMessage, setExportStatusMessage] = useState("");
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
+  const timeoutHandles = useRef<Map<string, number>>(new Map());
+  const scheduleTimeout = (key: string, callback: () => void, delay: number) => {
+    const existing = timeoutHandles.current.get(key);
+    if (existing) {
+      window.clearTimeout(existing);
+    }
+    const id = window.setTimeout(() => {
+      timeoutHandles.current.delete(key);
+      callback();
+    }, delay);
+    timeoutHandles.current.set(key, id);
+  };
+  useEffect(() => {
+    return () => {
+      timeoutHandles.current.forEach((id) => window.clearTimeout(id));
+      timeoutHandles.current.clear();
+    };
+  }, []);
   const shareNeeds = [
     ...(shareReadiness && !shareReadiness.hasResidentKeys ? ["Set a resident access key."] : []),
     ...(shareReadiness && !shareReadiness.hasSubmissionStore ? ["Connect ledger storage to save issues."] : []),
@@ -582,16 +600,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
     await navigator.clipboard.writeText(noticeText);
     setCopyLabel("Copied!");
     setNoticeStatusMessage("Notice copied.");
-    setTimeout(() => setCopyLabel("Copy text"), 1500);
-    setTimeout(() => setNoticeStatusMessage(""), 2000);
+    scheduleTimeout("copy-label", () => setCopyLabel("Copy text"), 1500);
+    scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2000);
   };
 
   const handleSummaryCopy = async () => {
     await navigator.clipboard.writeText(exportSummary);
     setSummaryCopyLabel("Copied!");
     setExportStatusMessage("Summary copied.");
-    setTimeout(() => setSummaryCopyLabel("Copy summary"), 1500);
-    setTimeout(() => setExportStatusMessage(""), 2000);
+    scheduleTimeout("summary-copy-label", () => setSummaryCopyLabel("Copy summary"), 1500);
+    scheduleTimeout("export-status", () => setExportStatusMessage(""), 2000);
   };
 
   const handleSummaryDownload = () => {
@@ -606,7 +624,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
     anchor.remove();
     URL.revokeObjectURL(url);
     setExportStatusMessage("Download started.");
-    setTimeout(() => setExportStatusMessage(""), 2000);
+    scheduleTimeout("export-status", () => setExportStatusMessage(""), 2000);
   };
 
   const handleLedgerSave = async () => {
@@ -686,8 +704,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
     await navigator.clipboard.writeText(`${window.location.origin}${submissionUrl}`);
     setLinkCopyLabel("Link copied");
     setLinkStatusMessage("Permalink copied.");
-    setTimeout(() => setLinkCopyLabel("Copy link"), 1500);
-    setTimeout(() => setLinkStatusMessage(""), 2000);
+    scheduleTimeout("link-copy-label", () => setLinkCopyLabel("Copy link"), 1500);
+    scheduleTimeout("link-status", () => setLinkStatusMessage(""), 2000);
   };
 
   const handleReset = () => {
@@ -733,8 +751,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
     setFormState(nextState);
     setRepeatLabel("Copied with today's date");
     setNoticeStatusMessage("Notice copied with today's date.");
-    setTimeout(() => setRepeatLabel("Repeat with today's date"), 1600);
-    setTimeout(() => setNoticeStatusMessage(""), 2000);
+    scheduleTimeout("repeat-label", () => setRepeatLabel("Repeat with today's date"), 1600);
+    scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2000);
   };
 
   const handleAddToExisting = async (id: string) => {
