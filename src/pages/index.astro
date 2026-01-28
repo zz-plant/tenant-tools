@@ -7,6 +7,9 @@ import { parseBuildingKeys } from "../lib/access";
 const env = Astro.locals.runtime?.env ?? {};
 const buildingKeys = parseBuildingKeys(env.BUILDING_KEYS_JSON);
 const buildingOptions = getBuildingOptions(buildingKeys);
+const hasResidentKeys =
+  Object.keys(buildingKeys).length > 0 || Boolean(env.BUILDING_ACCESS_KEY && env.BUILDING_ACCESS_KEY.trim());
+const hasSubmissionStore = Boolean(env.SUBMISSIONS_KV);
 ---
 
 <!DOCTYPE html>
@@ -21,6 +24,10 @@ const buildingOptions = getBuildingOptions(buildingKeys);
     />
   </head>
   <body>
-    <NoticeBuilder client:load buildingOptions={buildingOptions} />
+    <NoticeBuilder
+      client:load
+      buildingOptions={buildingOptions}
+      shareReadiness={{ hasResidentKeys, hasSubmissionStore }}
+    />
   </body>
 </html>

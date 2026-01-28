@@ -173,6 +173,15 @@ Fallback options:
 - `BUILDING_ACCESS_KEY` — optional global fallback when a building is not listed in `BUILDING_KEYS_JSON`.
 - `STEWARD_KEY` — required to enable steward status updates (pass with `?stewardKey=...`).
 
+## Share with neighbors (readiness checklist)
+
+Before sharing this link with neighbors, confirm:
+
+- You set a resident access key (`BUILDING_KEYS_JSON` or `BUILDING_ACCESS_KEY`).
+- You connected ledger storage (`SUBMISSIONS_KV`) so residents can save issues.
+- You shared the building link with `?key=YOUR_KEY`.
+- You reminded neighbors not to post names or unit numbers.
+
 ---
 
 ## Vision
