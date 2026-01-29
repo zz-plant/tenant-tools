@@ -164,10 +164,13 @@ const RadioGroup = {
 };
 
 const evidenceSafetyChecklist = [
+  "Evidence is private by default.",
   "Do not upload faces.",
   "Do not upload names, mail labels, or unit numbers.",
   "Do not upload leases or ID documents.",
 ];
+
+const freeTextSafetyNote = "Write short facts only. Do not include names or unit numbers.";
 
 const detailWarningThreshold = detailCharacterLimit - 40;
 
@@ -1249,6 +1252,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                     const limitText = isTextField
                       ? `Limit: ${detailCharacterLimit} characters${trimmedLength > 0 ? ` (${trimmedLength}/${detailCharacterLimit})` : "."}`
                       : "";
+                    const helperText = isTextField ? `${limitText} ${freeTextSafetyNote}` : "";
                     const helperId = isTextField ? `detail-${fieldKey}-helper` : undefined;
                     return (
                       <label key={fieldKey}>
@@ -1273,11 +1277,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                           aria-describedby={helperId}
                         />
                         {isTextField && (
-                          <p
-                            className={`helper${showLimitWarning ? " helper-warning" : ""}`}
-                            id={helperId}
-                          >
-                            {limitText}
+                          <p className={`helper${showLimitWarning ? " helper-warning" : ""}`} id={helperId}>
+                            {helperText}
                             {trimmedLength > detailCharacterLimit && " Extra text is removed when saving."}
                           </p>
                         )}

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.31 - 2026-01-24
+
+- Changed: Issue detail helpers now remind residents to keep short factual notes and avoid names or unit numbers.
+- Changed: Evidence notes now restate that uploads are private by default.
+
 ## 1.0.30 - 2026-01-24
 
 - Added: Share readiness checklist and setup status callout before sharing with neighbors.
