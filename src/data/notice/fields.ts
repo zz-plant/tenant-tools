@@ -4,7 +4,7 @@ export const fieldDefinitions = {
   temp: { label: "Temperature (°F)", type: "number", placeholder: "68" },
   time: { label: "Time", type: "time" },
   location: { label: "Location (for leaks)", placeholder: "kitchen ceiling" },
-  attachment: { label: "Evidence note (optional)", placeholder: "photo of ceiling leak" },
+  attachment: { label: "Evidence note (optional, private)", placeholder: "photo of ceiling leak" },
   eventDate: { label: "Event date", type: "date" },
   eventDates: { label: "Event date(s)", placeholder: "[DATES]" },
   eventDateTime: { label: "Event date/time", placeholder: "[DATE/TIME]" },
