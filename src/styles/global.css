@@ -55,7 +55,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.2em;
   font-size: 0.75rem;
-  opacity: 0.7;
+  opacity: 0.85;
   margin: 0 0 8px;
 }
 
@@ -67,6 +67,8 @@ body {
 .tagline {
   margin: 0 0 20px;
   line-height: 1.6;
+  color: #f1f4ff;
+  font-weight: 500;
 }
 
 .metrics {
@@ -94,19 +96,25 @@ body {
 }
 
 .tag-row span {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 0.85rem;
+  color: #f7f8ff;
 }
 
 .contact-panel {
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
 .contact-panel h2 {
   margin: 0;
+}
+
+.contact-panel p {
+  margin: 0;
+  line-height: 1.5;
 }
 
 .layout {
@@ -145,8 +153,8 @@ body {
 
 .quick-warning {
   border-radius: 12px;
-  border: 1px solid #f1d5a6;
-  background: #fff4e2;
+  border: 1px solid #f0d2a0;
+  background: #fff1db;
   padding: 10px 12px;
 }
 
@@ -1083,8 +1091,18 @@ code {
 .helper-card {
   border-radius: 16px;
   border: 1px solid #dfe4f2;
-  background: #ffffff;
+  background: #fbfcff;
   padding: 10px 14px;
+}
+
+.privacy-reminder {
+  border-radius: 10px;
+  border: 1px solid #f2d7bf;
+  background: #fff6ea;
+  padding: 6px 10px;
+  color: #7a4b12;
+  font-weight: 600;
+  display: inline-block;
 }
 
 .helper-card summary {
@@ -1314,6 +1332,11 @@ code {
   gap: 16px;
 }
 
+.label-optional {
+  color: #5a6688;
+  font-weight: 500;
+}
+
 .waitlist-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1428,7 +1451,9 @@ code {
 
 .site-footer {
   text-align: center;
-  color: #6b7280;
+  color: #4b5563;
+  font-weight: 600;
+  padding: 8px 0;
 }
 
 @media (max-width: 720px) {

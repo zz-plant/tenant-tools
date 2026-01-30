@@ -965,7 +965,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
               <h2>Build your notice</h2>
               <p className="helper">Start with the basics and move step by step.</p>
               <p className="helper">Step {currentStep} of {steps.length}</p>
-              <p className="helper">Privacy reminder: Do not include names or unit numbers.</p>
+              <p className="helper privacy-reminder">Privacy reminder: Do not include names or unit numbers.</p>
               <div className="quick-guide">
                 <div>
                   <p className="quick-title">Start here</p>
@@ -1457,7 +1457,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                 ))}
               </ul>
             ) : (
-              <p className="helper">Add dates to show a timeline.</p>
+              <p className="helper">Add a date above to show the timeline.</p>
             )}
 
             {issueGuidance && (

@@ -166,7 +166,7 @@ const WaitlistPanel = () => {
             Do not include unit numbers or resident names.
           </p>
           <label>
-            City (optional)
+            <span className="label-optional">City (optional)</span>
             <Input
               className="input"
               value={waitlistState.city}
