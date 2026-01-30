@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.32 - 2026-01-24
+
+- Changed: Notice builder emphasis now improves contrast and surfaces privacy reminders more clearly.
+- Changed: Timeline, waitlist, and contact panels add clearer spacing and optional-field styling for readability.
+- Changed: Footer safety reminder now has stronger contrast.
+
 ## 1.0.31 - 2026-01-24
 
 - Changed: Issue detail helpers now remind residents to keep short factual notes and avoid names or unit numbers.
