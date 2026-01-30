@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.33 - 2026-01-30
+
+- Changed: Notice builder step labels now use action wording and add clearer plan/export helper copy.
+- Changed: Access-gated pages add a more scannable key checklist and a reminder to verify links.
+- Changed: Submission summary view reinforces the privacy review reminder.
+
 ## 1.0.32 - 2026-01-24
 
 - Changed: Notice builder emphasis now improves contrast and surfaces privacy reminders more clearly.

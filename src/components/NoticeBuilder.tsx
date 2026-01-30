@@ -71,27 +71,27 @@ type FormState = typeof initialState;
 const steps = [
   {
     id: 1,
-    title: "Step 1",
-    label: "Basics",
-    description: "Pick your building, issue, and notice stage.",
+    title: "Choose basics",
+    label: "Building & issue",
+    description: "Choose your building, issue, and notice stage.",
   },
   {
     id: 2,
-    title: "Step 2",
+    title: "Add facts",
     label: "Issue details",
     description: "Add issue-specific facts that support your request.",
   },
   {
     id: 3,
-    title: "Step 3",
+    title: "Set dates",
     label: "Dates & language",
-    description: "Confirm the timeline and language options.",
+    description: "Confirm the dates and language options.",
   },
   {
     id: 4,
-    title: "Step 4",
-    label: "Review & send",
-    description: "Copy the notice and save your records.",
+    title: "Review & share",
+    label: "Notice & save",
+    description: "Copy the notice and save your record.",
   },
 ];
 
@@ -1497,6 +1497,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
 
             <h2>Plan if the issue is not fixed</h2>
             <p className="helper">Choose a goal. This does not give legal advice. Rules vary by city.</p>
+            <p className="helper">Pick the closest goal. You can change it later.</p>
             <RadioGroup.Root
               className="plan-options"
               aria-label="Plan goal if the issue is not fixed"
@@ -1643,6 +1644,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
               <div>
                 <h3>{selectedAudience.label} export</h3>
                 <p className="helper">Choose who you are exporting for. The fields adjust automatically.</p>
+                <p className="helper">This does not notify anyone. It only changes the summary text.</p>
               </div>
               <div className="export-actions">
                 <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>

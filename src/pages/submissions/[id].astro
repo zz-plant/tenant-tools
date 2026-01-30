@@ -118,6 +118,7 @@ const formatTimelineDate = (value: string) => {
               <p class="helper">This entry is private to residents in the building.</p>
               <p class="helper">The link can include private details.</p>
               <p class="helper">Ask a resident steward for the key.</p>
+              <p class="helper">If the key is correct but this still does not load, ask a steward to check the link.</p>
               <div class="access-sample">
                 <p class="access-sample-title">Example link</p>
                 <code>?key=YOUR_KEY</code>
@@ -162,6 +163,7 @@ const formatTimelineDate = (value: string) => {
                   <p class="summary-value">{reportCountLabel}</p>
                 </div>
               </div>
+              <p class="helper">Review this summary before sharing. Remove names or unit numbers.</p>
               {dashboardUrl && (
                 <a class="button button-secondary" href={dashboardUrl}>
                   Back to building dashboard
