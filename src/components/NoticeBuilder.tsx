@@ -168,11 +168,21 @@ const evidenceSafetyChecklist = [
   "Do not upload faces.",
   "Do not upload names, mail labels, or unit numbers.",
   "Do not upload leases or ID documents.",
+  "Remove location data if you can.",
 ];
 
 const freeTextSafetyNote = "Write short facts only. Do not include names or unit numbers.";
 
 const detailWarningThreshold = detailCharacterLimit - 40;
+
+const factualTagOptions: Partial<Record<keyof typeof fieldDefinitions, string[]>> = {
+  location: ["kitchen", "bathroom", "ceiling", "hallway"],
+  attachment: ["photo", "video", "screenshot"],
+  pestType: ["roaches", "rats", "bedbugs"],
+  commonArea: ["elevator", "garage door", "hall lights", "trash room"],
+  lockoutAction: ["locked out", "utilities shut off"],
+  issueDescription: ["broken elevator", "water leak", "no heat", "mold smell"],
+};
 
 const issueIcons: Record<string, React.ReactNode> = {
   heat: (
@@ -401,6 +411,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
         [key]: checked,
       }));
     };
+
+  const handleTagClick = (fieldKey: keyof FormState, tag: string) => {
+    setFormState((prev) => {
+      const current = String(prev[fieldKey] ?? "").trim();
+      if (!current) {
+        return { ...prev, [fieldKey]: tag };
+      }
+      if (current.toLowerCase().includes(tag.toLowerCase())) {
+        return prev;
+      }
+      return { ...prev, [fieldKey]: `${current}, ${tag}` };
+    });
+  };
 
   const selectedIssue = issueOptions.find((option) => option.id === formState.issue);
   const issueFields = issueFieldMap[formState.issue] || [];
@@ -975,15 +998,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                     <li>Confirm the notice stage.</li>
                   </ul>
                 </div>
-                <div className="quick-warning">
-                  <p className="helper">
-                    <strong>Safety note:</strong> Write short facts. Do not include names or unit numbers.
-                  </p>
-                </div>
-                {missingBasics.length > 0 && (
-                  <div className="quick-needed">
-                    <p className="helper">
-                      <strong>Needed to continue:</strong>
+                    <div className="quick-warning">
+                      <p className="helper">
+                        <strong>Safety note:</strong> Write short facts. Do not include names or unit numbers.
+                      </p>
+                    </div>
+                    <div className="quick-checklist">
+                      <p className="quick-title">Before sharing</p>
+                      <ul className="quick-list">
+                        <li>Set a resident access key.</li>
+                        <li>Connect ledger storage to save issues.</li>
+                        <li>Share the link only with neighbors.</li>
+                        <li>Remind neighbors not to include names or unit numbers.</li>
+                      </ul>
+                    </div>
+                    {missingBasics.length > 0 && (
+                      <div className="quick-needed">
+                        <p className="helper">
+                          <strong>Needed to continue:</strong>
                     </p>
                     <ul className="quick-list">
                       {missingBasics.map((item) => (
@@ -1248,6 +1280,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                     const fieldValue = String(formState[fieldKey as keyof FormState] ?? "");
                     const trimmedLength = fieldValue.trim().length;
                     const isTextField = !field.type;
+                    const tags = isTextField ? factualTagOptions[fieldKey] : undefined;
                     const showLimitWarning = isTextField && trimmedLength >= detailWarningThreshold;
                     const limitText = isTextField
                       ? `Limit: ${detailCharacterLimit} characters${trimmedLength > 0 ? ` (${trimmedLength}/${detailCharacterLimit})` : "."}`
@@ -1276,6 +1309,23 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                           maxLength={isTextField ? detailCharacterLimit : undefined}
                           aria-describedby={helperId}
                         />
+                        {tags && (
+                          <div className="fact-tags" aria-label={`${field.label} quick facts`}>
+                            <p className="helper">Quick facts:</p>
+                            <div className="fact-tag-row">
+                              {tags.map((tag) => (
+                                <button
+                                  key={tag}
+                                  className="fact-tag"
+                                  type="button"
+                                  onClick={() => handleTagClick(fieldKey as keyof FormState, tag)}
+                                >
+                                  {tag}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                         {isTextField && (
                           <p className={`helper${showLimitWarning ? " helper-warning" : ""}`} id={helperId}>
                             {helperText}
@@ -1542,6 +1592,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                           : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
                       </p>
                       <p className="helper">Reminder date: {step.reminderDateLabel}</p>
+                      <p className="helper">
+                        {step.unlocked
+                          ? `Unlocked because the issue has been open for ${daysOpen} days.`
+                          : `Unlocks after ${step.unlockDay} days open.`}
+                      </p>
                     </div>
                     <a
                       className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
