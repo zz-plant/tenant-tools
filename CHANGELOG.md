@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.0.39 - 2026-02-04
+
+- Changed: Privacy basics now use progressive disclosure to reduce early clutter.
+- Changed: Mobile view hides extra hero tags and stacks progress details more cleanly.
+- Added: Clearer privacy helper styling inside the disclosure card.
+
+## 1.0.38 - 2026-02-04
+
+- Added: Visual quick-guide icons and a progress pill in the notice builder header.
+- Changed: Organizer setup now uses progressive disclosure to reduce early load.
+- Changed: Mobile layout stacks quick-guide cards and step metadata more cleanly.
+
+## 1.0.37 - 2026-02-04
+
+- Added: Progress percent and “now/next” labels in the notice builder header.
+- Changed: Quick guide cards now group privacy basics and setup tasks more clearly.
+- Changed: Hero tags remind users to share only with neighbors.
+
+## 1.0.36 - 2026-02-04
+
+- Added: Step progress bar in the notice builder header.
+- Changed: Quick guide now uses a scannable card layout with clearer privacy notes.
+- Changed: Hero tag row highlights private evidence handling.
+- Changed: Calendar action label now reads as a reminder.
+
 ## 1.0.35 - 2026-02-02
 
 - Added: Inline notice stage helper text for first-time clarity.

@@ -353,6 +353,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
       timeoutHandles.current.clear();
     };
   }, []);
+  const stepProgress = Math.round((currentStep / steps.length) * 100);
+  const currentStepInfo = steps[currentStep - 1];
+  const nextStepInfo = steps[currentStep] || null;
+  const progressPillLabel = stepProgress < 100 ? `${stepProgress}%` : "Done";
   const shareNeeds = [
     ...(shareReadiness && !shareReadiness.hasResidentKeys ? ["Set a resident access key."] : []),
     ...(shareReadiness && !shareReadiness.hasSubmissionStore ? ["Connect ledger storage to save issues."] : []),
@@ -978,6 +982,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
           <div className="tag-row">
             <span>No names saved</span>
             <span>Short facts only</span>
+            <span>Evidence stays private</span>
+            <span>Share only with neighbors</span>
           </div>
         </div>
       </header>
@@ -988,59 +994,117 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
             <div className="step-header">
               <h2>Build your notice</h2>
               <p className="helper">Start with the basics and move step by step.</p>
-              <p className="helper">Step {currentStep} of {steps.length}</p>
-              <p className="helper privacy-reminder">Privacy reminder: Do not include names or unit numbers.</p>
+              <div className="step-meta">
+                <div className="step-progress">
+                  <div className="step-progress-row">
+                    <p className="step-progress-label">Step {currentStep} of {steps.length}</p>
+                    <span className="step-progress-pill">{progressPillLabel}</span>
+                  </div>
+                  <p className="step-progress-value">Notice progress</p>
+                  <div
+                    className="step-progress-track"
+                    role="progressbar"
+                    aria-valuenow={stepProgress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Step progress"
+                  >
+                    <span className="step-progress-bar" style={{ width: `${stepProgress}%` }} />
+                  </div>
+                </div>
+                <div className="step-privacy">
+                  <p className="helper privacy-reminder">Privacy reminder: Do not include names or unit numbers.</p>
+                  <p className="helper">Write short facts. Use general areas only.</p>
+                  <p className="helper step-now">Now: {currentStepInfo.label}</p>
+                  {nextStepInfo && <p className="helper step-next">Next: {nextStepInfo.label}</p>}
+                </div>
+              </div>
               <div className="quick-guide">
-                <div>
-                  <p className="quick-title">Start here</p>
+                <div className="quick-card">
+                  <div className="quick-card-header">
+                    <span className="quick-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" role="presentation">
+                        <circle cx="12" cy="12" r="10" fill="#e8edff" stroke="#4f67ff" strokeWidth="1.5" />
+                        <path d="M8 12h8M12 8v8" stroke="#4f67ff" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                    <p className="quick-title">Start here</p>
+                  </div>
                   <ul className="quick-list">
                     <li>Choose a building.</li>
                     <li>Choose an issue type.</li>
                     <li>Confirm the notice stage.</li>
                   </ul>
                 </div>
-                    <div className="quick-warning">
-                      <p className="helper">
-                        <strong>Safety note:</strong> Write short facts. Do not include names or unit numbers.
-                      </p>
-                    </div>
-                    <div className="quick-checklist">
-                      <p className="quick-title">Before sharing (for building organizers)</p>
-                      <ul className="quick-list">
-                        <li>Set a resident access key.</li>
-                        <li>Connect ledger storage to save issues.</li>
-                        <li>Share the link only with neighbors.</li>
-                        <li>Remind neighbors not to include names or unit numbers.</li>
-                      </ul>
-                    </div>
-                    {missingBasics.length > 0 && (
+                <details className="quick-card quick-warning quick-disclosure">
+                  <summary className="quick-summary">
+                    <span className="quick-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" role="presentation">
+                        <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6l7-3z" fill="#fff1db" stroke="#b0701a" strokeWidth="1.5" />
+                        <path d="M9.5 12.5l2 2 3-3" stroke="#b0701a" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                    <span>
+                      <span className="quick-title">Privacy basics</span>
+                      <span className="quick-summary-helper">Open to review safe sharing rules.</span>
+                    </span>
+                  </summary>
+                  <div className="quick-disclosure-body">
+                    <ul className="quick-list">
+                      <li>Write short facts only.</li>
+                      <li>Do not add names.</li>
+                      <li>Do not add unit numbers.</li>
+                    </ul>
+                  </div>
+                </details>
+                <details className="quick-card quick-disclosure">
+                  <summary className="quick-summary">
+                    <span className="quick-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" role="presentation">
+                        <rect x="4" y="6" width="16" height="12" rx="2.5" fill="#eef1ff" stroke="#4f67ff" strokeWidth="1.5" />
+                        <path d="M7 10h10M7 14h6" stroke="#4f67ff" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                    <span>
+                      <span className="quick-title">Organizer setup (optional)</span>
+                      <span className="quick-summary-helper">Open when you are ready to share.</span>
+                    </span>
+                  </summary>
+                  <div className="quick-disclosure-body">
+                    <ul className="quick-list">
+                      <li>Set a resident access key.</li>
+                      <li>Connect ledger storage to save issues.</li>
+                      <li>Share the link only with neighbors.</li>
+                      <li>Remind neighbors not to include names or unit numbers.</li>
+                    </ul>
+                    {shareReadiness && (
                       <div className="quick-needed">
                         <p className="helper">
-                          <strong>Needed to continue:</strong>
-                    </p>
+                          <strong>Sharing status:</strong>{" "}
+                          {isShareReady ? "Ready to share with neighbors." : "Setup needed before sharing."}
+                        </p>
+                        {shareNeeds.length > 0 && (
+                          <>
+                            <ul className="quick-list">
+                              {shareNeeds.map((item) => (
+                                <li key={item}>{item}</li>
+                              ))}
+                            </ul>
+                            <p className="helper">You can still build a notice without saving.</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </details>
+                {missingBasics.length > 0 && (
+                  <div className="quick-card quick-needed">
+                    <p className="quick-title">Needed to continue</p>
                     <ul className="quick-list">
                       {missingBasics.map((item) => (
                         <li key={item}>{item}</li>
                       ))}
                     </ul>
-                  </div>
-                )}
-                {shareReadiness && (
-                  <div className="quick-needed">
-                    <p className="helper">
-                      <strong>Sharing status:</strong>{" "}
-                      {isShareReady ? "Ready to share with neighbors." : "Setup needed before sharing."}
-                    </p>
-                    {shareNeeds.length > 0 && (
-                      <>
-                        <ul className="quick-list">
-                          {shareNeeds.map((item) => (
-                            <li key={item}>{item}</li>
-                          ))}
-                        </ul>
-                        <p className="helper">You can still build a notice without saving.</p>
-                      </>
-                    )}
                   </div>
                 )}
               </div>
@@ -1592,28 +1656,28 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                           </p>
                           <p className="helper">Reminder date: {step.reminderDateLabel}</p>
                           <p className="helper">
-                            {step.unlocked
-                              ? `Unlocked because the issue has been open for ${daysOpen} days.`
-                              : `Unlocks after ${step.unlockDay} days open.`}
-                          </p>
-                        </div>
-                        <a
-                          className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
-                          href={step.calendarLink || "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-disabled={!step.calendarLink}
-                          onClick={(event) => {
-                            if (!step.calendarLink) {
-                              event.preventDefault();
-                            }
-                          }}
-                        >
-                          Add to Google Calendar
-                        </a>
-                      </div>
-                    </li>
-                  ))}
+                        {step.unlocked
+                          ? `Unlocked because the issue has been open for ${daysOpen} days.`
+                          : `Unlocks after ${step.unlockDay} days open.`}
+                      </p>
+                    </div>
+                    <a
+                      className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
+                      href={step.calendarLink || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-disabled={!step.calendarLink}
+                      onClick={(event) => {
+                        if (!step.calendarLink) {
+                          event.preventDefault();
+                        }
+                      }}
+                    >
+                      Add reminder to Google Calendar
+                    </a>
+                  </div>
+                </li>
+              ))}
                 </ul>
 
                 <h3>Community impact</h3>
