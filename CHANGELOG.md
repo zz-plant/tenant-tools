@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.34 - 2026-02-01
+
+- Added: Quick fact tags for common issue details to keep entries short.
+- Changed: Quick guide now includes a short “before sharing” checklist.
+- Changed: Evidence safety checklist now reminds residents to remove location data when possible.
+- Changed: Timeline steps now explain why a step is unlocked.
+
 ## 1.0.33 - 2026-01-30
 
 - Changed: Notice builder step labels now use action wording and add clearer plan/export helper copy.

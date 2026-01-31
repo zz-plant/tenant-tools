@@ -158,6 +158,13 @@ body {
   padding: 10px 12px;
 }
 
+.quick-checklist {
+  border-radius: 12px;
+  border: 1px solid #d5dbea;
+  background: #ffffff;
+  padding: 10px 12px;
+}
+
 .quick-needed {
   border-radius: 12px;
   border: 1px solid #d5dbea;
@@ -557,6 +564,33 @@ code {
   color: #6a4a17;
   display: grid;
   gap: 4px;
+}
+
+.fact-tags {
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.fact-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fact-tag {
+  border-radius: 999px;
+  border: 1px solid #d5dbef;
+  background: #f4f6ff;
+  color: #2a3550;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.fact-tag:hover {
+  background: #e9eeff;
 }
 
 .review-actions {
