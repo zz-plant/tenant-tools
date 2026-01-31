@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.40 - 2026-02-04
+
+- Changed: Tablet layout now stacks the main panels and tightens grid sizing for easier scanning.
+
 ## 1.0.39 - 2026-02-04
 
 - Changed: Privacy basics now use progressive disclosure to reduce early clutter.

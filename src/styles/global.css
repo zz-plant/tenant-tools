@@ -1563,6 +1563,42 @@ code {
   font-weight: 600;
 }
 
+@media (max-width: 1024px) {
+  .page {
+    padding: 32px 5vw 56px;
+  }
+
+  .hero {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    padding: 28px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-panel {
+    position: static;
+    max-height: none;
+  }
+
+  .metrics {
+    gap: 16px;
+  }
+
+  .quick-guide {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .building-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .issue-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   .impact {
     flex-direction: column;
