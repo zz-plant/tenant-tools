@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.35 - 2026-02-02
+
+- Added: Inline notice stage helper text for first-time clarity.
+- Changed: Timeline and export panels now unlock after step 1 to reduce early overload.
+- Changed: Sharing checklist now labels organizer-only setup tasks more clearly.
+- Changed: Ledger save panel clarifies how to get a building key.
+- Changed: Contact panel shows only for Continuum buildings.
+
 ## 1.0.34 - 2026-02-01
 
 - Added: Quick fact tags for common issue details to keep entries short.

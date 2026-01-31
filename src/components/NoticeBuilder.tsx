@@ -371,6 +371,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
   }, [formState.building, formState.issue]);
 
   const isStep1Complete = Boolean(formState.building && formState.issue);
+  const canShowAfterBasics = isStep1Complete;
   const isNoticeReady = missingBasics.length === 0;
   const noticeReadiness = isNoticeReady
     ? {
@@ -1004,7 +1005,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                       </p>
                     </div>
                     <div className="quick-checklist">
-                      <p className="quick-title">Before sharing</p>
+                      <p className="quick-title">Before sharing (for building organizers)</p>
                       <ul className="quick-list">
                         <li>Set a resident access key.</li>
                         <li>Connect ledger storage to save issues.</li>
@@ -1264,6 +1265,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                         </Select.Positioner>
                       </Select.Portal>
                     </Select.Root>
+                    <p className="helper">Stage A is the first notice. Stage B is a follow-up. Stage C is the final reminder.</p>
                   </label>
                 </Tabs.Panel>
 
@@ -1459,14 +1461,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                     Review the preview. Copy the text and save it for your records. Dates and repeated reports help
                     most.
                   </p>
-                  <div className="review-actions">
-                    <Button className="button" type="button" onClick={handleCopy} disabled={!isNoticeReady}>
-                      {copyLabel}
-                    </Button>
-                    <Button className="button button-secondary" type="button" onClick={handleReset}>
-                      Reset form
-                    </Button>
-                  </div>
+                  <p className="helper">Use the buttons in the preview panel to copy, repeat, or reset.</p>
                 </Tabs.Panel>
               </form>
             </Tabs.Root>
@@ -1496,139 +1491,145 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
 
           <section className="panel">
             <h2>Issue timeline</h2>
-            <p className="helper">Read-only record of key dates for this issue.</p>
-            {timelineEntries.length > 0 ? (
-              <ul className="timeline">
-                {timelineEntries.map((entry) => (
-                  <li key={`${entry.label}-${entry.date}`}>
-                    <p className="timeline-date">{formatTimelineDate(entry.date)}</p>
-                    <p className="timeline-label">{entry.label}</p>
-                  </li>
-                ))}
-              </ul>
+            {!canShowAfterBasics ? (
+              <p className="helper">Finish step 1 to unlock the timeline, plan, and next steps.</p>
             ) : (
-              <p className="helper">Add a date above to show the timeline.</p>
-            )}
-
-            {issueGuidance && (
-              <details className="helper-card">
-                <summary>Calling 311 for this issue</summary>
-                <div className="helper-card-body">
-                  <p>
-                    <strong>Category to choose:</strong> {issueGuidance.category}
-                  </p>
-                  <p>
-                    <strong>What to say:</strong> {guidanceScript}
-                  </p>
-                  <p>
-                    <strong>What happens next:</strong> {issueGuidance.nextStep}
-                  </p>
-                </div>
-              </details>
-            )}
-
-            {ruleSources.length > 0 && (
-              <details className="helper-card">
-                <summary>Local rules (information only)</summary>
-                <div className="helper-card-body">
-                  <p className="helper">Short source list for Chicago and Cook County. This is not legal advice.</p>
-                  <ul className="rule-sources">
-                    {ruleSources.map((source) => (
-                      <li key={source.url}>
-                        <a href={source.url} target="_blank" rel="noreferrer">
-                          {source.title}
-                        </a>
+              <>
+                <p className="helper">Read-only record of key dates for this issue.</p>
+                {timelineEntries.length > 0 ? (
+                  <ul className="timeline">
+                    {timelineEntries.map((entry) => (
+                      <li key={`${entry.label}-${entry.date}`}>
+                        <p className="timeline-date">{formatTimelineDate(entry.date)}</p>
+                        <p className="timeline-label">{entry.label}</p>
                       </li>
                     ))}
                   </ul>
-                </div>
-              </details>
-            )}
+                ) : (
+                  <p className="helper">Add a date above to show the timeline.</p>
+                )}
 
-            <h2>Plan if the issue is not fixed</h2>
-            <p className="helper">Choose a goal. This does not give legal advice. Rules vary by city.</p>
-            <p className="helper">Pick the closest goal. You can change it later.</p>
-            <RadioGroup.Root
-              className="plan-options"
-              aria-label="Plan goal if the issue is not fixed"
-              value={formState.planChoice}
-              onValueChange={(value) => {
-                if (typeof value === "string") {
-                  setFormState((prev) => ({ ...prev, planChoice: value as PlanChoice }));
-                }
-              }}
-            >
-              {planChoiceOptions.map((option) => (
-                <RadioGroup.Item
-                  key={option.id}
-                  value={option.id}
-                  render={<div />}
-                  className={`preset-card ${formState.planChoice === option.id ? "active" : ""}`}
-                >
-                  <span className="preset-radio" aria-hidden="true">
-                    <span className="preset-radio-outer">
-                      <span className="preset-radio-indicator" />
-                    </span>
-                  </span>
-                  <div>
-                    <p className="preset-title">{option.label}</p>
-                    <p className="helper">{option.description}</p>
-                    {option.caution && <p className="helper plan-caution">{option.caution}</p>}
-                  </div>
-                </RadioGroup.Item>
-              ))}
-            </RadioGroup.Root>
-
-            <h2>What usually happens next</h2>
-            <p className="helper">This shows the normal next step based on how long the issue has been open.</p>
-            <ul className="next-steps">
-              {nextSteps.map((step) => (
-                <li key={step.label} className={step.unlocked ? "" : "locked"}>
-                  <div className="next-step-row">
-                    <div>
-                      <p className="next-step-title">
-                        {step.unlocked
-                          ? step.label
-                          : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
+                {issueGuidance && (
+                  <details className="helper-card">
+                    <summary>Calling 311 for this issue</summary>
+                    <div className="helper-card-body">
+                      <p>
+                        <strong>Category to choose:</strong> {issueGuidance.category}
                       </p>
-                      <p className="helper">Reminder date: {step.reminderDateLabel}</p>
-                      <p className="helper">
-                        {step.unlocked
-                          ? `Unlocked because the issue has been open for ${daysOpen} days.`
-                          : `Unlocks after ${step.unlockDay} days open.`}
+                      <p>
+                        <strong>What to say:</strong> {guidanceScript}
+                      </p>
+                      <p>
+                        <strong>What happens next:</strong> {issueGuidance.nextStep}
                       </p>
                     </div>
-                    <a
-                      className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
-                      href={step.calendarLink || "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-disabled={!step.calendarLink}
-                      onClick={(event) => {
-                        if (!step.calendarLink) {
-                          event.preventDefault();
-                        }
-                      }}
-                    >
-                      Add to Google Calendar
-                    </a>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                  </details>
+                )}
 
-            <h3>Community impact</h3>
-            <div className="impact">
-              <div className="impact-summary">
-                <p className="impact-count">{impactCount}</p>
-                <div>
-                  <p className="impact-label">Total reports</p>
-                  <p className="impact-hint">
-                    Reports start at 1. Use “Me too” on an existing issue to add your report.
-                  </p>
+                {ruleSources.length > 0 && (
+                  <details className="helper-card">
+                    <summary>Local rules (information only)</summary>
+                    <div className="helper-card-body">
+                      <p className="helper">Short source list for Chicago and Cook County. This is not legal advice.</p>
+                      <ul className="rule-sources">
+                        {ruleSources.map((source) => (
+                          <li key={source.url}>
+                            <a href={source.url} target="_blank" rel="noreferrer">
+                              {source.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </details>
+                )}
+
+                <h2>Plan if the issue is not fixed</h2>
+                <p className="helper">Choose a goal. This does not give legal advice. Rules vary by city.</p>
+                <p className="helper">Pick the closest goal. You can change it later.</p>
+                <RadioGroup.Root
+                  className="plan-options"
+                  aria-label="Plan goal if the issue is not fixed"
+                  value={formState.planChoice}
+                  onValueChange={(value) => {
+                    if (typeof value === "string") {
+                      setFormState((prev) => ({ ...prev, planChoice: value as PlanChoice }));
+                    }
+                  }}
+                >
+                  {planChoiceOptions.map((option) => (
+                    <RadioGroup.Item
+                      key={option.id}
+                      value={option.id}
+                      render={<div />}
+                      className={`preset-card ${formState.planChoice === option.id ? "active" : ""}`}
+                    >
+                      <span className="preset-radio" aria-hidden="true">
+                        <span className="preset-radio-outer">
+                          <span className="preset-radio-indicator" />
+                        </span>
+                      </span>
+                      <div>
+                        <p className="preset-title">{option.label}</p>
+                        <p className="helper">{option.description}</p>
+                        {option.caution && <p className="helper plan-caution">{option.caution}</p>}
+                      </div>
+                    </RadioGroup.Item>
+                  ))}
+                </RadioGroup.Root>
+
+                <h2>What usually happens next</h2>
+                <p className="helper">This shows the normal next step based on how long the issue has been open.</p>
+                <ul className="next-steps">
+                  {nextSteps.map((step) => (
+                    <li key={step.label} className={step.unlocked ? "" : "locked"}>
+                      <div className="next-step-row">
+                        <div>
+                          <p className="next-step-title">
+                            {step.unlocked
+                              ? step.label
+                              : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
+                          </p>
+                          <p className="helper">Reminder date: {step.reminderDateLabel}</p>
+                          <p className="helper">
+                            {step.unlocked
+                              ? `Unlocked because the issue has been open for ${daysOpen} days.`
+                              : `Unlocks after ${step.unlockDay} days open.`}
+                          </p>
+                        </div>
+                        <a
+                          className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
+                          href={step.calendarLink || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-disabled={!step.calendarLink}
+                          onClick={(event) => {
+                            if (!step.calendarLink) {
+                              event.preventDefault();
+                            }
+                          }}
+                        >
+                          Add to Google Calendar
+                        </a>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+
+                <h3>Community impact</h3>
+                <div className="impact">
+                  <div className="impact-summary">
+                    <p className="impact-count">{impactCount}</p>
+                    <div>
+                      <p className="impact-label">Total reports</p>
+                      <p className="impact-hint">
+                        Reports start at 1. Use “Me too” on an existing issue to add your report.
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </>
+            )}
           </section>
         </div>
 
@@ -1695,142 +1696,148 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
             <pre className="output output-notice">{noticeText}</pre>
           </div>
           <div className="export-block">
-            <div className="export-header">
-              <div>
-                <h3>{selectedAudience.label} export</h3>
-                <p className="helper">Choose who you are exporting for. The fields adjust automatically.</p>
-                <p className="helper">This does not notify anyone. It only changes the summary text.</p>
-              </div>
-              <div className="export-actions">
-                <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
-                  {summaryCopyLabel}
-                </Button>
-                <Button className="button button-secondary" type="button" onClick={handleSummaryDownload}>
-                  Download .txt
-                </Button>
-              </div>
-            </div>
-            <p className="helper" role="status" aria-live="polite">
-              {exportStatusMessage}
-            </p>
-            <div className="export-status">
-              <label>
-                Issue status
-                <Select.Root value={formState.exportStatus} onValueChange={updateSelect("exportStatus")} required>
-                  <Select.Trigger className="select-trigger" aria-label="Issue status">
-                    <Select.Value placeholder="Select status" />
-                    <Select.Icon className="select-icon">
-                      <span aria-hidden="true">▾</span>
-                    </Select.Icon>
-                  </Select.Trigger>
-                  <Select.Portal>
-                    <Select.Positioner className="select-positioner">
-                      <Select.Popup className="select-popup">
-                        <Select.List className="select-list">
-                          {exportStatusOptions.map((option) => (
-                            <Select.Item key={option.id} value={option.id} className="select-item">
-                              <Select.ItemText>
-                                {option.label} — {option.description}
-                              </Select.ItemText>
-                              <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                            </Select.Item>
-                          ))}
-                        </Select.List>
-                      </Select.Popup>
-                    </Select.Positioner>
-                  </Select.Portal>
-                </Select.Root>
-              </label>
-            </div>
-            <RadioGroup.Root
-              className="export-presets"
-              aria-label="Export audience"
-              value={exportAudience}
-              onValueChange={(value) => {
-                if (typeof value === "string") {
-                  setExportAudience(value as ExportAudience);
-                }
-              }}
-            >
-              {exportAudienceOptions.map((option) => (
-                <RadioGroup.Item
-                  key={option.id}
-                  value={option.id}
-                  render={<div />}
-                  className={`preset-card ${exportAudience === option.id ? "active" : ""}`}
-                >
-                  <span className="preset-radio" aria-hidden="true">
-                    <span className="preset-radio-outer">
-                      <span className="preset-radio-indicator" />
-                    </span>
-                  </span>
+            {!canShowAfterBasics ? (
+              <p className="helper">Finish step 1 to unlock exports and saving.</p>
+            ) : (
+              <>
+                <div className="export-header">
                   <div>
-                    <p className="preset-title">{option.label}</p>
-                    <p className="helper">{option.description}</p>
+                    <h3>{selectedAudience.label} export</h3>
+                    <p className="helper">Choose who you are exporting for. The fields adjust automatically.</p>
+                    <p className="helper">This does not notify anyone. It only changes the summary text.</p>
                   </div>
-                </RadioGroup.Item>
-              ))}
-            </RadioGroup.Root>
-            <pre className="output output-summary">{exportSummary}</pre>
-            <div className="submission-block">
-              <div>
-                <h3>Save to the shared ledger</h3>
-                <p className="helper">This saves a short summary. It does not save personal details.</p>
-                {!buildingKey && (
-                  <p className="helper">Add your building key to the URL before saving.</p>
-                )}
-                {!formState.building || !formState.issue ? (
-                  <p className="helper">Choose a building and issue to enable saving.</p>
-                ) : null}
-              </div>
-              <div className="submission-actions">
-                <Button
-                  className="button button-secondary"
-                  type="button"
-                  onClick={handleLedgerSave}
-                  disabled={!canSaveLedger || saveStatus === "saving"}
-                >
-                  {saveLabel}
-                </Button>
-                {submissionUrl && (
-                  <Button className="button button-secondary" type="button" onClick={handleCopyLink}>
-                    {linkCopyLabel}
-                  </Button>
-                )}
-              </div>
-              {saveStatus === "saved" && submissionUrl && (
-                <p className="submission-note" role="status" aria-live="polite">
-                  Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>
-                </p>
-              )}
-              {saveStatus === "error" && (
-                <p className="submission-error" role="alert">
-                  {saveError || "We could not save the ledger entry."}
-                </p>
-              )}
-              {linkStatusMessage && (
-                <p className="helper" role="status" aria-live="polite">
-                  {linkStatusMessage}
-                </p>
-              )}
-              {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
-                <div className="submission-details">
-                  <p className="helper">Details saved:</p>
-                  <ul>
-                    {savedMetaItems.map((item) => (
-                      <li key={item.label}>
-                        <strong>{item.label}:</strong> {item.value}
-                      </li>
-                    ))}
-                    {detailSummaryItems.map((item) => (
-                      <li key={item.label}>
-                        <strong>{item.label}:</strong> {item.value}
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="export-actions">
+                    <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
+                      {summaryCopyLabel}
+                    </Button>
+                    <Button className="button button-secondary" type="button" onClick={handleSummaryDownload}>
+                      Download .txt
+                    </Button>
+                  </div>
                 </div>
-              )}
-            </div>
+                <p className="helper" role="status" aria-live="polite">
+                  {exportStatusMessage}
+                </p>
+                <div className="export-status">
+                  <label>
+                    Issue status
+                    <Select.Root value={formState.exportStatus} onValueChange={updateSelect("exportStatus")} required>
+                      <Select.Trigger className="select-trigger" aria-label="Issue status">
+                        <Select.Value placeholder="Select status" />
+                        <Select.Icon className="select-icon">
+                          <span aria-hidden="true">▾</span>
+                        </Select.Icon>
+                      </Select.Trigger>
+                      <Select.Portal>
+                        <Select.Positioner className="select-positioner">
+                          <Select.Popup className="select-popup">
+                            <Select.List className="select-list">
+                              {exportStatusOptions.map((option) => (
+                                <Select.Item key={option.id} value={option.id} className="select-item">
+                                  <Select.ItemText>
+                                    {option.label} — {option.description}
+                                  </Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                              ))}
+                            </Select.List>
+                          </Select.Popup>
+                        </Select.Positioner>
+                      </Select.Portal>
+                    </Select.Root>
+                  </label>
+                </div>
+                <RadioGroup.Root
+                  className="export-presets"
+                  aria-label="Export audience"
+                  value={exportAudience}
+                  onValueChange={(value) => {
+                    if (typeof value === "string") {
+                      setExportAudience(value as ExportAudience);
+                    }
+                  }}
+                >
+                  {exportAudienceOptions.map((option) => (
+                    <RadioGroup.Item
+                      key={option.id}
+                      value={option.id}
+                      render={<div />}
+                      className={`preset-card ${exportAudience === option.id ? "active" : ""}`}
+                    >
+                      <span className="preset-radio" aria-hidden="true">
+                        <span className="preset-radio-outer">
+                          <span className="preset-radio-indicator" />
+                        </span>
+                      </span>
+                      <div>
+                        <p className="preset-title">{option.label}</p>
+                        <p className="helper">{option.description}</p>
+                      </div>
+                    </RadioGroup.Item>
+                  ))}
+                </RadioGroup.Root>
+                <pre className="output output-summary">{exportSummary}</pre>
+                <div className="submission-block">
+                  <div>
+                    <h3>Save to the shared ledger</h3>
+                    <p className="helper">This saves a short summary. It does not save personal details.</p>
+                    {!buildingKey && (
+                      <p className="helper">Add your building key to the URL before saving. Your building organizer gives you the key.</p>
+                    )}
+                    {!formState.building || !formState.issue ? (
+                      <p className="helper">Choose a building and issue to enable saving.</p>
+                    ) : null}
+                  </div>
+                  <div className="submission-actions">
+                    <Button
+                      className="button button-secondary"
+                      type="button"
+                      onClick={handleLedgerSave}
+                      disabled={!canSaveLedger || saveStatus === "saving"}
+                    >
+                      {saveLabel}
+                    </Button>
+                    {submissionUrl && (
+                      <Button className="button button-secondary" type="button" onClick={handleCopyLink}>
+                        {linkCopyLabel}
+                      </Button>
+                    )}
+                  </div>
+                  {saveStatus === "saved" && submissionUrl && (
+                    <p className="submission-note" role="status" aria-live="polite">
+                      Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>
+                    </p>
+                  )}
+                  {saveStatus === "error" && (
+                    <p className="submission-error" role="alert">
+                      {saveError || "We could not save the ledger entry."}
+                    </p>
+                  )}
+                  {linkStatusMessage && (
+                    <p className="helper" role="status" aria-live="polite">
+                      {linkStatusMessage}
+                    </p>
+                  )}
+                  {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
+                    <div className="submission-details">
+                      <p className="helper">Details saved:</p>
+                      <ul>
+                        {savedMetaItems.map((item) => (
+                          <li key={item.label}>
+                            <strong>{item.label}:</strong> {item.value}
+                          </li>
+                        ))}
+                        {detailSummaryItems.map((item) => (
+                          <li key={item.label}>
+                            <strong>{item.label}:</strong> {item.value}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </div>
           <div className="plain-meaning">
             <Button
@@ -1849,15 +1856,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
             )}
           </div>
         </aside>
-        <aside className="panel contact-panel">
-          <h2>Continuum contacts</h2>
-          <p className="helper">Use these contacts if your building is listed under Continuum.</p>
-          <p><strong>Maintenance text line:</strong> (773) 708-2321</p>
-          <p><strong>Landlord line:</strong> +1 (773) 678-7636</p>
-          <p><strong>Rent email:</strong> continuumbrokers@yahoo.com</p>
-          <p className="helper">Use text for urgent safety issues. Email for rent receipts.</p>
-          <p className="helper">If your building has different contacts, use the waitlist below.</p>
-        </aside>
+        {selectedPortfolio?.id === "continuum" && formState.building && (
+          <aside className="panel contact-panel">
+            <h2>Continuum contacts</h2>
+            <p className="helper">Use these contacts if your building is listed under Continuum.</p>
+            <p><strong>Maintenance text line:</strong> (773) 708-2321</p>
+            <p><strong>Landlord line:</strong> +1 (773) 678-7636</p>
+            <p><strong>Rent email:</strong> continuumbrokers@yahoo.com</p>
+            <p className="helper">Use text for urgent safety issues. Email for rent receipts.</p>
+            <p className="helper">If your building has different contacts, use the waitlist below.</p>
+          </aside>
+        )}
       </main>
 
       <WaitlistPanel />
