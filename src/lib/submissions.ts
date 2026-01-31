@@ -97,6 +97,22 @@ const pushSensitiveErrors = (label: string, value: string, errors: string[]) => 
   });
 };
 
+const asString = (value: unknown) => (typeof value === "string" ? value : "");
+
+const asNumber = (value: unknown) => (typeof value === "number" ? value : Number(value));
+
+const validateRequiredDate = (label: string, value: string, errors: string[]) => {
+  if (!isValidDateString(value)) {
+    errors.push(`${label} is invalid.`);
+  }
+};
+
+const validateOptionalDate = (label: string, value: string, errors: string[]) => {
+  if (value && !isValidDateString(value)) {
+    errors.push(`${label} is invalid.`);
+  }
+};
+
 export const validateSubmissionInput = (payload: unknown) => {
   if (!payload || typeof payload !== "object") {
     return { ok: false, errors: ["Payload must be an object."] } as const;
@@ -105,15 +121,14 @@ export const validateSubmissionInput = (payload: unknown) => {
   const data = payload as Record<string, unknown>;
   const errors: string[] = [];
 
-  const building =
-    typeof data.building === "string" ? sanitizeLimitedText(data.building, maxBuildingLength) : "";
+  const building = sanitizeLimitedText(asString(data.building), maxBuildingLength);
   if (!building) {
     errors.push("Building is required.");
   } else {
     pushSensitiveErrors("Building", building, errors);
   }
 
-  const issue = typeof data.issue === "string" ? data.issue : "";
+  const issue = asString(data.issue);
   if (!issueIds.has(issue)) {
     errors.push("Issue type is invalid.");
   }
@@ -133,40 +148,29 @@ export const validateSubmissionInput = (payload: unknown) => {
     errors.push("Portfolio is invalid.");
   }
 
-  const startDate = typeof data.startDate === "string" ? data.startDate : "";
-  if (!isValidDateString(startDate)) {
-    errors.push("Start date is invalid.");
-  }
+  const startDate = asString(data.startDate);
+  validateRequiredDate("Start date", startDate, errors);
 
-  const reportDate = typeof data.reportDate === "string" ? data.reportDate : "";
-  if (!isValidDateString(reportDate)) {
-    errors.push("Report date is invalid.");
-  }
+  const reportDate = asString(data.reportDate);
+  validateRequiredDate("Report date", reportDate, errors);
 
-  const reportCount = typeof data.reportCount === "number" ? data.reportCount : Number(data.reportCount);
+  const reportCount = asNumber(data.reportCount);
   if (!Number.isFinite(reportCount) || reportCount < 1 || reportCount > 50) {
     errors.push("Report count is invalid.");
   }
 
-  const zone = typeof data.zone === "string" ? data.zone : "";
+  const zone = asString(data.zone);
   if (zone && !isValidZoneId(zone)) {
     errors.push("Zone is invalid.");
   }
 
-  const firstMessageDate = typeof data.firstMessageDate === "string" ? data.firstMessageDate : "";
-  if (firstMessageDate && !isValidDateString(firstMessageDate)) {
-    errors.push("First message date is invalid.");
-  }
+  const firstMessageDate = asString(data.firstMessageDate);
+  validateOptionalDate("First message date", firstMessageDate, errors);
 
-  const ticketDate = typeof data.ticketDate === "string" ? data.ticketDate : "";
-  if (ticketDate && !isValidDateString(ticketDate)) {
-    errors.push("311 ticket date is invalid.");
-  }
+  const ticketDate = asString(data.ticketDate);
+  validateOptionalDate("311 ticket date", ticketDate, errors);
 
-  const ticketNumber =
-    typeof data.ticketNumber === "string"
-      ? sanitizeLimitedText(data.ticketNumber, ticketNumberCharacterLimit)
-      : "";
+  const ticketNumber = sanitizeLimitedText(asString(data.ticketNumber), ticketNumberCharacterLimit);
   if (ticketNumber) {
     pushSensitiveErrors("Ticket number", ticketNumber, errors);
   }
