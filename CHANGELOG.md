@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.49 - 2026-02-04
+
+- Changed: Notice stage selection now uses clear card choices with a default-first hint.
+
 ## 1.0.48 - 2026-02-04
 
 - Changed: Notice builder removes organizer setup, similar issue prompts, 311 call details, plan goal prompts, and the Continuum contact panel to keep the flow focused.
