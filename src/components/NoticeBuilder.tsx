@@ -23,7 +23,7 @@ import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
 import WaitlistPanel from "./WaitlistPanel";
 import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
-import { detailCharacterLimit, ticketNumberCharacterLimit, type SubmissionStatus } from "../lib/submissions";
+import { detailCharacterLimit, type SubmissionStatus } from "../lib/submissions";
 
 const initialState = {
   building: "",
@@ -52,19 +52,9 @@ const initialState = {
   attachment: "",
   ticketDate: "",
   ticketNumber: "",
-  planChoice: "keep_open",
 };
 
 type Stage = "A" | "B" | "C";
-type PlanChoice = "keep_open" | "hire_professional" | "end_lease";
-
-type SimilarIssue = {
-  id: string;
-  issueLabel: string;
-  startDate: string;
-  reportCount: number;
-  zone?: string;
-};
 
 type FormState = typeof initialState;
 
@@ -137,26 +127,6 @@ const exportStatusOptions: Array<{ id: SubmissionStatus; label: string; descript
     id: "archived",
     label: "Archived",
     description: "Record closed for now.",
-  },
-];
-
-const planChoiceOptions: Array<{ id: PlanChoice; label: string; description: string; caution?: string }> = [
-  {
-    id: "keep_open",
-    label: "Documentation only",
-    description: "Document first. Decide later.",
-  },
-  {
-    id: "hire_professional",
-    label: "Consider hiring a professional",
-    description: "Consider hiring a repair and seeking reimbursement later.",
-    caution: "Only do this if local rules allow. Get advice first.",
-  },
-  {
-    id: "end_lease",
-    label: "Consider ending the lease",
-    description: "Consider ending the lease if unresolved.",
-    caution: "Check local rules and notice deadlines first.",
   },
 ];
 
@@ -295,13 +265,9 @@ const formatTimelineDate = (value: string) => {
 
 type NoticeBuilderProps = {
   buildingOptions?: BuildingOption[];
-  shareReadiness?: {
-    hasResidentKeys: boolean;
-    hasSubmissionStore: boolean;
-  };
 };
 
-const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadiness }: NoticeBuilderProps) => {
+const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuilderProps) => {
   const [formState, setFormState] = useState<FormState>(() => {
     const today = new Date();
     const formatted = formatDate(today);
@@ -330,12 +296,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
   const [linkCopyLabel, setLinkCopyLabel] = useState("Copy link");
   const [repeatLabel, setRepeatLabel] = useState("Repeat with today's date");
   const [exportAudience, setExportAudience] = useState<ExportAudience>("inspector");
-  const [similarIssues, setSimilarIssues] = useState<SimilarIssue[]>([]);
-  const [similarNotice, setSimilarNotice] = useState("");
-  const [similarLoading, setSimilarLoading] = useState(false);
-  const [similarError, setSimilarError] = useState("");
-  const [dismissSimilar, setDismissSimilar] = useState(false);
-  const [reportingIssueId, setReportingIssueId] = useState<string | null>(null);
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
   const [exportStatusMessage, setExportStatusMessage] = useState("");
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
@@ -361,11 +321,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
   const currentStepInfo = steps[currentStep - 1];
   const nextStepInfo = steps[currentStep] || null;
   const progressPillLabel = stepProgress < 100 ? `${stepProgress}%` : "Done";
-  const shareNeeds = [
-    ...(shareReadiness && !shareReadiness.hasResidentKeys ? ["Set a resident access key."] : []),
-    ...(shareReadiness && !shareReadiness.hasSubmissionStore ? ["Connect ledger storage to save issues."] : []),
-  ];
-  const isShareReady = Boolean(shareReadiness && shareNeeds.length === 0);
   const stepRequirementLabel = steps[currentStep - 1]?.requirement ?? "";
 
   const missingBasics = useMemo(() => {
@@ -510,8 +465,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
   const selectedExportStatus =
     exportStatusOptions.find((option) => option.id === formState.exportStatus) || exportStatusOptions[0];
   const selectedPortfolio = portfolioOptions.find((option) => option.id === formState.portfolio);
-  const selectedPlanChoice =
-    planChoiceOptions.find((option) => option.id === formState.planChoice) || planChoiceOptions[0];
 
   const buildNoticeText = (state: FormState) => {
     if (!selectedIssue) {
@@ -856,41 +809,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
     scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2000);
   };
 
-  const handleAddToExisting = async (id: string) => {
-    setReportingIssueId(id);
-    setSimilarNotice("");
-    setSimilarError("");
-    if (!buildingKey) {
-      setSimilarError("Add your building key to the URL before adding a report.");
-      setReportingIssueId(null);
-      return;
-    }
-    try {
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
-      headers["x-building-key"] = buildingKey;
-      const response = await fetch(`/api/submissions/${id}/report`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ increment: 1 }),
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(payload?.error || "We could not update the report count.");
-      }
-      setSimilarIssues((prev) =>
-        prev.map((issue) =>
-          issue.id === id ? { ...issue, reportCount: payload.reportCount ?? issue.reportCount } : issue
-        )
-      );
-      setSimilarNotice("Your report was added to the existing issue.");
-      setDismissSimilar(true);
-    } catch (error) {
-      setSimilarError(error instanceof Error ? error.message : "We could not add your report.");
-    } finally {
-      setReportingIssueId(null);
-    }
-  };
-
   const summaryItems = [
     { label: "Building", value: formState.building || "Select a building" },
     { label: "Portfolio", value: selectedPortfolio?.label || "Not listed" },
@@ -902,7 +820,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
     { label: "Start date", value: formState.startDate || "Add a start date" },
     { label: "Today", value: formState.today || "Add today's date" },
     { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
-    { label: "Plan goal", value: selectedPlanChoice.label },
   ];
   const noticeLanguageLabel = formState.simpleEnglish
     ? "Very simple English"
@@ -980,64 +897,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
 
     return Array.from(sourceMap, ([url, title]) => ({ url, title }));
   }, [ruleCards]);
-
-  useEffect(() => {
-    if (!formState.building || !formState.issue) {
-      setSimilarIssues([]);
-      setSimilarError("");
-      return;
-    }
-    if (!buildingKey) {
-      setSimilarIssues([]);
-      setSimilarError("Add your building key to the URL to check for similar issues.");
-      return;
-    }
-
-    const controller = new AbortController();
-    const params = new URLSearchParams({
-      building: formState.building,
-      issue: formState.issue,
-      startDate: formState.startDate || formatDate(new Date()),
-    });
-    if (formState.zone) {
-      params.set("zone", formState.zone);
-    }
-    params.set("key", buildingKey);
-
-    setSimilarLoading(true);
-    setSimilarError("");
-    const run = async () => {
-      try {
-        const response = await fetch(`/api/submissions/similar?${params.toString()}`, {
-          signal: controller.signal,
-        });
-        const payload = await response.json().catch(() => ({}));
-        if (!response.ok) {
-          throw new Error(payload?.error || "We could not check for similar issues right now.");
-        }
-        if (Array.isArray(payload?.matches)) {
-          setSimilarIssues(payload.matches);
-          return;
-        }
-        setSimilarIssues([]);
-      } catch (error) {
-        if ((error as { name?: string })?.name === "AbortError") {
-          return;
-        }
-        setSimilarError(error instanceof Error ? error.message : "We could not check for similar issues right now.");
-      } finally {
-        setSimilarLoading(false);
-      }
-    };
-    run();
-
-    return () => controller.abort();
-  }, [buildingKey, formState.building, formState.issue, formState.startDate, formState.zone]);
-
-  useEffect(() => {
-    setDismissSimilar(false);
-    setSimilarNotice("");
-  }, [buildingKey, formState.building, formState.issue, formState.zone, formState.startDate]);
 
   return (
     <div className="page">
@@ -1125,46 +984,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                       <li>Do not add names.</li>
                       <li>Do not add unit numbers.</li>
                     </ul>
-                  </div>
-                </details>
-                <details className="quick-card quick-disclosure">
-                  <summary className="quick-summary">
-                    <span className="quick-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" role="presentation">
-                        <rect x="4" y="6" width="16" height="12" rx="2.5" fill="#eef1ff" stroke="#4f67ff" strokeWidth="1.5" />
-                        <path d="M7 10h10M7 14h6" stroke="#4f67ff" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    <span>
-                      <span className="quick-title">Organizer setup (optional)</span>
-                      <span className="quick-summary-helper">Open when you are ready to share.</span>
-                    </span>
-                  </summary>
-                  <div className="quick-disclosure-body">
-                    <ul className="quick-list">
-                      <li>Set a resident access key.</li>
-                      <li>Connect ledger storage to save issues.</li>
-                      <li>Share the link only with neighbors.</li>
-                      <li>Remind neighbors not to include names or unit numbers.</li>
-                    </ul>
-                    {shareReadiness && (
-                      <div className="quick-needed">
-                        <p className="helper">
-                          <strong>Sharing status:</strong>{" "}
-                          {isShareReady ? "Ready to share with neighbors." : "Setup needed before sharing."}
-                        </p>
-                        {shareNeeds.length > 0 && (
-                          <>
-                            <ul className="quick-list">
-                              {shareNeeds.map((item) => (
-                                <li key={item}>{item}</li>
-                              ))}
-                            </ul>
-                            <p className="helper">You can still build a notice without saving.</p>
-                          </>
-                        )}
-                      </div>
-                    )}
                   </div>
                 </details>
                 {missingBasics.length > 0 && (
@@ -1295,65 +1114,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                       </RadioGroup.Root>
                     </div>
 
-                    {similarIssues.length > 0 && !dismissSimilar && (
-                      <div className="similar-issue-card">
-                        <div>
-                          <h3>Same issue?</h3>
-                          <p className="helper">
-                            There is already a recent issue like this in the last few weeks. Would you like to add your
-                            report to it instead?
-                          </p>
-                        </div>
-                        <ul className="similar-issue-list">
-                          {similarIssues.map((issue) => (
-                            <li key={issue.id}>
-                              <div>
-                                <p className="similar-issue-title">{issue.issueLabel}</p>
-                                <p className="helper">
-                                  Started {issue.startDate}. Reports: {issue.reportCount}.
-                                </p>
-                              </div>
-                              <div className="similar-issue-actions">
-                                <a
-                                  className="button button-secondary"
-                                  href={`/submissions/${issue.id}${buildingKey ? `?key=${encodeURIComponent(buildingKey)}` : ""}`}
-                                >
-                                  View summary
-                                </a>
-                                <Button
-                                  className="button"
-                                  type="button"
-                                  onClick={() => handleAddToExisting(issue.id)}
-                                  disabled={reportingIssueId === issue.id}
-                                >
-                                  {reportingIssueId === issue.id ? "Adding..." : "Me too"}
-                                </Button>
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                        {similarLoading && <p className="helper">Checking recent issues...</p>}
-                        {similarNotice && (
-                          <p className="similar-issue-success" role="status" aria-live="polite">
-                            {similarNotice}
-                          </p>
-                        )}
-                        {similarError && (
-                          <p className="similar-issue-error" role="alert">
-                            {similarError}
-                          </p>
-                        )}
-                        <div className="similar-issue-footer">
-                          <Button
-                            className="link-button"
-                            type="button"
-                            onClick={() => setDismissSimilar(true)}
-                          >
-                            Keep this as a new issue
-                          </Button>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   <div className="form-section">
@@ -1563,34 +1323,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                     </label>
                   </div>
 
-                  <div className="form-section">
-                    <div className="form-section-header">
-                      <h3>311 call details</h3>
-                      <p className="helper">Optional. Use only if you called 311.</p>
-                    </div>
-                    <div className="inline-fields">
-                      <label>
-                        311 ticket date (optional)
-                        <Input
-                          className="input"
-                          type="date"
-                          value={formState.ticketDate}
-                          onChange={updateField("ticketDate")}
-                        />
-                      </label>
-                      <label>
-                        311 ticket number (optional)
-                        <Input
-                          className="input"
-                          value={formState.ticketNumber}
-                          onChange={updateField("ticketNumber")}
-                          placeholder="Ticket number"
-                          maxLength={ticketNumberCharacterLimit}
-                        />
-                      </label>
-                    </div>
-                    <p className="helper">Use this only if you already called 311. Do not include names.</p>
-                  </div>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="4">
@@ -1680,40 +1412,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                     </div>
                   </details>
                 )}
-
-                <h2>Plan if the issue is not fixed</h2>
-                <p className="helper">Choose a goal. This does not give legal advice. Rules vary by city.</p>
-                <p className="helper">Pick the closest goal. You can change it later.</p>
-                <RadioGroup.Root
-                  className="plan-options"
-                  aria-label="Plan goal if the issue is not fixed"
-                  value={formState.planChoice}
-                  onValueChange={(value) => {
-                    if (typeof value === "string") {
-                      setFormState((prev) => ({ ...prev, planChoice: value as PlanChoice }));
-                    }
-                  }}
-                >
-                  {planChoiceOptions.map((option) => (
-                    <RadioGroup.Item
-                      key={option.id}
-                      value={option.id}
-                      render={<div />}
-                      className={`preset-card ${formState.planChoice === option.id ? "active" : ""}`}
-                    >
-                      <span className="preset-radio" aria-hidden="true">
-                        <span className="preset-radio-outer">
-                          <span className="preset-radio-indicator" />
-                        </span>
-                      </span>
-                      <div>
-                        <p className="preset-title">{option.label}</p>
-                        <p className="helper">{option.description}</p>
-                        {option.caution && <p className="helper plan-caution">{option.caution}</p>}
-                      </div>
-                    </RadioGroup.Item>
-                  ))}
-                </RadioGroup.Root>
 
                 <h2>What usually happens next</h2>
                 <p className="helper">This shows the normal next step based on how long the issue has been open.</p>
@@ -2003,17 +1701,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
             </div>
           </section>
         </aside>
-        {selectedPortfolio?.id === "continuum" && formState.building && (
-          <aside className="panel contact-panel">
-            <h2>Continuum contacts</h2>
-            <p className="helper">Use these contacts if your building is listed under Continuum.</p>
-            <p><strong>Maintenance text line:</strong> (773) 708-2321</p>
-            <p><strong>Landlord line:</strong> +1 (773) 678-7636</p>
-            <p><strong>Rent email:</strong> continuumbrokers@yahoo.com</p>
-            <p className="helper">Use text for urgent safety issues. Email for rent receipts.</p>
-            <p className="helper">If your building has different contacts, use the waitlist below.</p>
-          </aside>
-        )}
       </main>
 
       <WaitlistPanel />

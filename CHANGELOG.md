@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.48 - 2026-02-04
+
+- Changed: Notice builder removes organizer setup, similar issue prompts, 311 call details, plan goal prompts, and the Continuum contact panel to keep the flow focused.
+
 ## 1.0.47 - 2026-02-04
 
 - Changed: Notice builder steps are grouped into smaller sections to reduce overload.
