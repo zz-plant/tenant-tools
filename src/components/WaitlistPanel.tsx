@@ -1,15 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Input } from "./ui";
 import { type PortfolioId } from "../data/portfolioOptions";
-import { waitlistBuildingLimit, waitlistCityLimit } from "../lib/waitlist";
+import { waitlistBuildingLimit } from "../lib/waitlist";
 
 const initialWaitlistState = {
   building: "",
-  city: "",
   portfolio: "continuum" as PortfolioId,
 };
 
 const WaitlistPanel = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [inviteVisible, setInviteVisible] = useState(false);
   const [waitlistState, setWaitlistState] = useState(initialWaitlistState);
   const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [waitlistLabel, setWaitlistLabel] = useState("Join waitlist");
@@ -81,7 +82,6 @@ const WaitlistPanel = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           building: waitlistState.building,
-          city: waitlistState.city,
           portfolio: waitlistState.portfolio,
         }),
       });
@@ -135,6 +135,7 @@ const WaitlistPanel = () => {
     setRequestId("");
     setRequestCopyLabel("Copy request code");
     setInviteCopyLabel("Copy invite text");
+    setInviteVisible(false);
   };
 
   return (
@@ -145,81 +146,93 @@ const WaitlistPanel = () => {
           <p className="helper">
             Add your building to the waitlist. We do not collect names, emails, or phone numbers.
           </p>
+          {!isExpanded && (
+            <p className="helper">Step 1: add the building address. Step 2: save the request code.</p>
+          )}
         </div>
+        <Button className="button button-secondary" type="button" onClick={() => setIsExpanded((prev) => !prev)}>
+          {isExpanded ? "Hide waitlist steps" : "Start waitlist"}
+        </Button>
       </div>
-      <div className="waitlist-grid">
-        <form className="waitlist-form" onSubmit={handleWaitlistSubmit}>
-          <label>
-            Building address
-            <Input
-              className="input"
-              value={waitlistState.building}
-              onChange={handleWaitlistChange("building")}
-              placeholder="123 Main St"
-              maxLength={waitlistBuildingLimit}
-              autoComplete="street-address"
-              aria-describedby={buildingHelperId}
-              required
-            />
-          </label>
-          <p className="helper" id={buildingHelperId}>
-            Do not include unit numbers or resident names.
-          </p>
-          <label>
-            <span className="label-optional">City (optional)</span>
-            <Input
-              className="input"
-              value={waitlistState.city}
-              onChange={handleWaitlistChange("city")}
-              placeholder="City"
-              maxLength={waitlistCityLimit}
-              autoComplete="address-level2"
-            />
-          </label>
-          <div className="waitlist-actions">
-            <Button className="button" type="submit" disabled={waitlistStatus === "saving"}>
-              {waitlistLabel}
-            </Button>
-            <Button className="button button-secondary" type="button" onClick={handleWaitlistReset}>
-              Clear
-            </Button>
-          </div>
-          {waitlistStatus === "saved" && requestId && (
-            <div className="waitlist-success">
-              <p className="helper" role="status" aria-live="polite">
-                Saved. Keep this request code so you can check back later.
-              </p>
-              <div className="waitlist-actions">
-                <span className="waitlist-code">{requestId}</span>
-                <Button className="button button-secondary" type="button" onClick={handleCopyRequestId}>
-                  {requestCopyLabel}
-                </Button>
+      {isExpanded && (
+        <div className="waitlist-grid">
+          <form className="waitlist-form" onSubmit={handleWaitlistSubmit}>
+            <h3>Step 1: Add the building</h3>
+            <label>
+              Building address
+              <Input
+                className="input"
+                value={waitlistState.building}
+                onChange={handleWaitlistChange("building")}
+                placeholder="123 Main St"
+                maxLength={waitlistBuildingLimit}
+                autoComplete="street-address"
+                aria-describedby={buildingHelperId}
+                required
+              />
+            </label>
+            <p className="helper" id={buildingHelperId}>
+              Do not include unit numbers or resident names.
+            </p>
+            <div className="waitlist-actions">
+              <Button className="button" type="submit" disabled={waitlistStatus === "saving"}>
+                {waitlistLabel}
+              </Button>
+              <Button className="button button-secondary" type="button" onClick={handleWaitlistReset}>
+                Clear
+              </Button>
+            </div>
+            {waitlistStatus === "saved" && requestId && (
+              <div className="waitlist-success">
+                <h3>Step 2: Save your request code</h3>
+                <p className="helper" role="status" aria-live="polite">
+                  Saved. Keep this request code so you can check back later.
+                </p>
+                <div className="waitlist-actions">
+                  <span className="waitlist-code">{requestId}</span>
+                  <Button className="button button-secondary" type="button" onClick={handleCopyRequestId}>
+                    {requestCopyLabel}
+                  </Button>
+                </div>
               </div>
+            )}
+            {waitlistStatus === "error" && (
+              <p className="submission-error" role="alert">
+                {waitlistError}
+              </p>
+            )}
+          </form>
+          {waitlistStatus === "saved" && requestId && (
+            <div className="waitlist-invite">
+              <h3>Step 3: Share the invite (optional)</h3>
+              <p className="helper">
+                This tool does not send messages between residents. Use this invite to talk in person or share a
+                printed note.
+              </p>
+              <Button
+                className="button button-secondary"
+                type="button"
+                onClick={() => setInviteVisible((prev) => !prev)}
+              >
+                {inviteVisible ? "Hide invite text" : "Show invite text"}
+              </Button>
+              {inviteVisible && (
+                <>
+                  <pre className="output output-summary">{inviteText}</pre>
+                  <div className="waitlist-actions">
+                    <Button className="button button-secondary" type="button" onClick={handleCopyInvite}>
+                      {inviteCopyLabel}
+                    </Button>
+                    <Button className="button button-secondary" type="button" onClick={handleInviteDownload}>
+                      Download invite
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           )}
-          {waitlistStatus === "error" && (
-            <p className="submission-error" role="alert">
-              {waitlistError}
-            </p>
-          )}
-        </form>
-        <div className="waitlist-invite">
-          <h3>Invite neighbors</h3>
-          <p className="helper">
-            This tool does not send messages between residents. Use this neutral invite to talk in person or share a
-            printed note.
-          </p>
-          <pre className="output output-summary">{inviteText}</pre>
-          <div className="waitlist-actions">
-            <Button className="button button-secondary" type="button" onClick={handleCopyInvite}>
-              {inviteCopyLabel}
-            </Button>
-            <Button className="button button-secondary" type="button" onClick={handleInviteDownload}>
-              Download invite
-            </Button>
-          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };

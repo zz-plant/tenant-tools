@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.46 - 2026-02-04
+
+- Changed: Waitlist steps are broken into a short sequence to reduce overload.
+
+## 1.0.45 - 2026-02-04
+
+- Changed: Waitlist signup now uses progressive disclosure and only shows the invite text after saving.
+
+## 1.0.44 - 2026-02-04
+
+- Changed: Waitlist signup no longer asks for a city to keep the form minimal.
+
 ## 1.0.43 - 2026-02-04
 
 - Changed: Notice builder steps now label required vs optional and add plain guidance for each step.
