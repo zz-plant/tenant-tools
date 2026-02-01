@@ -73,25 +73,25 @@ const steps = [
     id: 1,
     title: "Choose basics",
     label: "Building & issue",
-    description: "Choose your building, issue, and notice stage.",
+    description: "Pick building, issue, and stage.",
   },
   {
     id: 2,
     title: "Add facts",
     label: "Issue details",
-    description: "Add issue-specific facts that support your request.",
+    description: "Add issue facts.",
   },
   {
     id: 3,
     title: "Set dates",
     label: "Dates & language",
-    description: "Confirm the dates and language options.",
+    description: "Confirm dates and language.",
   },
   {
     id: 4,
     title: "Review & share",
     label: "Notice & save",
-    description: "Copy the notice and save your record.",
+    description: "Copy notice and save.",
   },
 ];
 
@@ -122,17 +122,17 @@ const exportStatusOptions: Array<{ id: SubmissionStatus; label: string; descript
   {
     id: "open",
     label: "Open",
-    description: "The issue is still happening.",
+    description: "Issue is still happening.",
   },
   {
     id: "resolved",
     label: "Resolved",
-    description: "Repairs are confirmed complete.",
+    description: "Repairs are complete.",
   },
   {
     id: "archived",
     label: "Archived",
-    description: "The record is closed for now.",
+    description: "Record closed for now.",
   },
 ];
 
@@ -140,18 +140,18 @@ const planChoiceOptions: Array<{ id: PlanChoice; label: string; description: str
   {
     id: "keep_open",
     label: "Documentation only",
-    description: "I want to document the issue before choosing a next step.",
+    description: "Document first. Decide later.",
   },
   {
     id: "hire_professional",
     label: "Consider hiring a professional",
-    description: "I may want to arrange a repair and request reimbursement later.",
+    description: "Consider hiring a repair and seeking reimbursement later.",
     caution: "Only do this if local rules allow. Get advice first.",
   },
   {
     id: "end_lease",
     label: "Consider ending the lease",
-    description: "I may want to end the lease if the issue stays unresolved.",
+    description: "Consider ending the lease if unresolved.",
     caution: "Check local rules and notice deadlines first.",
   },
 ];
