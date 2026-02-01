@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.43 - 2026-02-04
+
+- Changed: Notice builder steps now label required vs optional and add plain guidance for each step.
+
 ## 1.0.42 - 2026-02-04
 
 - Changed: Notice builder header no longer includes the tool-fit helper line to reduce clutter.

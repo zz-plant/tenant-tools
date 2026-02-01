@@ -74,24 +74,28 @@ const steps = [
     title: "Choose basics",
     label: "Building & issue",
     description: "Pick building, issue, and stage.",
+    requirement: "Required",
   },
   {
     id: 2,
     title: "Add facts",
     label: "Issue details",
-    description: "Add issue facts.",
+    description: "Add short facts if you want.",
+    requirement: "Optional",
   },
   {
     id: 3,
     title: "Set dates",
     label: "Dates & language",
     description: "Confirm dates and language.",
+    requirement: "Required",
   },
   {
     id: 4,
     title: "Review & share",
     label: "Notice & save",
     description: "Copy notice and save.",
+    requirement: "Review",
   },
 ];
 
@@ -362,6 +366,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
     ...(shareReadiness && !shareReadiness.hasSubmissionStore ? ["Connect ledger storage to save issues."] : []),
   ];
   const isShareReady = Boolean(shareReadiness && shareNeeds.length === 0);
+  const stepRequirementLabel = steps[currentStep - 1]?.requirement ?? "";
 
   const missingBasics = useMemo(() => {
     const missing: string[] = [];
@@ -1127,10 +1132,18 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                   >
                     <span className="step-title">{step.title}</span>
                     <span className="step-label">{step.label}</span>
+                    <span className="step-requirement">{step.requirement}</span>
                   </Tabs.Tab>
                 ))}
               </Tabs.List>
               <p className="helper">{steps[currentStep - 1].description}</p>
+              <p className="helper step-requirement-note">
+                {stepRequirementLabel === "Optional"
+                  ? "This step is optional. You can skip it."
+                  : stepRequirementLabel === "Review"
+                    ? "Use this step to review and save."
+                    : "This step is required to build the notice."}
+              </p>
 
               <form className="form-grid">
                 <Tabs.Panel value="1">
@@ -1334,6 +1347,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                 </Tabs.Panel>
 
                 <Tabs.Panel value="2">
+                  <p className="helper">All fields in this step are optional. Add short facts only.</p>
                   {issueFields.length === 0 && (
                     <p className="helper">Select an issue to reveal the specific details to include.</p>
                   )}
