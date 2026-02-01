@@ -4,14 +4,12 @@ import { sanitizeLimitedText } from "./validation";
 
 const allowedPortfolioSet = new Set<PortfolioId>(allowedPortfolios);
 export const waitlistBuildingLimit = 140;
-export const waitlistCityLimit = 60;
 
 const containsUnitInfo = (value: string) =>
   /(?:\bapt\b|\bunit\b|\bsuite\b|\bste\b|#\s*\w+)/i.test(value);
 
 export type WaitlistInput = {
   building: string;
-  city?: string;
   portfolio: PortfolioId;
 };
 
@@ -35,8 +33,6 @@ export const validateWaitlistInput = (payload: unknown) => {
     errors.push("Do not include unit numbers in the building address.");
   }
 
-  const city = typeof data.city === "string" ? sanitizeLimitedText(data.city, waitlistCityLimit) : "";
-
   const portfolio = isValidPortfolioId(data.portfolio) ? data.portfolio : "";
   if (!portfolio) {
     errors.push("Property group is invalid.");
@@ -50,7 +46,6 @@ export const validateWaitlistInput = (payload: unknown) => {
     ok: true,
     data: {
       building,
-      city: city || undefined,
       portfolio: portfolio as WaitlistInput["portfolio"],
     },
   } as const;
