@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.47 - 2026-02-04
+
+- Changed: Notice builder steps are grouped into smaller sections to reduce overload.
+
 ## 1.0.46 - 2026-02-04
 
 - Changed: Waitlist steps are broken into a short sequence to reduce overload.

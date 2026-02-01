@@ -393,6 +393,71 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
       };
   const canSaveLedger = Boolean(formState.building && formState.issue && buildingKey);
 
+  const renderDetailField = (fieldKey: keyof typeof fieldDefinitions) => {
+    const field = fieldDefinitions[fieldKey];
+    if (!field) {
+      return null;
+    }
+    const isAttachmentField = fieldKey === "attachment";
+    const fieldValue = String(formState[fieldKey as keyof FormState] ?? "");
+    const trimmedLength = fieldValue.trim().length;
+    const isTextField = !field.type;
+    const tags = isTextField ? factualTagOptions[fieldKey] : undefined;
+    const showLimitWarning = isTextField && trimmedLength >= detailWarningThreshold;
+    const limitText = isTextField
+      ? `Limit: ${detailCharacterLimit} characters${trimmedLength > 0 ? ` (${trimmedLength}/${detailCharacterLimit})` : "."}`
+      : "";
+    const helperText = isTextField ? `${limitText} ${freeTextSafetyNote}` : "";
+    const helperId = isTextField ? `detail-${fieldKey}-helper` : undefined;
+    return (
+      <label key={fieldKey}>
+        {field.label}
+        {isAttachmentField && (
+          <div className="evidence-warning" role="note">
+            <p className="evidence-warning-title">Evidence safety check</p>
+            <ul className="evidence-warning-list">
+              {evidenceSafetyChecklist.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <Input
+          className="input"
+          type={field.type || "text"}
+          value={fieldValue}
+          onChange={updateField(fieldKey as keyof FormState)}
+          placeholder={field.placeholder}
+          maxLength={isTextField ? detailCharacterLimit : undefined}
+          aria-describedby={helperId}
+        />
+        {tags && (
+          <div className="fact-tags" aria-label={`${field.label} quick facts`}>
+            <p className="helper">Quick facts:</p>
+            <div className="fact-tag-row">
+              {tags.map((tag) => (
+                <button
+                  key={tag}
+                  className="fact-tag"
+                  type="button"
+                  onClick={() => handleTagClick(fieldKey as keyof FormState, tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {isTextField && (
+          <p className={`helper${showLimitWarning ? " helper-warning" : ""}`} id={helperId}>
+            {helperText}
+            {trimmedLength > detailCharacterLimit && " Extra text is removed when saving."}
+          </p>
+        )}
+      </label>
+    );
+  };
+
   const updateField =
     (key: keyof FormState) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -1147,203 +1212,215 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
 
               <form className="form-grid">
                 <Tabs.Panel value="1">
-                  <label>
-                    Building
-                    <Select.Root
-                      value={formState.building || null}
-                      onValueChange={(value) =>
-                        setFormState((prev) => ({
-                          ...prev,
-                          building: value ?? "",
-                          portfolio: value ? "continuum" : prev.portfolio,
-                        }))
-                      }
-                      required
-                    >
-                      <Select.Trigger className="select-trigger" aria-label="Building">
-                        <Select.Value placeholder="Select building" />
-                        <Select.Icon className="select-icon">
-                          <span aria-hidden="true">▾</span>
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Positioner className="select-positioner">
+                  <div className="form-section">
+                    <div className="form-section-header">
+                      <h3>Building basics</h3>
+                      <p className="helper">Choose the building and issue type.</p>
+                    </div>
+                    <label>
+                      Building
+                      <Select.Root
+                        value={formState.building || null}
+                        onValueChange={(value) =>
+                          setFormState((prev) => ({
+                            ...prev,
+                            building: value ?? "",
+                            portfolio: value ? "continuum" : prev.portfolio,
+                          }))
+                        }
+                        required
+                      >
+                        <Select.Trigger className="select-trigger" aria-label="Building">
+                          <Select.Value placeholder="Select building" />
+                          <Select.Icon className="select-icon">
+                            <span aria-hidden="true">▾</span>
+                          </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Positioner className="select-positioner">
+                              <Select.Popup className="select-popup">
+                                <Select.List className="select-list">
+                                  {buildingOptions.map((building) => {
+                                    const isComingSoon = building.status === "coming-soon";
+                                    return (
+                                      <Select.Item
+                                        key={building.id}
+                                        value={building.id}
+                                        className="select-item"
+                                        disabled={isComingSoon}
+                                      >
+                                        <Select.ItemText>
+                                          {building.id} {isComingSoon ? "(Coming soon)" : ""}
+                                        </Select.ItemText>
+                                        <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                      </Select.Item>
+                                    );
+                                  })}
+                                </Select.List>
+                              </Select.Popup>
+                            </Select.Positioner>
+                          </Select.Portal>
+                      </Select.Root>
+                    </label>
+
+                    <div className="issue-gallery">
+                      <div>
+                        <h3 id="issue-gallery-title">Issue gallery</h3>
+                        <p className="helper">Select one issue type to unlock the notice templates.</p>
+                      </div>
+                      <RadioGroup.Root
+                        className="issue-grid"
+                        aria-labelledby="issue-gallery-title"
+                        value={formState.issue}
+                        onValueChange={(value) => {
+                          if (typeof value !== "string") {
+                            return;
+                          }
+                          setFormState((prev) => ({ ...prev, issue: value }));
+                        }}
+                        required
+                      >
+                        {issueOptions.map((option) => (
+                          <RadioGroup.Item
+                            key={option.id}
+                            render={<div />}
+                            className={`issue-card ${formState.issue === option.id ? "active" : ""}`}
+                            value={option.id}
+                            aria-label={formatIssueLabel(option.label)}
+                          >
+                            <div className="issue-icon">{issueIcons[option.id]}</div>
+                            <p className="issue-label">{formatIssueLabel(option.label)}</p>
+                          </RadioGroup.Item>
+                        ))}
+                      </RadioGroup.Root>
+                    </div>
+
+                    {similarIssues.length > 0 && !dismissSimilar && (
+                      <div className="similar-issue-card">
+                        <div>
+                          <h3>Same issue?</h3>
+                          <p className="helper">
+                            There is already a recent issue like this in the last few weeks. Would you like to add your
+                            report to it instead?
+                          </p>
+                        </div>
+                        <ul className="similar-issue-list">
+                          {similarIssues.map((issue) => (
+                            <li key={issue.id}>
+                              <div>
+                                <p className="similar-issue-title">{issue.issueLabel}</p>
+                                <p className="helper">
+                                  Started {issue.startDate}. Reports: {issue.reportCount}.
+                                </p>
+                              </div>
+                              <div className="similar-issue-actions">
+                                <a
+                                  className="button button-secondary"
+                                  href={`/submissions/${issue.id}${buildingKey ? `?key=${encodeURIComponent(buildingKey)}` : ""}`}
+                                >
+                                  View summary
+                                </a>
+                                <Button
+                                  className="button"
+                                  type="button"
+                                  onClick={() => handleAddToExisting(issue.id)}
+                                  disabled={reportingIssueId === issue.id}
+                                >
+                                  {reportingIssueId === issue.id ? "Adding..." : "Me too"}
+                                </Button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                        {similarLoading && <p className="helper">Checking recent issues...</p>}
+                        {similarNotice && (
+                          <p className="similar-issue-success" role="status" aria-live="polite">
+                            {similarNotice}
+                          </p>
+                        )}
+                        {similarError && (
+                          <p className="similar-issue-error" role="alert">
+                            {similarError}
+                          </p>
+                        )}
+                        <div className="similar-issue-footer">
+                          <Button
+                            className="link-button"
+                            type="button"
+                            onClick={() => setDismissSimilar(true)}
+                          >
+                            Keep this as a new issue
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="form-section">
+                    <div className="form-section-header">
+                      <h3>Location and stage</h3>
+                      <p className="helper">Optional location and required notice stage.</p>
+                    </div>
+                    <label>
+                      Issue location zone (optional)
+                      <Select.Root value={formState.zone || null} onValueChange={updateSelect("zone")}>
+                        <Select.Trigger className="select-trigger" aria-label="Issue location zone">
+                          <Select.Value placeholder="Select zone" />
+                          <Select.Icon className="select-icon">
+                            <span aria-hidden="true">▾</span>
+                          </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Positioner className="select-positioner">
                             <Select.Popup className="select-popup">
                               <Select.List className="select-list">
-                                {buildingOptions.map((building) => {
-                                  const isComingSoon = building.status === "coming-soon";
-                                  return (
-                                    <Select.Item
-                                      key={building.id}
-                                      value={building.id}
-                                      className="select-item"
-                                      disabled={isComingSoon}
-                                    >
-                                      <Select.ItemText>
-                                        {building.id} {isComingSoon ? "(Coming soon)" : ""}
-                                      </Select.ItemText>
-                                      <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                    </Select.Item>
-                                  );
-                                })}
+                                {zoneOptions.map((option) => (
+                                  <Select.Item key={option.id} value={option.id} className="select-item">
+                                    <Select.ItemText>{option.label}</Select.ItemText>
+                                    <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                  </Select.Item>
+                                ))}
                               </Select.List>
                             </Select.Popup>
                           </Select.Positioner>
                         </Select.Portal>
-                    </Select.Root>
-                  </label>
+                      </Select.Root>
+                      <p className="helper">Choose a general area only. Do not enter unit numbers.</p>
+                    </label>
 
-                  <div className="issue-gallery">
-                    <div>
-                      <h3 id="issue-gallery-title">Issue gallery</h3>
-                      <p className="helper">Select one issue type to unlock the notice templates.</p>
-                    </div>
-                    <RadioGroup.Root
-                      className="issue-grid"
-                      aria-labelledby="issue-gallery-title"
-                      value={formState.issue}
-                      onValueChange={(value) => {
-                        if (typeof value !== "string") {
-                          return;
-                        }
-                        setFormState((prev) => ({ ...prev, issue: value }));
-                      }}
-                      required
-                    >
-                      {issueOptions.map((option) => (
-                        <RadioGroup.Item
-                          key={option.id}
-                          render={<div />}
-                          className={`issue-card ${formState.issue === option.id ? "active" : ""}`}
-                          value={option.id}
-                          aria-label={formatIssueLabel(option.label)}
-                        >
-                          <div className="issue-icon">{issueIcons[option.id]}</div>
-                          <p className="issue-label">{formatIssueLabel(option.label)}</p>
-                        </RadioGroup.Item>
-                      ))}
-                    </RadioGroup.Root>
-                  </div>
-
-                  <label>
-                    Issue location zone (optional)
-                    <Select.Root value={formState.zone || null} onValueChange={updateSelect("zone")}>
-                      <Select.Trigger className="select-trigger" aria-label="Issue location zone">
-                        <Select.Value placeholder="Select zone" />
-                        <Select.Icon className="select-icon">
-                          <span aria-hidden="true">▾</span>
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Positioner className="select-positioner">
-                          <Select.Popup className="select-popup">
-                            <Select.List className="select-list">
-                              {zoneOptions.map((option) => (
-                                <Select.Item key={option.id} value={option.id} className="select-item">
-                                  <Select.ItemText>{option.label}</Select.ItemText>
+                    <label>
+                      Notice stage
+                      <Select.Root value={formState.stage} onValueChange={updateSelect("stage")} required>
+                        <Select.Trigger className="select-trigger" aria-label="Notice stage">
+                          <Select.Value placeholder="Select stage" />
+                          <Select.Icon className="select-icon">
+                            <span aria-hidden="true">▾</span>
+                          </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Positioner className="select-positioner">
+                            <Select.Popup className="select-popup">
+                              <Select.List className="select-list">
+                                <Select.Item value="A" className="select-item">
+                                  <Select.ItemText>A. {stages.A}</Select.ItemText>
                                   <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
                                 </Select.Item>
-                              ))}
-                            </Select.List>
-                          </Select.Popup>
-                        </Select.Positioner>
-                      </Select.Portal>
-                    </Select.Root>
-                    <p className="helper">Choose a general area only. Do not enter unit numbers.</p>
-                  </label>
-
-                  {similarIssues.length > 0 && !dismissSimilar && (
-                    <div className="similar-issue-card">
-                      <div>
-                        <h3>Same issue?</h3>
-                        <p className="helper">
-                          There is already a recent issue like this in the last few weeks. Would you like to add your
-                          report to it instead?
-                        </p>
-                      </div>
-                      <ul className="similar-issue-list">
-                        {similarIssues.map((issue) => (
-                          <li key={issue.id}>
-                            <div>
-                              <p className="similar-issue-title">{issue.issueLabel}</p>
-                              <p className="helper">
-                                Started {issue.startDate}. Reports: {issue.reportCount}.
-                              </p>
-                            </div>
-                            <div className="similar-issue-actions">
-                              <a
-                                className="button button-secondary"
-                                href={`/submissions/${issue.id}${buildingKey ? `?key=${encodeURIComponent(buildingKey)}` : ""}`}
-                              >
-                                View summary
-                              </a>
-                              <Button
-                                className="button"
-                                type="button"
-                                onClick={() => handleAddToExisting(issue.id)}
-                                disabled={reportingIssueId === issue.id}
-                              >
-                                {reportingIssueId === issue.id ? "Adding..." : "Me too"}
-                              </Button>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                      {similarLoading && <p className="helper">Checking recent issues...</p>}
-                      {similarNotice && (
-                        <p className="similar-issue-success" role="status" aria-live="polite">
-                          {similarNotice}
-                        </p>
-                      )}
-                      {similarError && (
-                        <p className="similar-issue-error" role="alert">
-                          {similarError}
-                        </p>
-                      )}
-                      <div className="similar-issue-footer">
-                        <Button
-                          className="link-button"
-                          type="button"
-                          onClick={() => setDismissSimilar(true)}
-                        >
-                          Keep this as a new issue
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  <label>
-                    Notice stage
-                    <Select.Root value={formState.stage} onValueChange={updateSelect("stage")} required>
-                      <Select.Trigger className="select-trigger" aria-label="Notice stage">
-                        <Select.Value placeholder="Select stage" />
-                        <Select.Icon className="select-icon">
-                          <span aria-hidden="true">▾</span>
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Positioner className="select-positioner">
-                          <Select.Popup className="select-popup">
-                            <Select.List className="select-list">
-                              <Select.Item value="A" className="select-item">
-                                <Select.ItemText>A. {stages.A}</Select.ItemText>
-                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                              </Select.Item>
-                              <Select.Item value="B" className="select-item">
-                                <Select.ItemText>B. {stages.B}</Select.ItemText>
-                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                              </Select.Item>
-                              <Select.Item value="C" className="select-item">
-                                <Select.ItemText>C. {stages.C}</Select.ItemText>
-                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                              </Select.Item>
-                            </Select.List>
-                          </Select.Popup>
-                        </Select.Positioner>
-                      </Select.Portal>
-                    </Select.Root>
-                    <p className="helper">Stage A is the first notice. Stage B is a follow-up. Stage C is the final reminder.</p>
-                  </label>
+                                <Select.Item value="B" className="select-item">
+                                  <Select.ItemText>B. {stages.B}</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                                <Select.Item value="C" className="select-item">
+                                  <Select.ItemText>C. {stages.C}</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                              </Select.List>
+                            </Select.Popup>
+                          </Select.Positioner>
+                        </Select.Portal>
+                      </Select.Root>
+                      <p className="helper">Stage A is the first notice. Stage B is a follow-up. Stage C is the final reminder.</p>
+                    </label>
+                  </div>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="2">
@@ -1351,187 +1428,169 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
                   {issueFields.length === 0 && (
                     <p className="helper">Select an issue to reveal the specific details to include.</p>
                   )}
-                  {issueFields.map((fieldKey) => {
-                    const field = fieldDefinitions[fieldKey];
-                    if (!field) {
-                      return null;
-                    }
-                    const isAttachmentField = fieldKey === "attachment";
-                    const fieldValue = String(formState[fieldKey as keyof FormState] ?? "");
-                    const trimmedLength = fieldValue.trim().length;
-                    const isTextField = !field.type;
-                    const tags = isTextField ? factualTagOptions[fieldKey] : undefined;
-                    const showLimitWarning = isTextField && trimmedLength >= detailWarningThreshold;
-                    const limitText = isTextField
-                      ? `Limit: ${detailCharacterLimit} characters${trimmedLength > 0 ? ` (${trimmedLength}/${detailCharacterLimit})` : "."}`
-                      : "";
-                    const helperText = isTextField ? `${limitText} ${freeTextSafetyNote}` : "";
-                    const helperId = isTextField ? `detail-${fieldKey}-helper` : undefined;
-                    return (
-                      <label key={fieldKey}>
-                        {field.label}
-                        {isAttachmentField && (
-                          <div className="evidence-warning" role="note">
-                            <p className="evidence-warning-title">Evidence safety check</p>
-                            <ul className="evidence-warning-list">
-                              {evidenceSafetyChecklist.map((item) => (
-                                <li key={item}>{item}</li>
-                              ))}
-                            </ul>
+                  {issueFields.length > 0 && (
+                    <>
+                      <div className="form-section">
+                        <div className="form-section-header">
+                          <h3>Issue facts</h3>
+                          <p className="helper">Optional details. Keep each note short.</p>
+                        </div>
+                        {issueFields.filter((fieldKey) => fieldKey !== "attachment").length > 0 ? (
+                          issueFields.filter((fieldKey) => fieldKey !== "attachment").map((fieldKey) =>
+                            renderDetailField(fieldKey as keyof typeof fieldDefinitions)
+                          )
+                        ) : (
+                          <p className="helper">No extra facts are needed for this issue.</p>
+                        )}
+                      </div>
+                      {issueFields.filter((fieldKey) => fieldKey === "attachment").length > 0 && (
+                        <div className="form-section">
+                          <div className="form-section-header">
+                            <h3>Evidence note</h3>
+                            <p className="helper">Optional. Evidence stays private.</p>
                           </div>
-                        )}
-                        <Input
-                          className="input"
-                          type={field.type || "text"}
-                          value={fieldValue}
-                          onChange={updateField(fieldKey as keyof FormState)}
-                          placeholder={field.placeholder}
-                          maxLength={isTextField ? detailCharacterLimit : undefined}
-                          aria-describedby={helperId}
-                        />
-                        {tags && (
-                          <div className="fact-tags" aria-label={`${field.label} quick facts`}>
-                            <p className="helper">Quick facts:</p>
-                            <div className="fact-tag-row">
-                              {tags.map((tag) => (
-                                <button
-                                  key={tag}
-                                  className="fact-tag"
-                                  type="button"
-                                  onClick={() => handleTagClick(fieldKey as keyof FormState, tag)}
-                                >
-                                  {tag}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {isTextField && (
-                          <p className={`helper${showLimitWarning ? " helper-warning" : ""}`} id={helperId}>
-                            {helperText}
-                            {trimmedLength > detailCharacterLimit && " Extra text is removed when saving."}
-                          </p>
-                        )}
-                      </label>
-                    );
-                  })}
+                          {issueFields
+                            .filter((fieldKey) => fieldKey === "attachment")
+                            .map((fieldKey) => renderDetailField(fieldKey as keyof typeof fieldDefinitions))}
+                        </div>
+                      )}
+                    </>
+                  )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="3">
-                  <label>
-                    Language
-                    <Select.Root value={formState.language} onValueChange={updateSelect("language")} required>
-                      <Select.Trigger className="select-trigger" aria-label="Language">
-                        <Select.Value placeholder="Select language" />
-                        <Select.Icon className="select-icon">
-                          <span aria-hidden="true">▾</span>
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Positioner className="select-positioner">
-                          <Select.Popup className="select-popup">
-                            <Select.List className="select-list">
-                              <Select.Item value="en" className="select-item">
-                                <Select.ItemText>English</Select.ItemText>
-                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                              </Select.Item>
-                              <Select.Item value="es" className="select-item">
-                                <Select.ItemText>Español</Select.ItemText>
-                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                              </Select.Item>
-                              <Select.Item value="hi" className="select-item">
-                                <Select.ItemText>हिंदी</Select.ItemText>
-                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                              </Select.Item>
-                              <Select.Item value="pl" className="select-item">
-                                <Select.ItemText>Polski</Select.ItemText>
-                                <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                              </Select.Item>
-                            </Select.List>
-                          </Select.Popup>
-                        </Select.Positioner>
-                      </Select.Portal>
-                    </Select.Root>
-                  </label>
+                  <div className="form-section">
+                    <div className="form-section-header">
+                      <h3>Language and style</h3>
+                      <p className="helper">Choose a language and reading level.</p>
+                    </div>
+                    <label>
+                      Language
+                      <Select.Root value={formState.language} onValueChange={updateSelect("language")} required>
+                        <Select.Trigger className="select-trigger" aria-label="Language">
+                          <Select.Value placeholder="Select language" />
+                          <Select.Icon className="select-icon">
+                            <span aria-hidden="true">▾</span>
+                          </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Positioner className="select-positioner">
+                            <Select.Popup className="select-popup">
+                              <Select.List className="select-list">
+                                <Select.Item value="en" className="select-item">
+                                  <Select.ItemText>English</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                                <Select.Item value="es" className="select-item">
+                                  <Select.ItemText>Español</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                                <Select.Item value="hi" className="select-item">
+                                  <Select.ItemText>हिंदी</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                                <Select.Item value="pl" className="select-item">
+                                  <Select.ItemText>Polski</Select.ItemText>
+                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                </Select.Item>
+                              </Select.List>
+                            </Select.Popup>
+                          </Select.Positioner>
+                        </Select.Portal>
+                      </Select.Root>
+                    </label>
 
-                  <div className="checkbox-row">
-                    <label className="checkbox-label">
-                      <Checkbox.Root
-                        checked={formState.simpleEnglish}
-                        onCheckedChange={updateChecked("simpleEnglish")}
-                        className="checkbox-root"
-                      >
-                        <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
-                      </Checkbox.Root>
-                      Very simple English
-                    </label>
-                    <label className="checkbox-label">
-                      <Switch.Root
-                        checked={formState.autoDates}
-                        onCheckedChange={updateChecked("autoDates")}
-                        className="switch-root"
-                      >
-                        <Switch.Thumb className="switch-thumb" />
-                      </Switch.Root>
-                      Include dates automatically
-                    </label>
+                    <div className="checkbox-row">
+                      <label className="checkbox-label">
+                        <Checkbox.Root
+                          checked={formState.simpleEnglish}
+                          onCheckedChange={updateChecked("simpleEnglish")}
+                          className="checkbox-root"
+                        >
+                          <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                        </Checkbox.Root>
+                        Very simple English
+                      </label>
+                      <label className="checkbox-label">
+                        <Switch.Root
+                          checked={formState.autoDates}
+                          onCheckedChange={updateChecked("autoDates")}
+                          className="switch-root"
+                        >
+                          <Switch.Thumb className="switch-thumb" />
+                        </Switch.Root>
+                        Include dates automatically
+                      </label>
+                    </div>
                   </div>
 
-                  <label>
-                    Start date
-                    <Input
-                      className="input"
-                      type="date"
-                      value={formState.startDate}
-                      onChange={updateField("startDate")}
-                    />
-                  </label>
-
-                  {(formState.stage === "B" || formState.stage === "C") && (
+                  <div className="form-section">
+                    <div className="form-section-header">
+                      <h3>Key dates</h3>
+                      <p className="helper">Check that the dates look right.</p>
+                    </div>
                     <label>
-                      Date of first message (for follow-ups)
+                      Start date
                       <Input
                         className="input"
                         type="date"
-                        value={formState.firstMessageDate}
-                        onChange={updateField("firstMessageDate")}
+                        value={formState.startDate}
+                        onChange={updateField("startDate")}
                       />
                     </label>
-                  )}
 
-                  <label>
-                    Today
-                    <Input
-                      className="input"
-                      type="date"
-                      value={formState.today}
-                      onChange={updateField("today")}
-                      disabled={formState.autoDates}
-                    />
-                  </label>
+                    {(formState.stage === "B" || formState.stage === "C") && (
+                      <label>
+                        Date of first message (for follow-ups)
+                        <Input
+                          className="input"
+                          type="date"
+                          value={formState.firstMessageDate}
+                          onChange={updateField("firstMessageDate")}
+                        />
+                      </label>
+                    )}
 
-                  <div className="inline-fields">
                     <label>
-                      311 ticket date (optional)
+                      Today
                       <Input
                         className="input"
                         type="date"
-                        value={formState.ticketDate}
-                        onChange={updateField("ticketDate")}
-                      />
-                    </label>
-                    <label>
-                      311 ticket number (optional)
-                      <Input
-                        className="input"
-                        value={formState.ticketNumber}
-                        onChange={updateField("ticketNumber")}
-                        placeholder="Ticket number"
-                        maxLength={ticketNumberCharacterLimit}
+                        value={formState.today}
+                        onChange={updateField("today")}
+                        disabled={formState.autoDates}
                       />
                     </label>
                   </div>
-                  <p className="helper">Use this only if you already called 311. Do not include names.</p>
+
+                  <div className="form-section">
+                    <div className="form-section-header">
+                      <h3>311 call details</h3>
+                      <p className="helper">Optional. Use only if you called 311.</p>
+                    </div>
+                    <div className="inline-fields">
+                      <label>
+                        311 ticket date (optional)
+                        <Input
+                          className="input"
+                          type="date"
+                          value={formState.ticketDate}
+                          onChange={updateField("ticketDate")}
+                        />
+                      </label>
+                      <label>
+                        311 ticket number (optional)
+                        <Input
+                          className="input"
+                          value={formState.ticketNumber}
+                          onChange={updateField("ticketNumber")}
+                          placeholder="Ticket number"
+                          maxLength={ticketNumberCharacterLimit}
+                        />
+                      </label>
+                    </div>
+                    <p className="helper">Use this only if you already called 311. Do not include names.</p>
+                  </div>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="4">
@@ -1729,210 +1788,220 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, shareReadines
           <p className="helper" role="status" aria-live="polite">
             {noticeStatusMessage}
           </p>
-          <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
-            <p className="notice-status-title">{noticeReadiness.title}</p>
-            <p className="helper">{noticeReadiness.detail}</p>
-            {missingBasics.length > 0 && (
-              <ul className="quick-list">
-                {missingBasics.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            )}
-            {!isNoticeReady && (
-              <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                Go to step 1
-              </Button>
-            )}
-          </div>
-          <div className="summary-header">
-            <h3>Notice summary</h3>
-            <p className="helper">Check the key facts before you share.</p>
-          </div>
-          <div className="summary-grid">
-            {summaryItems.map((item) => (
-              <div key={item.label} className="summary-card">
-                <p className="summary-label">{item.label}</p>
-                <p className="summary-value">{item.value}</p>
-              </div>
-            ))}
-          </div>
-          <p className="helper">Preview the message before you share it.</p>
-          <p className="helper">Privacy reminder: do not include names, unit numbers, or personal details.</p>
-          <div className="notice-preview">
-            <div className="notice-preview-header">
-              <div>
-                <p className="notice-preview-title">Notice message</p>
-                <p className="helper">Copy and send this text.</p>
-              </div>
-              <div className="notice-preview-tags">
-                <span className="notice-tag">{selectedIssue?.label || "Issue"}</span>
-                <span className="notice-tag">{stageLabel}</span>
-                <span className="notice-tag">{noticeLanguageLabel}</span>
-              </div>
-            </div>
-            <pre className="output output-notice">{noticeText}</pre>
-          </div>
-          <div className="export-block">
-            {!canShowAfterBasics ? (
-              <p className="helper">Finish step 1 to unlock exports and saving.</p>
-            ) : (
-              <>
-                <div className="export-header">
-                  <div>
-                    <h3>{selectedAudience.label} export</h3>
-                    <p className="helper">Choose who you are exporting for. The fields adjust automatically.</p>
-                    <p className="helper">This does not notify anyone. It only changes the summary text.</p>
-                  </div>
-                  <div className="export-actions">
-                    <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
-                      {summaryCopyLabel}
-                    </Button>
-                    <Button className="button button-secondary" type="button" onClick={handleSummaryDownload}>
-                      Download .txt
-                    </Button>
-                  </div>
-                </div>
-                <p className="helper" role="status" aria-live="polite">
-                  {exportStatusMessage}
-                </p>
-                <div className="export-status">
-                  <label>
-                    Issue status
-                    <Select.Root value={formState.exportStatus} onValueChange={updateSelect("exportStatus")} required>
-                      <Select.Trigger className="select-trigger" aria-label="Issue status">
-                        <Select.Value placeholder="Select status" />
-                        <Select.Icon className="select-icon">
-                          <span aria-hidden="true">▾</span>
-                        </Select.Icon>
-                      </Select.Trigger>
-                      <Select.Portal>
-                        <Select.Positioner className="select-positioner">
-                          <Select.Popup className="select-popup">
-                            <Select.List className="select-list">
-                              {exportStatusOptions.map((option) => (
-                                <Select.Item key={option.id} value={option.id} className="select-item">
-                                  <Select.ItemText>
-                                    {option.label} — {option.description}
-                                  </Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                              ))}
-                            </Select.List>
-                          </Select.Popup>
-                        </Select.Positioner>
-                      </Select.Portal>
-                    </Select.Root>
-                  </label>
-                </div>
-                <RadioGroup.Root
-                  className="export-presets"
-                  aria-label="Export audience"
-                  value={exportAudience}
-                  onValueChange={(value) => {
-                    if (typeof value === "string") {
-                      setExportAudience(value as ExportAudience);
-                    }
-                  }}
-                >
-                  {exportAudienceOptions.map((option) => (
-                    <RadioGroup.Item
-                      key={option.id}
-                      value={option.id}
-                      render={<div />}
-                      className={`preset-card ${exportAudience === option.id ? "active" : ""}`}
-                    >
-                      <span className="preset-radio" aria-hidden="true">
-                        <span className="preset-radio-outer">
-                          <span className="preset-radio-indicator" />
-                        </span>
-                      </span>
-                      <div>
-                        <p className="preset-title">{option.label}</p>
-                        <p className="helper">{option.description}</p>
-                      </div>
-                    </RadioGroup.Item>
+          <section className="preview-section">
+            <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
+              <p className="notice-status-title">{noticeReadiness.title}</p>
+              <p className="helper">{noticeReadiness.detail}</p>
+              {missingBasics.length > 0 && (
+                <ul className="quick-list">
+                  {missingBasics.map((item) => (
+                    <li key={item}>{item}</li>
                   ))}
-                </RadioGroup.Root>
-                <pre className="output output-summary">{exportSummary}</pre>
-                <div className="submission-block">
-                  <div>
-                    <h3>Save to the shared ledger</h3>
-                    <p className="helper">This saves a short summary. It does not save personal details.</p>
-                    {!buildingKey && (
-                      <p className="helper">Add your building key to the URL before saving. Your building organizer gives you the key.</p>
-                    )}
-                    {!formState.building || !formState.issue ? (
-                      <p className="helper">Choose a building and issue to enable saving.</p>
-                    ) : null}
-                  </div>
-                  <div className="submission-actions">
-                    <Button
-                      className="button button-secondary"
-                      type="button"
-                      onClick={handleLedgerSave}
-                      disabled={!canSaveLedger || saveStatus === "saving"}
-                    >
-                      {saveLabel}
-                    </Button>
-                    {submissionUrl && (
-                      <Button className="button button-secondary" type="button" onClick={handleCopyLink}>
-                        {linkCopyLabel}
-                      </Button>
-                    )}
-                  </div>
-                  {saveStatus === "saved" && submissionUrl && (
-                    <p className="submission-note" role="status" aria-live="polite">
-                      Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>
-                    </p>
-                  )}
-                  {saveStatus === "error" && (
-                    <p className="submission-error" role="alert">
-                      {saveError || "We could not save the ledger entry."}
-                    </p>
-                  )}
-                  {linkStatusMessage && (
-                    <p className="helper" role="status" aria-live="polite">
-                      {linkStatusMessage}
-                    </p>
-                  )}
-                  {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
-                    <div className="submission-details">
-                      <p className="helper">Details saved:</p>
-                      <ul>
-                        {savedMetaItems.map((item) => (
-                          <li key={item.label}>
-                            <strong>{item.label}:</strong> {item.value}
-                          </li>
-                        ))}
-                        {detailSummaryItems.map((item) => (
-                          <li key={item.label}>
-                            <strong>{item.label}:</strong> {item.value}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                </ul>
+              )}
+              {!isNoticeReady && (
+                <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
+                  Go to step 1
+                </Button>
+              )}
+            </div>
+          </section>
+          <section className="preview-section">
+            <div className="summary-header">
+              <h3>Notice summary</h3>
+              <p className="helper">Check the key facts before you share.</p>
+            </div>
+            <div className="summary-grid">
+              {summaryItems.map((item) => (
+                <div key={item.label} className="summary-card">
+                  <p className="summary-label">{item.label}</p>
+                  <p className="summary-value">{item.value}</p>
                 </div>
-              </>
-            )}
-          </div>
-          <div className="plain-meaning">
-            <Button
-              className="button button-secondary"
-              type="button"
-              onClick={() => setPlainMeaningVisible((prev) => !prev)}
-            >
-              {plainMeaningVisible ? "Hide plain meaning" : "Show plain meaning"}
-            </Button>
-            {plainMeaningVisible && (
-              <ul className="meaning-list">
-                {meaningItems.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            )}
-          </div>
+              ))}
+            </div>
+            <p className="helper">Preview the message before you share it.</p>
+            <p className="helper">Privacy reminder: do not include names, unit numbers, or personal details.</p>
+          </section>
+          <section className="preview-section">
+            <div className="notice-preview">
+              <div className="notice-preview-header">
+                <div>
+                  <p className="notice-preview-title">Notice message</p>
+                  <p className="helper">Copy and send this text.</p>
+                </div>
+                <div className="notice-preview-tags">
+                  <span className="notice-tag">{selectedIssue?.label || "Issue"}</span>
+                  <span className="notice-tag">{stageLabel}</span>
+                  <span className="notice-tag">{noticeLanguageLabel}</span>
+                </div>
+              </div>
+              <pre className="output output-notice">{noticeText}</pre>
+            </div>
+          </section>
+          <section className="preview-section">
+            <div className="export-block">
+              {!canShowAfterBasics ? (
+                <p className="helper">Finish step 1 to unlock exports and saving.</p>
+              ) : (
+                <>
+                  <div className="export-header">
+                    <div>
+                      <h3>{selectedAudience.label} export</h3>
+                      <p className="helper">Choose who you are exporting for. The fields adjust automatically.</p>
+                      <p className="helper">This does not notify anyone. It only changes the summary text.</p>
+                    </div>
+                    <div className="export-actions">
+                      <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
+                        {summaryCopyLabel}
+                      </Button>
+                      <Button className="button button-secondary" type="button" onClick={handleSummaryDownload}>
+                        Download .txt
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="helper" role="status" aria-live="polite">
+                    {exportStatusMessage}
+                  </p>
+                  <div className="export-status">
+                    <label>
+                      Issue status
+                      <Select.Root value={formState.exportStatus} onValueChange={updateSelect("exportStatus")} required>
+                        <Select.Trigger className="select-trigger" aria-label="Issue status">
+                          <Select.Value placeholder="Select status" />
+                          <Select.Icon className="select-icon">
+                            <span aria-hidden="true">▾</span>
+                          </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Positioner className="select-positioner">
+                            <Select.Popup className="select-popup">
+                              <Select.List className="select-list">
+                                {exportStatusOptions.map((option) => (
+                                  <Select.Item key={option.id} value={option.id} className="select-item">
+                                    <Select.ItemText>
+                                      {option.label} — {option.description}
+                                    </Select.ItemText>
+                                    <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                  </Select.Item>
+                                ))}
+                              </Select.List>
+                            </Select.Popup>
+                          </Select.Positioner>
+                        </Select.Portal>
+                      </Select.Root>
+                    </label>
+                  </div>
+                  <RadioGroup.Root
+                    className="export-presets"
+                    aria-label="Export audience"
+                    value={exportAudience}
+                    onValueChange={(value) => {
+                      if (typeof value === "string") {
+                        setExportAudience(value as ExportAudience);
+                      }
+                    }}
+                  >
+                    {exportAudienceOptions.map((option) => (
+                      <RadioGroup.Item
+                        key={option.id}
+                        value={option.id}
+                        render={<div />}
+                        className={`preset-card ${exportAudience === option.id ? "active" : ""}`}
+                      >
+                        <span className="preset-radio" aria-hidden="true">
+                          <span className="preset-radio-outer">
+                            <span className="preset-radio-indicator" />
+                          </span>
+                        </span>
+                        <div>
+                          <p className="preset-title">{option.label}</p>
+                          <p className="helper">{option.description}</p>
+                        </div>
+                      </RadioGroup.Item>
+                    ))}
+                  </RadioGroup.Root>
+                  <pre className="output output-summary">{exportSummary}</pre>
+                  <div className="submission-block">
+                    <div>
+                      <h3>Save to the shared ledger</h3>
+                      <p className="helper">This saves a short summary. It does not save personal details.</p>
+                      {!buildingKey && (
+                        <p className="helper">Add your building key to the URL before saving. Your building organizer gives you the key.</p>
+                      )}
+                      {!formState.building || !formState.issue ? (
+                        <p className="helper">Choose a building and issue to enable saving.</p>
+                      ) : null}
+                    </div>
+                    <div className="submission-actions">
+                      <Button
+                        className="button button-secondary"
+                        type="button"
+                        onClick={handleLedgerSave}
+                        disabled={!canSaveLedger || saveStatus === "saving"}
+                      >
+                        {saveLabel}
+                      </Button>
+                      {submissionUrl && (
+                        <Button className="button button-secondary" type="button" onClick={handleCopyLink}>
+                          {linkCopyLabel}
+                        </Button>
+                      )}
+                    </div>
+                    {saveStatus === "saved" && submissionUrl && (
+                      <p className="submission-note" role="status" aria-live="polite">
+                        Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>
+                      </p>
+                    )}
+                    {saveStatus === "error" && (
+                      <p className="submission-error" role="alert">
+                        {saveError || "We could not save the ledger entry."}
+                      </p>
+                    )}
+                    {linkStatusMessage && (
+                      <p className="helper" role="status" aria-live="polite">
+                        {linkStatusMessage}
+                      </p>
+                    )}
+                    {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
+                      <div className="submission-details">
+                        <p className="helper">Details saved:</p>
+                        <ul>
+                          {savedMetaItems.map((item) => (
+                            <li key={item.label}>
+                              <strong>{item.label}:</strong> {item.value}
+                            </li>
+                          ))}
+                          {detailSummaryItems.map((item) => (
+                            <li key={item.label}>
+                              <strong>{item.label}:</strong> {item.value}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+          <section className="preview-section">
+            <div className="plain-meaning">
+              <Button
+                className="button button-secondary"
+                type="button"
+                onClick={() => setPlainMeaningVisible((prev) => !prev)}
+              >
+                {plainMeaningVisible ? "Hide plain meaning" : "Show plain meaning"}
+              </Button>
+              {plainMeaningVisible && (
+                <ul className="meaning-list">
+                  {meaningItems.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </section>
         </aside>
         {selectedPortfolio?.id === "continuum" && formState.building && (
           <aside className="panel contact-panel">
