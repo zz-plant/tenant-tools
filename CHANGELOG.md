@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.42 - 2026-02-04
+
+- Changed: Notice builder header no longer includes the tool-fit helper line to reduce clutter.
+
+## 1.0.41 - 2026-02-04
+
+- Changed: Notice builder header now includes a compact tool-fit line to reduce quick-guide clutter.
+
 ## 1.0.40 - 2026-02-04
 
 - Changed: Tablet layout now stacks the main panels and tightens grid sizing for easier scanning.
