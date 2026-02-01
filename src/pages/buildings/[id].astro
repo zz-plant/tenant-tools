@@ -126,7 +126,7 @@ const totalFiltered = filtered.length;
           <p class="eyebrow">Building ledger</p>
           <h1>Resident dashboard</h1>
           <p class="tagline">
-            This page groups recent submissions by status and helps residents add a report without writing.
+            See recent reports by status. Add “Me too” with one click.
           </p>
           <div class="tag-row">
             <span>Building: {buildingId || "Not listed"}</span>
@@ -136,8 +136,8 @@ const totalFiltered = filtered.length;
         </div>
         <div class="contact-panel">
           <h2>Safety reminder</h2>
-          <p class="helper">Keep details short. Do not include names or unit numbers.</p>
-          <p class="helper">Evidence stays private and is not shown here.</p>
+          <p class="helper">Keep it short. No names or unit numbers.</p>
+          <p class="helper">Evidence is private and hidden here.</p>
         </div>
       </header>
 
@@ -145,20 +145,20 @@ const totalFiltered = filtered.length;
         <section class="panel panel-highlight dashboard-grid">
           {!hasAccess ? (
             <div class="access-panel">
-              <h2>Access key required</h2>
-              <p class="helper">This dashboard is private for residents.</p>
-              <p class="helper">Ask a resident steward for the building key.</p>
+              <h2>Key required</h2>
+              <p class="helper">Residents only.</p>
+              <p class="helper">Ask a steward for the building key.</p>
               <ol class="helper-list">
                 <li>Get the building key from a resident steward.</li>
-                <li>Add <code>?key=YOUR_KEY</code> to this link.</li>
+                <li>Add <code>?key=YOUR_KEY</code> to the link.</li>
                 <li>Reload to view the dashboard.</li>
               </ol>
               <div class="access-sample">
-                <p class="access-sample-title">Example link</p>
+                <p class="access-sample-title">Example</p>
                 <code>?key=YOUR_KEY</code>
-                <p class="helper">Add the key to the end of the link.</p>
+                <p class="helper">Put the key at the end.</p>
               </div>
-              <p class="access-warning">Do not share the key in public.</p>
+              <p class="access-warning">Do not share the key publicly.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>
             </div>
           ) : !kv ? (
