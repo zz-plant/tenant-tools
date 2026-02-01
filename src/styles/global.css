@@ -462,6 +462,22 @@ body {
   color: #1c2436;
 }
 
+.step-requirement {
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4a5cc7;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.step-requirement-note {
+  margin-top: -6px;
+}
+
 label {
   display: grid;
   gap: 8px;
