@@ -947,7 +947,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     <p className="step-progress-label">Step {currentStep} of {steps.length}</p>
                     <span className="step-progress-pill">{progressPillLabel}</span>
                   </div>
-                  <p className="step-progress-value">Notice progress</p>
                   <div
                     className="step-progress-track"
                     role="progressbar"
@@ -960,60 +959,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   </div>
                 </div>
                 <div className="step-privacy">
-                  <p className="helper privacy-reminder">Privacy reminder: Do not include names or unit numbers.</p>
-                  <p className="helper">Write short facts. Use general areas only.</p>
+                  <p className="helper privacy-reminder">
+                    Privacy reminder: Do not include names or unit numbers. Use general areas only.
+                  </p>
                   <p className="helper step-now">Now: {currentStepInfo.label}</p>
-                  {nextStepInfo && <p className="helper step-next">Next: {nextStepInfo.label}</p>}
                 </div>
-              </div>
-              <div className="quick-guide">
-                <div className="quick-card">
-                  <div className="quick-card-header">
-                    <span className="quick-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" role="presentation">
-                        <circle cx="12" cy="12" r="10" fill="#e8edff" stroke="#4f67ff" strokeWidth="1.5" />
-                        <path d="M8 12h8M12 8v8" stroke="#4f67ff" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    <p className="quick-title">Start here</p>
-                  </div>
-                  <ul className="quick-list">
-                    <li>Choose a building.</li>
-                    <li>Choose an issue type.</li>
-                    <li>Confirm the notice stage.</li>
-                  </ul>
-                </div>
-                <details className="quick-card quick-warning quick-disclosure">
-                  <summary className="quick-summary">
-                    <span className="quick-icon" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" role="presentation">
-                        <path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6l7-3z" fill="#fff1db" stroke="#b0701a" strokeWidth="1.5" />
-                        <path d="M9.5 12.5l2 2 3-3" stroke="#b0701a" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                    <span>
-                      <span className="quick-title">Privacy basics</span>
-                      <span className="quick-summary-helper">Open to review safe sharing rules.</span>
-                    </span>
-                  </summary>
-                  <div className="quick-disclosure-body">
-                    <ul className="quick-list">
-                      <li>Write short facts only.</li>
-                      <li>Do not add names.</li>
-                      <li>Do not add unit numbers.</li>
-                    </ul>
-                  </div>
-                </details>
-                {missingBasics.length > 0 && (
-                  <div className="quick-card quick-needed">
-                    <p className="quick-title">Needed to continue</p>
-                    <ul className="quick-list">
-                      {missingBasics.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
             </div>
             <Tabs.Root
@@ -1349,7 +1299,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     Review the preview. Copy the text and save it for your records. Dates and repeated reports help
                     most.
                   </p>
-                  <p className="helper">Use the buttons in the preview panel to copy, repeat, or reset.</p>
                 </Tabs.Panel>
               </form>
             </Tabs.Root>
@@ -1536,7 +1485,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </div>
               ))}
             </div>
-            <p className="helper">Preview the message before you share it.</p>
             <p className="helper">Privacy reminder: do not include names, unit numbers, or personal details.</p>
           </section>
           <section className="preview-section">

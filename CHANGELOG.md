@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.50 - 2026-02-04
+
+- Changed: Notice builder step header now shows a shorter privacy reminder and removes the quick-start cards to reduce visual clutter.
+
 ## 1.0.49 - 2026-02-04
 
 - Changed: Notice stage selection now uses clear card choices with a default-first hint.

@@ -136,96 +136,6 @@ body {
   overflow: auto;
 }
 
-.quick-guide {
-  border-radius: 16px;
-  border: 1px solid #e0e6f6;
-  background: #f4f6ff;
-  padding: 16px;
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-.quick-card {
-  border-radius: 12px;
-  border: 1px solid #d5dbea;
-  background: #ffffff;
-  padding: 10px 12px;
-  display: grid;
-  gap: 8px;
-}
-
-.quick-card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.quick-icon {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.quick-icon svg {
-  width: 28px;
-  height: 28px;
-}
-
-.quick-title {
-  margin: 0 0 8px;
-  font-weight: 600;
-  color: #1c2436;
-}
-
-.quick-warning {
-  border: 1px solid #f0d2a0;
-  background: #fff1db;
-}
-
-.quick-warning .quick-summary-helper {
-  color: #8a5a18;
-}
-
-.quick-checklist {
-  border-color: #d5dbea;
-}
-
-.quick-disclosure {
-  border-color: #d5dbea;
-}
-
-.quick-summary {
-  list-style: none;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 10px;
-  align-items: center;
-  cursor: pointer;
-}
-
-.quick-summary::-webkit-details-marker {
-  display: none;
-}
-
-.quick-summary-helper {
-  display: block;
-  font-size: 0.85rem;
-  color: #5a647a;
-}
-
-.quick-disclosure-body {
-  display: grid;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.quick-needed {
-  border-color: #d5dbea;
-}
-
 .notice-status {
   border-radius: 16px;
   border: 1px solid #d8dde8;
@@ -403,11 +313,6 @@ body {
   font-weight: 600;
 }
 
-.step-progress-value {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #5a647a;
-}
 
 .step-progress-track {
   height: 8px;
@@ -1654,10 +1559,6 @@ code {
     gap: 16px;
   }
 
-  .quick-guide {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  }
-
   .building-grid {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
@@ -1680,14 +1581,6 @@ code {
 
   .step-meta {
     grid-template-columns: 1fr;
-  }
-
-  .quick-guide {
-    grid-template-columns: 1fr;
-  }
-
-  .quick-summary {
-    grid-template-columns: auto 1fr;
   }
 
   .tag-row span:nth-child(n + 3) {
