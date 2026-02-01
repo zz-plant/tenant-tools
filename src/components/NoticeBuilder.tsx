@@ -130,6 +130,24 @@ const exportStatusOptions: Array<{ id: SubmissionStatus; label: string; descript
   },
 ];
 
+const stageOptions: Array<{ id: Stage; label: string; description: string }> = [
+  {
+    id: "A",
+    label: `A. ${stages.A}`,
+    description: "Use this for most new issues.",
+  },
+  {
+    id: "B",
+    label: `B. ${stages.B}`,
+    description: "Use this after the first notice.",
+  },
+  {
+    id: "C",
+    label: `C. ${stages.C}`,
+    description: "Use this after a follow-up.",
+  },
+];
+
 const detailEntries = Object.entries(fieldDefinitions);
 
 const RadioGroup = {
@@ -1148,38 +1166,39 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       <p className="helper">Choose a general area only. Do not enter unit numbers.</p>
                     </label>
 
-                    <label>
-                      Notice stage
-                      <Select.Root value={formState.stage} onValueChange={updateSelect("stage")} required>
-                        <Select.Trigger className="select-trigger" aria-label="Notice stage">
-                          <Select.Value placeholder="Select stage" />
-                          <Select.Icon className="select-icon">
-                            <span aria-hidden="true">▾</span>
-                          </Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Positioner className="select-positioner">
-                            <Select.Popup className="select-popup">
-                              <Select.List className="select-list">
-                                <Select.Item value="A" className="select-item">
-                                  <Select.ItemText>A. {stages.A}</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                                <Select.Item value="B" className="select-item">
-                                  <Select.ItemText>B. {stages.B}</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                                <Select.Item value="C" className="select-item">
-                                  <Select.ItemText>C. {stages.C}</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                              </Select.List>
-                            </Select.Popup>
-                          </Select.Positioner>
-                        </Select.Portal>
-                      </Select.Root>
-                      <p className="helper">Stage A is the first notice. Stage B is a follow-up. Stage C is the final reminder.</p>
-                    </label>
+                    <fieldset className="stage-selector">
+                      <legend>Notice stage</legend>
+                      <p className="helper">Most people start with Stage A.</p>
+                      <RadioGroup.Root
+                        className="stage-options"
+                        aria-label="Notice stage"
+                        value={formState.stage}
+                        onValueChange={(value) => {
+                          if (typeof value === "string") {
+                            setFormState((prev) => ({ ...prev, stage: value as Stage }));
+                          }
+                        }}
+                      >
+                        {stageOptions.map((option) => (
+                          <RadioGroup.Item
+                            key={option.id}
+                            value={option.id}
+                            render={<div />}
+                            className={`preset-card ${formState.stage === option.id ? "active" : ""}`}
+                          >
+                            <span className="preset-radio" aria-hidden="true">
+                              <span className="preset-radio-outer">
+                                <span className="preset-radio-indicator" />
+                              </span>
+                            </span>
+                            <div>
+                              <p className="preset-title">{option.label}</p>
+                              <p className="helper">{option.description}</p>
+                            </div>
+                          </RadioGroup.Item>
+                        ))}
+                      </RadioGroup.Root>
+                    </fieldset>
                   </div>
                 </Tabs.Panel>
 

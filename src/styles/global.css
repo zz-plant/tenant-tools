@@ -1335,6 +1335,25 @@ code {
   gap: 10px;
 }
 
+.stage-selector {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  color: #2b3142;
+}
+
+.stage-selector legend {
+  font-weight: 500;
+  color: #2b3142;
+}
+
+.stage-options {
+  display: grid;
+  gap: 10px;
+}
+
 .plan-caution {
   color: #6a4c1a;
   font-weight: 600;
