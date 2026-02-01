@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.51 - 2026-02-04
+
+- Changed: Dashboard sidebar panels now use card styling for clearer filters and notes.
+
 ## 1.0.50 - 2026-02-04
 
 - Changed: Notice builder step header now shows a shorter privacy reminder and removes the quick-start cards to reduce visual clutter.
