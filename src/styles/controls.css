@@ -576,6 +576,11 @@
   background: #4f67ff;
   color: #ffffff;
   cursor: pointer;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -605,11 +610,11 @@
 
 @media (max-width: 720px) {
   .page {
-    padding: 24px;
+    padding: 16px 16px 36px;
   }
 
   .hero {
-    padding: 24px;
+    padding: 18px;
   }
 
   .layout {
@@ -639,5 +644,34 @@
   .similar-issue-list li {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .output-actions,
+  .export-actions,
+  .submission-actions,
+  .similar-issue-actions,
+  .impact-actions,
+  .waitlist-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .output-actions .button,
+  .export-actions .button,
+  .submission-actions .button,
+  .similar-issue-actions .button,
+  .impact-actions .button,
+  .waitlist-actions .button,
+  .output-actions .calendar-link,
+  .export-actions .calendar-link,
+  .submission-actions .calendar-link,
+  .similar-issue-actions .calendar-link,
+  .impact-actions .calendar-link,
+  .waitlist-actions .calendar-link {
+    width: 100%;
+  }
+
+  .link-button {
+    padding: 8px 0;
   }
 }

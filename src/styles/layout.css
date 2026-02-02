@@ -181,3 +181,34 @@
 .sidebar-panel .export-block {
   margin-top: 0;
 }
+
+@media (max-width: 720px) {
+  .page {
+    padding: 16px 16px 36px;
+    gap: 24px;
+  }
+
+  .hero {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .metrics {
+    gap: 12px;
+  }
+
+  .tag-row {
+    gap: 8px;
+  }
+
+  .panel {
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: none;
+    border: 1px solid #e3e7f5;
+  }
+
+  .sidebar-panel {
+    position: static;
+  }
+}

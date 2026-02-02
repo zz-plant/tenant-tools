@@ -244,6 +244,7 @@ label {
   font-size: 0.95rem;
   font-family: inherit;
   background-color: #fff;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -846,3 +847,96 @@ code {
   align-items: center;
 }
 
+@media (max-width: 720px) {
+  .form-section,
+  .preview-section,
+  .notice-preview,
+  .notice-status,
+  .building-gallery,
+  .issue-gallery {
+    padding: 12px;
+  }
+
+  .form-section,
+  .preview-section,
+  .notice-preview,
+  .notice-status {
+    background: #ffffff;
+    border-color: #e6eaf6;
+  }
+
+  .step-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+  }
+
+  .step-button {
+    padding: 10px 12px;
+    min-width: 150px;
+    scroll-snap-align: start;
+  }
+
+  .step-meta {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .summary-grid,
+  .building-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .issue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .notice-preview-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .output {
+    padding: 16px;
+    font-size: 0.9rem;
+  }
+
+  .checkbox-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .issue-card {
+    padding: 10px;
+  }
+
+  .issue-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .issue-icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .review-actions,
+  .issue-actions,
+  .step-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .review-actions .button,
+  .issue-actions .button,
+  .step-controls .button {
+    width: 100%;
+  }
+}
