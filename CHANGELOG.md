@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.53 - 2026-02-04
+
+- Changed: Mobile view uses lighter panels, a scrollable step row, and a two-column issue grid to reduce scrolling.
+
+## 1.0.52 - 2026-02-04
+
+- Changed: Mobile layouts now stack action buttons, widen tap targets, and tighten card spacing for easier phone use.
+
 ## 1.0.51 - 2026-02-04
 
 - Changed: Dashboard sidebar panels now use card styling for clearer filters and notes.
