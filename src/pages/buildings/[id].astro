@@ -2,11 +2,8 @@
 import "../../styles/global.css";
 import { issueOptions } from "../../data/noticeData";
 import { isAccessKeyValid, isBuildingAccessValid } from "../../lib/access";
-import {
-  normalizeSubmissionStatus,
-  submissionStatusLabels,
-  type SubmissionStatus,
-} from "../../lib/submissions";
+import { loadBuildingSubmissions, type BuildingSubmission } from "../../lib/buildingDashboard";
+import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
 
 export const prerender = false;
 
@@ -38,57 +35,10 @@ const clearFiltersUrl = `/buildings/${encodeURIComponent(buildingId)}${baseQuery
 
 const statusLabels = submissionStatusLabels;
 
-type BuildingSubmission = {
-  id: string;
-  issue: string;
-  issueLabel: string;
-  building: string;
-  startDate: string;
-  reportDate: string;
-  reportCount: number;
-  createdAt: string;
-  status: SubmissionStatus;
-};
-
-const submissions: BuildingSubmission[] = [];
-
-if (hasAccess && kv && buildingId) {
-  let cursor: string | undefined;
-  do {
-    const listResult = await kv.list({ prefix: "submission:", cursor, limit: 50 });
-    cursor = listResult.list_complete ? undefined : listResult.cursor;
-
-    for (const key of listResult.keys) {
-      const record = (await kv.get(key.name, { type: "json" })) as Record<string, unknown> | null;
-      if (!record) {
-        continue;
-      }
-      if (record.building !== buildingId) {
-        continue;
-      }
-
-      const reportCount =
-        typeof record.reportCount === "number" ? record.reportCount : Number(record.reportCount) || 0;
-
-      submissions.push({
-        id: String(record.id || ""),
-        issue: String(record.issue || ""),
-        issueLabel: String(record.issueLabel || record.issue || "Issue"),
-        building: String(record.building || ""),
-        startDate: String(record.startDate || ""),
-        reportDate: String(record.reportDate || ""),
-        reportCount,
-        createdAt: String(record.createdAt || ""),
-        status: normalizeSubmissionStatus(record.status),
-      });
-
-      if (submissions.length >= 200) {
-        cursor = undefined;
-        break;
-      }
-    }
-  } while (cursor);
-}
+const submissions: BuildingSubmission[] =
+  hasAccess && kv && buildingId
+    ? await loadBuildingSubmissions({ kv, buildingId })
+    : [];
 
 const filtered = submissions
   .filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter))
@@ -354,97 +304,14 @@ const totalFiltered = filtered.length;
     </div>
 
     {hasAccess && kv && (
-      <script define:vars={{ stewardKey }}>
-        const stewardKeyValue = stewardKey || "";
-
-        const updateReportCount = (id, nextCount) => {
-          const countEl = document.querySelector(`[data-report-count="${id}"]`);
-          if (countEl) {
-            countEl.textContent = String(nextCount);
-          }
-        };
-
-        const setReportStatus = (id, message, isError = false) => {
-          const statusEl = document.querySelector(`[data-report-status="${id}"]`);
-          if (!statusEl) return;
-          statusEl.textContent = message;
-          statusEl.style.color = isError ? "#9a2b2b" : "#1d3b2a";
-        };
-
-        document.querySelectorAll("[data-report-button]").forEach((button) => {
-          button.addEventListener("click", async () => {
-            const id = button.getAttribute("data-submission-id");
-            if (!id) return;
-            const defaultLabel = button.getAttribute("data-default-label") || "Me too";
-            button.setAttribute("disabled", "true");
-            button.textContent = "Saving...";
-            setReportStatus(id, "Saving your report...");
-            try {
-              const response = await fetch(`/api/submissions/${id}/report`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ increment: 1 }),
-              });
-              const payload = await response.json().catch(() => ({}));
-              if (!response.ok) {
-                throw new Error(payload?.error || "We could not update the report count.");
-              }
-              updateReportCount(id, payload.reportCount ?? 0);
-              setReportStatus(id, "Your report was added.");
-            } catch (error) {
-              setReportStatus(
-                id,
-                error instanceof Error ? error.message : "We could not add your report.",
-                true
-              );
-            } finally {
-              button.removeAttribute("disabled");
-              button.textContent = defaultLabel;
-            }
-          });
-        });
-
-        document.querySelectorAll("[data-status-save]").forEach((button) => {
-          button.addEventListener("click", async () => {
-            const id = button.getAttribute("data-submission-id");
-            if (!id) return;
-            const defaultLabel = button.getAttribute("data-default-label") || "Save";
-            const select = document.querySelector(`[data-status-select][data-submission-id="${id}"]`);
-            const note = document.querySelector(`[data-status-note="${id}"]`);
-            const nextStatus = select?.value;
-            if (!nextStatus) return;
-            button.setAttribute("disabled", "true");
-            button.textContent = "Saving...";
-            if (note) {
-              note.textContent = "Saving status...";
-              note.style.color = "";
-            }
-            try {
-              const response = await fetch(`/api/submissions/${id}/status?stewardKey=${encodeURIComponent(stewardKeyValue)}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: nextStatus }),
-              });
-              const payload = await response.json().catch(() => ({}));
-              if (!response.ok) {
-                throw new Error(payload?.error || "We could not update the status.");
-              }
-              if (note) {
-                note.textContent = "Status saved. Refreshing...";
-              }
-              window.location.reload();
-            } catch (error) {
-              if (note) {
-                note.textContent = error instanceof Error ? error.message : "We could not update the status.";
-                note.style.color = "#9a2b2b";
-              }
-            } finally {
-              button.removeAttribute("disabled");
-              button.textContent = defaultLabel;
-            }
-          });
-        });
-      </script>
+      <>
+        <script define:vars={{ stewardKey }}>
+          window.__BUILDING_DASHBOARD__ = {
+            stewardKey: stewardKey || "",
+          };
+        </script>
+        <script type="module" src={Astro.resolve("../../scripts/buildingDashboard.ts")}></script>
+      </>
     )}
   </body>
 </html>

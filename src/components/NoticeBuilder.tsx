@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -23,7 +23,22 @@ import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
 import WaitlistPanel from "./WaitlistPanel";
 import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
-import { detailCharacterLimit, type SubmissionStatus } from "../lib/submissions";
+import { detailCharacterLimit } from "../lib/submissions";
+import useTimedCallbacks from "../hooks/useTimedCallbacks";
+import { addDays, formatCalendarDate, formatDate, formatTimelineDate, getCurrentTime } from "../lib/dateUtils";
+import { fillTemplate, formatIssueLabel } from "../lib/noticeUtils";
+import {
+  detailWarningThreshold,
+  evidenceSafetyChecklist,
+  exportAudienceOptions,
+  exportStatusOptions,
+  factualTagOptions,
+  freeTextSafetyNote,
+  stageOptions,
+  steps,
+} from "./noticeBuilder/constants";
+import { issueIcons } from "./noticeBuilder/issueIcons";
+import type { Stage } from "./noticeBuilder/types";
 
 const initialState = {
   building: "",
@@ -54,99 +69,7 @@ const initialState = {
   ticketNumber: "",
 };
 
-type Stage = "A" | "B" | "C";
-
 type FormState = typeof initialState;
-
-const steps = [
-  {
-    id: 1,
-    title: "Choose basics",
-    label: "Building & issue",
-    description: "Pick building, issue, and stage.",
-    requirement: "Required",
-  },
-  {
-    id: 2,
-    title: "Add facts",
-    label: "Issue details",
-    description: "Add short facts if you want.",
-    requirement: "Optional",
-  },
-  {
-    id: 3,
-    title: "Set dates",
-    label: "Dates & language",
-    description: "Confirm dates and language.",
-    requirement: "Required",
-  },
-  {
-    id: 4,
-    title: "Review & share",
-    label: "Notice & save",
-    description: "Copy notice and save.",
-    requirement: "Review",
-  },
-];
-
-const exportAudienceOptions: Array<{ id: ExportAudience; label: string; description: string }> = [
-  {
-    id: "inspector",
-    label: "Inspector",
-    description: "Focus on dates and conditions for an inspection review.",
-  },
-  {
-    id: "legal",
-    label: "Legal aid",
-    description: "Adds stage history and report counts for case intake.",
-  },
-  {
-    id: "management",
-    label: "Management",
-    description: "Shares a concise summary without report counts or evidence notes.",
-  },
-  {
-    id: "personal",
-    label: "Personal records",
-    description: "Keeps a full timeline summary for your own files.",
-  },
-];
-
-const exportStatusOptions: Array<{ id: SubmissionStatus; label: string; description: string }> = [
-  {
-    id: "open",
-    label: "Open",
-    description: "Issue is still happening.",
-  },
-  {
-    id: "resolved",
-    label: "Resolved",
-    description: "Repairs are complete.",
-  },
-  {
-    id: "archived",
-    label: "Archived",
-    description: "Record closed for now.",
-  },
-];
-
-const stageOptions: Array<{ id: Stage; label: string; description: string }> = [
-  {
-    id: "A",
-    label: `A. ${stages.A}`,
-    description: "Use this for most new issues.",
-  },
-  {
-    id: "B",
-    label: `B. ${stages.B}`,
-    description: "Use this after the first notice.",
-  },
-  {
-    id: "C",
-    label: `C. ${stages.C}`,
-    description: "Use this after a follow-up.",
-  },
-];
 
 const detailEntries = Object.entries(fieldDefinitions);
 
@@ -155,131 +78,6 @@ const RadioGroup = {
   Item: Radio.Root,
 };
 
-const evidenceSafetyChecklist = [
-  "Evidence is private by default.",
-  "Do not upload faces.",
-  "Do not upload names, mail labels, or unit numbers.",
-  "Do not upload leases or ID documents.",
-  "Remove location data if you can.",
-];
-
-const freeTextSafetyNote = "Write short facts only. Do not include names or unit numbers.";
-
-const detailWarningThreshold = detailCharacterLimit - 40;
-
-const factualTagOptions: Partial<Record<keyof typeof fieldDefinitions, string[]>> = {
-  location: ["kitchen", "bathroom", "ceiling", "hallway"],
-  attachment: ["photo", "video", "screenshot"],
-  pestType: ["roaches", "rats", "bedbugs"],
-  commonArea: ["elevator", "garage door", "hall lights", "trash room"],
-  lockoutAction: ["locked out", "utilities shut off"],
-  issueDescription: ["broken elevator", "water leak", "no heat", "mold smell"],
-};
-
-const issueIcons: Record<string, React.ReactNode> = {
-  heat: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Heat issue">
-      <path d="M32 10C24 20 40 26 40 38c0 6-4 12-8 12s-8-6-8-12c0-6 4-10 8-16z" fill="#f6b352" />
-      <path d="M32 10C24 20 40 26 40 38c0 6-4 12-8 12s-8-6-8-12c0-6 4-10 8-16z" fill="none" stroke="#c46a2a" strokeWidth="2" />
-    </svg>
-  ),
-  leak: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Water leak issue">
-      <path d="M32 10C24 22 18 28 18 38a14 14 0 0 0 28 0c0-10-6-16-14-28z" fill="#7bb5ff" />
-      <path d="M32 10C24 22 18 28 18 38a14 14 0 0 0 28 0c0-10-6-16-14-28z" fill="none" stroke="#3a6fb0" strokeWidth="2" />
-    </svg>
-  ),
-  pests: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Pest issue">
-      <ellipse cx="32" cy="34" rx="10" ry="14" fill="#cfe8c6" stroke="#4a7d4f" strokeWidth="2" />
-      <circle cx="26" cy="22" r="4" fill="#cfe8c6" stroke="#4a7d4f" strokeWidth="2" />
-      <circle cx="38" cy="22" r="4" fill="#cfe8c6" stroke="#4a7d4f" strokeWidth="2" />
-      <path d="M22 40l-8 4M42 40l8 4M22 28l-8-4M42 28l8-4" stroke="#4a7d4f" strokeWidth="2" />
-    </svg>
-  ),
-  entry: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Entry issue">
-      <rect x="18" y="12" width="28" height="40" rx="2" fill="#f4d1c5" stroke="#a95b4a" strokeWidth="2" />
-      <circle cx="38" cy="32" r="2" fill="#a95b4a" />
-      <rect x="14" y="10" width="36" height="44" rx="3" fill="none" stroke="#a95b4a" strokeWidth="2" />
-    </svg>
-  ),
-  common: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Common area issue">
-      <rect x="12" y="12" width="40" height="40" rx="4" fill="#d4e1ff" stroke="#4b6fa9" strokeWidth="2" />
-      <rect x="20" y="20" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
-      <rect x="36" y="20" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
-      <rect x="20" y="34" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
-      <rect x="36" y="34" width="8" height="8" fill="#ffffff" stroke="#4b6fa9" />
-    </svg>
-  ),
-  "no-timeline": (
-    <svg viewBox="0 0 64 64" role="img" aria-label="No timeline issue">
-      <rect x="16" y="10" width="32" height="44" rx="4" fill="#f6e2b8" stroke="#b0823e" strokeWidth="2" />
-      <path d="M22 24h20M22 32h20M22 40h14" stroke="#b0823e" strokeWidth="2" />
-    </svg>
-  ),
-  deposit: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Deposit issue">
-      <circle cx="32" cy="32" r="16" fill="#ffe3a3" stroke="#b67a2b" strokeWidth="2" />
-      <path d="M28 26h8v12h-8z" fill="#b67a2b" />
-      <path d="M32 22v20" stroke="#b67a2b" strokeWidth="2" />
-    </svg>
-  ),
-  lockout: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Lockout issue">
-      <rect x="18" y="28" width="28" height="22" rx="4" fill="#f0ccd1" stroke="#9a4454" strokeWidth="2" />
-      <path d="M24 28v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#9a4454" strokeWidth="2" />
-      <circle cx="32" cy="38" r="3" fill="#9a4454" />
-    </svg>
-  ),
-  building: (
-    <svg viewBox="0 0 64 64" role="img" aria-label="Building-wide issue">
-      <rect x="14" y="14" width="36" height="36" rx="4" fill="#dfe9f5" stroke="#5a7aa6" strokeWidth="2" />
-      <rect x="22" y="22" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
-      <rect x="36" y="22" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
-      <rect x="22" y="34" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
-      <rect x="36" y="34" width="6" height="6" fill="#ffffff" stroke="#5a7aa6" />
-    </svg>
-  ),
-};
-
-const formatIssueLabel = (label: string) => label.replace(/^[^a-zA-Z0-9]+\s*/, "");
-
-const formatDate = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-
-const formatCalendarDate = (date: Date) => date.toISOString().slice(0, 10).replaceAll("-", "");
-
-const getCurrentTime = (date: Date) =>
-  `${date.getHours().toString().padStart(2, "0")}:${date
-    .getMinutes()
-    .toString()
-    .padStart(2, "0")}`;
-
-const addDays = (date: Date, days: number) => {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-};
-
-const fillTemplate = (template: string, values: Record<string, string>) => {
-  let text = template;
-  Object.entries(values).forEach(([key, value]) => {
-    text = text.replaceAll(`[${key}]`, value);
-  });
-  return text;
-};
-
-const formatTimelineDate = (value: string) => {
-  if (!value) {
-    return "";
-  }
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.valueOf())) {
-    return value;
-  }
-  return parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-};
 
 type NoticeBuilderProps = {
   buildingOptions?: BuildingOption[];
@@ -317,24 +115,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
   const [exportStatusMessage, setExportStatusMessage] = useState("");
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
-  const timeoutHandles = useRef<Map<string, number>>(new Map());
-  const scheduleTimeout = (key: string, callback: () => void, delay: number) => {
-    const existing = timeoutHandles.current.get(key);
-    if (existing) {
-      window.clearTimeout(existing);
-    }
-    const id = window.setTimeout(() => {
-      timeoutHandles.current.delete(key);
-      callback();
-    }, delay);
-    timeoutHandles.current.set(key, id);
-  };
-  useEffect(() => {
-    return () => {
-      timeoutHandles.current.forEach((id) => window.clearTimeout(id));
-      timeoutHandles.current.clear();
-    };
-  }, []);
+  const { scheduleTimeout } = useTimedCallbacks();
   const stepProgress = Math.round((currentStep / steps.length) * 100);
   const currentStepInfo = steps[currentStep - 1];
   const nextStepInfo = steps[currentStep] || null;
