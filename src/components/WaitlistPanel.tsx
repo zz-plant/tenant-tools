@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, Input } from "./ui";
 import { type PortfolioId } from "../data/portfolioOptions";
 import { waitlistBuildingLimit } from "../lib/waitlist";
+import useTimedCallbacks from "../hooks/useTimedCallbacks";
 
 const initialWaitlistState = {
   building: "",
@@ -20,27 +21,10 @@ const WaitlistPanel = () => {
   const [inviteCopyLabel, setInviteCopyLabel] = useState("Copy invite text");
   const [origin, setOrigin] = useState("");
   const buildingHelperId = "waitlist-building-helper";
-  const timeoutHandles = useRef<Map<string, number>>(new Map());
-  const scheduleTimeout = (key: string, callback: () => void, delay: number) => {
-    const existing = timeoutHandles.current.get(key);
-    if (existing) {
-      window.clearTimeout(existing);
-    }
-    const id = window.setTimeout(() => {
-      timeoutHandles.current.delete(key);
-      callback();
-    }, delay);
-    timeoutHandles.current.set(key, id);
-  };
+  const { scheduleTimeout } = useTimedCallbacks();
 
   useEffect(() => {
     setOrigin(window.location.origin);
-  }, []);
-  useEffect(() => {
-    return () => {
-      timeoutHandles.current.forEach((id) => window.clearTimeout(id));
-      timeoutHandles.current.clear();
-    };
   }, []);
 
   const inviteText = useMemo(() => {

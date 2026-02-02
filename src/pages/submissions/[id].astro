@@ -3,6 +3,8 @@ import "../../styles/global.css";
 import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
 import { portfolioOptions } from "../../data/portfolioOptions";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../lib/access";
+import { formatTimelineDate } from "../../lib/dateUtils";
+import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 
 export const prerender = false;
 
@@ -61,36 +63,7 @@ const dashboardUrl =
     ? `/buildings/${encodeURIComponent(submissionRecord.building)}${accessKeyParam ? `?${accessKeyParam}` : ""}`
     : "";
 
-const timelineEntries = submissionRecord
-  ? [
-      submissionRecord.startDate
-        ? { label: "Issue started", date: submissionRecord.startDate }
-        : null,
-      submissionRecord.stage === "A" && submissionRecord.reportDate
-        ? { label: "Notice sent", date: submissionRecord.reportDate }
-        : null,
-      (submissionRecord.stage === "B" || submissionRecord.stage === "C") && submissionRecord.firstMessageDate
-        ? { label: "First notice sent", date: submissionRecord.firstMessageDate }
-        : null,
-      (submissionRecord.stage === "B" || submissionRecord.stage === "C") && submissionRecord.reportDate
-        ? {
-            label: submissionRecord.stage === "B" ? "Follow-up sent" : "Final notice sent",
-            date: submissionRecord.reportDate,
-          }
-        : null,
-      submissionRecord.ticketDate ? { label: "311 ticket logged", date: submissionRecord.ticketDate } : null,
-    ]
-      .filter(Boolean)
-      .sort((a, b) => (a?.date || "").localeCompare(b?.date || ""))
-  : [];
-
-const formatTimelineDate = (value: string) => {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.valueOf())) {
-    return value;
-  }
-  return parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-};
+const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissionRecord) : [];
 ---
 <!DOCTYPE html>
 <html lang="en">
