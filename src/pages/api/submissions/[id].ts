@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../../lib/access";
 import { getRequestKey, jsonError, jsonResponse } from "../../../lib/http";
+import { fetchSubmissionRecord, getSubmissionsKv } from "../../../lib/storage/submissions";
 
 export const prerender = false;
 
@@ -16,12 +17,12 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     return jsonError("Resident access is required.", 403);
   }
 
-  const kv = locals.runtime?.env?.SUBMISSIONS_KV;
+  const kv = getSubmissionsKv(env);
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
 
-  const record = await kv.get(`submission:${id}`, { type: "json" });
+  const record = await fetchSubmissionRecord(kv, id);
   if (!record) {
     return jsonError("Submission not found.", 404);
   }

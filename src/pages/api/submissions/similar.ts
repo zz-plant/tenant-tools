@@ -3,6 +3,7 @@ import { issueOptions, zoneOptions } from "../../../data/noticeData";
 import { isBuildingAccessValid, isResidentKeyRecognized } from "../../../lib/access";
 import { jsonError, jsonResponse, getRequestKey } from "../../../lib/http";
 import { isValidDateString } from "../../../lib/validation";
+import { fetchSubmissionRecord, getSubmissionsKv, listSubmissionKeys } from "../../../lib/storage/submissions";
 
 export const prerender = false;
 
@@ -37,7 +38,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
   }
 
   const referenceDate = isValidDateString(startDate) ? startDate : "";
-  const kv = locals.runtime?.env?.SUBMISSIONS_KV;
+  const kv = getSubmissionsKv(env);
   if (!kv) {
     return jsonResponse({ matches: [] });
   }
@@ -52,11 +53,11 @@ export const GET: APIRoute = async ({ request, locals }) => {
 
   let cursor: string | undefined;
   do {
-    const listResult = await kv.list({ prefix: "submission:", cursor, limit: 50 });
+    const listResult = await listSubmissionKeys(kv, cursor, 50);
     cursor = listResult.list_complete ? undefined : listResult.cursor;
 
     for (const key of listResult.keys) {
-      const record = (await kv.get(key.name, { type: "json" })) as
+      const record = (await fetchSubmissionRecord(kv, key.name.replace("submission:", ""))) as
         | {
             id: string;
             building: string;

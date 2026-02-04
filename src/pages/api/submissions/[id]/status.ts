@@ -3,6 +3,7 @@ import { isAccessKeyValid } from "../../../../lib/access";
 import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
 import { isValidSubmissionStatus } from "../../../../lib/submissions";
 import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../../lib/http";
+import { fetchSubmissionRecord, getSubmissionsKv, saveSubmissionRecord } from "../../../../lib/storage/submissions";
 
 export const prerender = false;
 
@@ -24,7 +25,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Status is invalid.", 400);
   }
 
-  const kv = locals.runtime?.env?.SUBMISSIONS_KV;
+  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
@@ -45,13 +46,13 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     );
   }
 
-  const record = await kv.get(`submission:${id}`, { type: "json" });
+  const record = await fetchSubmissionRecord(kv, id);
   if (!record || typeof record !== "object") {
     return jsonError("Submission not found.", 404);
   }
 
   const updated = { ...(record as Record<string, unknown>), status };
-  await kv.put(`submission:${id}`, JSON.stringify(updated));
+  await saveSubmissionRecord(kv, updated as { id: string });
 
   return jsonResponse({ status });
 };

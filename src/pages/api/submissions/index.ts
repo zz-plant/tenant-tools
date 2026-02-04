@@ -4,6 +4,7 @@ import { enforceRateLimit, getClientIp } from "../../../lib/rateLimit";
 import { validateSubmissionInput } from "../../../lib/submissions";
 import { isBuildingAccessValid, isResidentKeyRecognized } from "../../../lib/access";
 import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../lib/http";
+import { getSubmissionsKv, saveSubmissionRecord } from "../../../lib/storage/submissions";
 
 export const prerender = false;
 
@@ -33,7 +34,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     ...validation.data,
   };
 
-  const kv = locals.runtime?.env?.SUBMISSIONS_KV;
+  const kv = getSubmissionsKv(env);
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
@@ -49,7 +50,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return jsonError("Too many submissions. Try again soon.", 429, {}, { "Retry-After": String(rateLimit.retryAfter) });
   }
 
-  await kv.put(`submission:${record.id}`, JSON.stringify(record));
+  await saveSubmissionRecord(kv, record);
 
   const keyForUrl = typeof providedKey === "string" ? providedKey.trim() : "";
   const keyParam = keyForUrl ? `?key=${encodeURIComponent(keyForUrl)}` : "";

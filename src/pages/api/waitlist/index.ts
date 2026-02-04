@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { enforceRateLimit, getClientIp } from "../../../lib/rateLimit";
 import { validateWaitlistInput } from "../../../lib/waitlist";
 import { jsonError, jsonResponse, parseJsonBody } from "../../../lib/http";
+import { getWaitlistKv, saveWaitlistEntry } from "../../../lib/storage/waitlist";
 
 export const prerender = false;
 
@@ -13,7 +14,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return jsonError("We could not save this waitlist request.", 400, { details: validation.errors });
   }
 
-  const kv = locals.runtime?.env?.WAITLIST_KV;
+  const kv = getWaitlistKv(locals.runtime?.env ?? {});
   if (!kv) {
     return jsonError("Waitlist storage is not configured.", 500);
   }
@@ -40,7 +41,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     ...validation.data,
   };
 
-  await kv.put(`waitlist:${record.id}`, JSON.stringify(record));
+  await saveWaitlistEntry(kv, record);
 
   return jsonResponse({ id: record.id }, 201);
 };
