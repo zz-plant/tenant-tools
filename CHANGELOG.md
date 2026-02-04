@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.54 - 2026-02-04
+
+- Changed: Home page now highlights the quick steps, adds clear start actions, and stacks panels on mobile.
+
 ## 1.0.53 - 2026-02-04
 
 - Changed: Mobile view uses lighter panels, a scrollable step row, and a two-column issue grid to reduce scrolling.

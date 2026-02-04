@@ -707,6 +707,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <p className="eyebrow">Building Ledger</p>
           <h1>Tenant Notice Builder</h1>
           <p className="tagline">Write a short, dated notice in four steps.</p>
+          <div className="hero-actions">
+            <a className="button hero-button" href="#builder">
+              Start with step 1
+            </a>
+            <a className="button button-secondary hero-button" href="#preview">
+              See the notice preview
+            </a>
+          </div>
           <div className="tag-row">
             <span>No names saved</span>
             <span>Short facts only</span>
@@ -714,11 +722,58 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <span>Share only with neighbors</span>
           </div>
         </div>
+        <div className="hero-steps" aria-label="Quick steps">
+          <div className="hero-step-card">
+            <p className="hero-step-title">1. Choose basics</p>
+            <p className="helper">Select a building and issue type.</p>
+          </div>
+          <div className="hero-step-card">
+            <p className="hero-step-title">2. Add facts</p>
+            <p className="helper">Short details only. No names.</p>
+          </div>
+          <div className="hero-step-card">
+            <p className="hero-step-title">3. Check dates</p>
+            <p className="helper">Confirm start date and today.</p>
+          </div>
+          <div className="hero-step-card">
+            <p className="hero-step-title">4. Copy & save</p>
+            <p className="helper">Share the notice with your group.</p>
+          </div>
+        </div>
       </header>
+
+      <section className="panel panel-highlight intro-panel">
+        <div className="intro-grid">
+          <div className="intro-card">
+            <h2>What you will do</h2>
+            <ul>
+              <li>Pick a building and issue type.</li>
+              <li>Add short facts with dates.</li>
+              <li>Review the notice preview.</li>
+            </ul>
+          </div>
+          <div className="intro-card">
+            <h2>What you will get</h2>
+            <ul>
+              <li>A dated notice message.</li>
+              <li>A simple summary for records.</li>
+              <li>A private record for this issue.</li>
+            </ul>
+          </div>
+          <div className="intro-card">
+            <h2>Privacy first</h2>
+            <ul>
+              <li>No names or unit numbers.</li>
+              <li>Evidence is private by default.</li>
+              <li>Share only with neighbors.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
       <main className="layout" id="main">
         <div className="flow">
-          <section className="panel">
+          <section className="panel" id="builder">
             <div className="step-header">
               <h2>Build your notice</h2>
               <p className="helper">Start with the basics and move step by step.</p>
@@ -1217,7 +1272,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           </section>
         </div>
 
-        <aside className="panel panel-highlight preview-panel">
+        <aside className="panel panel-highlight preview-panel" id="preview">
           <div className="output-header">
             <h2>Generated notice</h2>
             <div className="output-actions">
