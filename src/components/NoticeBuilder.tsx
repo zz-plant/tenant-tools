@@ -134,6 +134,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   }, [formState.building, formState.issue]);
 
   const isStep1Complete = Boolean(formState.building && formState.issue);
+  const stepsLocked = !isStep1Complete;
   const canShowAfterBasics = isStep1Complete;
   const isNoticeReady = missingBasics.length === 0;
   const noticeReadiness = isNoticeReady
@@ -806,23 +807,31 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               value={String(currentStep)}
               onValueChange={(value) => {
                 if (value) {
-                  setCurrentStep(Number(value));
+                  const nextStep = Number(value);
+                  if (stepsLocked && nextStep > 1) {
+                    return;
+                  }
+                  setCurrentStep(nextStep);
                 }
               }}
             >
               <Tabs.List className="step-nav">
-                {steps.map((step) => (
-                  <Tabs.Tab
-                    key={step.id}
-                    value={String(step.id)}
-                    className={`step-button ${currentStep === step.id ? "active" : ""}`}
-                    aria-current={currentStep === step.id ? "step" : undefined}
-                  >
-                    <span className="step-title">{step.title}</span>
-                    <span className="step-label">{step.label}</span>
-                    <span className="step-requirement">{step.requirement}</span>
-                  </Tabs.Tab>
-                ))}
+                {steps.map((step) => {
+                  const isLocked = stepsLocked && step.id > 1;
+                  return (
+                    <Tabs.Tab
+                      key={step.id}
+                      value={String(step.id)}
+                      disabled={isLocked}
+                      className={`step-button ${currentStep === step.id ? "active" : ""}${isLocked ? " disabled" : ""}`}
+                      aria-current={currentStep === step.id ? "step" : undefined}
+                    >
+                      <span className="step-title">{step.title}</span>
+                      <span className="step-label">{step.label}</span>
+                      <span className="step-requirement">{step.requirement}</span>
+                    </Tabs.Tab>
+                  );
+                })}
               </Tabs.List>
               <p className="helper">{steps[currentStep - 1].description}</p>
               <p className="helper step-requirement-note">
@@ -832,6 +841,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     ? "Review and save here."
                     : "Required to build the notice."}
               </p>
+              {stepsLocked && (
+                <p className="helper">Finish step 1 to unlock the remaining steps.</p>
+              )}
 
               <form className="form-grid">
                 <Tabs.Panel value="1">

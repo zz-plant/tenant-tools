@@ -179,6 +179,13 @@
   gap: 4px;
 }
 
+.step-button.disabled,
+.step-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  background: #f5f6fb;
+}
+
 .step-button.active {
   border-color: #4f67ff;
   background: #eef0ff;
