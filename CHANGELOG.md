@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.56 - 2026-02-04
+
+- Changed: Notice builder now locks later steps until basics are complete for a clearer flow.
+
 ## 1.0.55 - 2026-02-04
 
 - Changed: Simplified notice builder and waitlist copy to be shorter and more direct.
