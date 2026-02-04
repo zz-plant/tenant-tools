@@ -191,6 +191,7 @@ For the longer-form product vision, see [docs/vision.md](docs/vision.md).
 ## Architecture
 
 For a deeper overview of routes, data flow, and storage, see [docs/architecture.md](docs/architecture.md).
+For the modernization roadmap, see [docs/modernization-plan.md](docs/modernization-plan.md).
 
 ---
 
