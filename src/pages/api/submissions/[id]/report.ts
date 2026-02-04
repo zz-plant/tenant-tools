@@ -3,6 +3,8 @@ import { createReportEntry, REPORT_ENTRY_TTL_SECONDS } from "../../../../lib/rep
 import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../../../lib/access";
 import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../../lib/http";
+import { saveReportEntry } from "../../../../lib/storage/reports";
+import { fetchSubmissionRecord, getSubmissionsKv, saveSubmissionRecord } from "../../../../lib/storage/submissions";
 
 export const prerender = false;
 
@@ -24,7 +26,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Resident access is required.", 403);
   }
 
-  const kv = locals.runtime?.env?.SUBMISSIONS_KV;
+  const kv = getSubmissionsKv(env);
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
@@ -45,7 +47,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     );
   }
 
-  const record = (await kv.get(`submission:${id}`, { type: "json" })) as
+  const record = (await fetchSubmissionRecord(kv, id)) as
     | {
         id: string;
         building: string;
@@ -64,11 +66,9 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
 
   const nextCount = Math.min(50, record.reportCount + increment);
   const updated = { ...record, reportCount: nextCount };
-  await kv.put(`submission:${id}`, JSON.stringify(updated));
+  await saveSubmissionRecord(kv, updated);
   const entry = createReportEntry(id);
-  await kv.put(`report:${id}:${entry.id}`, JSON.stringify(entry), {
-    expirationTtl: REPORT_ENTRY_TTL_SECONDS,
-  });
+  await saveReportEntry(kv, entry, { expirationTtl: REPORT_ENTRY_TTL_SECONDS });
 
   return jsonResponse({ reportCount: nextCount });
 };
