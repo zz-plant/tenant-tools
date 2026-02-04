@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.55 - 2026-02-04
+
+- Changed: Simplified notice builder and waitlist copy to be shorter and more direct.
+
 ## 1.0.54 - 2026-02-04
 
 - Changed: Home page now highlights the quick steps, adds clear start actions, and stacks panels on mobile.

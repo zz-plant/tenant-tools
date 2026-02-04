@@ -34,8 +34,8 @@ const WaitlistPanel = () => {
       "Neighbor note",
       "",
       `I want Building Ledger to support ${buildingLabel}.`,
-      "It is a private tool for repair tracking and notices.",
-      `If you want it too, add the building to the waitlist at ${siteLabel}.`,
+      "Private tool for repair tracking and notices.",
+      `If you want it too, add the building at ${siteLabel}.`,
       "Do not include names or unit numbers.",
     ].join("\n");
   }, [origin, waitlistState.building]);
@@ -128,14 +128,14 @@ const WaitlistPanel = () => {
         <div>
           <h2>Building not listed?</h2>
           <p className="helper">
-            Add your building to the waitlist. We do not collect names, emails, or phone numbers.
+            Add your building to the waitlist. No names, emails, or phone numbers.
           </p>
           {!isExpanded && (
-            <p className="helper">Step 1: add the building address. Step 2: save the request code.</p>
+            <p className="helper">Step 1: add address. Step 2: save request code.</p>
           )}
         </div>
         <Button className="button button-secondary" type="button" onClick={() => setIsExpanded((prev) => !prev)}>
-          {isExpanded ? "Hide waitlist steps" : "Start waitlist"}
+          {isExpanded ? "Hide steps" : "Start"}
         </Button>
       </div>
       {isExpanded && (
@@ -156,7 +156,7 @@ const WaitlistPanel = () => {
               />
             </label>
             <p className="helper" id={buildingHelperId}>
-              Do not include unit numbers or resident names.
+              No unit numbers or resident names.
             </p>
             <div className="waitlist-actions">
               <Button className="button" type="submit" disabled={waitlistStatus === "saving"}>
@@ -170,7 +170,7 @@ const WaitlistPanel = () => {
               <div className="waitlist-success">
                 <h3>Step 2: Save your request code</h3>
                 <p className="helper" role="status" aria-live="polite">
-                  Saved. Keep this request code so you can check back later.
+                  Saved. Keep this request code.
                 </p>
                 <div className="waitlist-actions">
                   <span className="waitlist-code">{requestId}</span>
@@ -190,8 +190,7 @@ const WaitlistPanel = () => {
             <div className="waitlist-invite">
               <h3>Step 3: Share the invite (optional)</h3>
               <p className="helper">
-                This tool does not send messages between residents. Use this invite to talk in person or share a
-                printed note.
+                This tool does not send resident messages. Use this invite in person or on paper.
               </p>
               <Button
                 className="button button-secondary"
