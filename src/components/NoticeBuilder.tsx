@@ -139,11 +139,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const noticeReadiness = isNoticeReady
     ? {
         title: "Notice ready",
-        detail: "Review the summary and copy the message when you are ready.",
+        detail: "Review the summary, then copy the message.",
       }
     : {
         title: "Finish the basics",
-        detail: "Choose a building and issue to unlock the notice preview.",
+        detail: "Choose a building and issue to unlock the preview.",
       };
   const canSaveLedger = Boolean(formState.building && formState.issue && buildingKey);
 
@@ -706,26 +706,26 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         <div className="hero-main">
           <p className="eyebrow">Building Ledger</p>
           <h1>Tenant Notice Builder</h1>
-          <p className="tagline">Write a short, dated notice in four steps.</p>
+          <p className="tagline">Write a short notice in four steps.</p>
           <div className="hero-actions">
             <a className="button hero-button" href="#builder">
-              Start with step 1
+              Start step 1
             </a>
             <a className="button button-secondary hero-button" href="#preview">
-              See the notice preview
+              See preview
             </a>
           </div>
           <div className="tag-row">
             <span>No names saved</span>
             <span>Short facts only</span>
             <span>Evidence stays private</span>
-            <span>Share only with neighbors</span>
+            <span>Share with neighbors only</span>
           </div>
         </div>
         <div className="hero-steps" aria-label="Quick steps">
           <div className="hero-step-card">
-            <p className="hero-step-title">1. Choose basics</p>
-            <p className="helper">Select a building and issue type.</p>
+            <p className="hero-step-title">1. Basics</p>
+            <p className="helper">Pick building and issue.</p>
           </div>
           <div className="hero-step-card">
             <p className="hero-step-title">2. Add facts</p>
@@ -733,11 +733,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           </div>
           <div className="hero-step-card">
             <p className="hero-step-title">3. Check dates</p>
-            <p className="helper">Confirm start date and today.</p>
+            <p className="helper">Confirm dates.</p>
           </div>
           <div className="hero-step-card">
             <p className="hero-step-title">4. Copy & save</p>
-            <p className="helper">Share the notice with your group.</p>
+            <p className="helper">Save or share.</p>
           </div>
         </div>
       </header>
@@ -745,27 +745,27 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       <section className="panel panel-highlight intro-panel">
         <div className="intro-grid">
           <div className="intro-card">
-            <h2>What you will do</h2>
+            <h2>What you do</h2>
             <ul>
-              <li>Pick a building and issue type.</li>
-              <li>Add short facts with dates.</li>
-              <li>Review the notice preview.</li>
+              <li>Pick building and issue.</li>
+              <li>Add short facts and dates.</li>
+              <li>Review the preview.</li>
             </ul>
           </div>
           <div className="intro-card">
-            <h2>What you will get</h2>
+            <h2>What you get</h2>
             <ul>
-              <li>A dated notice message.</li>
-              <li>A simple summary for records.</li>
-              <li>A private record for this issue.</li>
+              <li>Dated notice text.</li>
+              <li>Simple record summary.</li>
+              <li>Private issue record.</li>
             </ul>
           </div>
           <div className="intro-card">
             <h2>Privacy first</h2>
             <ul>
               <li>No names or unit numbers.</li>
-              <li>Evidence is private by default.</li>
-              <li>Share only with neighbors.</li>
+              <li>Evidence stays private.</li>
+              <li>Share with neighbors only.</li>
             </ul>
           </div>
         </div>
@@ -776,7 +776,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <section className="panel" id="builder">
             <div className="step-header">
               <h2>Build your notice</h2>
-              <p className="helper">Start with the basics and move step by step.</p>
+              <p className="helper">Start with basics. Go step by step.</p>
               <div className="step-meta">
                 <div className="step-progress">
                   <div className="step-progress-row">
@@ -796,7 +796,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </div>
                 <div className="step-privacy">
                   <p className="helper privacy-reminder">
-                    Privacy reminder: Do not include names or unit numbers. Use general areas only.
+                    No names or unit numbers. Use general areas.
                   </p>
                   <p className="helper step-now">Now: {currentStepInfo.label}</p>
                 </div>
@@ -827,19 +827,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               <p className="helper">{steps[currentStep - 1].description}</p>
               <p className="helper step-requirement-note">
                 {stepRequirementLabel === "Optional"
-                  ? "This step is optional. You can skip it."
+                  ? "Optional. You can skip this."
                   : stepRequirementLabel === "Review"
-                    ? "Use this step to review and save."
-                    : "This step is required to build the notice."}
+                    ? "Review and save here."
+                    : "Required to build the notice."}
               </p>
 
               <form className="form-grid">
                 <Tabs.Panel value="1">
-                  <div className="form-section">
-                    <div className="form-section-header">
-                      <h3>Building basics</h3>
-                      <p className="helper">Choose the building and issue type.</p>
-                    </div>
+                    <div className="form-section">
+                      <div className="form-section-header">
+                        <h3>Building basics</h3>
+                        <p className="helper">Choose building and issue.</p>
+                      </div>
                     <label>
                       Building
                       <Select.Root
@@ -889,7 +889,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     <div className="issue-gallery">
                       <div>
                         <h3 id="issue-gallery-title">Issue gallery</h3>
-                        <p className="helper">Select one issue type to unlock the notice templates.</p>
+                        <p className="helper">Pick one issue to unlock templates.</p>
                       </div>
                       <RadioGroup.Root
                         className="issue-grid"
@@ -923,10 +923,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Location and stage</h3>
-                      <p className="helper">Optional location and required notice stage.</p>
+                      <p className="helper">Optional location. Stage required.</p>
                     </div>
                     <label>
-                      Issue location zone (optional)
+                      Location zone (optional)
                       <Select.Root value={formState.zone || null} onValueChange={updateSelect("zone")}>
                         <Select.Trigger className="select-trigger" aria-label="Issue location zone">
                           <Select.Value placeholder="Select zone" />
@@ -949,12 +949,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           </Select.Positioner>
                         </Select.Portal>
                       </Select.Root>
-                      <p className="helper">Choose a general area only. Do not enter unit numbers.</p>
+                      <p className="helper">General area only. No unit numbers.</p>
                     </label>
 
                     <fieldset className="stage-selector">
                       <legend>Notice stage</legend>
-                      <p className="helper">Most people start with Stage A.</p>
+                      <p className="helper">Start with Stage A.</p>
                       <RadioGroup.Root
                         className="stage-options"
                         aria-label="Notice stage"
@@ -989,16 +989,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </Tabs.Panel>
 
                 <Tabs.Panel value="2">
-                  <p className="helper">All fields in this step are optional. Add short facts only.</p>
+                  <p className="helper">Optional. Add short facts only.</p>
                   {issueFields.length === 0 && (
-                    <p className="helper">Select an issue to reveal the specific details to include.</p>
+                    <p className="helper">Select an issue to see detail fields.</p>
                   )}
                   {issueFields.length > 0 && (
                     <>
                       <div className="form-section">
                         <div className="form-section-header">
                           <h3>Issue facts</h3>
-                          <p className="helper">Optional details. Keep each note short.</p>
+                          <p className="helper">Optional. Keep notes short.</p>
                         </div>
                         {issueFields.filter((fieldKey) => fieldKey !== "attachment").length > 0 ? (
                           issueFields.filter((fieldKey) => fieldKey !== "attachment").map((fieldKey) =>
@@ -1010,10 +1010,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       </div>
                       {issueFields.filter((fieldKey) => fieldKey === "attachment").length > 0 && (
                         <div className="form-section">
-                          <div className="form-section-header">
-                            <h3>Evidence note</h3>
-                            <p className="helper">Optional. Evidence stays private.</p>
-                          </div>
+                        <div className="form-section-header">
+                          <h3>Evidence note</h3>
+                          <p className="helper">Optional. Evidence stays private.</p>
+                        </div>
                           {issueFields
                             .filter((fieldKey) => fieldKey === "attachment")
                             .map((fieldKey) => renderDetailField(fieldKey as keyof typeof fieldDefinitions))}
@@ -1027,7 +1027,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Language and style</h3>
-                      <p className="helper">Choose a language and reading level.</p>
+                      <p className="helper">Choose language and reading level.</p>
                     </div>
                     <label>
                       Language
@@ -1092,7 +1092,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Key dates</h3>
-                      <p className="helper">Check that the dates look right.</p>
+                      <p className="helper">Check the dates.</p>
                     </div>
                     <label>
                       Start date
@@ -1106,7 +1106,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
                     {(formState.stage === "B" || formState.stage === "C") && (
                       <label>
-                        Date of first message (for follow-ups)
+                        First message date (for follow-ups)
                         <Input
                           className="input"
                           type="date"
@@ -1132,8 +1132,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
                 <Tabs.Panel value="4">
                   <p className="helper">
-                    Review the preview. Copy the text and save it for your records. Dates and repeated reports help
-                    most.
+                    Review the preview. Copy and save. Dates and repeats help.
                   </p>
                 </Tabs.Panel>
               </form>
@@ -1158,17 +1157,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               </Button>
             </div>
             {currentStep === 1 && !isStep1Complete && (
-              <p className="helper">Choose a building and issue to continue.</p>
+              <p className="helper">Choose a building and issue.</p>
             )}
           </section>
 
           <section className="panel">
             <h2>Issue timeline</h2>
             {!canShowAfterBasics ? (
-              <p className="helper">Finish step 1 to unlock the timeline, plan, and next steps.</p>
+              <p className="helper">Finish step 1 to unlock timeline and next steps.</p>
             ) : (
               <>
-                <p className="helper">Read-only record of key dates for this issue.</p>
+                <p className="helper">Read-only record of key dates.</p>
                 {timelineEntries.length > 0 ? (
                   <ul className="timeline">
                     {timelineEntries.map((entry) => (
@@ -1184,7 +1183,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
                 {issueGuidance && (
                   <details className="helper-card">
-                    <summary>Calling 311 for this issue</summary>
+                    <summary>311 call info</summary>
                     <div className="helper-card-body">
                       <p>
                         <strong>Category to choose:</strong> {issueGuidance.category}
@@ -1203,7 +1202,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <details className="helper-card">
                     <summary>Local rules (information only)</summary>
                     <div className="helper-card-body">
-                      <p className="helper">Short source list for Chicago and Cook County. This is not legal advice.</p>
+                      <p className="helper">Short source list for Chicago and Cook County. Not legal advice.</p>
                       <ul className="rule-sources">
                         {ruleSources.map((source) => (
                           <li key={source.url}>
@@ -1218,7 +1217,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 )}
 
                 <h2>What usually happens next</h2>
-                <p className="helper">This shows the normal next step based on how long the issue has been open.</p>
+                <p className="helper">Shows the normal next step by days open.</p>
                 <ul className="next-steps">
                   {nextSteps.map((step) => (
                     <li key={step.label} className={step.unlocked ? "" : "locked"}>
@@ -1232,7 +1231,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           <p className="helper">Reminder date: {step.reminderDateLabel}</p>
                           <p className="helper">
                         {step.unlocked
-                          ? `Unlocked because the issue has been open for ${daysOpen} days.`
+                          ? `Unlocked at ${daysOpen} days open.`
                           : `Unlocks after ${step.unlockDay} days open.`}
                       </p>
                     </div>
@@ -1248,7 +1247,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         }
                       }}
                     >
-                      Add reminder to Google Calendar
+                      Add Google Calendar reminder
                     </a>
                   </div>
                 </li>
@@ -1262,7 +1261,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     <div>
                       <p className="impact-label">Total reports</p>
                       <p className="impact-hint">
-                        Reports start at 1. Use “Me too” on an existing issue to add your report.
+                        Reports start at 1. Use “Me too” to add yours.
                       </p>
                     </div>
                   </div>
@@ -1311,7 +1310,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <section className="preview-section">
             <div className="summary-header">
               <h3>Notice summary</h3>
-              <p className="helper">Check the key facts before you share.</p>
+              <p className="helper">Check key facts before sharing.</p>
             </div>
             <div className="summary-grid">
               {summaryItems.map((item) => (
@@ -1321,14 +1320,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </div>
               ))}
             </div>
-            <p className="helper">Privacy reminder: do not include names, unit numbers, or personal details.</p>
+            <p className="helper">Privacy reminder: no names, unit numbers, or personal details.</p>
           </section>
           <section className="preview-section">
             <div className="notice-preview">
               <div className="notice-preview-header">
                 <div>
                   <p className="notice-preview-title">Notice message</p>
-                  <p className="helper">Copy and send this text.</p>
+                  <p className="helper">Copy and send.</p>
                 </div>
                 <div className="notice-preview-tags">
                   <span className="notice-tag">{selectedIssue?.label || "Issue"}</span>
@@ -1348,8 +1347,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="export-header">
                     <div>
                       <h3>{selectedAudience.label} export</h3>
-                      <p className="helper">Choose who you are exporting for. The fields adjust automatically.</p>
-                      <p className="helper">This does not notify anyone. It only changes the summary text.</p>
+                      <p className="helper">Choose export audience. Fields adjust.</p>
+                      <p className="helper">This does not notify anyone. It changes the summary only.</p>
                     </div>
                     <div className="export-actions">
                       <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
@@ -1425,9 +1424,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="submission-block">
                     <div>
                       <h3>Save to the shared ledger</h3>
-                      <p className="helper">This saves a short summary. It does not save personal details.</p>
+                      <p className="helper">Saves a short summary. No personal details.</p>
                       {!buildingKey && (
-                        <p className="helper">Add your building key to the URL before saving. Your building organizer gives you the key.</p>
+                        <p className="helper">Add your building key to the URL to save. Your organizer provides it.</p>
                       )}
                       {!formState.building || !formState.issue ? (
                         <p className="helper">Choose a building and issue to enable saving.</p>
@@ -1465,7 +1464,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     )}
                     {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
                       <div className="submission-details">
-                        <p className="helper">Details saved:</p>
+                        <p className="helper">Saved details:</p>
                         <ul>
                           {savedMetaItems.map((item) => (
                             <li key={item.label}>
