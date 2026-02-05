@@ -892,6 +892,17 @@ code {
     gap: 10px;
   }
 
+  .step-controls {
+    position: sticky;
+    bottom: 12px;
+    z-index: 5;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e3e7f5;
+    padding: 10px;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  }
+
   .summary-grid,
   .building-grid {
     grid-template-columns: 1fr;
@@ -899,6 +910,13 @@ code {
 
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .input,
+  .select-trigger {
+    font-size: 1rem;
+    min-height: 48px;
+    padding: 12px 14px;
   }
 
   .issue-grid {
@@ -945,5 +963,16 @@ code {
   .issue-actions .button,
   .step-controls .button {
     width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .issue-grid,
+  .building-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
   }
 }

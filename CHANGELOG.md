@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.57 - 2026-02-04
+
+- Changed: Mobile layout now uses full-width actions, larger inputs, and clearer card spacing.
+
 ## 1.0.56 - 2026-02-04
 
 - Changed: Notice builder now locks later steps until basics are complete for a clearer flow.
