@@ -122,11 +122,6 @@
   align-items: start;
 }
 
-.flow {
-  display: grid;
-  gap: 24px;
-}
-
 .preview-panel {
   position: sticky;
   top: 24px;

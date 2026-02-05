@@ -707,13 +707,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         <div className="hero-main">
           <p className="eyebrow">Building Ledger</p>
           <h1>Tenant Notice Builder</h1>
-          <p className="tagline">Write a short notice in four steps.</p>
+          <p className="tagline">Build a short notice and a private record.</p>
           <div className="hero-actions">
             <a className="button hero-button" href="#builder">
-              Start step 1
+              Start with basics
             </a>
             <a className="button button-secondary hero-button" href="#preview">
               See preview
+            </a>
+            <a className="button button-secondary hero-button" href="#record">
+              Record & next steps
             </a>
           </div>
           <div className="tag-row">
@@ -729,16 +732,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <p className="helper">Pick building and issue.</p>
           </div>
           <div className="hero-step-card">
-            <p className="hero-step-title">2. Add facts</p>
-            <p className="helper">Short details only. No names.</p>
+            <p className="hero-step-title">2. Dates</p>
+            <p className="helper">Check dates and language.</p>
           </div>
           <div className="hero-step-card">
-            <p className="hero-step-title">3. Check dates</p>
-            <p className="helper">Confirm dates.</p>
+            <p className="hero-step-title">3. Add facts</p>
+            <p className="helper">Optional short facts.</p>
           </div>
           <div className="hero-step-card">
-            <p className="hero-step-title">4. Copy & save</p>
-            <p className="helper">Save or share.</p>
+            <p className="hero-step-title">4. Review</p>
+            <p className="helper">Preview, save, and export.</p>
           </div>
         </div>
       </header>
@@ -749,7 +752,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <h2>What you do</h2>
             <ul>
               <li>Pick building and issue.</li>
-              <li>Add short facts and dates.</li>
+              <li>Set dates and language.</li>
+              <li>Add short facts if needed.</li>
               <li>Review the preview.</li>
             </ul>
           </div>
@@ -772,8 +776,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         </div>
       </section>
 
-      <main className="layout" id="main">
-        <div className="flow">
+      <main id="main">
+        <div className="layout">
           <section className="panel" id="builder">
             <div className="step-header">
               <h2>Build your notice</h2>
@@ -1001,41 +1005,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </Tabs.Panel>
 
                 <Tabs.Panel value="2">
-                  <p className="helper">Optional. Add short facts only.</p>
-                  {issueFields.length === 0 && (
-                    <p className="helper">Select an issue to see detail fields.</p>
-                  )}
-                  {issueFields.length > 0 && (
-                    <>
-                      <div className="form-section">
-                        <div className="form-section-header">
-                          <h3>Issue facts</h3>
-                          <p className="helper">Optional. Keep notes short.</p>
-                        </div>
-                        {issueFields.filter((fieldKey) => fieldKey !== "attachment").length > 0 ? (
-                          issueFields.filter((fieldKey) => fieldKey !== "attachment").map((fieldKey) =>
-                            renderDetailField(fieldKey as keyof typeof fieldDefinitions)
-                          )
-                        ) : (
-                          <p className="helper">No extra facts are needed for this issue.</p>
-                        )}
-                      </div>
-                      {issueFields.filter((fieldKey) => fieldKey === "attachment").length > 0 && (
-                        <div className="form-section">
-                        <div className="form-section-header">
-                          <h3>Evidence note</h3>
-                          <p className="helper">Optional. Evidence stays private.</p>
-                        </div>
-                          {issueFields
-                            .filter((fieldKey) => fieldKey === "attachment")
-                            .map((fieldKey) => renderDetailField(fieldKey as keyof typeof fieldDefinitions))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </Tabs.Panel>
-
-                <Tabs.Panel value="3">
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Language and style</h3>
@@ -1142,6 +1111,41 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
                 </Tabs.Panel>
 
+                <Tabs.Panel value="3">
+                  <p className="helper">Optional. Add short facts and evidence notes.</p>
+                  {issueFields.length === 0 && (
+                    <p className="helper">Select an issue to see detail fields.</p>
+                  )}
+                  {issueFields.length > 0 && (
+                    <>
+                      <div className="form-section">
+                        <div className="form-section-header">
+                          <h3>Issue facts</h3>
+                          <p className="helper">Optional. Keep notes short.</p>
+                        </div>
+                        {issueFields.filter((fieldKey) => fieldKey !== "attachment").length > 0 ? (
+                          issueFields.filter((fieldKey) => fieldKey !== "attachment").map((fieldKey) =>
+                            renderDetailField(fieldKey as keyof typeof fieldDefinitions)
+                          )
+                        ) : (
+                          <p className="helper">No extra facts are needed for this issue.</p>
+                        )}
+                      </div>
+                      {issueFields.filter((fieldKey) => fieldKey === "attachment").length > 0 && (
+                        <div className="form-section">
+                          <div className="form-section-header">
+                            <h3>Evidence note</h3>
+                            <p className="helper">Optional. Evidence stays private.</p>
+                          </div>
+                          {issueFields
+                            .filter((fieldKey) => fieldKey === "attachment")
+                            .map((fieldKey) => renderDetailField(fieldKey as keyof typeof fieldDefinitions))}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </Tabs.Panel>
+
                 <Tabs.Panel value="4">
                   <p className="helper">
                     Review the preview. Copy and save. Dates and repeats help.
@@ -1172,118 +1176,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               <p className="helper">Choose a building and issue.</p>
             )}
           </section>
-
-          <section className="panel">
-            <h2>Issue timeline</h2>
-            {!canShowAfterBasics ? (
-              <p className="helper">Finish step 1 to unlock timeline and next steps.</p>
-            ) : (
-              <>
-                <p className="helper">Read-only record of key dates.</p>
-                {timelineEntries.length > 0 ? (
-                  <ul className="timeline">
-                    {timelineEntries.map((entry) => (
-                      <li key={`${entry.label}-${entry.date}`}>
-                        <p className="timeline-date">{formatTimelineDate(entry.date)}</p>
-                        <p className="timeline-label">{entry.label}</p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="helper">Add a date above to show the timeline.</p>
-                )}
-
-                {issueGuidance && (
-                  <details className="helper-card">
-                    <summary>311 call info</summary>
-                    <div className="helper-card-body">
-                      <p>
-                        <strong>Category to choose:</strong> {issueGuidance.category}
-                      </p>
-                      <p>
-                        <strong>What to say:</strong> {guidanceScript}
-                      </p>
-                      <p>
-                        <strong>What happens next:</strong> {issueGuidance.nextStep}
-                      </p>
-                    </div>
-                  </details>
-                )}
-
-                {ruleSources.length > 0 && (
-                  <details className="helper-card">
-                    <summary>Local rules (information only)</summary>
-                    <div className="helper-card-body">
-                      <p className="helper">Short source list for Chicago and Cook County. Not legal advice.</p>
-                      <ul className="rule-sources">
-                        {ruleSources.map((source) => (
-                          <li key={source.url}>
-                            <a href={source.url} target="_blank" rel="noreferrer">
-                              {source.title}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </details>
-                )}
-
-                <h2>What usually happens next</h2>
-                <p className="helper">Shows the normal next step by days open.</p>
-                <ul className="next-steps">
-                  {nextSteps.map((step) => (
-                    <li key={step.label} className={step.unlocked ? "" : "locked"}>
-                      <div className="next-step-row">
-                        <div>
-                          <p className="next-step-title">
-                            {step.unlocked
-                              ? step.label
-                              : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
-                          </p>
-                          <p className="helper">Reminder date: {step.reminderDateLabel}</p>
-                          <p className="helper">
-                        {step.unlocked
-                          ? `Unlocked at ${daysOpen} days open.`
-                          : `Unlocks after ${step.unlockDay} days open.`}
-                      </p>
-                    </div>
-                    <a
-                      className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
-                      href={step.calendarLink || "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-disabled={!step.calendarLink}
-                      onClick={(event) => {
-                        if (!step.calendarLink) {
-                          event.preventDefault();
-                        }
-                      }}
-                    >
-                      Add Google Calendar reminder
-                    </a>
-                  </div>
-                </li>
-              ))}
-                </ul>
-
-                <h3>Community impact</h3>
-                <div className="impact">
-                  <div className="impact-summary">
-                    <p className="impact-count">{impactCount}</p>
-                    <div>
-                      <p className="impact-label">Total reports</p>
-                      <p className="impact-hint">
-                        Reports start at 1. Use “Me too” to add yours.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </section>
-        </div>
-
-        <aside className="panel panel-highlight preview-panel" id="preview">
+          <aside className="panel panel-highlight preview-panel" id="preview">
           <div className="output-header">
             <h2>Generated notice</h2>
             <div className="output-actions">
@@ -1514,7 +1407,129 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               )}
             </div>
           </section>
-        </aside>
+          </aside>
+        </div>
+
+        <section className="panel panel-highlight record-panel" id="record">
+          <div>
+            <h2>Record and next steps</h2>
+            <p className="helper">Use this after you send the notice.</p>
+          </div>
+          {!canShowAfterBasics ? (
+            <p className="helper">Finish step 1 to unlock the record and next steps.</p>
+          ) : (
+            <>
+              <div>
+                <h3>Issue timeline</h3>
+                <p className="helper">Read-only record of key dates.</p>
+                {timelineEntries.length > 0 ? (
+                  <ul className="timeline">
+                    {timelineEntries.map((entry) => (
+                      <li key={`${entry.label}-${entry.date}`}>
+                        <p className="timeline-date">{formatTimelineDate(entry.date)}</p>
+                        <p className="timeline-label">{entry.label}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="helper">Add a date above to show the timeline.</p>
+                )}
+              </div>
+
+              <div>
+                <h3>What usually happens next</h3>
+                <p className="helper">Shows the normal next step by days open.</p>
+                <ul className="next-steps">
+                  {nextSteps.map((step) => (
+                    <li key={step.label} className={step.unlocked ? "" : "locked"}>
+                      <div className="next-step-row">
+                        <div>
+                          <p className="next-step-title">
+                            {step.unlocked
+                              ? step.label
+                              : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
+                          </p>
+                          <p className="helper">Reminder date: {step.reminderDateLabel}</p>
+                          <p className="helper">
+                            {step.unlocked
+                              ? `Unlocked at ${daysOpen} days open.`
+                              : `Unlocks after ${step.unlockDay} days open.`}
+                          </p>
+                        </div>
+                        <a
+                          className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
+                          href={step.calendarLink || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-disabled={!step.calendarLink}
+                          onClick={(event) => {
+                            if (!step.calendarLink) {
+                              event.preventDefault();
+                            }
+                          }}
+                        >
+                          Add Google Calendar reminder
+                        </a>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3>Community impact</h3>
+                <div className="impact">
+                  <div className="impact-summary">
+                    <p className="impact-count">{impactCount}</p>
+                    <div>
+                      <p className="impact-label">Total reports</p>
+                      <p className="impact-hint">Reports start at 1. Use “Me too” to add yours.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3>Help and sources</h3>
+                <p className="helper">Information only. Not legal advice.</p>
+                {issueGuidance && (
+                  <details className="helper-card">
+                    <summary>311 call info</summary>
+                    <div className="helper-card-body">
+                      <p>
+                        <strong>Category to choose:</strong> {issueGuidance.category}
+                      </p>
+                      <p>
+                        <strong>What to say:</strong> {guidanceScript}
+                      </p>
+                      <p>
+                        <strong>What happens next:</strong> {issueGuidance.nextStep}
+                      </p>
+                    </div>
+                  </details>
+                )}
+
+                {ruleSources.length > 0 && (
+                  <details className="helper-card">
+                    <summary>Local rules (information only)</summary>
+                    <div className="helper-card-body">
+                      <p className="helper">Short source list for Chicago and Cook County.</p>
+                      <ul className="rule-sources">
+                        {ruleSources.map((source) => (
+                          <li key={source.url}>
+                            <a href={source.url} target="_blank" rel="noreferrer">
+                              {source.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </details>
+                )}
+              </div>
+            </>
+          )}
+        </section>
       </main>
 
       <WaitlistPanel />

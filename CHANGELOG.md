@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.58 - 2026-02-04
+
+- Changed: Notice builder flow now confirms dates before optional facts and moves record/next steps into a dedicated section.
+
 ## 1.0.57 - 2026-02-04
 
 - Changed: Mobile layout now uses full-width actions, larger inputs, and clearer card spacing.
