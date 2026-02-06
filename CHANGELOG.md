@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.59 - 2026-02-06
+
+- Changed: Upgraded core stack versions to Astro 5, Cloudflare adapter 12, React 19, TypeScript 5.9, and Wrangler 4.
+- Changed: Updated React type packages to 19.x to match the runtime upgrade.
+
 ## 1.0.58 - 2026-02-04
 
 - Changed: Notice builder flow now confirms dates before optional facts and moves record/next steps into a dedicated section.
