@@ -192,6 +192,7 @@ For the longer-form product vision, see [docs/vision.md](docs/vision.md).
 
 For a deeper overview of routes, data flow, and storage, see [docs/architecture.md](docs/architecture.md).
 For the modernization roadmap, see [docs/modernization-plan.md](docs/modernization-plan.md).
+For stack upgrade research notes, see [docs/tech-stack-capability-research-2026-02.md](docs/tech-stack-capability-research-2026-02.md).
 
 ---
 
