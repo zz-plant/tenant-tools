@@ -300,7 +300,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           simpleEnglish: true,
           autoDates: true,
           today: formattedToday,
-          startDate: prev.startDate || formattedToday,
+          startDate: formattedToday,
           firstMessageDate: "",
         };
       }
@@ -312,8 +312,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           simpleEnglish: true,
           autoDates: true,
           today: formattedToday,
-          startDate: prev.startDate || followUpDate,
-          firstMessageDate: prev.firstMessageDate || followUpDate,
+          startDate: followUpDate,
+          firstMessageDate: followUpDate,
         };
       }
 
@@ -323,8 +323,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         simpleEnglish: true,
         autoDates: true,
         today: formattedToday,
-        startDate: prev.startDate || finalReminderDate,
-        firstMessageDate: prev.firstMessageDate || finalReminderDate,
+        startDate: finalReminderDate,
+        firstMessageDate: finalReminderDate,
       };
     });
 
