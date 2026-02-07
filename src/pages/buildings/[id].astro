@@ -129,15 +129,15 @@ const totalFiltered = filtered.length;
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Open</p>
-                  <p class="summary-value">{grouped.open.length}</p>
+                  <p class="summary-value" data-summary-count="open">{grouped.open.length}</p>
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">{statusLabels.resolved}</p>
-                  <p class="summary-value">{grouped.resolved.length}</p>
+                  <p class="summary-value" data-summary-count="resolved">{grouped.resolved.length}</p>
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Archived</p>
-                  <p class="summary-value">{grouped.archived.length}</p>
+                  <p class="summary-value" data-summary-count="archived">{grouped.archived.length}</p>
                 </div>
               </div>
 
@@ -151,16 +151,16 @@ const totalFiltered = filtered.length;
                 <p class="helper">No submissions match these filters.</p>
               ) : (
                 statusIds.map((status) => (
-                  <section class="status-group">
+                  <section class="status-group" data-status-group={status}>
                     <div class="status-header">
                       <h3>{statusLabels[status]}</h3>
-                      <span class="status-pill">{grouped[status].length}</span>
+                      <span class="status-pill" data-status-count={status}>{grouped[status].length}</span>
                     </div>
                     {grouped[status].length === 0 ? (
                       <p class="helper">No submissions in this status.</p>
                     ) : (
                       grouped[status].map((record) => (
-                        <article class="issue-card" data-submission-id={record.id}>
+                        <article class="issue-card" data-submission-id={record.id} data-current-status={record.status}>
                           <div>
                             <p class="issue-title">{record.issueLabel}</p>
                             <p class="issue-meta">
@@ -305,9 +305,10 @@ const totalFiltered = filtered.length;
 
     {hasAccess && kv && (
       <>
-        <script define:vars={{ stewardKey }}>
+        <script define:vars={{ stewardKey, isSteward }}>
           window.__BUILDING_DASHBOARD__ = {
             stewardKey: stewardKey || "",
+            isSteward,
           };
         </script>
         <script type="module" src={Astro.resolve("../../scripts/buildingDashboard.ts")}></script>
