@@ -33,7 +33,7 @@ const updateStatusCounts = () => {
     const group = document.querySelector(`[data-status-group="${status}"]`) as HTMLElement | null;
     if (!group) return;
 
-    const cards = group.querySelectorAll("[data-submission-id]").length;
+    const cards = group.querySelectorAll("[data-current-status][data-submission-id]").length;
 
     const groupCounter = group.querySelector(`[data-status-count="${status}"]`) as HTMLElement | null;
     if (groupCounter) {
@@ -48,14 +48,14 @@ const updateStatusCounts = () => {
 };
 
 const moveCardToStatusGroup = (id: string, nextStatus: SubmissionStatus) => {
-  const card = document.querySelector(`[data-submission-id="${id}"]`) as HTMLElement | null;
+  const card = document.querySelector(`[data-current-status][data-submission-id="${id}"]`) as HTMLElement | null;
   const targetGroup = document.querySelector(`[data-status-group="${nextStatus}"]`) as HTMLElement | null;
   if (!card || !targetGroup) {
     updateStatusCounts();
     return;
   }
 
-  const firstCard = targetGroup.querySelector("[data-submission-id]");
+  const firstCard = targetGroup.querySelector("[data-current-status][data-submission-id]");
   if (firstCard) {
     targetGroup.insertBefore(card, firstCard);
   } else {
@@ -108,7 +108,7 @@ document.querySelectorAll("[data-status-save]").forEach((button) => {
     const select = document.querySelector(`[data-status-select][data-submission-id="${id}"]`) as HTMLSelectElement | null;
     const note = document.querySelector(`[data-status-note="${id}"]`) as HTMLElement | null;
     const nextStatus = select?.value as SubmissionStatus | undefined;
-    const currentCard = document.querySelector(`[data-submission-id="${id}"]`) as HTMLElement | null;
+    const currentCard = document.querySelector(`[data-current-status][data-submission-id="${id}"]`) as HTMLElement | null;
     const currentStatus = currentCard?.dataset.currentStatus as SubmissionStatus | undefined;
 
     if (!nextStatus) return;
