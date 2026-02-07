@@ -1,13 +1,13 @@
 # Building Ledger
 
-**Shared issue tracking for tenants.**
+**Shared issue tracking for residents.**
 
-Building Ledger is a lightweight web app that helps residents log building issues, quietly coordinate with neighbors, and generate clear written notices that create timelines and records.
+Building Ledger is a lightweight web app. It helps residents log building issues, coordinate with neighbors, and generate clear repair notices with dates.
 
 It is designed for:
 - first-time renters
 - immigrants / ESL tenants
-- residents under stress who need structure more than expression
+- residents under stress who need structure
 
 ---
 
@@ -15,16 +15,16 @@ It is designed for:
 
 Building Ledger helps residents:
 
-- Log building issues with minimal input (issue type + start date)
-- Add themselves to an issue without writing (“me too”)
-- Upload evidence once and attach it to the issue
+- Log issues with minimal input (issue type + start date)
+- Join an issue without writing ("me too")
+- Upload evidence and attach it to the issue
 - See how long an issue has been open
 - See when an issue affects multiple residents
-- Generate neutral, copy-pasteable repair notices
-- Send follow-ups without rewriting messages
+- Generate neutral repair notices
+- Send follow-ups without rewriting
 - Export summaries for inspectors or legal aid
 
-The tool focuses on **facts, dates, repetition, and aggregation**.
+The tool focuses on **facts, dates, and patterns across reports**.
 
 ---
 
@@ -32,32 +32,32 @@ The tool focuses on **facts, dates, repetition, and aggregation**.
 
 By design, Building Ledger does **not**:
 
-- Host discussions or comment threads
+- Host discussion threads
 - Allow long free-text complaints
-- Encourage public callouts or naming individuals
-- Require users to know legal language
+- Encourage naming people
+- Require legal language
 - Replace legal advice or tenant organizations
 
-Constraints are intentional.
+These limits are intentional.
 
 ---
 
 ## Core design principles
 
 - **Structure over tone**  
-  Users should not have to “sound official.” The app provides the structure.
+  Users should not need to "sound official." The app provides structure.
 
 - **Facts only, by default**  
-  Emotional language is valid but weakens records. The UI limits it.
+  The interface keeps entries short and factual.
 
 - **Aggregation over escalation**  
-  Patterns matter more than severity. “Me too” is a primary action.
+  Patterns matter more than a single report. "Me too" is a primary action.
 
 - **Time matters**  
-  The interface makes duration visible and unlocks next steps based on time.
+  The interface shows duration and unlocks next steps over time.
 
 - **Safety first**  
-  Participation is anonymous by default. Sharing is controlled.
+  Participation is anonymous by default. Sharing is limited.
 
 ---
 
@@ -104,7 +104,7 @@ No public write access.
 - No evidence access
 - Aggregated counts only
 
-Public mode is opt-in and constrained to reduce risk.
+Public mode is optional and restricted to reduce risk.
 
 ---
 
@@ -113,13 +113,13 @@ Public mode is opt-in and constrained to reduce risk.
 Building Ledger is meant to:
 - reduce confusion
 - reduce isolation
-- reduce self-sabotage
+- support consistent reporting
 - make timelines visible
 
 It is not meant to:
 - shame
 - threaten
-- perform outrage
+- drive outrage
 - replace collective organizing
 
 ---
@@ -129,9 +129,9 @@ It is not meant to:
 If you contribute:
 
 - Prefer clarity over cleverness
-- Prefer boring over expressive
+- Prefer simple language over expressive language
 - Prefer safety over exposure
-- Optimize for tired users on bad days
+- Optimize for tired users on hard days
 
 Features that increase risk for vulnerable users will be rejected.
 
