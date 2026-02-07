@@ -48,7 +48,7 @@ const initialState = {
   exportStatus: "open",
   language: "en",
   portfolio: "continuum",
-  simpleEnglish: false,
+  simpleEnglish: true,
   autoDates: true,
   startDate: "",
   firstMessageDate: "",
@@ -70,6 +70,7 @@ const initialState = {
 };
 
 type FormState = typeof initialState;
+type QuickStartPreset = "first_notice" | "follow_up" | "final_reminder";
 
 const detailEntries = Object.entries(fieldDefinitions);
 
@@ -138,6 +139,22 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const isNoticeReady = missingBasics.length === 0;
   const noticeReadinessTitle = isNoticeReady ? "Notice ready" : "Finish the basics";
   const canSaveLedger = Boolean(formState.building && formState.issue && buildingKey);
+  const canFastTrack = Boolean(formState.building && formState.issue);
+
+  const quickStartSummary: Record<QuickStartPreset, { title: string; description: string }> = {
+    first_notice: {
+      title: "First notice",
+      description: "New issue. Fast default.",
+    },
+    follow_up: {
+      title: "Follow-up",
+      description: "After first notice.",
+    },
+    final_reminder: {
+      title: "Final reminder",
+      description: "After follow-up.",
+    },
+  };
 
   const renderDetailField = (fieldKey: keyof typeof fieldDefinitions) => {
     const field = fieldDefinitions[fieldKey];
@@ -244,6 +261,77 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       }
       return { ...prev, [fieldKey]: `${current}, ${tag}` };
     });
+  };
+
+  const handleFastTrackToPreview = () => {
+    if (!formState.building || !formState.issue) {
+      setNoticeStatusMessage("Choose building and issue first.");
+      scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
+      return;
+    }
+
+    const today = new Date();
+    const formattedToday = formatDate(today);
+    setFormState((prev) => ({
+      ...prev,
+      stage: prev.stage || "A",
+      simpleEnglish: true,
+      autoDates: true,
+      today: prev.today || formattedToday,
+      startDate: prev.startDate || formattedToday,
+      time: prev.time || getCurrentTime(today),
+    }));
+    setCurrentStep(4);
+    setNoticeStatusMessage("Preview ready. Review and copy.");
+    scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
+  };
+
+  const handleQuickStart = (preset: QuickStartPreset) => {
+    const today = new Date();
+    const formattedToday = formatDate(today);
+    const followUpDate = formatDate(addDays(today, -3));
+    const finalReminderDate = formatDate(addDays(today, -6));
+
+    setFormState((prev) => {
+      if (preset === "first_notice") {
+        return {
+          ...prev,
+          stage: "A",
+          simpleEnglish: true,
+          autoDates: true,
+          today: formattedToday,
+          startDate: prev.startDate || formattedToday,
+          firstMessageDate: "",
+        };
+      }
+
+      if (preset === "follow_up") {
+        return {
+          ...prev,
+          stage: "B",
+          simpleEnglish: true,
+          autoDates: true,
+          today: formattedToday,
+          startDate: prev.startDate || followUpDate,
+          firstMessageDate: prev.firstMessageDate || followUpDate,
+        };
+      }
+
+      return {
+        ...prev,
+        stage: "C",
+        simpleEnglish: true,
+        autoDates: true,
+        today: formattedToday,
+        startDate: prev.startDate || finalReminderDate,
+        firstMessageDate: prev.firstMessageDate || finalReminderDate,
+      };
+    });
+
+    setCurrentStep((prev) => (prev < 2 ? 2 : prev));
+    const presetTitle = quickStartSummary[preset].title;
+    setNoticeStatusMessage(`${presetTitle} mode is ready. Continue with basics.`);
+    scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
   };
 
   const selectedIssue = issueOptions.find((option) => option.id === formState.issue);
@@ -689,6 +777,25 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     return Array.from(sourceMap, ([url, title]) => ({ url, title }));
   }, [ruleCards]);
 
+  const guidedAction = useMemo(() => {
+    if (!formState.building) {
+      return { label: "Choose building", step: 1 };
+    }
+    if (!formState.issue) {
+      return { label: "Choose issue", step: 1 };
+    }
+    if (currentStep < steps.length) {
+      return { label: `Step ${currentStep + 1}`, step: currentStep + 1 };
+    }
+    return { label: "Review + copy", step: 4 };
+  }, [currentStep, formState.building, formState.issue]);
+
+  const basicsChecklist = [
+    { label: "Building selected", done: Boolean(formState.building) },
+    { label: "Issue selected", done: Boolean(formState.issue) },
+    { label: "Simple English on", done: formState.simpleEnglish },
+  ];
+
   return (
     <div className="page">
       <a className="skip-link" href="#main">
@@ -698,16 +805,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         <div className="hero-main">
           <p className="eyebrow">Building Ledger</p>
           <h1>Tenant Notice Builder</h1>
-          <p className="tagline">Build a short notice and a private record.</p>
+          <p className="tagline">Make a notice fast.</p>
           <div className="hero-actions">
             <a className="button hero-button" href="#builder">
-              Start with basics
+              Start
             </a>
             <a className="button button-secondary hero-button" href="#preview">
-              See preview
+              Preview
             </a>
             <a className="button button-secondary hero-button" href="#record">
-              Record & next steps
+              Next steps
             </a>
           </div>
           <div className="tag-row">
@@ -736,36 +843,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           </div>
         </div>
       </header>
-
-      <section className="panel panel-highlight intro-panel">
-        <div className="intro-grid">
-          <div className="intro-card">
-            <h2>What you do</h2>
-            <ul>
-              <li>Pick building and issue.</li>
-              <li>Set dates and language.</li>
-              <li>Add short facts if needed.</li>
-              <li>Review the preview.</li>
-            </ul>
-          </div>
-          <div className="intro-card">
-            <h2>What you get</h2>
-            <ul>
-              <li>Dated notice text.</li>
-              <li>Simple record summary.</li>
-              <li>Private issue record.</li>
-            </ul>
-          </div>
-          <div className="intro-card">
-            <h2>Privacy first</h2>
-            <ul>
-              <li>No names or unit numbers.</li>
-              <li>Evidence stays private.</li>
-              <li>Share with neighbors only.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
 
       <main id="main">
         <div className="layout">
@@ -828,7 +905,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 })}
               </Tabs.List>
               {stepsLocked && (
-                <p className="helper">Finish step 1 to unlock the remaining steps.</p>
+                <p className="helper">Finish step 1 to continue.</p>
               )}
 
               <form className="form-grid">
@@ -836,6 +913,50 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Building basics</h3>
+                      <p className="helper">Quick start</p>
+                    </div>
+                    <div className="quick-start-grid" aria-label="Quick start options">
+                      {(Object.keys(quickStartSummary) as QuickStartPreset[]).map((preset) => {
+                        const option = quickStartSummary[preset];
+                        return (
+                          <button
+                            key={preset}
+                            type="button"
+                            className="quick-start-card"
+                            onClick={() => handleQuickStart(preset)}
+                          >
+                            <span className="quick-start-title">{option.title}</span>
+                            <span className="quick-start-description">{option.description}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="guided-action" role="status" aria-live="polite">
+                      <p className="guided-action-label">Next: {guidedAction.label}</p>
+                      <div className="guided-action-buttons">
+                        <Button
+                          className="button button-secondary"
+                          type="button"
+                          onClick={() => setCurrentStep(guidedAction.step)}
+                        >
+                          Go now
+                        </Button>
+                        <Button
+                          className="button"
+                          type="button"
+                          onClick={handleFastTrackToPreview}
+                          disabled={!canFastTrack}
+                        >
+                          Finish setup fast
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="basics-checklist" aria-label="Basics checklist">
+                      {basicsChecklist.map((item) => (
+                        <p key={item.label} className={`check-item ${item.done ? "done" : ""}`}>
+                          {item.done ? "✓" : "○"} {item.label}
+                        </p>
+                      ))}
                     </div>
                     <label>
                       Building
@@ -985,7 +1106,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Language and style</h3>
-                      <p className="helper">Choose language and reading level.</p>
+                      <p className="helper">Short language setup.</p>
                     </div>
                     <label>
                       Language
@@ -1050,7 +1171,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Key dates</h3>
-                      <p className="helper">Check the dates.</p>
+                      <p className="helper">Check dates.</p>
                     </div>
                     <label>
                       Start date
@@ -1089,7 +1210,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </Tabs.Panel>
 
                 <Tabs.Panel value="3">
-                  <p className="helper">Optional. Add short facts and evidence notes.</p>
+                  <p className="helper">Optional facts and evidence.</p>
                   {issueFields.length === 0 && (
                     <p className="helper">Select an issue to see detail fields.</p>
                   )}
@@ -1216,7 +1337,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <section className="preview-section">
             <div className="export-block">
               {!canShowAfterBasics ? (
-                <p className="helper">Finish step 1 to unlock exports and saving.</p>
+                <p className="helper">Finish step 1 for save/export.</p>
               ) : (
                 <>
                   <div className="export-header">
@@ -1382,7 +1503,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <p className="helper">Use this after you send the notice.</p>
           </div>
           {!canShowAfterBasics ? (
-            <p className="helper">Finish step 1 to unlock the record and next steps.</p>
+            <p className="helper">Finish step 1 for this section.</p>
           ) : (
             <>
               <div>

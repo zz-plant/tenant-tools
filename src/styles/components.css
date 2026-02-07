@@ -195,7 +195,8 @@
 .step-button:focus-visible,
 .building-card:focus-visible,
 .link-button:focus-visible,
-.preset-card:focus-visible {
+.preset-card:focus-visible,
+.quick-start-card:focus-visible {
   outline: 2px solid rgba(70, 90, 255, 0.35);
   outline-offset: 2px;
   border-color: #4f67ff;
@@ -234,6 +235,86 @@
 
 .step-requirement-note {
   margin-top: -6px;
+}
+
+
+.quick-start-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.quick-start-card {
+  border: 1px solid #d7dbe9;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: left;
+  display: grid;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.quick-start-card:hover {
+  border-color: #4f67ff;
+  background: #f5f7ff;
+}
+
+.quick-start-title {
+  font-weight: 600;
+  color: #1c2436;
+}
+
+.quick-start-description {
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.guided-action {
+  border: 1px solid #dce2f2;
+  border-radius: 12px;
+  background: #f7f9ff;
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guided-action-label {
+  margin: 0;
+  font-weight: 600;
+  color: #1c2436;
+}
+
+
+.guided-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.basics-checklist {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.check-item {
+  margin: 0;
+  border: 1px solid #dce2f2;
+  background: #fafbff;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.86rem;
+  color: #4b5563;
+}
+
+.check-item.done {
+  border-color: #c8dbca;
+  background: #f2fbf3;
+  color: #1f5130;
 }
 
 label {

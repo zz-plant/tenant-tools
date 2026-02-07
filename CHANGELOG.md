@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.62 - 2026-02-07
+
+- Changed: Removed the extra intro panel to reduce repeated guidance text.
+- Changed: Shortened quick-start, guided-action, and helper copy across the notice flow.
+- Changed: Simplified top hero labels to keep focus on core actions.
+
+## 1.0.61 - 2026-02-07
+
+- Added: One-click "Finish setup fast" action to jump from basics to preview with safe defaults.
+- Added: Basics checklist in step 1 so users can see required progress at a glance.
+- Changed: Very simple English now starts enabled by default to reduce setup decisions.
+- Changed: Step 1 guidance now groups actions to reduce scan time.
+
+## 1.0.60 - 2026-02-07
+
+- Added: Quick-start presets for first notice, follow-up, and final reminder to reduce setup effort.
+- Added: Guided "Next easiest step" action in step 1 to keep users moving through the flow.
+- Changed: Step 1 now includes clearer quick-start helper text and card styling for faster scanning.
+
 ## 1.0.59 - 2026-02-06
 
 - Changed: Upgraded core stack versions to Astro 5, Cloudflare adapter 12, React 19, TypeScript 5.9, and Wrangler 4.
