@@ -4,6 +4,7 @@ import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../../../lib/access";
 import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../../lib/http";
 import { saveReportEntry } from "../../../../lib/storage/reports";
+import type { SubmissionRecord } from "../../../../lib/submissions";
 import { fetchSubmissionRecord, getSubmissionsKv, saveSubmissionRecord } from "../../../../lib/storage/submissions";
 
 export const prerender = false;
@@ -47,13 +48,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     );
   }
 
-  const record = (await fetchSubmissionRecord(kv, id)) as
-    | {
-        id: string;
-        building: string;
-        reportCount: number;
-      }
-    | null;
+  const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
 
   if (!record) {
     return jsonError("Submission not found.", 404);
