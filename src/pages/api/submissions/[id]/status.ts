@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { isAccessKeyValid } from "../../../../lib/access";
 import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
-import { isValidSubmissionStatus, type SubmissionRecord } from "../../../../lib/submissions";
+import { isSubmissionRecord, isValidSubmissionStatus, type SubmissionRecord } from "../../../../lib/submissions";
 import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../../lib/http";
 import { fetchSubmissionRecord, getSubmissionsKv, saveSubmissionRecord } from "../../../../lib/storage/submissions";
 
@@ -47,7 +47,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   }
 
   const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
-  if (!record) {
+  if (!isSubmissionRecord(record)) {
     return jsonError("Submission not found.", 404);
   }
 

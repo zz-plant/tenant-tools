@@ -59,6 +59,15 @@ export type SubmissionRecord = SubmissionInput & {
   status: SubmissionStatus;
 };
 
+export const isSubmissionRecord = (value: unknown): value is SubmissionRecord => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const candidate = value as Partial<SubmissionRecord>;
+  return typeof candidate.id === "string" && candidate.id.length > 0;
+};
+
 export const isValidSubmissionStatus = (value: unknown): value is SubmissionStatus =>
   typeof value === "string" && allowedStatusSet.has(value);
 
