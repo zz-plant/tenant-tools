@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { isValidSubmissionStatus, normalizeSubmissionStatus } from "../src/lib/submissions";
+import { isSubmissionRecord, isValidSubmissionStatus, normalizeSubmissionStatus } from "../src/lib/submissions";
 
 describe("submission status helpers", () => {
   it("accepts valid statuses", () => {
@@ -17,4 +17,12 @@ describe("submission status helpers", () => {
   it("normalizes missing status to open", () => {
     assert.equal(normalizeSubmissionStatus(undefined), "open");
   });
+
+  it("validates runtime submission record shape", () => {
+    assert.equal(isSubmissionRecord({ id: "sub-1", status: "open" }), true);
+    assert.equal(isSubmissionRecord({ status: "open" }), false);
+    assert.equal(isSubmissionRecord("corrupt"), false);
+    assert.equal(isSubmissionRecord(123), false);
+  });
+
 });
