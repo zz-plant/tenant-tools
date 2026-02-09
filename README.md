@@ -85,6 +85,10 @@ The app can run without production KV, but shared data features require Cloudfla
 - `BUILDING_ACCESS_KEY` — fallback key when a building does not exist in `BUILDING_KEYS_JSON`
 - `STEWARD_KEY` — required for status updates and steward actions
 
+### SEO and sitemap
+
+- `SITE_URL` — full site origin used to build canonical URLs and sitemap entries (example: `https://app.example.org`)
+
 Example `BUILDING_KEYS_JSON`:
 
 ```json

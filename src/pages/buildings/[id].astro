@@ -4,6 +4,7 @@ import { issueOptions } from "../../data/noticeData";
 import { isAccessKeyValid, isBuildingAccessValid } from "../../lib/access";
 import { loadBuildingSubmissions, type BuildingSubmission } from "../../lib/buildingDashboard";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
+import SeoHead from "../../components/SeoHead.astro";
 
 export const prerender = false;
 
@@ -64,9 +65,12 @@ const totalFiltered = filtered.length;
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Building Dashboard | Building Ledger</title>
+    <SeoHead
+      title="Building dashboard | Building Ledger"
+      description="Private building dashboard for resident issue summaries."
+      canonicalPath={`/buildings/${encodeURIComponent(buildingId)}`}
+      noindex={true}
+    />
   </head>
   <body>
     <div class="page">

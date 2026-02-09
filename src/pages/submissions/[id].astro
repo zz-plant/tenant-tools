@@ -5,6 +5,7 @@ import { portfolioOptions } from "../../data/portfolioOptions";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../lib/access";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
+import SeoHead from "../../components/SeoHead.astro";
 
 export const prerender = false;
 
@@ -68,9 +69,12 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Submission | Tenant Notice Builder</title>
+    <SeoHead
+      title="Submission summary | Building Ledger"
+      description="Private resident submission summary with timeline and factual details."
+      canonicalPath={`/submissions/${encodeURIComponent(id ?? "")}`}
+      noindex={true}
+    />
   </head>
   <body>
     <div class="page">
