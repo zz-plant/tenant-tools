@@ -305,10 +305,11 @@ const totalFiltered = filtered.length;
 
     {hasAccess && kv && (
       <>
-        <script define:vars={{ stewardKey, isSteward }}>
+        <script define:vars={{ stewardKey, isSteward, accessKey }}>
           window.__BUILDING_DASHBOARD__ = {
             stewardKey: stewardKey || "",
             isSteward,
+            accessKey: accessKey || "",
           };
         </script>
         <script type="module" src={Astro.resolve("../../scripts/buildingDashboard.ts")}></script>

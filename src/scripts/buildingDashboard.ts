@@ -3,6 +3,7 @@ declare global {
     __BUILDING_DASHBOARD__?: {
       stewardKey?: string;
       isSteward?: boolean;
+      accessKey?: string;
     };
   }
 }
@@ -10,6 +11,7 @@ declare global {
 const dashboardConfig = window.__BUILDING_DASHBOARD__;
 const stewardKeyValue = dashboardConfig?.stewardKey ?? "";
 const isStewardMode = Boolean(dashboardConfig?.isSteward);
+const accessKeyValue = dashboardConfig?.accessKey?.trim() ?? "";
 
 type SubmissionStatus = "open" | "resolved" | "archived";
 const statusOrder: SubmissionStatus[] = ["open", "resolved", "archived"];
@@ -81,7 +83,10 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
     try {
       const response = await fetch(`/api/submissions/${id}/report`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessKeyValue ? { "x-building-key": accessKeyValue } : {}),
+        },
         body: JSON.stringify({ increment: 1 }),
       });
       const payload = await response.json().catch(() => ({}));
