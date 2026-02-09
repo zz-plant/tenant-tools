@@ -32,7 +32,7 @@ The repo already runs on current major tooling (Astro 5, React 19, TypeScript 5.
 
 - Keep `README.md` as the contributor entry point.
 - Keep architecture docs aligned with real file paths.
-- Keep agent skill docs aligned with `AGENTS.md` requirements.
+- Keep agent skill docs aligned with [`AGENTS.md`](../AGENTS.md) requirements.
 - Maintain explicit “what is out of scope” language to prevent unsafe feature creep.
 
 ### D) Quality gates
