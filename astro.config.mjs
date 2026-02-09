@@ -3,7 +3,11 @@ import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 
-const site = process.env.SITE_URL || "https://example.com";
+const site = process.env.SITE_URL;
+
+if (process.env.NODE_ENV === "production" && !site) {
+  throw new Error("Missing SITE_URL in production. Set SITE_URL to the deployed site origin.");
+}
 
 export default defineConfig({
   site,
