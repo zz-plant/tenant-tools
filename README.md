@@ -35,7 +35,7 @@ Design choices prioritize:
 - No comments/chat/reactions
 - No threatening or pushy escalation language
 
-See `AGENTS.md` for full required policy.
+See [`AGENTS.md`](AGENTS.md) for full required policy.
 
 ---
 
