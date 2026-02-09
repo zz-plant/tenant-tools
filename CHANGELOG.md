@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.64 - 2026-02-09
+
+- Fixed: Astro config no longer defaults `site` to `https://example.com`, preventing wrong canonical and OG origins when `SITE_URL` is unset.
+- Security: Production startup now fails fast if `SITE_URL` is missing so deployments cannot publish foreign canonical domains.
+
 ## 1.0.63 - 2026-02-09
 
 - Added: Shared SEO head component with canonical and social metadata support for page templates.
