@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import NoticeBuilder from "../components/NoticeBuilder";
+import SeoHead from "../components/SeoHead.astro";
 import { getBuildingOptions } from "../data/buildings";
 import { parseBuildingKeys } from "../lib/access";
 
@@ -12,18 +13,34 @@ const buildingOptions = getBuildingOptions(buildingKeys);
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Building Ledger | Tenant Notice Builder</title>
-    <meta
-      name="description"
-      content="Build short, dated repair notices and keep a private record for your building."
+    <SeoHead
+      title="Building Ledger | Resident issue tracker and notice builder"
+      description="Track building repair issues, add me too reports, and create neutral notice drafts with simple forms."
+      canonicalPath="/"
     />
   </head>
   <body>
-    <NoticeBuilder
-      client:load
-      buildingOptions={buildingOptions}
-    />
+    <main class="page" id="main">
+      <section class="panel panel-highlight" aria-labelledby="home-title">
+        <p class="eyebrow">Building ledger</p>
+        <h1 id="home-title">Resident issue tracker</h1>
+        <p class="helper">Keep a private record of repair issues in your building.</p>
+        <p class="helper">Use short facts and dates. Do not include names or unit numbers.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="home-how-it-works">
+        <h2 id="home-how-it-works">How it works</h2>
+        <ul class="helper-list">
+          <li>Create an issue with simple fields.</li>
+          <li>Add “Me too” to show how many residents are affected.</li>
+          <li>Generate a neutral repair notice with standard or very simple English.</li>
+        </ul>
+      </section>
+
+      <NoticeBuilder
+        client:load
+        buildingOptions={buildingOptions}
+      />
+    </main>
   </body>
 </html>

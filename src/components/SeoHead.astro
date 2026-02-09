@@ -1,0 +1,36 @@
+---
+export type Props = {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  imagePath?: string;
+  noindex?: boolean;
+};
+
+const {
+  title,
+  description,
+  canonicalPath,
+  imagePath,
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = Astro.site ? new URL(Astro.site) : new URL(Astro.url.origin);
+const canonicalUrl = canonicalPath ? new URL(canonicalPath, siteUrl).toString() : Astro.url.origin + Astro.url.pathname;
+const ogImageUrl = imagePath ? new URL(imagePath, siteUrl).toString() : null;
+---
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+{noindex && <meta name="robots" content="noindex,nofollow,noarchive" />}
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+{ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}

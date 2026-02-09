@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.63 - 2026-02-09
+
+- Added: Shared SEO head component with canonical and social metadata support for page templates.
+- Added: Sitemap integration with filtering that excludes private resident routes.
+- Changed: Home page now includes static crawlable overview content before the interactive builder.
+- Security: Private building and submission pages now return noindex robots directives.
+
 ## 1.0.62 - 2026-02-07
 
 - Changed: Removed the extra intro panel to reduce repeated guidance text.
