@@ -1,100 +1,64 @@
 # Tech stack capability research (2026-02)
 
-This note captures newer capabilities in the current stack and how they may help Building Ledger while preserving privacy and safety constraints.
+This note summarizes current stack capabilities and practical contributor guidance. It is a planning reference, not a product policy source.
 
-## Scope and method
+## Source and verification method
 
-- Read current dependency versions from `package.json`.
-- Queried npm for latest package versions with:
-  - `npm view astro version`
-  - `npm view @astrojs/cloudflare version`
-  - `npm view @astrojs/react version`
-  - `npm view react version`
-  - `npm view react-dom version`
-  - `npm view @base-ui/react version`
-  - `npm view typescript version`
-  - `npm view wrangler version`
+Version checks were based on:
+
+- `package.json` in this repository
+- npm metadata lookups run with `npm view <package> version`
 
 ## Version snapshot
 
-| Stack element | Current in repo | Latest on npm (2026-02 check) | Upgrade signal |
+| Stack element | Repo version | npm latest (checked) | Status |
 | --- | --- | --- | --- |
-| Astro | `^5.17.1` | `5.17.1` | Current |
-| `@astrojs/cloudflare` | `^12.6.12` | `12.6.12` | Current |
-| `@astrojs/react` | `^4.4.2` | `4.4.2` | Current |
-| React | `^19.2.4` | `19.2.4` | Current |
-| React DOM | `^19.2.4` | `19.2.4` | Current |
-| `@base-ui/react` | `^1.1.0` | `1.1.0` | Already current |
-| TypeScript | `^5.9.3` | `5.9.3` | Current |
-| Wrangler | `^4.63.0` | `4.63.0` | Current |
+| Astro | `^5.17.1` | `5.17.1` | current |
+| `@astrojs/cloudflare` | `^12.6.12` | `12.6.12` | current |
+| `@astrojs/react` | `^4.4.2` | `4.4.2` | current |
+| React | `^19.2.4` | `19.2.4` | current |
+| React DOM | `^19.2.4` | `19.2.4` | current |
+| `@base-ui/react` | `^1.1.0` | `1.1.0` | current |
+| TypeScript | `^5.9.3` | `5.9.3` | current |
+| Wrangler | `^4.63.0` | `4.63.0` | current |
 
-## Newer capability opportunities to evaluate
+## What this means for contributors
 
-These are high-value capabilities to review during upgrade planning.
+- Major upgrades are not the immediate bottleneck.
+- Reliability work should prioritize test depth, boundary checks, and docs alignment.
+- Dependency changes should be justified by a clear safety, performance, or maintenance gain.
 
-### 1) Astro 5 + Cloudflare adapter 12
+## Capability notes by layer
 
-Potential capabilities:
-- Better server/runtime alignment for modern Cloudflare Worker deployments.
-- Improvements in island rendering and server-first patterns that can keep client JavaScript smaller.
-- Better fit for route-level server logic in `src/pages/api/*` while keeping strict access controls.
+### Astro + Cloudflare adapter
 
-Why it matters here:
-- Smaller bundles and server-first rendering are aligned with mobile-first resident usage.
-- Better server integration can simplify resident-key gating paths and reduce accidental client exposure.
+- Strong server-first model for gated routes.
+- Good fit for limiting client-side exposure of private data.
+- Continue minimizing hydration for static or mostly-static UI.
 
-### 2) React 19
+### React 19
 
-Potential capabilities:
-- New form/action patterns that can simplify write flows and pending states.
-- Improved async rendering ergonomics for optimistic updates and loading UI.
-- Better hydration/runtime behavior in mixed server/client apps.
+- Better ergonomics for async interactions and pending states.
+- Use carefully: avoid shipping client-heavy patterns where server rendering is enough.
 
-Why it matters here:
-- Could reduce custom state code in notice and submission flows.
-- Can improve reliability for low-bandwidth users during submit/report actions.
+### TypeScript 5.9
 
-### 3) TypeScript 5.9
+- Stronger type workflows for validation and API boundaries.
+- Continue reducing implicit `any` paths in shared helpers.
 
-Potential capabilities:
-- Improved type-checking performance and editor responsiveness.
-- Newer type-system improvements that reduce unsafe implicit paths.
-- Better support for modern module/tooling workflows.
+### Wrangler 4
 
-Why it matters here:
-- Faster feedback on validation and access-control code paths.
-- Helps keep input constraints strict (issue enum/date/detail limits).
+- Mature Workers local/dev/deploy tooling.
+- Keep environment variable and binding docs precise to reduce setup errors.
 
-### 4) Wrangler 4
+## Recommended near-term investments (non-version work)
 
-Potential capabilities:
-- Updated local dev and deploy ergonomics for Workers.
-- Better compatibility with recent Cloudflare platform features.
-- Improved operational controls for environment bindings.
+1. Add tests for any new API endpoint at creation time.
+2. Keep security-sensitive checks in shared helpers (`access`, `validation`, `rateLimit`).
+3. Regularly prune stale docs that mention outdated package majors.
+4. Keep release notes concise and explicit for security-relevant changes.
 
-Why it matters here:
-- Easier validation of KV bindings and access-key environment setup.
-- Can tighten deployment confidence for resident-only routes.
+## Out of scope
 
-## Safety-first adoption checklist
-
-Before adopting any major version:
-
-1. Confirm private mode gating still blocks unauthorized building access.
-2. Confirm evidence endpoints remain private and not publicly enumerable.
-3. Confirm public mode (if used) still suppresses small counts and free-text.
-4. Re-run validation tests for issue type enum, valid start date, and short details.
-5. Re-check copy style in UI strings (ESL-first, neutral, no threats).
-
-## Suggested phased plan
-
-- Phase 1: Patch/minor updates (`@astrojs/react`, TypeScript) with full test run.
-- Phase 2: Astro 5 + `@astrojs/cloudflare` 12 upgrade in one branch with integration checks.
-- Phase 3: React 19 migration spike with focused component compatibility tests.
-- Phase 4: Wrangler 4 upgrade after deploy pipeline validation.
-
-## Out-of-scope in this research note
-
-- Core dependency upgrades were applied in version 1.0.59.
-- No production behavior changes were made.
-- No schema or API contract changes were made.
+- This doc does not authorize unsafe feature expansion.
+- Product policy remains defined in `AGENTS.md`.

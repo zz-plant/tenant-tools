@@ -1,84 +1,77 @@
 # Modernization plan
 
-This plan outlines a site-wide re-architecture to modernize the stack while preserving the safety and privacy rules in this repo.
+This plan tracks contributor-facing modernization work while keeping Building Ledger safety constraints intact.
 
-## Goals
+## Objectives
 
-- Keep resident data minimal and private.
-- Separate access control, validation, and storage logic.
-- Keep a small client bundle by limiting hydration.
-- Make storage adapters interchangeable without changing UI code.
+- Keep privacy and anti-retaliation controls strict during refactors.
+- Reduce maintenance cost by standardizing validation, access, and storage patterns.
+- Improve contributor onboarding and release safety.
+- Keep the app fast on low-bandwidth mobile devices.
 
-## Current stack summary
+## Current baseline
 
-- **Framework:** Astro pages with React components for interactive UI. The main UI lives in `src/pages` and `src/components`.
-- **Runtime:** Cloudflare Workers via `@astrojs/cloudflare`.
-- **Storage:** Cloudflare KV namespaces for submissions and waitlist entries.
+The repo already runs on current major tooling (Astro 5, React 19, TypeScript 5.9, Wrangler 4). Modernization focus is now on **engineering consistency and operational safety**, not framework migration.
 
-References:
-- `docs/architecture.md`
-- `package.json`
+## 2026 workstreams
 
-## Target-state milestones
+### A) Guardrail consolidation
 
-### 1) Modular server layout
+- Keep access checks centralized in `src/lib/access`.
+- Keep input validation centralized in `src/lib/validation`.
+- Document required checks for new write endpoints.
+- Add tests whenever new API handlers are introduced.
 
-Move access control, validation, and storage into isolated modules so API routes call a single service layer.
+### B) Storage abstraction hardening
 
-Proposed layout:
+- Continue using KV as default.
+- Keep storage helpers under `src/lib/storage/*` with stable interfaces.
+- If a new adapter is introduced (e.g., D1), gate it behind explicit environment flags and parity tests.
 
-- `src/lib/access/` for key checks and steward gating.
-- `src/lib/validation/` for shared schemas and length limits.
-- `src/lib/storage/` for KV and future adapters.
+### C) Documentation modernization
 
-### 2) Shared validation schemas
+- Keep `README.md` as the contributor entry point.
+- Keep architecture docs aligned with real file paths.
+- Keep agent skill docs aligned with `AGENTS.md` requirements.
+- Maintain explicit “what is out of scope” language to prevent unsafe feature creep.
 
-Create shared schemas for submissions, reports, and waitlist requests. Enforce:
+### D) Quality gates
 
-- Issue type enums
-- Valid dates
-- Short detail length limits
-- Rejections or warnings for unit numbers and personal identifiers
+- Run `npm test` before every merge.
+- Expand integration coverage for:
+  - access control
+  - status updates
+  - report increments
+  - export assembly
+- Add visual checks/screenshots for meaningful UI behavior changes.
 
-### 3) Storage adapter interface
+### E) Release hygiene
 
-Add a `SubmissionStore` interface with adapters:
+- Continue semantic version updates in `package.json` for shipped changes.
+- Add concise changelog entries (`Added`, `Changed`, `Fixed`, `Security`).
+- Note operational or env changes in PR summaries.
 
-- `KvSubmissionStore` (current behavior)
-- `D1SubmissionStore` (optional, controlled by env)
+## Safety checklist for every modernization PR
 
-Keep rate limiting in KV for now.
+- No new personal data collection
+- No public evidence exposure
+- No unit-number leakage in public surfaces
+- No comments/forum features
+- No legal-advice claims
+- ESL-first, neutral copy
 
-### 4) Hydration audit
+## Deferred items (explicitly not in this cycle)
 
-Limit client hydration to truly interactive components. Convert static components to server-rendered Astro where possible.
+- Authentication systems that require identity collection
+- Public write APIs
+- Social engagement mechanics (comments, likes, reactions)
+- Legal strategy automation
 
-## Dependency upgrade matrix
+## Exit criteria for this plan
 
-| Package | Current | Target range | Notes |
-| --- | --- | --- | --- |
-| `astro` | `^4.15.0` | `^4.15.0` or `^4.x` latest | Keep aligned with `@astrojs/cloudflare` and `@astrojs/react`. |
-| `@astrojs/cloudflare` | `^11.1.0` | `^11.x` latest | Confirm Worker runtime compatibility. |
-| `@astrojs/react` | `^4.3.0` | `^4.x` latest | Match Astro 4 compatibility. |
-| `react` | `^18.3.1` | `^18.x` latest | Keep with React 18 until React 19 migration plan exists. |
-| `react-dom` | `^18.3.1` | `^18.x` latest | Match React version. |
-| `@base-ui/react` | `^1.1.0` | `^1.x` latest | Validate bundle size and accessibility. |
-| `typescript` | `^5.6.2` | `^5.6.x` latest | Keep in sync with `tsx`. |
-| `tsx` | `^4.21.0` | `^4.x` latest | Confirm Node test compatibility. |
-| `@types/react` | `^18.3.5` | `^18.3.x` latest | Keep with React 18 types. |
-| `@types/react-dom` | `^18.3.0` | `^18.3.x` latest | Keep with React 18 types. |
-| `tslib` | `^2.8.1` | `^2.x` latest | Standard runtime helper updates. |
+This modernization cycle can be considered complete when:
 
-## Safety checklist for the re-arch
-
-- No public evidence access.
-- No unit numbers shown in public mode.
-- No forum or comment UI.
-- No user identity collection.
-- Keep UI copy short and literal.
-
-## Rollout notes
-
-- Make changes in small slices with tests.
-- Add migration notes when data storage changes.
-- Prefer opt-in flags for new storage backends.
+1. Access/validation/storage patterns are consistently reused.
+2. Core security-sensitive paths have stable test coverage.
+3. Contributor and agent docs remain accurate and easy to follow.
+4. Release notes consistently capture user-visible and security-relevant changes.

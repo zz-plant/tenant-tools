@@ -2,162 +2,90 @@
 
 **Shared issue tracking for residents.**
 
-Building Ledger is a lightweight web app. It helps residents log building issues, coordinate with neighbors, and generate clear repair notices with dates.
+Building Ledger is a privacy-first web app for tenant buildings. Residents can log repair issues, join existing issues with “me too,” and generate neutral notices without needing legal language.
 
-It is designed for:
-- first-time renters
-- immigrants / ESL tenants
-- residents under stress who need structure
+## Product boundaries (non-negotiable)
 
----
+Building Ledger is intentionally limited.
 
-## What this tool does
+- It is **not** a forum.
+- It is **not** legal advice.
+- It is **not** a public shaming tool.
 
-Building Ledger helps residents:
+Design choices prioritize:
 
-- Log issues with minimal input (issue type + start date)
-- Join an issue without writing ("me too")
-- Upload evidence and attach it to the issue
-- See how long an issue has been open
-- See when an issue affects multiple residents
-- Generate neutral repair notices
-- Send follow-ups without rewriting
-- Export summaries for inspectors or legal aid
+1. Safety and anti-retaliation defaults
+2. Simple input for stressed and ESL users
+3. Factual, date-based reporting
+4. Procedural usefulness (not intimidation)
 
-The tool focuses on **facts, dates, and patterns across reports**.
+## What residents can do
 
----
+- Log issues with structured fields
+- Add “me too” participation without writing a long narrative
+- Upload private evidence with safety warnings
+- Generate calm notice templates (standard + very simple English)
+- Export summaries for inspection/legal-aid workflows
 
-## What this tool does *not* do
+## What contributors must protect
 
-By design, Building Ledger does **not**:
+- No names, emails, phone numbers, or unit numbers by default
+- No public evidence access
+- No public write paths
+- No comments/chat/reactions
+- No threatening or pushy escalation language
 
-- Host discussion threads
-- Allow long free-text complaints
-- Encourage naming people
-- Require legal language
-- Replace legal advice or tenant organizations
-
-These limits are intentional.
+See `AGENTS.md` for full required policy.
 
 ---
 
-## Core design principles
+## Developer quick start
 
-- **Structure over tone**  
-  Users should not need to "sound official." The app provides structure.
+### Requirements
 
-- **Facts only, by default**  
-  The interface keeps entries short and factual.
+- Node 20+
+- npm 10+
 
-- **Aggregation over escalation**  
-  Patterns matter more than a single report. "Me too" is a primary action.
+### Install and run
 
-- **Time matters**  
-  The interface shows duration and unlocks next steps over time.
+```bash
+npm install
+npm run dev
+```
 
-- **Safety first**  
-  Participation is anonymous by default. Sharing is limited.
+### Test
 
----
+```bash
+npm test
+```
 
-## Chicago-aware (configurable)
+### Build
 
-The MVP is tuned for Chicago / Cook County workflows, including:
-
-- Written notice expectations
-- Essential services (heat, water, power)
-- 48-hour entry norms
-- 311 inspection pathways
-- Security deposit deadlines
-- Sheriff-only eviction enforcement
-
-These rules are **configuration**, not hard-coded assumptions.
+```bash
+npm run build
+```
 
 ---
 
-## High-level data model
+## Environment setup
 
-- **Building** — address, visibility mode
-- **Issue** — type, start date, status
-- **Report** — individual participation (“me too”)
-- **Evidence** — photos/videos attached to issues
-- **Session** — anonymous, building-scoped identity
-- **Steward role** — light review + export
+The app can run without production KV, but shared data features require Cloudflare bindings.
 
-No names.  
-No landlord access.  
-No public write access.
+### Required for shared submission storage
 
----
+- `SUBMISSIONS_KV`
 
-## Visibility modes
+### Required for waitlist storage
 
-### Private (default)
-- Resident-only access
-- Full issue details and evidence
-- Notice generation and exports
+- `WAITLIST_KV`
 
-### Public (optional, restricted)
-- Read-only summaries
-- No unit identifiers
-- No evidence access
-- Aggregated counts only
+### Access control keys
 
-Public mode is optional and restricted to reduce risk.
+- `BUILDING_KEYS_JSON` — JSON map of building id → resident key (recommended)
+- `BUILDING_ACCESS_KEY` — fallback key when a building does not exist in `BUILDING_KEYS_JSON`
+- `STEWARD_KEY` — required for status updates and steward actions
 
----
-
-## Intended use
-
-Building Ledger is meant to:
-- reduce confusion
-- reduce isolation
-- support consistent reporting
-- make timelines visible
-
-It is not meant to:
-- shame
-- threaten
-- drive outrage
-- replace collective organizing
-
----
-
-## Contribution guidelines (short version)
-
-If you contribute:
-
-- Prefer clarity over cleverness
-- Prefer simple language over expressive language
-- Prefer safety over exposure
-- Optimize for tired users on hard days
-
-Features that increase risk for vulnerable users will be rejected.
-
----
-
-## Cloudflare KV setup (optional)
-
-If you want to enable shared storage, create two KV namespaces and bind them in Cloudflare:
-
-1. Create a KV namespace in the Cloudflare dashboard for submissions.
-2. Create a second KV namespace for waitlist requests.
-3. Open your project settings and choose **Bindings**.
-4. Add KV namespace bindings for `SUBMISSIONS_KV` and `WAITLIST_KV`.
-5. Select each KV namespace and save.
-
-Do not store personal names or unit numbers in KV. Keep only structured issue data.
-
-## Access keys (optional)
-
-Resident pages are private by default. Add the building key to the URL with `?key=...`.
-
-Use per-building keys when possible:
-
-- `BUILDING_KEYS_JSON` — JSON map of building id to key.
-
-Example:
+Example `BUILDING_KEYS_JSON`:
 
 ```json
 {
@@ -166,36 +94,40 @@ Example:
 }
 ```
 
-Do not commit real keys to the repository. Set them only in environment variables.
-
-Fallback options:
-
-- `BUILDING_ACCESS_KEY` — optional global fallback when a building is not listed in `BUILDING_KEYS_JSON`.
-- `STEWARD_KEY` — required to enable steward status updates (pass with `?stewardKey=...`).
-
-## Share with neighbors (readiness checklist)
-
-Before sharing this link with neighbors, confirm:
-
-- You set a resident access key (`BUILDING_KEYS_JSON` or `BUILDING_ACCESS_KEY`).
-- You connected ledger storage (`SUBMISSIONS_KV`) so residents can save issues.
-- You shared the building link with `?key=YOUR_KEY`.
-- You reminded neighbors not to post names or unit numbers.
+Never commit real keys to git.
 
 ---
 
-## Vision
+## Contributor workflow
 
-For the longer-form product vision, see [docs/vision.md](docs/vision.md).
+1. Read `AGENTS.md` before changing product behavior or copy.
+2. Keep changes small and scoped.
+3. Add tests when touching access, validation, evidence, export, or notice logic.
+4. Run `npm test` before opening a PR.
+5. For UI changes, include screenshots.
+6. Update `CHANGELOG.md` for user-visible behavior changes.
 
-## Architecture
+### Commit format
 
-For a deeper overview of routes, data flow, and storage, see [docs/architecture.md](docs/architecture.md).
-For the modernization roadmap, see [docs/modernization-plan.md](docs/modernization-plan.md).
-For stack upgrade research notes, see [docs/tech-stack-capability-research-2026-02.md](docs/tech-stack-capability-research-2026-02.md).
+Use Conventional Commit style:
+
+- `feat: ...`
+- `fix: ...`
+- `chore: ...`
+
+---
+
+## Documentation map
+
+- Product intent: `docs/vision.md`
+- Architecture and data flow: `docs/architecture.md`
+- Active modernization plan: `docs/modernization-plan.md`
+- Dependency capability review: `docs/tech-stack-capability-research-2026-02.md`
+- Rule data pack notes: `src/data/rules/README.md`
+- Agent skill guidance: `skills/building-ledger-agent/SKILL.md`
 
 ---
 
 ## License
 
-cc0
+CC0

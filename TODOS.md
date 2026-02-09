@@ -1,14 +1,20 @@
 # TODOs
 
-Short list of near-term tasks.
+Near-term contributor tasks.
 
-## Product
-- [x] Add a short evidence safety checklist before uploads.
-- [x] Add soft limits/warnings for free-text fields.
-- [x] Add a privacy reminder near the notice preview.
-- [x] Add an "issue status" selector for exports (open/resolved/archived).
+## Documentation
+
+- [ ] Add a PR template file that mirrors `AGENTS.md` section 12 requirements.
+- [ ] Add a short `docs/testing.md` with command matrix and CI expectations.
+- [ ] Add a `docs/security-checklist.md` for release-time safety verification.
 
 ## Engineering
-- [x] Add simple validation helpers for free-text length limits.
-- [x] Add unit tests for validation helpers.
-- [x] Add a visual snapshot test for the export summary layout (if available).
+
+- [ ] Add integration tests for key propagation across dashboard and submission flows.
+- [ ] Add tests for waitlist rate limiting and validation edge cases.
+- [ ] Add regression tests for public-readonly count suppression behavior.
+
+## Product safety UX
+
+- [ ] Add explicit evidence-upload metadata warning text to all upload entry points.
+- [ ] Add a reusable helper for “very simple English” notice lint checks.

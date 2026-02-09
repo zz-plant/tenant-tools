@@ -1,83 +1,99 @@
 # Architecture
 
-This document describes how Building Ledger is structured and how data flows through the app.
+This document explains how Building Ledger is organized today, where safety checks happen, and which boundaries contributors must keep intact.
 
-## Stack overview
+## Runtime and stack
 
-- **Framework:** Astro pages with React components for interactive UI. The main UI lives in `src/pages` and `src/components`.
-- **Runtime:** Cloudflare Workers via `@astrojs/cloudflare`.
-- **Storage:** Cloudflare KV namespaces for submissions and waitlist entries.
+- Astro `5.x` for routes/pages
+- React `19.x` for interactive UI islands
+- Cloudflare Workers runtime via `@astrojs/cloudflare`
+- Cloudflare KV for submission and waitlist persistence
 
-## Directory map
+Source of truth for versions: `package.json`.
 
-- `src/pages`: Route handlers and page templates.
-  - `src/pages/index.astro`: Notice builder landing page.
-  - `src/pages/buildings/[id].astro`: Resident dashboard for a building.
-  - `src/pages/submissions/[id].astro`: Saved submission summary and timeline.
-  - `src/pages/api/*`: JSON API endpoints.
-- `src/components`: React UI components used by the pages.
-- `src/lib`: Shared logic for access, validation, storage helpers, and rate limiting.
-- `src/data`: Typed data and options used in forms and templates.
+## Repository map
 
-## Request flow
+- `src/pages`
+  - Route pages (`index.astro`, `buildings/[id].astro`, `submissions/[id].astro`)
+  - API handlers under `src/pages/api/*`
+- `src/components`
+  - React components used by pages
+- `src/lib`
+  - Access control (`src/lib/access`)
+  - Validation (`src/lib/validation`)
+  - Rate limiting (`src/lib/rateLimit.ts`)
+  - Storage helpers (`src/lib/storage/*`)
+  - Export/notice/submission helpers
+- `src/data`
+  - Static options, notice templates, and rules metadata
+- `tests`
+  - Node test suite for validation, access, status, export, and report flows
 
-### Create a submission
+## Trust boundaries
 
-1. The notice builder posts to `POST /api/submissions`.
-2. The request is validated and sanitized in `validateSubmissionInput`.
-3. The API enforces a resident access key and rate limits per IP.
-4. A submission record is stored in `SUBMISSIONS_KV` with key `submission:{id}`.
-5. The API responds with a permalink to `/submissions/{id}`.
+### 1) Browser/UI boundary
 
-### Add “me too” reports
+UI should never be trusted for enforcement. Client checks are UX-only. Final checks must run on API handlers and gated server routes.
 
-1. The dashboard calls `POST /api/submissions/:id/report`.
-2. The API validates the increment, confirms access key scope, and rate limits per IP.
-3. The submission record is updated with the new report count.
-4. A short-lived report entry is stored at `report:{submissionId}:{reportId}` for audit history.
+### 2) Access boundary
 
-### Update submission status
+Resident pages and write endpoints require a resident building key. Steward operations require `STEWARD_KEY`.
 
-1. Steward actions call `POST /api/submissions/:id/status`.
-2. The API validates the status enum and the steward key.
-3. The submission record is updated in `SUBMISSIONS_KV`.
+### 3) Storage boundary
 
-### Waitlist
+KV is treated as internal storage. Evidence metadata and submission records remain private unless explicit public-safe aggregation is implemented.
 
-1. The waitlist form posts to `POST /api/waitlist`.
-2. The API validates the building and portfolio, then rate limits per IP.
-3. Records are stored in `WAITLIST_KV` with key `waitlist:{id}`.
+## Core request flows
 
-## Access control
+### Submission creation
 
-- Building access uses a per-building key or a fallback key stored in environment variables.
-- Pages that show resident data check the key before loading KV data.
-- API routes check the key before writing to KV.
-- Steward actions require a separate steward key.
+1. `POST /api/submissions`
+2. Validate + sanitize input
+3. Enforce access key and rate limit
+4. Persist `submission:{id}` in `SUBMISSIONS_KV`
+5. Return submission link (`/submissions/{id}`)
 
-## Validation and safety
+### “Me too” report increment
 
-- Submission input is validated for enums, dates, and limited-length detail fields.
-- Optional detail fields are sanitized and checked for sensitive content.
-- Waitlist input rejects unit numbers in building addresses.
-- All write endpoints apply rate limits using `SUBMISSIONS_KV` or `WAITLIST_KV`.
+1. `POST /api/submissions/:id/report`
+2. Validate input, key scope, and rate limit
+3. Update report count on `submission:{id}`
+4. Write audit entry `report:{submissionId}:{reportId}` (TTL)
 
-## Storage layout (KV)
+### Status update (steward)
 
-### Submissions
+1. `POST /api/submissions/:id/status`
+2. Validate status enum + steward key
+3. Update `submission:{id}`
 
-- `submission:{id}`: Full submission record.
-- `report:{submissionId}:{reportId}`: Short-lived “me too” report entries (90-day TTL).
+### Waitlist entry
 
-### Waitlist
+1. `POST /api/waitlist`
+2. Validate building + portfolio fields
+3. Enforce rate limit
+4. Persist `waitlist:{id}` in `WAITLIST_KV`
 
-- `waitlist:{id}`: Waitlist request record.
+## Security and privacy controls
+
+- Enum/date/length validation for structured inputs
+- Sensitive-content warnings on optional free text
+- Unit-number rejection for waitlist building address fields
+- IP/session rate limiting on write endpoints
+- Resident-key gating on protected pages and APIs
 
 ## Environment variables
 
-- `SUBMISSIONS_KV`: KV namespace for submissions and reports.
-- `WAITLIST_KV`: KV namespace for waitlist entries.
-- `BUILDING_KEYS_JSON`: Per-building access keys (JSON map).
-- `BUILDING_ACCESS_KEY`: Fallback key when a building is not listed.
-- `STEWARD_KEY`: Key required for steward status updates.
+- `SUBMISSIONS_KV`
+- `WAITLIST_KV`
+- `BUILDING_KEYS_JSON`
+- `BUILDING_ACCESS_KEY`
+- `STEWARD_KEY`
 
+## Change guidance for contributors
+
+When changing architecture-sensitive areas (`access`, `validation`, `storage`, `api`):
+
+1. Keep enforcement server-side.
+2. Reuse existing helper modules instead of duplicating checks.
+3. Add or update tests for the touched boundary.
+4. Re-check copy for ESL-first and neutral wording.

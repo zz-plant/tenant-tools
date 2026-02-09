@@ -1,21 +1,40 @@
 # Quick checks
 
+Use this list before committing.
+
 ## Safety and privacy
-- Do not collect or display names, emails, phone numbers, or unit numbers.
-- Evidence stays private by default; no public access to files.
-- Avoid public write access and comment threads.
 
-## Copy rules (ESL-first)
+- No names, emails, phone numbers, or unit numbers added.
+- Evidence remains private by default.
+- No public write endpoints introduced.
+- No comments/chat/reaction features introduced.
+
+## Validation and abuse resistance
+
+- Issue type remains enum-limited.
+- Start date validation still enforced.
+- Free-text limits still enforced where applicable.
+- Write endpoints keep rate limiting.
+
+## Copy quality (ESL-first)
+
 - Short, literal sentences.
-- No idioms, sarcasm, threats, or legal claims.
-- Use calm escalation phrasing (“next normal step”).
+- No idioms, sarcasm, or metaphors.
+- No intimidation language.
+- “Next step” phrasing remains calm and procedural.
 
-## Required validations
-- Issue type from enum.
-- Valid start date.
-- Short free-text with length limits and sensitive-content warnings.
+## QA pass
 
-## PR and QA reminders
-- Add tests for access control, evidence, notice generator, export, or public mode changes.
-- Include a manual QA checklist in the PR summary.
-- Add screenshots for visible UI changes.
+- Run `npm test`.
+- For UI changes, review in browser and capture screenshot.
+- For security-sensitive changes, verify gating with and without key.
+
+## PR summary reminders
+
+Include:
+
+- summary of behavior changes
+- explicit out-of-scope statement
+- security/privacy notes
+- test plan and results
+- migration/env notes (if any)
