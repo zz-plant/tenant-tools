@@ -9,7 +9,7 @@ Use this skill for implementation, review, or documentation updates in this repo
 
 ## 1) Required first step
 
-Read the applicable `AGENTS.md` before editing files. Treat it as binding policy for:
+Read the applicable [`AGENTS.md`](../../AGENTS.md) before editing files. Treat it as binding policy for:
 
 - safety and abuse prevention
 - privacy and data minimization
