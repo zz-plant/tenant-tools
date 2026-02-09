@@ -61,4 +61,4 @@ Version checks were based on:
 ## Out of scope
 
 - This doc does not authorize unsafe feature expansion.
-- Product policy remains defined in `AGENTS.md`.
+- Product policy remains defined in [`AGENTS.md`](../AGENTS.md).
