@@ -180,6 +180,40 @@
   background: linear-gradient(135deg, #f7f8ff, #ffffff);
 }
 
+
+.home-intro-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.home-intro-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.home-intro-copy h1,
+.home-intro-copy .helper {
+  margin: 0;
+}
+
+.home-intro-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.home-intro-list li {
+  border-radius: 999px;
+  border: 1px solid #d8deef;
+  background: #ffffff;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  color: #2b3142;
+}
+
 .intro-panel {
   padding: 28px;
 }
@@ -269,6 +303,11 @@
     border-radius: 16px;
     box-shadow: none;
     border: 1px solid #e3e7f5;
+  }
+
+  .home-intro-list li {
+    font-size: 0.8rem;
+    padding: 5px 9px;
   }
 
   .intro-panel {

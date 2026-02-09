@@ -21,19 +21,17 @@ const buildingOptions = getBuildingOptions(buildingKeys);
   </head>
   <body>
     <main class="page" id="main">
-      <section class="panel panel-highlight" aria-labelledby="home-title">
-        <p class="eyebrow">Building ledger</p>
-        <h1 id="home-title">Resident issue tracker</h1>
-        <p class="helper">Keep a private record of repair issues in your building.</p>
-        <p class="helper">Use short facts and dates. Do not include names or unit numbers.</p>
-      </section>
-
-      <section class="panel" aria-labelledby="home-how-it-works">
-        <h2 id="home-how-it-works">How it works</h2>
-        <ul class="helper-list">
-          <li>Create an issue with simple fields.</li>
-          <li>Add “Me too” to show how many residents are affected.</li>
-          <li>Generate a neutral repair notice with standard or very simple English.</li>
+      <section class="panel panel-highlight home-intro-panel" aria-labelledby="home-title">
+        <div class="home-intro-copy">
+          <p class="eyebrow">Building ledger</p>
+          <h1 id="home-title">Resident issue tracker</h1>
+          <p class="helper">Keep a private record of repair issues in your building.</p>
+          <p class="helper">Use short facts and dates. Do not include names or unit numbers.</p>
+        </div>
+        <ul class="home-intro-list" aria-label="How it works">
+          <li>Create one issue.</li>
+          <li>Add “Me too”.</li>
+          <li>Generate a neutral notice.</li>
         </ul>
       </section>
 

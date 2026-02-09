@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.67 - 2026-02-09
+
+- Changed: Combined the home intro and quick steps into one compact panel so the notice builder appears earlier on phones.
+- Changed: Above-the-fold mobile content now uses short step chips to reduce vertical scrolling before the first form action.
+
 ## 1.0.66 - 2026-02-09
 
 - Fixed: Removed forced text-size adjustment so mobile browsers can render readable default text sizing.
