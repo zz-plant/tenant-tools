@@ -100,7 +100,7 @@ Never commit real keys to git.
 
 ## Contributor workflow
 
-1. Read `AGENTS.md` before changing product behavior or copy.
+1. Read [`AGENTS.md`](AGENTS.md) before changing product behavior or copy.
 2. Keep changes small and scoped.
 3. Add tests when touching access, validation, evidence, export, or notice logic.
 4. Run `npm test` before opening a PR.
