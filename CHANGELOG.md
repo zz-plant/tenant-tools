@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.0.67 - 2026-02-09
+
+- Changed: Combined the home intro and quick steps into one compact panel so the notice builder appears earlier on phones.
+- Changed: Above-the-fold mobile content now uses short step chips to reduce vertical scrolling before the first form action.
+
+## 1.0.66 - 2026-02-09
+
+- Fixed: Removed forced text-size adjustment so mobile browsers can render readable default text sizing.
+- Changed: Phone layouts now use one-column issue and summary grids at small widths for easier reading and tapping.
+
+## 1.0.65 - 2026-02-09
+
+- Changed: Added safe-area support and dynamic viewport height handling to improve layout stability on iOS and Android.
+- Changed: Sticky mobile step controls now clear bottom system bars by using safe-area bottom spacing.
+- Added: Viewport metadata now enables edge-to-edge rendering on mobile browsers.
+
 ## 1.0.64 - 2026-02-09
 
 - Fixed: Astro config no longer defaults `site` to `https://example.com`, preventing wrong canonical and OG origins when `SITE_URL` is unset.

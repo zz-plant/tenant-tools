@@ -20,7 +20,8 @@ const canonicalUrl = canonicalPath ? new URL(canonicalPath, siteUrl).toString() 
 const ogImageUrl = imagePath ? new URL(imagePath, siteUrl).toString() : null;
 ---
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#f5f6fb" />
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonicalUrl} />
