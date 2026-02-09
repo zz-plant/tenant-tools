@@ -975,12 +975,13 @@ code {
 
   .step-controls {
     position: sticky;
-    bottom: 12px;
+    bottom: calc(12px + var(--safe-area-bottom));
     z-index: 5;
     background: #ffffff;
     border-radius: 16px;
     border: 1px solid #e3e7f5;
     padding: 10px;
+    padding-bottom: calc(10px + var(--safe-area-bottom));
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
   }
 
@@ -990,7 +991,7 @@ code {
   }
 
   .summary-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .input,
@@ -1001,7 +1002,7 @@ code {
   }
 
   .issue-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .notice-preview-header {
@@ -1055,5 +1056,19 @@ code {
 
   .summary-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+
+@media (hover: none) and (pointer: coarse) {
+  .button:hover,
+  .quick-start-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .quick-start-card:hover {
+    border-color: #d7dbe9;
+    background: #ffffff;
   }
 }

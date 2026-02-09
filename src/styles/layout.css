@@ -1,6 +1,7 @@
 .page {
   min-height: 100vh;
-  padding: 40px 6vw 64px;
+  min-height: 100dvh;
+  padding: calc(40px + var(--safe-area-top)) 6vw calc(64px + var(--safe-area-bottom));
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -232,7 +233,7 @@
 
 @media (max-width: 720px) {
   .page {
-    padding: 16px 16px 36px;
+    padding: calc(16px + var(--safe-area-top)) 16px calc(36px + var(--safe-area-bottom));
     gap: 24px;
   }
 
@@ -291,7 +292,7 @@
 
 @media (max-width: 480px) {
   .page {
-    padding: 12px 12px 32px;
+    padding: calc(12px + var(--safe-area-top)) 12px calc(32px + var(--safe-area-bottom));
     gap: 20px;
   }
 
