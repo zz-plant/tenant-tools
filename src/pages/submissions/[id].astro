@@ -96,10 +96,17 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
               <p class="helper">The link can include private details.</p>
               <p class="helper">Ask a resident steward for the key.</p>
               <p class="helper">If the key is correct but this still does not load, ask a steward to check the link.</p>
+              <form class="filter-grid" method="get">
+                <label>
+                  <span>Building key</span>
+                  <input class="input" name="key" type="text" placeholder="Paste building key" required />
+                </label>
+                <button class="button" type="submit">Continue</button>
+              </form>
               <div class="access-sample">
                 <p class="access-sample-title">Example link</p>
                 <code>?key=YOUR_KEY</code>
-                <p class="helper">Add the key to the end of the link.</p>
+                <p class="helper">You can also add the key to the end of the link.</p>
               </div>
               <p class="access-warning">Do not share the key or link in public.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>

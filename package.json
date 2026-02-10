@@ -1,7 +1,7 @@
 {
   "name": "tenant-notice-builder",
   "type": "module",
-  "version": "1.0.69",
+  "version": "1.0.71",
   "private": true,
   "scripts": {
     "dev": "astro dev",

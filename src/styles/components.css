@@ -162,6 +162,12 @@
   list-style: disc;
 }
 
+
+.step-nav-hint {
+  display: none;
+  margin: 0;
+}
+
 .step-nav {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -951,6 +957,11 @@ code {
   .notice-status {
     background: #ffffff;
     border-color: #e6eaf6;
+  }
+
+  .step-nav-hint {
+    display: block;
+    margin-top: 6px;
   }
 
   .step-nav {
