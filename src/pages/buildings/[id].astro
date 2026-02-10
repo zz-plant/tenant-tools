@@ -223,6 +223,7 @@ const totalFiltered = filtered.length;
                                 </button>
                               </label>
                               <p class="helper" data-status-note={record.id} role="status" aria-live="polite"></p>
+                              <p class="helper">Use this only after residents confirm the issue is fixed.</p>
                             </div>
                           )}
                         </article>
@@ -313,9 +314,8 @@ const totalFiltered = filtered.length;
 
     {hasAccess && kv && (
       <>
-        <script define:vars={{ stewardKey, isSteward, accessKey }}>
+        <script define:vars={{ isSteward, accessKey }}>
           window.__BUILDING_DASHBOARD__ = {
-            stewardKey: stewardKey || "",
             isSteward,
             accessKey: accessKey || "",
           };

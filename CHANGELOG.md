@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.69 - 2026-02-10
+
+- Security: Steward status updates now send `STEWARD_KEY` in the `x-steward-key` header instead of a URL query parameter.
+- Changed: Building dashboard no longer injects the steward key into inline page configuration.
+- Changed: Steward controls now include a reminder to set issue status only after residents confirm the fix.
+- Added: Integration test coverage for steward status updates using header-based key auth.
+
 ## 1.0.68 - 2026-02-10
 
 - Added: Save-to-ledger now includes an inline building key field so residents can save without editing the URL manually.
