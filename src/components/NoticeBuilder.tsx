@@ -641,6 +641,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     scheduleTimeout("link-status", () => setLinkStatusMessage(""), 2000);
   };
 
+  const handleBuildingKeyInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBuildingKey(event.currentTarget.value.trim());
+  };
+
   const handleReset = () => {
     const today = new Date();
     const formatted = formatDate(today);
@@ -1417,9 +1421,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="submission-block">
                     <div>
                       <h3>Save to the shared ledger</h3>
-                      {!buildingKey && (
-                        <p className="helper">Add your building key to the URL to save. Your organizer provides it.</p>
-                      )}
+                      <label>
+                        Building key
+                        <Input
+                          className="input"
+                          type="password"
+                          value={buildingKey}
+                          onChange={handleBuildingKeyInput}
+                          placeholder="Paste building key"
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                      </label>
+                      <p className="helper">Use the resident key from your organizer. Keep this key private.</p>
                       {!formState.building || !formState.issue ? (
                         <p className="helper">Choose a building and issue to enable saving.</p>
                       ) : null}

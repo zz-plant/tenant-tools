@@ -102,9 +102,8 @@ const WaitlistPanel = () => {
     const blob = new Blob([inviteText], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
-    const safeBuilding = (waitlistState.building || "building").toLowerCase().replace(/\s+/g, "-");
     anchor.href = url;
-    anchor.download = `${safeBuilding}-neighbor-invite.txt`;
+    anchor.download = "building-ledger-invite.txt";
     document.body.append(anchor);
     anchor.click();
     anchor.remove();
