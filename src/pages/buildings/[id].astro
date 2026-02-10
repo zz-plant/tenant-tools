@@ -2,7 +2,11 @@
 import "../../styles/global.css";
 import { issueOptions } from "../../data/noticeData";
 import { isAccessKeyValid, isBuildingAccessValid } from "../../lib/access";
-import { loadBuildingSubmissions, type BuildingSubmission } from "../../lib/buildingDashboard";
+import {
+  formatResidentReportCount,
+  loadBuildingSubmissions,
+  type BuildingSubmission,
+} from "../../lib/buildingDashboard";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
 import SeoHead from "../../components/SeoHead.astro";
 
@@ -133,15 +137,15 @@ const totalFiltered = filtered.length;
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Open</p>
-                  <p class="summary-value" data-summary-count="open">{grouped.open.length}</p>
+                  <p class="summary-value" data-summary-count="open">{formatResidentReportCount(grouped.open.length)}</p>
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">{statusLabels.resolved}</p>
-                  <p class="summary-value" data-summary-count="resolved">{grouped.resolved.length}</p>
+                  <p class="summary-value" data-summary-count="resolved">{formatResidentReportCount(grouped.resolved.length)}</p>
                 </div>
                 <div class="summary-card">
                   <p class="summary-label">Archived</p>
-                  <p class="summary-value" data-summary-count="archived">{grouped.archived.length}</p>
+                  <p class="summary-value" data-summary-count="archived">{formatResidentReportCount(grouped.archived.length)}</p>
                 </div>
               </div>
 
@@ -158,7 +162,7 @@ const totalFiltered = filtered.length;
                   <section class="status-group" data-status-group={status}>
                     <div class="status-header">
                       <h3>{statusLabels[status]}</h3>
-                      <span class="status-pill" data-status-count={status}>{grouped[status].length}</span>
+                      <span class="status-pill" data-status-count={status}>{formatResidentReportCount(grouped[status].length)}</span>
                     </div>
                     {grouped[status].length === 0 ? (
                       <p class="helper">No submissions in this status.</p>
@@ -169,7 +173,7 @@ const totalFiltered = filtered.length;
                             <p class="issue-title">{record.issueLabel}</p>
                             <p class="issue-meta">
                               Started {record.startDate || "Date not listed"}. Reports:{" "}
-                              <span data-report-count={record.id}>{record.reportCount}</span>.
+                              <span data-report-count={record.id}>{formatResidentReportCount(record.reportCount)}</span>.
                             </p>
                             <p class="issue-meta">
                               Last update saved on {record.reportDate || record.createdAt || "Date not listed"}.

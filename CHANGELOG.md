@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.68 - 2026-02-10
+
+- Added: Save-to-ledger now includes an inline building key field so residents can save without editing the URL manually.
+- Changed: Resident dashboard report counts now bucket values below 3 as `<3` to reduce small-count identity leakage.
+- Changed: Waitlist invite downloads now use a neutral filename that does not include the building address.
+
 ## 1.0.67 - 2026-02-09
 
 - Changed: Combined the home intro and quick steps into one compact panel so the notice builder appears earlier on phones.

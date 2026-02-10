@@ -21,6 +21,16 @@ export type BuildingSubmission = {
   status: SubmissionStatus;
 };
 
+export const formatResidentReportCount = (count: number) => {
+  if (!Number.isFinite(count) || count <= 0) {
+    return "0";
+  }
+  if (count < 3) {
+    return "<3";
+  }
+  return String(Math.floor(count));
+};
+
 type LoadBuildingSubmissionsOptions = {
   kv: SubmissionsKv;
   buildingId: string;

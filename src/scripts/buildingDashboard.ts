@@ -16,10 +16,21 @@ const accessKeyValue = dashboardConfig?.accessKey?.trim() ?? "";
 type SubmissionStatus = "open" | "resolved" | "archived";
 const statusOrder: SubmissionStatus[] = ["open", "resolved", "archived"];
 
+
+const formatResidentReportCount = (count: number) => {
+  if (!Number.isFinite(count) || count <= 0) {
+    return "0";
+  }
+  if (count < 3) {
+    return "<3";
+  }
+  return String(Math.floor(count));
+};
+
 const updateReportCount = (id: string, nextCount: number) => {
   const countEl = document.querySelector(`[data-report-count="${id}"]`);
   if (countEl) {
-    countEl.textContent = String(nextCount);
+    countEl.textContent = formatResidentReportCount(nextCount);
   }
 };
 
@@ -39,12 +50,12 @@ const updateStatusCounts = () => {
 
     const groupCounter = group.querySelector(`[data-status-count="${status}"]`) as HTMLElement | null;
     if (groupCounter) {
-      groupCounter.textContent = String(cards);
+      groupCounter.textContent = formatResidentReportCount(cards);
     }
 
     const summaryCounter = document.querySelector(`[data-summary-count="${status}"]`) as HTMLElement | null;
     if (summaryCounter) {
-      summaryCounter.textContent = String(cards);
+      summaryCounter.textContent = formatResidentReportCount(cards);
     }
   });
 };
@@ -94,7 +105,7 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
         throw new Error(payload?.error || "We could not update the report count.");
       }
       updateReportCount(id, payload.reportCount ?? 0);
-      setReportStatus(id, "Your report was added.");
+      setReportStatus(id, "Your report was added. No personal details were saved.");
     } catch (error) {
       setReportStatus(id, error instanceof Error ? error.message : "We could not add your report.", true);
     } finally {
