@@ -4,9 +4,9 @@ Near-term contributor tasks.
 
 ## Documentation
 
-- [ ] Add a PR template file that mirrors [`AGENTS.md`](AGENTS.md) section 12 requirements.
-- [ ] Add a short `docs/testing.md` with command matrix and CI expectations.
-- [ ] Add a `docs/security-checklist.md` for release-time safety verification.
+- [x] Add a PR template file that mirrors [`AGENTS.md`](AGENTS.md) section 12 requirements.
+- [x] Add a short `docs/testing.md` with command matrix and CI expectations.
+- [x] Add a `docs/security-checklist.md` for release-time safety verification.
 
 ## Engineering
 
