@@ -24,11 +24,11 @@
 - List exact commands and outcomes.
 
 ### Manual QA checklist
-- [ ] Can a non-auth user access a building page?
-- [ ] Can evidence be accessed without a key?
-- [ ] Are unit hints visible anywhere?
-- [ ] Does “very simple English” contain idioms?
-- [ ] Do counts leak identity when small?
+- [ ] Non-auth users cannot access resident-only building pages.
+- [ ] Evidence is never publicly readable by default.
+- [ ] Unit hints and identifying details are hidden where required.
+- [ ] “Very simple English” copy remains short and literal.
+- [ ] Small counts do not expose individual participation.
 
 ## Migration plan (if schema or runtime behavior changed)
 - Describe migration steps.
