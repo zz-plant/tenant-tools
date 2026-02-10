@@ -99,7 +99,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const key = params.get("key") || "";
-    setBuildingKey(key.trim());
+    setBuildingKey(key);
   }, []);
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
@@ -138,7 +138,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const canShowAfterBasics = isStep1Complete;
   const isNoticeReady = missingBasics.length === 0;
   const noticeReadinessTitle = isNoticeReady ? "Notice ready" : "Finish the basics";
-  const canSaveLedger = Boolean(formState.building && formState.issue && buildingKey);
+  const normalizedBuildingKey = buildingKey.trim();
+  const canSaveLedger = Boolean(formState.building && formState.issue && normalizedBuildingKey);
   const canFastTrack = Boolean(formState.building && formState.issue);
 
   const quickStartSummary: Record<QuickStartPreset, { title: string; description: string }> = {
@@ -566,7 +567,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       setSaveError("Select a building and issue before saving.");
       return;
     }
-    if (!buildingKey) {
+    if (!normalizedBuildingKey) {
       setSaveStatus("error");
       setSaveLabel("Save to ledger");
       setSaveError("Add your building key to the URL before saving.");
@@ -587,8 +588,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
-      if (buildingKey) {
-        headers["x-building-key"] = buildingKey;
+      if (normalizedBuildingKey) {
+        headers["x-building-key"] = normalizedBuildingKey;
       }
       const response = await fetch("/api/submissions", {
         method: "POST",
