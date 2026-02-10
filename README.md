@@ -87,7 +87,7 @@ The app can run without production KV, but shared data features require Cloudfla
 
 ### SEO and sitemap
 
-- `SITE_URL` — full site origin used to build canonical URLs and sitemap entries (example: `https://app.example.org`). Required in production.
+- `SITE_URL` — preferred full site origin used to build canonical URLs and sitemap entries (example: `https://app.example.org`). If unset, build tooling may fall back to deploy URL environment variables and will log a warning.
 
 Example `BUILDING_KEYS_JSON`:
 

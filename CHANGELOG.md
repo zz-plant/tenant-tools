@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.71 - 2026-02-10
+
+### Changed
+
+- Build config now accepts inferred deploy URLs (`CF_PAGES_URL`, `DEPLOY_PRIME_URL`, or `URL`) when `SITE_URL` is not set.
+
+### Fixed
+
+- Production builds no longer fail immediately when `SITE_URL` is missing in CI environments.
+
+### Security
+
+- Canonical and sitemap host warnings remain explicit when no site URL is available.
+
 ## 1.0.70 - 2026-02-10
 
 ### Added
