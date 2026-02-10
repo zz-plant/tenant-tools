@@ -1,7 +1,6 @@
 declare global {
   interface Window {
     __BUILDING_DASHBOARD__?: {
-      stewardKey?: string;
       isSteward?: boolean;
       accessKey?: string;
     };
@@ -9,7 +8,7 @@ declare global {
 }
 
 const dashboardConfig = window.__BUILDING_DASHBOARD__;
-const stewardKeyValue = dashboardConfig?.stewardKey ?? "";
+const stewardKeyValue = new URLSearchParams(window.location.search).get("stewardKey")?.trim() ?? "";
 const isStewardMode = Boolean(dashboardConfig?.isSteward);
 const accessKeyValue = dashboardConfig?.accessKey?.trim() ?? "";
 
@@ -145,10 +144,13 @@ document.querySelectorAll("[data-status-save]").forEach((button) => {
 
     try {
       const response = await fetch(
-        `/api/submissions/${id}/status?stewardKey=${encodeURIComponent(stewardKeyValue)}`,
+        `/api/submissions/${id}/status`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(stewardKeyValue ? { "x-steward-key": stewardKeyValue } : {}),
+          },
           body: JSON.stringify({ status: nextStatus }),
         }
       );
