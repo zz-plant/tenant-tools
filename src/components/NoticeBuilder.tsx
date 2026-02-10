@@ -854,6 +854,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           <section className="panel" id="builder">
             <div className="step-header">
               <h2>Build your notice</h2>
+              <p className="helper">
+                Building not listed? <a href="#waitlist">Open waitlist</a>.
+              </p>
               <div className="step-meta">
                 <div className="step-progress">
                   <div className="step-progress-row">
@@ -909,6 +912,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   );
                 })}
               </Tabs.List>
+              <p className="helper step-nav-hint">On mobile, swipe to see all steps.</p>
               {stepsLocked && (
                 <p className="helper">Finish step 1 to continue.</p>
               )}

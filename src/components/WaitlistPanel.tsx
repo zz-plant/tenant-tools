@@ -122,7 +122,7 @@ const WaitlistPanel = () => {
   };
 
   return (
-    <section className="panel waitlist-panel">
+    <section className="panel waitlist-panel" id="waitlist">
       <div className="waitlist-header">
         <div>
           <h2>Building not listed?</h2>

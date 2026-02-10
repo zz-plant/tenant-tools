@@ -108,13 +108,21 @@ const totalFiltered = filtered.length;
               <p class="helper">Ask a steward for the building key.</p>
               <ol class="helper-list">
                 <li>Get the building key from a resident steward.</li>
-                <li>Add <code>?key=YOUR_KEY</code> to the link.</li>
-                <li>Reload to view the dashboard.</li>
+                <li>Paste the key below and continue.</li>
+                <li>If needed, add <code>?key=YOUR_KEY</code> to the link.</li>
               </ol>
+              <form class="filter-grid" method="get">
+                {stewardKey && <input type="hidden" name="stewardKey" value={stewardKey} />}
+                <label>
+                  <span>Building key</span>
+                  <input class="input" name="key" type="text" placeholder="Paste building key" required />
+                </label>
+                <button class="button" type="submit">Continue</button>
+              </form>
               <div class="access-sample">
                 <p class="access-sample-title">Example</p>
                 <code>?key=YOUR_KEY</code>
-                <p class="helper">Put the key at the end.</p>
+                <p class="helper">You can also add the key at the end.</p>
               </div>
               <p class="access-warning">Do not share the key publicly.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>
