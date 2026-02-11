@@ -82,17 +82,17 @@ export const stageOptions: Array<{ id: Stage; label: string; description: string
   {
     id: "A",
     label: `A. ${stages.A}`,
-    description: "Use for most new issues.",
+    description: "Example: first message about a new issue.",
   },
   {
     id: "B",
     label: `B. ${stages.B}`,
-    description: "Use after the first notice.",
+    description: "Example: no repair yet after first message.",
   },
   {
     id: "C",
     label: `C. ${stages.C}`,
-    description: "Use after a follow-up.",
+    description: "Example: final calm reminder after follow-up.",
   },
 ];
 

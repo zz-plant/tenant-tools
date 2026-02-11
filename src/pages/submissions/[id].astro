@@ -70,8 +70,8 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
 <html lang="en">
   <head>
     <SeoHead
-      title="Submission summary | Building Ledger"
-      description="Private resident submission summary with timeline and factual details."
+      title="Record summary | Building Ledger"
+      description="Private resident record summary with timeline and factual details."
       canonicalPath={`/submissions/${encodeURIComponent(id ?? "")}`}
       noindex={true}
     />
@@ -81,9 +81,9 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
       <a class="skip-link" href="#main">Skip to main content</a>
       <header class="hero">
         <div class="hero-main">
-          <p class="eyebrow">Shared ledger entry</p>
-          <h1>Issue submission</h1>
-          <p class="tagline">This permalink shows the saved issue summary.</p>
+          <p class="eyebrow">Shared ledger record</p>
+          <h1>Issue record</h1>
+          <p class="tagline">This permalink shows the saved issue record.</p>
         </div>
       </header>
 
@@ -173,11 +173,32 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                 )}
               </div>
 
+
+
+              <div class="export-block share-checklist" id="share-checklist">
+                <div>
+                  <h3>Before you share</h3>
+                  <p class="helper">Check these items first.</p>
+                </div>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="share-check" />
+                  I removed names.
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="share-check" />
+                  I removed unit numbers.
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="share-check" />
+                  I removed contact details.
+                </label>
+                <p class="helper" data-share-status role="status" aria-live="polite"></p>
+              </div>
+
               <div class="export-block">
                 <div>
                   <h3>Details saved</h3>
                   <p class="helper">Short factual details only.</p>
-                  <p class="helper">Review this summary before sharing. Remove names or unit numbers.</p>
                   <p class="helper">Evidence files are not shown here.</p>
                 </div>
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
@@ -212,7 +233,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
             </>
           ) : (
             <div>
-              <h2>We could not find this submission.</h2>
+              <h2>We could not find this record.</h2>
               <p class="helper">Check the link, or confirm you used the correct building key.</p>
               <a class="button" href="/">Back to builder</a>
             </div>
@@ -224,5 +245,19 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
         <p>Safety first: review this summary before sharing. It may include names or unit numbers.</p>
       </footer>
     </div>
+
+    <script>
+      const checks = Array.from(document.querySelectorAll('.share-check'));
+      const status = document.querySelector('[data-share-status]');
+      const refreshShareStatus = () => {
+        if (!status || checks.length === 0) {
+          return;
+        }
+        const done = checks.every((item) => item instanceof HTMLInputElement && item.checked);
+        status.textContent = done ? 'Checklist complete. This record is ready to share.' : 'Complete all checks before sharing.';
+      };
+      checks.forEach((item) => item.addEventListener('change', refreshShareStatus));
+      refreshShareStatus();
+    </script>
   </body>
 </html>

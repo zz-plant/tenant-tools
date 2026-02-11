@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.0.72 - 2026-02-11
+
+### Added
+
+- Preview now shows a privacy status strip to flag contact details and unit hints before sharing.
+- Submission record page now includes a local “Before you share” checklist for names, unit numbers, and contact details.
+
+### Changed
+
+- Step 1 now keeps required choices first and moves location/stage into an optional setup section.
+- Notice builder now shows explicit mobile Previous/Next step controls in addition to swipe.
+- Dashboard copy now uses “records” language and explains that small counts are hidden for privacy.
+- Stage and export audience cards now include helper descriptions for easier decisions.
+- Reset action is now a tertiary clear action with confirmation to reduce accidental data loss.
+
+### Security
+
+- Early resident-key reminders now appear before save actions to reduce accidental unsaved private workflows.
+- Privacy safety messaging is more consistent at preview and sharing points.
+
 ## 1.0.71 - 2026-02-10
 
 ### Changed
