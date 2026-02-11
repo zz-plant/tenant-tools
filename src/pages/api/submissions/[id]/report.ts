@@ -17,7 +17,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
 
   const payload = await parseJsonBody(request, {});
   const increment = typeof payload?.increment === "number" ? payload.increment : 1;
-  if (!Number.isFinite(increment) || increment < 1 || increment > 5) {
+  if (!Number.isInteger(increment) || increment < 1 || increment > 5) {
     return jsonError("Invalid increment.", 400);
   }
 

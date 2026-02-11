@@ -164,7 +164,7 @@ export const validateSubmissionInput = (payload: unknown) => {
   validateRequiredDate("Report date", reportDate, errors);
 
   const reportCount = asNumber(data.reportCount);
-  if (!Number.isFinite(reportCount) || reportCount < 1 || reportCount > 50) {
+  if (!Number.isInteger(reportCount) || reportCount < 1 || reportCount > 50) {
     errors.push("Report count is invalid.");
   }
 
