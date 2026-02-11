@@ -27,6 +27,7 @@ import { detailCharacterLimit } from "../lib/submissions";
 import useTimedCallbacks from "../hooks/useTimedCallbacks";
 import { addDays, formatCalendarDate, formatDate, formatTimelineDate, getCurrentTime } from "../lib/dateUtils";
 import { fillTemplate, formatIssueLabel } from "../lib/noticeUtils";
+import { detectSensitiveContent } from "../lib/validation";
 import {
   detailWarningThreshold,
   evidenceSafetyChecklist,
@@ -106,7 +107,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [impactCount] = useState(1);
   const [copyLabel, setCopyLabel] = useState("Copy text");
   const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy summary");
-  const [saveLabel, setSaveLabel] = useState("Save to ledger");
+  const [saveLabel, setSaveLabel] = useState("Save record");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveError, setSaveError] = useState("");
   const [submissionUrl, setSubmissionUrl] = useState("");
@@ -116,6 +117,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
   const [exportStatusMessage, setExportStatusMessage] = useState("");
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
+  const [showOptionalSetup, setShowOptionalSetup] = useState(false);
   const { scheduleTimeout } = useTimedCallbacks();
   const stepProgress = Math.round((currentStep / steps.length) * 100);
   const currentStepInfo = steps[currentStep - 1];
@@ -564,13 +566,13 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const handleLedgerSave = async () => {
     if (!formState.building || !formState.issue) {
       setSaveStatus("error");
-      setSaveError("Select a building and issue before saving.");
+      setSaveError("Select a building and issue before saving this record.");
       return;
     }
     if (!normalizedBuildingKey) {
       setSaveStatus("error");
-      setSaveLabel("Save to ledger");
-      setSaveError("Add your building key to the URL before saving.");
+      setSaveLabel("Save record");
+      setSaveError("Add your building key before saving this record.");
       return;
     }
 
@@ -618,7 +620,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           ? payload.details.filter((item): item is string => typeof item === "string")
           : [];
         const detailText = details.length > 0 ? ` ${details.join(" ")}` : "";
-        throw new Error(`${payload?.error || "Unable to save right now."}${detailText}`);
+        throw new Error(`${payload?.error || "Unable to save this record right now."}${detailText}`);
       }
 
       setSubmissionUrl(payload.url || "");
@@ -626,8 +628,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       setSaveLabel("Saved");
     } catch (error) {
       setSaveStatus("error");
-      setSaveLabel("Save to ledger");
-      setSaveError(error instanceof Error ? error.message : "We could not save the ledger entry.");
+      setSaveLabel("Save record");
+      setSaveError(error instanceof Error ? error.message : "We could not save this record.");
     }
   };
 
@@ -647,6 +649,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   };
 
   const handleReset = () => {
+    const confirmed = window.confirm("Clear this form and start over?");
+    if (!confirmed) {
+      return;
+    }
     const today = new Date();
     const formatted = formatDate(today);
     setFormState({
@@ -659,7 +665,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     setPlainMeaningVisible(false);
     setCopyLabel("Copy text");
     setSummaryCopyLabel("Copy summary");
-    setSaveLabel("Save to ledger");
+    setSaveLabel("Save record");
     setSaveStatus("idle");
     setSaveError("");
     setSubmissionUrl("");
@@ -724,6 +730,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
         .filter(Boolean) as Array<{ label: string; value: string }>,
     [formState]
   );
+
+  const privacyStatus = useMemo(() => {
+    const fieldsToScan = [
+      formState.building,
+      formState.location,
+      formState.issueDescription,
+      ...detailSummaryItems.map((item) => item.value),
+    ];
+    const flags = fieldsToScan.flatMap((value) => detectSensitiveContent(String(value || "")));
+    const hasUnitHint = flags.includes("unit");
+    const hasContactHint = flags.includes("email") || flags.includes("phone");
+
+    return {
+      hasUnitHint,
+      hasContactHint,
+      hasEvidenceNote: Boolean(formState.attachment.trim()),
+    };
+  }, [detailSummaryItems, formState.attachment, formState.building, formState.issueDescription, formState.location]);
 
   const savedMetaItems = [
     selectedPortfolio?.label ? { label: "Portfolio", value: selectedPortfolio.label } : null,
@@ -815,18 +839,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <a className="button hero-button" href="#builder">
               Start
             </a>
-            <a className="button button-secondary hero-button" href="#preview">
-              Preview
-            </a>
-            <a className="button button-secondary hero-button" href="#record">
-              Next steps
-            </a>
           </div>
+          <p className="helper hero-jump-links">
+            Quick links: <a href="#preview">Preview</a> · <a href="#record">Next steps</a>
+          </p>
           <div className="tag-row">
             <span>No names saved</span>
             <span>Short facts only</span>
             <span>Evidence stays private</span>
-            <span>Share with neighbors only</span>
+            <span>Resident key needed to save</span>
           </div>
         </div>
         <div className="hero-steps" aria-label="Quick steps">
@@ -913,6 +934,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 })}
               </Tabs.List>
               <p className="helper step-nav-hint">On mobile, swipe to see all steps.</p>
+              <div className="mobile-step-controls" aria-label="Mobile step controls">
+                <Button
+                  className="button button-secondary button-compact"
+                  type="button"
+                  onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+                  disabled={currentStep === 1}
+                >
+                  Previous step
+                </Button>
+                <Button
+                  className="button button-secondary button-compact"
+                  type="button"
+                  onClick={() => setCurrentStep((prev) => Math.min(steps.length, prev + 1))}
+                  disabled={currentStep === steps.length || (currentStep === 1 && !isStep1Complete)}
+                >
+                  Next step
+                </Button>
+              </div>
               {stepsLocked && (
                 <p className="helper">Finish step 1 to continue.</p>
               )}
@@ -922,43 +961,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Building basics</h3>
-                      <p className="helper">Quick start</p>
-                    </div>
-                    <div className="quick-start-grid" aria-label="Quick start options">
-                      {(Object.keys(quickStartSummary) as QuickStartPreset[]).map((preset) => {
-                        const option = quickStartSummary[preset];
-                        return (
-                          <button
-                            key={preset}
-                            type="button"
-                            className="quick-start-card"
-                            onClick={() => handleQuickStart(preset)}
-                          >
-                            <span className="quick-start-title">{option.title}</span>
-                            <span className="quick-start-description">{option.description}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="guided-action" role="status" aria-live="polite">
-                      <p className="guided-action-label">Next: {guidedAction.label}</p>
-                      <div className="guided-action-buttons">
-                        <Button
-                          className="button button-secondary"
-                          type="button"
-                          onClick={() => setCurrentStep(guidedAction.step)}
-                        >
-                          Go now
-                        </Button>
-                        <Button
-                          className="button"
-                          type="button"
-                          onClick={handleFastTrackToPreview}
-                          disabled={!canFastTrack}
-                        >
-                          Finish setup fast
-                        </Button>
-                      </div>
+                      <p className="helper">Required first.</p>
                     </div>
                     <div className="basics-checklist" aria-label="Basics checklist">
                       {basicsChecklist.map((item) => (
@@ -1044,70 +1047,134 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       </RadioGroup.Root>
                     </div>
 
-                  </div>
-
-                  <div className="form-section">
-                    <div className="form-section-header">
-                      <h3>Location and stage</h3>
-                    </div>
                     <label>
-                      Location zone (optional)
-                      <Select.Root value={formState.zone || null} onValueChange={updateSelect("zone")}>
-                        <Select.Trigger className="select-trigger" aria-label="Issue location zone">
-                          <Select.Value placeholder="Select zone" />
-                          <Select.Icon className="select-icon">
-                            <span aria-hidden="true">▾</span>
-                          </Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Positioner className="select-positioner">
-                            <Select.Popup className="select-popup">
-                              <Select.List className="select-list">
-                                {zoneOptions.map((option) => (
-                                  <Select.Item key={option.id} value={option.id} className="select-item">
-                                    <Select.ItemText>{option.label}</Select.ItemText>
-                                    <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                  </Select.Item>
-                                ))}
-                              </Select.List>
-                            </Select.Popup>
-                          </Select.Positioner>
-                        </Select.Portal>
-                      </Select.Root>
-                      <p className="helper">General area only. No unit numbers.</p>
+                      Resident key (optional now)
+                      <Input
+                        className="input"
+                        type="password"
+                        value={buildingKey}
+                        onChange={handleBuildingKeyInput}
+                        placeholder="Paste resident key now or later"
+                        autoComplete="off"
+                        spellCheck={false}
+                      />
+                      <p className="helper">You need this key to save a shared record.</p>
                     </label>
 
-                    <fieldset className="stage-selector">
-                      <legend>Notice stage</legend>
-                      <RadioGroup.Root
-                        className="stage-options"
-                        aria-label="Notice stage"
-                        value={formState.stage}
-                        onValueChange={(value) => {
-                          if (typeof value === "string") {
-                            setFormState((prev) => ({ ...prev, stage: value as Stage }));
-                          }
-                        }}
+                    <div className="optional-setup">
+                      <button
+                        className="link-button"
+                        type="button"
+                        onClick={() => setShowOptionalSetup((prev) => !prev)}
+                        aria-expanded={showOptionalSetup}
                       >
-                        {stageOptions.map((option) => (
-                          <RadioGroup.Item
-                            key={option.id}
-                            value={option.id}
-                            render={<div />}
-                            className={`preset-card ${formState.stage === option.id ? "active" : ""}`}
+                        {showOptionalSetup ? "Hide optional setup" : "Show optional setup"}
+                      </button>
+                      {showOptionalSetup && (
+                        <>
+                          <p className="helper">You can skip this now.</p>
+                          <div className="optional-setup-body">
+                        <label>
+                          Location zone (optional)
+                          <Select.Root value={formState.zone || null} onValueChange={updateSelect("zone")}>
+                            <Select.Trigger className="select-trigger" aria-label="Issue location zone">
+                              <Select.Value placeholder="Select zone" />
+                              <Select.Icon className="select-icon">
+                                <span aria-hidden="true">▾</span>
+                              </Select.Icon>
+                            </Select.Trigger>
+                            <Select.Portal>
+                              <Select.Positioner className="select-positioner">
+                                <Select.Popup className="select-popup">
+                                  <Select.List className="select-list">
+                                    {zoneOptions.map((option) => (
+                                      <Select.Item key={option.id} value={option.id} className="select-item">
+                                        <Select.ItemText>{option.label}</Select.ItemText>
+                                        <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                      </Select.Item>
+                                    ))}
+                                  </Select.List>
+                                </Select.Popup>
+                              </Select.Positioner>
+                            </Select.Portal>
+                          </Select.Root>
+                          <p className="helper">General area only. No unit numbers.</p>
+                        </label>
+
+                        <fieldset className="stage-selector">
+                          <legend>Notice stage</legend>
+                          <RadioGroup.Root
+                            className="stage-options"
+                            aria-label="Notice stage"
+                            value={formState.stage}
+                            onValueChange={(value) => {
+                              if (typeof value === "string") {
+                                setFormState((prev) => ({ ...prev, stage: value as Stage }));
+                              }
+                            }}
                           >
-                            <span className="preset-radio" aria-hidden="true">
-                              <span className="preset-radio-outer">
-                                <span className="preset-radio-indicator" />
-                              </span>
-                            </span>
-                            <div>
-                              <p className="preset-title">{option.label}</p>
-                            </div>
-                          </RadioGroup.Item>
-                        ))}
-                      </RadioGroup.Root>
-                    </fieldset>
+                            {stageOptions.map((option) => (
+                              <RadioGroup.Item
+                                key={option.id}
+                                value={option.id}
+                                render={<div />}
+                                className={`preset-card ${formState.stage === option.id ? "active" : ""}`}
+                              >
+                                <span className="preset-radio" aria-hidden="true">
+                                  <span className="preset-radio-outer">
+                                    <span className="preset-radio-indicator" />
+                                  </span>
+                                </span>
+                                <div>
+                                  <p className="preset-title">{option.label}</p>
+                                  <p className="helper">{option.description}</p>
+                                </div>
+                              </RadioGroup.Item>
+                            ))}
+                          </RadioGroup.Root>
+                        </fieldset>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="quick-start-grid" aria-label="Quick start options">
+                      {(Object.keys(quickStartSummary) as QuickStartPreset[]).map((preset) => {
+                        const option = quickStartSummary[preset];
+                        return (
+                          <button
+                            key={preset}
+                            type="button"
+                            className="quick-start-card"
+                            onClick={() => handleQuickStart(preset)}
+                          >
+                            <span className="quick-start-title">{option.title}</span>
+                            <span className="quick-start-description">{option.description}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="guided-action" role="status" aria-live="polite">
+                      <p className="guided-action-label">Next: {guidedAction.label}</p>
+                      <div className="guided-action-buttons">
+                        <Button
+                          className="button button-secondary"
+                          type="button"
+                          onClick={() => setCurrentStep(guidedAction.step)}
+                        >
+                          Go now
+                        </Button>
+                        <Button
+                          className="button"
+                          type="button"
+                          onClick={handleFastTrackToPreview}
+                          disabled={!canFastTrack}
+                        >
+                          Finish setup fast
+                        </Button>
+                      </div>
+                    </div>
+
                   </div>
                 </Tabs.Panel>
 
@@ -1176,6 +1243,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       </label>
                     </div>
                   </div>
+
 
                   <div className="form-section">
                     <div className="form-section-header">
@@ -1289,9 +1357,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               <Button className="button button-secondary" type="button" onClick={handleRepeatNotice} disabled={!isNoticeReady}>
                 {repeatLabel}
               </Button>
-              <Button className="button button-secondary" type="button" onClick={handleReset}>
-                Reset
-              </Button>
             </div>
           </div>
           <p className="helper" role="status" aria-live="polite">
@@ -1312,6 +1377,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   Go to step 1
                 </Button>
               )}
+            </div>
+          </section>
+          <section className="preview-section">
+            <div className="privacy-strip" aria-live="polite">
+              <p className={`privacy-chip ${privacyStatus.hasContactHint ? "risk" : "ok"}`}>
+                {privacyStatus.hasContactHint ? "Contact info found" : "No contact info found"}
+              </p>
+              <p className={`privacy-chip ${privacyStatus.hasUnitHint ? "risk" : "ok"}`}>
+                {privacyStatus.hasUnitHint ? "Unit hint found" : "No unit hints found"}
+              </p>
+              <p className={`privacy-chip ${privacyStatus.hasEvidenceNote ? "ok" : "neutral"}`}>
+                {privacyStatus.hasEvidenceNote ? "Evidence note included" : "No evidence note"}
+              </p>
             </div>
           </section>
           <section className="preview-section">
@@ -1418,6 +1496,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         </span>
                         <div>
                           <p className="preset-title">{option.label}</p>
+                          <p className="helper">{option.description}</p>
                         </div>
                       </RadioGroup.Item>
                     ))}
@@ -1425,19 +1504,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <pre className="output output-summary">{exportSummary}</pre>
                   <div className="submission-block">
                     <div>
-                      <h3>Save to the shared ledger</h3>
-                      <label>
-                        Building key
-                        <Input
-                          className="input"
-                          type="password"
-                          value={buildingKey}
-                          onChange={handleBuildingKeyInput}
-                          placeholder="Paste building key"
-                          autoComplete="off"
-                          spellCheck={false}
-                        />
-                      </label>
+                      <h3>Save to shared records</h3>
                       <p className="helper">Use the resident key from your organizer. Keep this key private.</p>
                       {!formState.building || !formState.issue ? (
                         <p className="helper">Choose a building and issue to enable saving.</p>
@@ -1465,7 +1532,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     )}
                     {saveStatus === "error" && (
                       <p className="submission-error" role="alert">
-                        {saveError || "We could not save the ledger entry."}
+                        {saveError || "We could not save this record."}
                       </p>
                     )}
                     {linkStatusMessage && (
@@ -1475,7 +1542,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     )}
                     {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
                       <div className="submission-details">
-                        <p className="helper">Saved details:</p>
+                        <p className="helper">Saved record details:</p>
                         <ul>
                           {savedMetaItems.map((item) => (
                             <li key={item.label}>
@@ -1490,6 +1557,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         </ul>
                       </div>
                     )}
+                    <button className="link-button danger-link" type="button" onClick={handleReset}>
+                      Clear form and start over
+                    </button>
                   </div>
                 </>
               )}

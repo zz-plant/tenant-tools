@@ -82,9 +82,9 @@ const totalFiltered = filtered.length;
       <header class="hero">
         <div class="hero-main">
           <p class="eyebrow">Building ledger</p>
-          <h1>Resident dashboard</h1>
+          <h1>Resident records</h1>
           <p class="tagline">
-            See recent reports by status. Add “Me too” with one click.
+            See recent records by status. Add “Me too” with one click.
           </p>
           <div class="tag-row">
             <span>Building: {buildingId || "Not listed"}</span>
@@ -158,13 +158,13 @@ const totalFiltered = filtered.length;
               </div>
 
               <div>
-                <h2>Recent submissions</h2>
-                <p class="helper">Showing {totalVisible} of {totalFiltered} submissions.</p>
+                <h2>Recent records</h2>
+                <p class="helper">Showing {totalVisible} of {totalFiltered} records.</p>
                 <p class="helper">Use the filters on the right to change this list.</p>
               </div>
 
               {totalFiltered === 0 ? (
-                <p class="helper">No submissions match these filters.</p>
+                <p class="helper">No records match these filters.</p>
               ) : (
                 statusIds.map((status) => (
                   <section class="status-group" data-status-group={status}>
@@ -173,7 +173,7 @@ const totalFiltered = filtered.length;
                       <span class="status-pill" data-status-count={status}>{formatResidentReportCount(grouped[status].length)}</span>
                     </div>
                     {grouped[status].length === 0 ? (
-                      <p class="helper">No submissions in this status.</p>
+                      <p class="helper">No records in this status.</p>
                     ) : (
                       grouped[status].map((record) => (
                         <article class="issue-card" data-submission-id={record.id} data-current-status={record.status}>
@@ -181,7 +181,7 @@ const totalFiltered = filtered.length;
                             <p class="issue-title">{record.issueLabel}</p>
                             <p class="issue-meta">
                               Started {record.startDate || "Date not listed"}. Reports:{" "}
-                              <span data-report-count={record.id}>{formatResidentReportCount(record.reportCount)}</span>.
+                              <span data-report-count={record.id} title="Small counts are hidden for privacy">{formatResidentReportCount(record.reportCount)}</span>.
                             </p>
                             <p class="issue-meta">
                               Last update saved on {record.reportDate || record.createdAt || "Date not listed"}.
@@ -306,8 +306,9 @@ const totalFiltered = filtered.length;
                 <h3>Notes</h3>
                 <ul class="submission-detail-list">
                   <li>Use “Me too” to add your report without writing.</li>
-                  <li>Stewards can update status for clean records.</li>
+                  <li>Stewards can update status for clear records.</li>
                   <li>Counts are resident-reported and not verified.</li>
+                  <li>Small counts are hidden to protect resident privacy.</li>
                 </ul>
               </div>
             </>
