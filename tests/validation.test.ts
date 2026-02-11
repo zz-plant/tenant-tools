@@ -55,6 +55,15 @@ describe("submission validation sensitive content checks", () => {
     assert.ok(result.errors.includes("Details: Remove email addresses."));
   });
 
+  it("rejects non-integer report counts", () => {
+    const result = validateSubmissionInput({
+      ...basePayload,
+      reportCount: 1.5,
+    });
+    assert.equal(result.ok, false);
+    assert.ok(result.errors.includes("Report count is invalid."));
+  });
+
   it("allows numeric ticket numbers without phone separators", () => {
     const result = validateSubmissionInput({
       ...basePayload,
