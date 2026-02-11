@@ -41,22 +41,22 @@ export const exportAudienceOptions: Array<{ id: ExportAudience; label: string; d
   {
     id: "inspector",
     label: "Inspector",
-    description: "Dates and conditions for inspection.",
+    description: "Includes timeline and factual details.",
   },
   {
     id: "legal",
     label: "Legal aid",
-    description: "Stage history and report counts.",
+    description: "Includes stage history and report counts.",
   },
   {
     id: "management",
     label: "Management",
-    description: "Concise summary without counts.",
+    description: "Excludes evidence details for safer sharing.",
   },
   {
     id: "personal",
     label: "Personal records",
-    description: "Full timeline for your files.",
+    description: "Includes full timeline for your records.",
   },
 ];
 

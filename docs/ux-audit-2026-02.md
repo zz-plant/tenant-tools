@@ -1,149 +1,195 @@
-# UX Audit — Building Ledger (2026-02)
+# UX Audit — Building Ledger (2026-02, Follow-up)
 
-## Method
+## Scope of this follow-up audit
 
-- Reviewed key resident flows in the notice builder, building dashboard, and submission detail pages.
-- Reviewed privacy and safety copy, progressive disclosure, and accessibility cues.
-- Cross-checked current behavior against project safety goals in `AGENTS.md`.
+This follow-up reviews the current resident flow after recent UX updates.
 
-## What is working well
+Reviewed areas:
+- Notice builder (step flow, copy/save behavior, safety cues)
+- Building dashboard (records list, privacy count language)
+- Submission permalink (share checks, detail clarity)
 
-1. **Clear safety framing at entry points**
-   - Home and dashboard surfaces repeat privacy guardrails early.
-   - Copy is mostly short and literal.
+Primary question:
 
-2. **Strong progressive flow for stressed users**
-   - Step locking and progress indicator reduce early complexity.
-   - Quick-start and guided-action blocks reduce decision friction.
+**Does the current interface help a stressed resident take one safe next step with low effort?**
 
-3. **Privacy-minded defaults are visible in UI**
-   - Evidence warnings are present inline.
-   - Report counts are bucketed for small numbers.
+This audit uses the same Kondo-style framing:
+- **Remove** = reduce noise or risk
+- **Move** = keep content, place it at the right decision point
+- **Modify** = keep feature, refine wording/interaction for safety and clarity
 
-4. **Operational usefulness is strong**
-   - Export and timeline support procedural next steps.
-   - “Me too” is one-click and low effort.
+---
 
-## Highest-priority UX improvements (recommended)
+## What improved since the last audit
 
-### 1) Add one persistent “privacy status” strip in preview
+1. **Step-1 overload was reduced**
+   - Optional setup and quick-start actions now appear only after building + issue are selected.
+   - This better protects first-time users from early complexity.
 
-**Why:** Safety reminders are present but fragmented. A single compact status strip helps users verify sharing risk before copy/save.
+2. **Terminology is more consistent**
+   - Resident-facing wording moved toward “record,” improving scan clarity.
 
-**Proposed UI:**
-- `No names detected` / `Review detail text`
-- `No unit hints detected` / `Unit hint found`
-- `Evidence note included` / `No evidence note`
+3. **Privacy explanation is more visible on records list**
+   - The dashboard now explains small-count privacy behavior inline.
 
-**Impact:** High safety + confidence; low implementation complexity.
+4. **Share safety is present at permalink time**
+   - The “Before you share” checklist appears where link sharing is likely.
 
-### 2) Reduce step-1 density by splitting “basics” and “context”
+These are meaningful improvements and align with safety-first product goals.
 
-**Why:** Current step 1 combines building, issue gallery, location, stage, language toggles, and dates setup entry points. For first-time users this creates visual overload.
+---
 
-**Proposed changes:**
-- Keep only **building + issue** in first fold.
-- Move **location/stage/language toggles** into an expandable “Optional setup” block collapsed by default.
-- Keep quick-start cards but place them below primary required fields.
+## Follow-up Kondo recommendations
 
-**Impact:** High completion rate gain for first-time users.
+## 1) Remove
 
-### 3) Make building-key requirements explicit earlier
+### 1.1 Remove duplicate safety reminders inside the same block
 
-**Why:** Save failure due to missing key is handled, but key awareness occurs relatively late (preview/save block).
+**Observation:** Some sections still include multiple nearby helper lines with overlapping privacy meaning.
 
-**Proposed changes:**
-- Add an always-visible “Resident key needed to save” chip near top action area.
-- Add a non-blocking inline prompt in step 1: “Have key now?” with optional input.
-- Keep current secure behavior; this is discoverability only.
+**Recommendation:** Keep one concise line per block unless a second line adds new action.
 
-**Impact:** High reduction in last-step confusion.
+**Why this matters:** Less reading load improves completion for ESL/stressed users.
 
-### 4) Add “before you share” checklist in submission permalink view
+---
 
-**Why:** Current warning text is good, but share intent can be supported with a quick checkbox checklist (local-only, no persistence).
+### 1.2 Remove optional “next” framing when user cannot act yet
 
-**Proposed checklist:**
-- I removed names.
-- I removed unit numbers.
-- I removed contact details.
+**Observation:** Some progression hints appear before prerequisites are complete.
 
-**Impact:** High safety for external sharing.
+**Recommendation:** Suppress “next step” action language until the user has unlocked that action.
 
-### 5) Improve accessibility for step navigation on mobile
+**Why this matters:** Reduces false urgency and confusion.
 
-**Why:** The hint says “swipe to see all steps,” but discoverability can still be weak for some users.
+---
 
-**Proposed changes:**
-- Add explicit left/right step buttons near tabs on mobile.
-- Ensure tab labels remain fully visible with horizontal snap and stronger active-state contrast.
+### 1.3 Remove high-risk destructive action from dense save area
 
-**Impact:** Medium-high usability improvement.
+**Observation:** “Clear form and start over” remains in the same save/export zone.
 
-## Medium-priority refinements
+**Recommendation:** Move it behind a secondary details element (for example, “More actions”) and keep confirm prompt.
 
-1. **Clarify CTA hierarchy in preview panel**
-   - Today, `Copy text`, `Repeat`, and `Reset` appear together; `Reset` is risky near primary actions.
-   - Move `Reset` into tertiary link-style action with confirmation.
+**Why this matters:** Lowers accidental data loss risk during copy/save tasks.
 
-2. **Normalize terminology consistency**
-   - Use one canonical phrase for records: pick either “submission,” “ledger entry,” or “record” for user-facing headings.
+---
 
-3. **Contextual helper text for stage selection**
-   - Stage A/B/C can still feel abstract. Add one-line examples under stage radio options.
+## 2) Move
 
-4. **Surface count bucketing meaning inline**
-   - Add tooltip: “Small counts are hidden to protect resident privacy.”
+### 2.1 Move resident-key input to save section and keep only awareness in step 1
 
-5. **Make export audience choice self-explanatory**
-   - Show one-sentence consequence under each audience option (what is included/excluded).
+**Observation:** Step 1 currently includes key input plus a top-level reminder.
 
-## What to remove or de-emphasize
+**Recommendation:** Keep a small awareness chip in step 1 and place full key input where save happens.
 
-1. **De-emphasize duplicate safety copy blocks**
-   - Keep one strong reminder per section instead of repeating similar lines several times.
+**Suggested copy:**
+> You can build a notice now. You need the key only to save a shared record.
 
-2. **Reduce decorative complexity in hero section**
-   - Multiple hero action buttons plus step cards can feel like two competing onboarding paths.
-   - Keep one primary “Start” action and move other jump links to subtle anchors.
+**Why this matters:** Keeps early flow focused while preserving discoverability.
 
-3. **Avoid showing too many optional controls before required completion**
-   - Maintain strict progressive reveal for optional details to lower cognitive load.
+---
 
-## Suggested UX roadmap (4 short iterations)
+### 2.2 Move “privacy status strip” next to copy/share actions only
 
-### Iteration 1 (1–2 days)
-- Add preview privacy status strip.
-- Reposition reset action.
-- Add inline copy explaining small-count bucketing.
+**Observation:** Privacy checks are useful, but their value is highest at copy/share moments.
 
-### Iteration 2 (2–3 days)
-- Simplify step-1 first fold.
-- Collapse optional setup by default.
-- Add early resident-key awareness chip.
+**Recommendation:** Anchor privacy status directly above copy notice / copy link controls.
 
-### Iteration 3 (1–2 days)
-- Add mobile step-nav affordances.
-- Improve active focus and contrast checks for tabs and quick-start cards.
+**Why this matters:** Better timing increases correction before external sharing.
 
-### Iteration 4 (1–2 days)
-- Add submission share checklist.
-- Harmonize record terminology.
+---
 
-## Success metrics to track
+### 2.3 Move helper text for count bucketing to every count context
+
+**Observation:** The dashboard now explains count bucketing, but not all count surfaces echo this.
+
+**Recommendation:** Reuse one short helper sentence near report counts in list/detail contexts.
+
+**Why this matters:** Consistent privacy explanation reduces mistrust (“why is count not exact?”).
+
+---
+
+## 3) Modify
+
+### 3.1 Modify share checklist into an actionable gate for copy-link
+
+**Observation:** Checklist is currently advisory only.
+
+**Recommendation:** Keep it local-only and disable “Copy link” until all checks are ticked.
+
+**Why this matters:** Adds a lightweight safety pause at the exact risk point.
+
+---
+
+### 3.2 Modify checklist copy to be more literal and concrete
+
+Current examples are good; make one line more explicit:
+- “I removed contact details” → “I removed phone numbers and email addresses.”
+
+**Why this matters:** Reduces ambiguity for ESL users.
+
+---
+
+### 3.3 Modify mobile step navigation hint
+
+**Observation:** “Swipe to see all steps” can remain discoverability-heavy.
+
+**Recommendation:** Keep explicit previous/next buttons and shorten hint text:
+> Use step buttons below on mobile.
+
+**Why this matters:** Action language is clearer than gesture instruction.
+
+---
+
+### 3.4 Modify export audience explanations to show consequence labels
+
+**Observation:** Audience options are present but consequences may still be abstract.
+
+**Recommendation:** Add short consequence labels under each option:
+- “Inspector: includes timeline + factual details”
+- “Management: excludes evidence details”
+
+**Why this matters:** Reduces wrong export selection.
+
+---
+
+## Prioritized implementation sequence (next small iterations)
+
+### Iteration A (fast + low risk)
+- De-duplicate helper copy in dense blocks.
+- Move clear/reset into “More actions.”
+- Normalize count-bucketing helper across contexts.
+
+### Iteration B (flow simplification)
+- Keep key awareness in step 1; move key input to save block.
+- Keep progress hints hidden until action is unlocked.
+
+### Iteration C (share safety)
+- Turn share checklist into local copy-link gate.
+- Tighten checklist wording for concrete PII examples.
+
+### Iteration D (mobile/export polish)
+- Update mobile hint copy.
+- Add consequence microcopy under export audience options.
+
+---
+
+## Manual QA checklist for this follow-up plan
+
+- First-time user can finish step 1 without reading optional controls.
+- User understands when key is needed and where to add it.
+- Clear/reset is hard to trigger by mistake.
+- Share checklist blocks link copy until all checks are complete (if gating is added).
+- Count privacy behavior is clear in dashboard and detail views.
+- Mobile step progress is clear without swipe-only discovery.
+- Copy remains short, literal, and non-idiomatic.
+
+---
+
+## Suggested metrics for next review
 
 - Step-1 completion rate
-- Save success rate on first attempt
-- Rate of save errors due to missing key
-- Time-to-first-copy
-- Share safety checklist completion rate (if added)
-- Mobile abandonment before step 2
-
-## QA checklist for UX updates
-
-- First-time user can complete step 1 without guidance.
-- User understands key requirement before pressing save.
-- Reset action cannot be triggered accidentally.
-- Privacy warnings are visible at key decision points (copy/save/share).
-- Mobile users can reliably navigate all steps.
-- Copy remains ESL-first and non-idiomatic.
+- Save attempt success (first try)
+- Save failures due to missing key
+- Link copy attempts before checklist completion
+- Mobile drop-off before step 2
+- % of records shared with checklist completed (if instrumented)

@@ -92,7 +92,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
           {!hasAccess ? (
             <div class="access-panel">
               <h2>Access key required</h2>
-              <p class="helper">This entry is private to residents in the building.</p>
+              <p class="helper">This record is private to residents in the building.</p>
               <p class="helper">The link can include private details.</p>
               <p class="helper">Ask a resident steward for the key.</p>
               <p class="helper">If the key is correct but this still does not load, ask a steward to check the link.</p>
@@ -148,6 +148,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                 </div>
               </div>
               <p class="helper">Review this summary before sharing. Remove names or unit numbers.</p>
+              <p class="helper">Small report counts may be hidden to protect resident privacy.</p>
               {dashboardUrl && (
                 <a class="button button-secondary" href={dashboardUrl}>
                   Back to building dashboard
@@ -190,7 +191,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                 </label>
                 <label class="checkbox-label">
                   <input type="checkbox" class="share-check" />
-                  I removed contact details.
+                  I removed phone numbers and email addresses.
                 </label>
                 <p class="helper" data-share-status role="status" aria-live="polite"></p>
               </div>
