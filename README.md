@@ -127,8 +127,11 @@ Use Conventional Commit style:
 - Architecture and data flow: `docs/architecture.md`
 - Active modernization plan: `docs/modernization-plan.md`
 - Dependency capability review: `docs/tech-stack-capability-research-2026-02.md`
+- MCP + agent skills research: `docs/mcp-agent-skills-research-2026-02.md`
+- Agent skills playbook: `docs/agent-skills-playbook.md`
 - Rule data pack notes: `src/data/rules/README.md`
-- Agent skill guidance: `skills/building-ledger-agent/SKILL.md`
+- Core agent skill: `skills/building-ledger-agent/SKILL.md`
+- Release-note skill: `skills/building-ledger-release-note/SKILL.md`
 
 ---
 

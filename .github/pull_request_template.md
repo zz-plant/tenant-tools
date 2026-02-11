@@ -13,6 +13,12 @@
 - Add before/after screenshots when any visible UI changed.
 - If no visual change, write: `No UI change.`
 
+## Skill usage (contributors/agents)
+- [ ] `building-ledger-agent` used (general policy/workflow)
+- [ ] `building-ledger-security-review` used (if security-sensitive)
+- [ ] `building-ledger-copy-review` used (if user-facing text changed)
+- [ ] `building-ledger-release-note` used (for PR/changelog drafting)
+
 ## Security and privacy notes
 - Confirm data minimization impact.
 - Confirm access control impact.
