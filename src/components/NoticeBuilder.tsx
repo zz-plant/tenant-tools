@@ -117,6 +117,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
   const [exportStatusMessage, setExportStatusMessage] = useState("");
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
+  const [shareChecks, setShareChecks] = useState({ names: false, units: false, contact: false });
   const [showOptionalSetup, setShowOptionalSetup] = useState(false);
   const { scheduleTimeout } = useTimedCallbacks();
   const stepProgress = Math.round((currentStep / steps.length) * 100);
@@ -143,6 +144,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const normalizedBuildingKey = buildingKey.trim();
   const canSaveLedger = Boolean(formState.building && formState.issue && normalizedBuildingKey);
   const canFastTrack = Boolean(formState.building && formState.issue);
+  const canCopyPermalink = shareChecks.names && shareChecks.units && shareChecks.contact;
 
   const quickStartSummary: Record<QuickStartPreset, { title: string; description: string }> = {
     first_notice: {
@@ -624,6 +626,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       }
 
       setSubmissionUrl(payload.url || "");
+      setShareChecks({ names: false, units: false, contact: false });
       setSaveStatus("saved");
       setSaveLabel("Saved");
     } catch (error) {
@@ -673,6 +676,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     setNoticeStatusMessage("");
     setExportStatusMessage("");
     setLinkStatusMessage("");
+    setShareChecks({ names: false, units: false, contact: false });
     setRepeatLabel("Repeat with today's date");
     setExportAudience("inspector");
     setSimilarIssues([]);
@@ -840,9 +844,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               Start
             </a>
           </div>
-          <p className="helper hero-jump-links">
-            Quick links: <a href="#preview">Preview</a> · <a href="#record">Next steps</a>
-          </p>
           <div className="tag-row">
             <span>No names saved</span>
             <span>Short facts only</span>
@@ -933,7 +934,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   );
                 })}
               </Tabs.List>
-              <p className="helper step-nav-hint">On mobile, swipe to see all steps.</p>
+              <p className="helper step-nav-hint">Use step buttons below on mobile.</p>
               <div className="mobile-step-controls" aria-label="Mobile step controls">
                 <Button
                   className="button button-secondary button-compact"
@@ -1047,33 +1048,23 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       </RadioGroup.Root>
                     </div>
 
-                    <label>
-                      Resident key (optional now)
-                      <Input
-                        className="input"
-                        type="password"
-                        value={buildingKey}
-                        onChange={handleBuildingKeyInput}
-                        placeholder="Paste resident key now or later"
-                        autoComplete="off"
-                        spellCheck={false}
-                      />
-                      <p className="helper">You need this key to save a shared record.</p>
-                    </label>
+                    <p className="helper">You can build now. You need a resident key only when you save a shared record.</p>
 
-                    <div className="optional-setup">
-                      <button
-                        className="link-button"
-                        type="button"
-                        onClick={() => setShowOptionalSetup((prev) => !prev)}
-                        aria-expanded={showOptionalSetup}
-                      >
-                        {showOptionalSetup ? "Hide optional setup" : "Show optional setup"}
-                      </button>
-                      {showOptionalSetup && (
-                        <>
-                          <p className="helper">You can skip this now.</p>
-                          <div className="optional-setup-body">
+                    {isStep1Complete ? (
+                      <>
+                        <div className="optional-setup">
+                          <button
+                            className="link-button"
+                            type="button"
+                            onClick={() => setShowOptionalSetup((prev) => !prev)}
+                            aria-expanded={showOptionalSetup}
+                          >
+                            {showOptionalSetup ? "Hide optional setup" : "Show optional setup"}
+                          </button>
+                          {showOptionalSetup && (
+                            <>
+                              <p className="helper">You can skip this now.</p>
+                              <div className="optional-setup-body">
                         <label>
                           Location zone (optional)
                           <Select.Root value={formState.zone || null} onValueChange={updateSelect("zone")}>
@@ -1133,47 +1124,51 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                             ))}
                           </RadioGroup.Root>
                         </fieldset>
-                          </div>
-                        </>
-                      )}
-                    </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
 
-                    <div className="quick-start-grid" aria-label="Quick start options">
-                      {(Object.keys(quickStartSummary) as QuickStartPreset[]).map((preset) => {
-                        const option = quickStartSummary[preset];
-                        return (
-                          <button
-                            key={preset}
-                            type="button"
-                            className="quick-start-card"
-                            onClick={() => handleQuickStart(preset)}
-                          >
-                            <span className="quick-start-title">{option.title}</span>
-                            <span className="quick-start-description">{option.description}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="guided-action" role="status" aria-live="polite">
-                      <p className="guided-action-label">Next: {guidedAction.label}</p>
-                      <div className="guided-action-buttons">
-                        <Button
-                          className="button button-secondary"
-                          type="button"
-                          onClick={() => setCurrentStep(guidedAction.step)}
-                        >
-                          Go now
-                        </Button>
-                        <Button
-                          className="button"
-                          type="button"
-                          onClick={handleFastTrackToPreview}
-                          disabled={!canFastTrack}
-                        >
-                          Finish setup fast
-                        </Button>
-                      </div>
-                    </div>
+                        <div className="quick-start-grid" aria-label="Quick start options">
+                          {(Object.keys(quickStartSummary) as QuickStartPreset[]).map((preset) => {
+                            const option = quickStartSummary[preset];
+                            return (
+                              <button
+                                key={preset}
+                                type="button"
+                                className="quick-start-card"
+                                onClick={() => handleQuickStart(preset)}
+                              >
+                                <span className="quick-start-title">{option.title}</span>
+                                <span className="quick-start-description">{option.description}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="guided-action" role="status" aria-live="polite">
+                          <p className="guided-action-label">Next: {guidedAction.label}</p>
+                          <div className="guided-action-buttons">
+                            <Button
+                              className="button button-secondary"
+                              type="button"
+                              onClick={() => setCurrentStep(guidedAction.step)}
+                            >
+                              Go now
+                            </Button>
+                            <Button
+                              className="button"
+                              type="button"
+                              onClick={handleFastTrackToPreview}
+                              disabled={!canFastTrack}
+                            >
+                              Finish setup fast
+                            </Button>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="helper">Finish building and issue first. Then optional setup appears.</p>
+                    )}
 
                   </div>
                 </Tabs.Panel>
@@ -1506,6 +1501,18 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     <div>
                       <h3>Save to shared records</h3>
                       <p className="helper">Use the resident key from your organizer. Keep this key private.</p>
+                      <label>
+                        Resident key
+                        <Input
+                          className="input"
+                          type="password"
+                          value={buildingKey}
+                          onChange={handleBuildingKeyInput}
+                          placeholder="Paste resident key"
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                      </label>
                       {!formState.building || !formState.issue ? (
                         <p className="helper">Choose a building and issue to enable saving.</p>
                       ) : null}
@@ -1520,7 +1527,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         {saveLabel}
                       </Button>
                       {submissionUrl && (
-                        <Button className="button button-secondary" type="button" onClick={handleCopyLink}>
+                        <Button
+                          className="button button-secondary"
+                          type="button"
+                          onClick={handleCopyLink}
+                          disabled={!canCopyPermalink}
+                        >
                           {linkCopyLabel}
                         </Button>
                       )}
@@ -1534,6 +1546,35 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       <p className="submission-error" role="alert">
                         {saveError || "We could not save this record."}
                       </p>
+                    )}
+                    {submissionUrl && (
+                      <div className="share-checklist-inline" aria-label="Before you copy the link">
+                        <p className="helper">Before sharing this link, confirm these checks.</p>
+                        <label className="checkbox-label">
+                          <Checkbox
+                            checked={shareChecks.names}
+                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, names: checked }))}
+                          />
+                          I removed names.
+                        </label>
+                        <label className="checkbox-label">
+                          <Checkbox
+                            checked={shareChecks.units}
+                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, units: checked }))}
+                          />
+                          I removed unit numbers.
+                        </label>
+                        <label className="checkbox-label">
+                          <Checkbox
+                            checked={shareChecks.contact}
+                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, contact: checked }))}
+                          />
+                          I removed phone numbers and email addresses.
+                        </label>
+                        <p className="helper" role="status" aria-live="polite">
+                          {canCopyPermalink ? "Checklist complete. You can copy the link." : "Complete all checks to copy the link."}
+                        </p>
+                      </div>
                     )}
                     {linkStatusMessage && (
                       <p className="helper" role="status" aria-live="polite">
@@ -1557,9 +1598,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         </ul>
                       </div>
                     )}
-                    <button className="link-button danger-link" type="button" onClick={handleReset}>
-                      Clear form and start over
-                    </button>
+                    <details className="more-actions">
+                      <summary>More actions</summary>
+                      <button className="link-button danger-link" type="button" onClick={handleReset}>
+                        Clear form and start over
+                      </button>
+                    </details>
                   </div>
                 </>
               )}
