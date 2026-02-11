@@ -1551,24 +1551,33 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       <div className="share-checklist-inline" aria-label="Before you copy the link">
                         <p className="helper">Before sharing this link, confirm these checks.</p>
                         <label className="checkbox-label">
-                          <Checkbox
+                          <Checkbox.Root
                             checked={shareChecks.names}
-                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, names: checked }))}
-                          />
+                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, names: checked === true }))}
+                            className="checkbox-root"
+                          >
+                            <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                          </Checkbox.Root>
                           I removed names.
                         </label>
                         <label className="checkbox-label">
-                          <Checkbox
+                          <Checkbox.Root
                             checked={shareChecks.units}
-                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, units: checked }))}
-                          />
+                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, units: checked === true }))}
+                            className="checkbox-root"
+                          >
+                            <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                          </Checkbox.Root>
                           I removed unit numbers.
                         </label>
                         <label className="checkbox-label">
-                          <Checkbox
+                          <Checkbox.Root
                             checked={shareChecks.contact}
-                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, contact: checked }))}
-                          />
+                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, contact: checked === true }))}
+                            className="checkbox-root"
+                          >
+                            <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                          </Checkbox.Root>
                           I removed phone numbers and email addresses.
                         </label>
                         <p className="helper" role="status" aria-live="polite">
