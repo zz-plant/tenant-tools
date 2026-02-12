@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.73 - 2026-02-11
+
+### Changed
+
+- Increased default text sizing, line spacing, and layout width constraints to make screens easier to read.
+- Reworded key builder labels and helper copy so steps read like plain instructions instead of shorthand.
+- Updated issue, summary, and notice preview typography to prioritize human readability over code-like presentation.
+
+### Security
+
+- Privacy reminders remain explicit while improving readability so residents can understand sharing cautions faster.
+
 ## 1.0.72 - 2026-02-11
 
 ### Added
