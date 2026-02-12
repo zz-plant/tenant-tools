@@ -31,6 +31,7 @@ import { detectSensitiveContent } from "../lib/validation";
 import {
   detailWarningThreshold,
   evidenceSafetyChecklist,
+  evidenceSafetySummary,
   exportAudienceOptions,
   exportStatusOptions,
   factualTagOptions,
@@ -1280,6 +1281,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
                 <Tabs.Panel value="3">
                   <p className="helper">Optional facts and evidence.</p>
+                  <p className="helper">{evidenceSafetySummary}</p>
                   {issueFields.length === 0 && (
                     <p className="helper">Select an issue to see detail fields.</p>
                   )}

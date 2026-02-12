@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.0.75 - 2026-02-12
+
+### Added
+
+- Added a docs-only MCP prototype server with read-only `resources/list` and `resources/read` methods for allowlisted policy and skills files.
+- Added maintenance MCP tool functions for `run_access_audit` and `validate_notice_copy` with deny-by-default behavior and warning-code outputs.
+- Added tests for docs allowlist resource access and maintenance tool behavior.
+- Added `npm run check:mcp-allowlist` to verify that the docs MCP allowlist stays in approved repo paths and points to existing files.
+- Added documentation for running and validating the MCP prototype server.
+
+### Security
+
+- MCP docs access is now constrained to a fixed allowlist and rejects non-allowlisted resources.
+- Maintenance audit helpers now return aggregate findings only and avoid raw private content output.
+
+## 1.0.74 - 2026-02-12
+
+### Added
+
+- Added a copy-lint helper for very simple English notice text and tests that check simple templates for blocked idioms or pushy phrases.
+- Added waitlist route and waitlist validation test coverage for payload errors, rate limits, and unit-hint rejection.
+- Added request-key propagation tests for query and header key paths used across dashboard and submission flows.
+
+### Changed
+
+- Submission record page now buckets report counts using privacy-safe formatting and gates link copying behind completed share checks.
+- Notice builder facts step now shows a unified evidence safety warning sentence before evidence notes.
+- Evidence safety checklist wording now uses explicit "ID documents" language.
+
+### Security
+
+- Share flow now requires checklist confirmation before copy-link actions on the submission page.
+- Small report counts on submission summaries now follow the same suppression pattern used elsewhere.
+
 ## 1.0.73 - 2026-02-11
 
 ### Changed

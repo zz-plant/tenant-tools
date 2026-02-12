@@ -156,6 +156,17 @@ describe("resident key gating on submission routes", () => {
     const invalidIncrementResponse = await reportSubmission({ params: { id: submissionId }, request: invalidIncrementRequest, locals } as Parameters<typeof reportSubmission>[0]);
     assert.equal(invalidIncrementResponse.status, 400);
 
+    const queryKeyReportRequest = new Request(`http://localhost/api/submissions/${submissionId}/report?key=key-2353-test`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-forwarded-for": "1.1.1.2",
+      },
+      body: JSON.stringify({ increment: 1 }),
+    });
+    const queryKeyReportResponse = await reportSubmission({ params: { id: submissionId }, request: queryKeyReportRequest, locals } as Parameters<typeof reportSubmission>[0]);
+    assert.equal(queryKeyReportResponse.status, 200);
+
     const correctBuildingReportRequest = new Request(`http://localhost/api/submissions/${submissionId}/report`, {
       method: "POST",
       headers: {
@@ -168,6 +179,6 @@ describe("resident key gating on submission routes", () => {
     const correctBuildingReportResponse = await reportSubmission({ params: { id: submissionId }, request: correctBuildingReportRequest, locals } as Parameters<typeof reportSubmission>[0]);
     assert.equal(correctBuildingReportResponse.status, 200);
     const reportPayload = await readJson(correctBuildingReportResponse);
-    assert.equal(reportPayload.reportCount, 2);
+    assert.equal(reportPayload.reportCount, 3);
   });
 });
