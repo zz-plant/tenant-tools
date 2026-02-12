@@ -100,9 +100,13 @@ export const evidenceSafetyChecklist = [
   "Evidence stays private.",
   "Do not upload faces.",
   "Do not upload names, mail labels, or unit numbers.",
-  "Do not upload leases or IDs.",
+  "Do not upload leases or ID documents.",
   "Remove location data if you can.",
 ];
+
+
+export const evidenceSafetySummary =
+  "Do not upload photos with faces, names, mail labels, unit numbers, leases, or ID documents.";
 
 export const freeTextSafetyNote = "Short facts only. No names or unit numbers.";
 

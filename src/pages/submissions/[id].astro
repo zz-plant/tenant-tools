@@ -3,6 +3,7 @@ import "../../styles/global.css";
 import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
 import { portfolioOptions } from "../../data/portfolioOptions";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../lib/access";
+import { formatResidentReportCount } from "../../lib/buildingDashboard";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 import SeoHead from "../../components/SeoHead.astro";
@@ -56,7 +57,9 @@ const portfolioLabel =
 const startDateLabel = submissionRecord?.startDate || "Not listed";
 const reportDateLabel = submissionRecord?.reportDate || "Not listed";
 const reportCountLabel =
-  typeof submissionRecord?.reportCount === "number" ? submissionRecord.reportCount : "Not listed";
+  typeof submissionRecord?.reportCount === "number"
+    ? formatResidentReportCount(submissionRecord.reportCount)
+    : "Not listed";
 
 const accessKeyParam = accessKey ? `key=${encodeURIComponent(accessKey)}` : "";
 const dashboardUrl =
@@ -192,6 +195,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                   <input type="checkbox" class="share-check" />
                   I removed phone numbers and email addresses.
                 </label>
+                <button class="button button-secondary" type="button" data-copy-link disabled>Copy this record link</button>
                 <p class="helper" data-share-status role="status" aria-live="polite"></p>
               </div>
 
@@ -248,14 +252,50 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
     <script>
       const checks = Array.from(document.querySelectorAll('.share-check'));
       const status = document.querySelector('[data-share-status]');
+      const copyButton = document.querySelector('[data-copy-link]');
       const refreshShareStatus = () => {
         if (!status || checks.length === 0) {
           return;
         }
         const done = checks.every((item) => item instanceof HTMLInputElement && item.checked);
-        status.textContent = done ? 'Checklist complete. This record is ready to share.' : 'Complete all checks before sharing.';
+        if (copyButton instanceof HTMLButtonElement) {
+          copyButton.disabled = !done;
+        }
+        status.textContent = done ? 'Checklist complete. You can copy the link.' : 'Complete all checks to copy the link.';
       };
+
+      const copyRecordLink = async () => {
+        if (!(copyButton instanceof HTMLButtonElement) || copyButton.disabled) {
+          return;
+        }
+
+        const previousText = copyButton.textContent;
+        copyButton.disabled = true;
+        copyButton.textContent = 'Copying...';
+
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          if (status) {
+            status.textContent = 'Link copied. Share only with residents who have the key.';
+          }
+          copyButton.textContent = 'Copied';
+          window.setTimeout(() => {
+            copyButton.textContent = 'Copy this record link';
+            refreshShareStatus();
+          }, 1400);
+        } catch {
+          if (status) {
+            status.textContent = 'Could not copy the link. Copy from the address bar.';
+          }
+          copyButton.textContent = previousText || 'Copy this record link';
+          refreshShareStatus();
+        }
+      };
+
       checks.forEach((item) => item.addEventListener('change', refreshShareStatus));
+      if (copyButton instanceof HTMLButtonElement) {
+        copyButton.addEventListener('click', copyRecordLink);
+      }
       refreshShareStatus();
     </script>
   </body>

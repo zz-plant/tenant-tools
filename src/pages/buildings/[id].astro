@@ -8,6 +8,7 @@ import {
   type BuildingSubmission,
 } from "../../lib/buildingDashboard";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
+import { buildAccessQuery, buildLinkSuffix } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 
 export const prerender = false;
@@ -32,11 +33,9 @@ const statusFilterRaw = url.searchParams.get("status") || "all";
 const statusFilter = statusIds.includes(statusFilterRaw as SubmissionStatus) ? statusFilterRaw : "all";
 const hasFilters = issueFilter !== "all" || statusFilter !== "all";
 
-const keyParam = accessKey ? `key=${encodeURIComponent(accessKey)}` : "";
-const stewardParam = stewardKey ? `stewardKey=${encodeURIComponent(stewardKey)}` : "";
-const baseQuery = [keyParam, stewardParam].filter(Boolean).join("&");
-const linkSuffix = baseQuery ? `?${baseQuery}` : "";
-const clearFiltersUrl = `/buildings/${encodeURIComponent(buildingId)}${baseQuery ? `?${baseQuery}` : ""}`;
+const baseQuery = buildAccessQuery({ accessKey, stewardKey });
+const linkSuffix = buildLinkSuffix(baseQuery);
+const clearFiltersUrl = `/buildings/${encodeURIComponent(buildingId)}${buildLinkSuffix(baseQuery)}`;
 
 const statusLabels = submissionStatusLabels;
 
