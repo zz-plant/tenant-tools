@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.76 - 2026-02-12
+
+### Added
+
+- Added shared navigation query helpers and tests to keep resident/steward key propagation consistent across dashboard links.
+- Added regression tests for public-readonly small-count suppression formatting behavior.
+- Added evidence warning copy tests to enforce required metadata safety terms.
+
+### Changed
+
+- Building dashboard now uses shared query helper utilities for link suffix and filter URL construction.
+- Marked near-term TODO engineering and safety UX items complete now that related tests and helpers are in place.
+
+### Security
+
+- Reinforced anti-deanonymization safeguards with explicit regression checks for suppressed small counts.
+- Reinforced evidence safety warning consistency with required-term assertions in tests.
+
 ## 1.0.75 - 2026-02-12
 
 ### Added
