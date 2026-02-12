@@ -460,10 +460,6 @@
   background: rgba(79, 103, 255, 0.1);
 }
 
-.waitlist-invite {
-  display: grid;
-  gap: 12px;
-}
 
 .impact-slider {
   display: grid;
