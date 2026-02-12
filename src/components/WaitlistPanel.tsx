@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Button, Input } from "./ui";
 import { type PortfolioId } from "../data/portfolioOptions";
 import { waitlistBuildingLimit } from "../lib/waitlist";
@@ -11,34 +11,14 @@ const initialWaitlistState = {
 
 const WaitlistPanel = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [inviteVisible, setInviteVisible] = useState(false);
   const [waitlistState, setWaitlistState] = useState(initialWaitlistState);
   const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [waitlistLabel, setWaitlistLabel] = useState("Join waitlist");
   const [waitlistError, setWaitlistError] = useState("");
   const [requestId, setRequestId] = useState("");
   const [requestCopyLabel, setRequestCopyLabel] = useState("Copy request code");
-  const [inviteCopyLabel, setInviteCopyLabel] = useState("Copy invite text");
-  const [origin, setOrigin] = useState("");
   const buildingHelperId = "waitlist-building-helper";
   const { scheduleTimeout } = useTimedCallbacks();
-
-  useEffect(() => {
-    setOrigin(window.location.origin);
-  }, []);
-
-  const inviteText = useMemo(() => {
-    const buildingLabel = waitlistState.building || "[ADDRESS]";
-    const siteLabel = origin || "this site";
-    return [
-      "Neighbor note",
-      "",
-      `I want Building Ledger to support ${buildingLabel}.`,
-      "Private tool for repair tracking and notices.",
-      `If you want it too, add the building at ${siteLabel}.`,
-      "Do not include names or unit numbers.",
-    ].join("\n");
-  }, [origin, waitlistState.building]);
 
   const handleWaitlistChange =
     (key: keyof typeof initialWaitlistState) =>
@@ -92,24 +72,6 @@ const WaitlistPanel = () => {
     scheduleTimeout("request-copy-label", () => setRequestCopyLabel("Copy request code"), 1500);
   };
 
-  const handleCopyInvite = async () => {
-    await navigator.clipboard.writeText(inviteText);
-    setInviteCopyLabel("Invite text copied");
-    scheduleTimeout("invite-copy-label", () => setInviteCopyLabel("Copy invite text"), 1500);
-  };
-
-  const handleInviteDownload = () => {
-    const blob = new Blob([inviteText], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "building-ledger-invite.txt";
-    document.body.append(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
-  };
-
   const handleWaitlistReset = () => {
     setWaitlistState(initialWaitlistState);
     setWaitlistStatus("idle");
@@ -117,8 +79,6 @@ const WaitlistPanel = () => {
     setWaitlistError("");
     setRequestId("");
     setRequestCopyLabel("Copy request code");
-    setInviteCopyLabel("Copy invite text");
-    setInviteVisible(false);
   };
 
   return (
@@ -186,31 +146,9 @@ const WaitlistPanel = () => {
             )}
           </form>
           {waitlistStatus === "saved" && requestId && (
-            <div className="waitlist-invite">
-              <h3>Step 3: Share the invite (optional)</h3>
-              <p className="helper">
-                This tool does not send resident messages. Use this invite in person or on paper.
-              </p>
-              <Button
-                className="button button-secondary"
-                type="button"
-                onClick={() => setInviteVisible((prev) => !prev)}
-              >
-                {inviteVisible ? "Hide invite text" : "Show invite text"}
-              </Button>
-              {inviteVisible && (
-                <>
-                  <pre className="output output-summary">{inviteText}</pre>
-                  <div className="waitlist-actions">
-                    <Button className="button button-secondary" type="button" onClick={handleCopyInvite}>
-                      {inviteCopyLabel}
-                    </Button>
-                    <Button className="button button-secondary" type="button" onClick={handleInviteDownload}>
-                      Download invite
-                    </Button>
-                  </div>
-                </>
-              )}
+            <div className="waitlist-success" role="status" aria-live="polite">
+              <h3>Done</h3>
+              <p className="helper">Your request is saved. Keep the request code for follow-up.</p>
             </div>
           )}
         </div>

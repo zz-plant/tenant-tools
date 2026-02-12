@@ -147,8 +147,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                   <p class="summary-value">{reportCountLabel}</p>
                 </div>
               </div>
-              <p class="helper">Review this summary before sharing. Remove names or unit numbers.</p>
-              <p class="helper">Small report counts may be hidden to protect resident privacy.</p>
+              <p class="helper">Review this summary before sharing. Small report counts may be hidden for privacy.</p>
               {dashboardUrl && (
                 <a class="button button-secondary" href={dashboardUrl}>
                   Back to building dashboard
@@ -199,8 +198,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
               <div class="export-block">
                 <div>
                   <h3>Details saved</h3>
-                  <p class="helper">Short factual details only.</p>
-                  <p class="helper">Evidence files are not shown here.</p>
+                  <p class="helper">Short factual details only. Evidence files are not shown here.</p>
                 </div>
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
                   <ul class="submission-detail-list detail-grid">
@@ -243,7 +241,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
       </main>
 
       <footer class="site-footer">
-        <p>Safety first: review this summary before sharing. It may include names or unit numbers.</p>
+        <p>Safety first: review this summary before sharing.</p>
       </footer>
     </div>
 

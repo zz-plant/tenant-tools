@@ -122,7 +122,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const { scheduleTimeout } = useTimedCallbacks();
   const stepProgress = Math.round((currentStep / steps.length) * 100);
   const currentStepInfo = steps[currentStep - 1];
-  const nextStepInfo = steps[currentStep] || null;
   const progressPillLabel = stepProgress < 100 ? `${stepProgress}%` : "Done";
 
   const missingBasics = useMemo(() => {
@@ -897,10 +896,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   </div>
                 </div>
                 <div className="step-privacy">
-                  <p className="helper privacy-reminder">
-                    No names or unit numbers. Use general areas.
-                  </p>
-                  <p className="helper step-now">Now: {currentStepInfo.label}</p>
+                  <p className="helper privacy-reminder">No names or unit numbers. Use general areas.</p>
+                  {!stepsLocked && <p className="helper step-now">Now: {currentStepInfo.label}</p>}
                 </div>
               </div>
             </div>
