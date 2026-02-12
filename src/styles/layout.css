@@ -2,6 +2,8 @@
   min-height: 100vh;
   min-height: 100dvh;
   padding: calc(40px + var(--safe-area-top)) 6vw calc(64px + var(--safe-area-bottom));
+  width: min(1100px, 100%);
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -20,10 +22,10 @@
 }
 
 .eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  font-size: 0.75rem;
-  opacity: 0.85;
+  letter-spacing: 0.04em;
+  font-size: 0.82rem;
+  font-weight: 600;
+  opacity: 0.9;
   margin: 0 0 8px;
 }
 
@@ -183,12 +185,13 @@
 
 .home-intro-panel {
   display: grid;
-  gap: 12px;
+  gap: 16px;
 }
 
 .home-intro-copy {
   display: grid;
-  gap: 6px;
+  gap: 8px;
+  max-width: 70ch;
 }
 
 .home-intro-copy h1,
@@ -200,17 +203,17 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
 }
 
 .home-intro-list li {
-  border-radius: 999px;
+  border-radius: 12px;
   border: 1px solid #d8deef;
   background: #ffffff;
-  padding: 6px 10px;
-  font-size: 0.85rem;
+  padding: 10px 12px;
+  font-size: 0.95rem;
   color: #2b3142;
 }
 
@@ -306,8 +309,8 @@
   }
 
   .home-intro-list li {
-    font-size: 0.8rem;
-    padding: 5px 9px;
+    font-size: 0.9rem;
+    padding: 8px 10px;
   }
 
   .intro-panel {

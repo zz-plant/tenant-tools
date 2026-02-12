@@ -105,7 +105,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
   const [impactCount] = useState(1);
-  const [copyLabel, setCopyLabel] = useState("Copy text");
+  const [copyLabel, setCopyLabel] = useState("Copy notice");
   const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy summary");
   const [saveLabel, setSaveLabel] = useState("Save record");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -149,15 +149,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const quickStartSummary: Record<QuickStartPreset, { title: string; description: string }> = {
     first_notice: {
       title: "First notice",
-      description: "New issue. Fast default.",
+      description: "Best for a new issue.",
     },
     follow_up: {
       title: "Follow-up",
-      description: "After first notice.",
+      description: "Use after your first notice.",
     },
     final_reminder: {
       title: "Final reminder",
-      description: "After follow-up.",
+      description: "Use after a follow-up.",
     },
   };
 
@@ -287,7 +287,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       time: prev.time || getCurrentTime(today),
     }));
     setCurrentStep(4);
-    setNoticeStatusMessage("Preview ready. Review and copy.");
+    setNoticeStatusMessage("Preview is ready. Review it, then copy.");
     scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
   };
 
@@ -335,7 +335,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
     setCurrentStep((prev) => (prev < 2 ? 2 : prev));
     const presetTitle = quickStartSummary[preset].title;
-    setNoticeStatusMessage(`${presetTitle} mode is ready. Continue with basics.`);
+    setNoticeStatusMessage(`${presetTitle} is ready. Continue with the basic details.`);
     scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
   };
 
@@ -538,7 +538,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     await navigator.clipboard.writeText(noticeText);
     setCopyLabel("Copied!");
     setNoticeStatusMessage("Notice copied.");
-    scheduleTimeout("copy-label", () => setCopyLabel("Copy text"), 1500);
+    scheduleTimeout("copy-label", () => setCopyLabel("Copy notice"), 1500);
     scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2000);
   };
 
@@ -666,7 +666,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     });
     setCurrentStep(1);
     setPlainMeaningVisible(false);
-    setCopyLabel("Copy text");
+    setCopyLabel("Copy notice");
     setSummaryCopyLabel("Copy summary");
     setSaveLabel("Save record");
     setSaveStatus("idle");
@@ -1019,7 +1019,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
                     <div className="issue-gallery">
                       <div>
-                        <h3 id="issue-gallery-title">Issue gallery</h3>
+                        <h3 id="issue-gallery-title">Choose the issue type</h3>
                       </div>
                       <RadioGroup.Root
                         className="issue-grid"
@@ -1048,7 +1048,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       </RadioGroup.Root>
                     </div>
 
-                    <p className="helper">You can build now. You need a resident key only when you save a shared record.</p>
+                    <p className="helper">You can draft a notice now. You only need a resident key to save a shared record.</p>
 
                     {isStep1Complete ? (
                       <>
@@ -1059,7 +1059,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                             onClick={() => setShowOptionalSetup((prev) => !prev)}
                             aria-expanded={showOptionalSetup}
                           >
-                            {showOptionalSetup ? "Hide optional setup" : "Show optional setup"}
+                            {showOptionalSetup ? "Hide extra options" : "Show extra options"}
                           </button>
                           {showOptionalSetup && (
                             <>

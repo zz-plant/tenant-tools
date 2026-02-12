@@ -216,10 +216,10 @@
 }
 
 .step-title {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.65rem;
-  color: #5f6b87;
+  letter-spacing: 0.01em;
+  font-size: 0.78rem;
+  color: #4f5d7a;
+  font-weight: 600;
 }
 
 .step-label {
@@ -272,8 +272,9 @@
 }
 
 .quick-start-description {
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   color: #4b5563;
+  line-height: 1.4;
 }
 
 .guided-action {
@@ -471,8 +472,9 @@ label {
 }
 
 .helper {
-  font-size: 0.9rem;
-  color: #5a647a;
+  font-size: 0.93rem;
+  color: #4f5769;
+  line-height: 1.5;
   margin: 0;
 }
 
@@ -762,9 +764,10 @@ code {
 
 .issue-label {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   color: #1c2436;
   font-weight: 600;
+  line-height: 1.35;
 }
 
 .building-site:hover {
@@ -798,10 +801,9 @@ code {
 
 .summary-label {
   margin: 0 0 6px;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #5a647a;
+  font-size: 0.88rem;
+  color: #4e5a74;
+  font-weight: 600;
 }
 
 .summary-value {
@@ -817,7 +819,9 @@ code {
   padding: 20px;
   min-height: 180px;
   white-space: pre-wrap;
-  font-family: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+  line-height: 1.6;
+  font-family: "Inter", "SF Pro Text", system-ui, sans-serif;
+  font-size: 1rem;
 }
 
 .notice-preview {
