@@ -1,7 +1,7 @@
 {
   "name": "tenant-notice-builder",
   "type": "module",
-  "version": "1.0.76",
+  "version": "1.0.77",
   "private": true,
   "scripts": {
     "dev": "astro dev",
@@ -15,17 +15,17 @@
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/react": "^4.4.2",
     "@astrojs/sitemap": "^3.7.0",
-    "@base-ui/react": "^1.1.0",
-    "astro": "^5.17.1",
+    "@base-ui/react": "^1.2.0",
+    "astro": "^5.17.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
-    "@types/react": "^19.2.13",
+    "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "wrangler": "^4.63.0"
+    "wrangler": "^4.65.0"
   }
 }
