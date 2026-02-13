@@ -44,25 +44,25 @@ See [`AGENTS.md`](AGENTS.md) for full required policy.
 ### Requirements
 
 - Node 20+
-- npm 10+
+- bun 1.2+
 
 ### Install and run
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 ### Test
 
 ```bash
-npm test
+bun run test
 ```
 
 ### Build
 
 ```bash
-npm run build
+bun run build
 ```
 
 ---
@@ -107,7 +107,7 @@ Never commit real keys to git.
 1. Read [`AGENTS.md`](AGENTS.md) before changing product behavior or copy.
 2. Keep changes small and scoped.
 3. Add tests when touching access, validation, evidence, export, or notice logic.
-4. Run `npm test` before opening a PR.
+4. Run `bun run test` before opening a PR.
 5. For UI changes, include screenshots.
 6. Update `CHANGELOG.md` for user-visible behavior changes.
 

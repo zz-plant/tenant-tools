@@ -34,7 +34,7 @@ This repository now includes a local prototype server for contributor agents.
 Run:
 
 ```bash
-npm run check:mcp-allowlist
+bun run check:mcp-allowlist
 ```
 
 The command fails if an allowlisted file is missing or outside approved doc/skill policy locations.

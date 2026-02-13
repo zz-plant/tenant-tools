@@ -6,17 +6,17 @@ This project uses a small command set. Run these checks before you open a PR.
 
 | Goal | Command | Expected result |
 | --- | --- | --- |
-| Run unit + integration tests | `npm test` | All tests pass. |
-| Validate production build | `npm run build` | Build completes with no errors. |
-| Local dev server | `npm run dev` | App runs locally for manual QA. |
-| Preview production output | `npm run preview` | Built output is served for checks. |
+| Run unit + integration tests | `bun run test` | All tests pass. |
+| Validate production build | `bun run build` | Build completes with no errors. |
+| Local dev server | `bun run dev` | App runs locally for manual QA. |
+| Preview production output | `bun run preview` | Built output is served for checks. |
 
 ## CI expectations
 
 CI should run at least:
 
-1. `npm test`
-2. `npm run build`
+1. `bun run test`
+2. `bun run build`
 
 A PR is not ready to merge if either command fails.
 

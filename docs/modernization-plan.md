@@ -37,7 +37,7 @@ The repo already runs on current major tooling (Astro 5, React 19, TypeScript 5.
 
 ### D) Quality gates
 
-- Run `npm test` before every merge.
+- Run `bun run test` before every merge.
 - Expand integration coverage for:
   - access control
   - status updates

@@ -39,7 +39,7 @@ Use this list before release and for high-risk PRs.
 
 Run and record outputs:
 
-- `npm test`
-- `npm run build`
+- `bun run test`
+- `bun run build`
 
 If a command cannot run due to environment limits, document why and create follow-up tasks.
