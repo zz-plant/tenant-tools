@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.77 - 2026-02-12
+
+### Changed
+
+- Updated core runtime dependencies to current patch/minor releases for Astro, Wrangler, Base UI, and React type support.
+- Refreshed lockfile metadata to match the updated dependency graph used for local and CI installs.
+
+### Security
+
+- Keeps framework and tooling components on currently supported versions to reduce exposure to known issues fixed in newer releases.
+
 ## 1.0.76 - 2026-02-12
 
 ### Added
