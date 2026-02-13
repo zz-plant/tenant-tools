@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.0.79 - 2026-02-13
+
+### Changed
+
+- Access key forms on building and record gate screens now use password-style fields with autocomplete disabled.
+- Builder save confirmation now tells residents to open the link and then enter a building key.
+- Cleaned gate-screen markup spacing after copy updates for clearer maintenance and review.
+
+### Security
+
+- Reduced shoulder-surfing and accidental key capture risk by masking key entry on gate forms.
+
+## 1.0.78 - 2026-02-13
+
+### Changed
+
+- Submission creation now returns a permalink without embedding the resident key in the URL query string.
+- Builder step 1 now explains early that a resident key is needed later only when saving a shared record.
+- Access gate screens now direct residents to paste keys in the form instead of showing query-string key examples.
+
+### Security
+
+- Reduced accidental key leakage risk from copied permalinks and example URLs shown on gate screens.
+
 ## 1.0.77 - 2026-02-12
 
 ### Changed

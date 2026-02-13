@@ -108,21 +108,23 @@ const totalFiltered = filtered.length;
               <ol class="helper-list">
                 <li>Get the building key from a resident steward.</li>
                 <li>Paste the key below and continue.</li>
-                <li>If needed, add <code>?key=YOUR_KEY</code> to the link.</li>
               </ol>
               <form class="filter-grid" method="get">
                 {stewardKey && <input type="hidden" name="stewardKey" value={stewardKey} />}
                 <label>
                   <span>Building key</span>
-                  <input class="input" name="key" type="text" placeholder="Paste building key" required />
+                  <input
+                    class="input"
+                    name="key"
+                    type="password"
+                    placeholder="Paste building key"
+                    autoComplete="new-password"
+                    spellcheck="false"
+                    required
+                  />
                 </label>
                 <button class="button" type="submit">Continue</button>
               </form>
-              <div class="access-sample">
-                <p class="access-sample-title">Example</p>
-                <code>?key=YOUR_KEY</code>
-                <p class="helper">You can also add the key at the end.</p>
-              </div>
               <p class="access-warning">Do not share the key publicly.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>
             </div>
@@ -253,8 +255,8 @@ const totalFiltered = filtered.length;
               </div>
               <ol class="helper-list">
                 <li>Get the building key from a resident steward.</li>
-                <li>Add <code>?key=YOUR_KEY</code> to this link.</li>
-                <li>Reload to view filters and reports.</li>
+                <li>Paste the building key in the form.</li>
+                <li>Continue to view filters and reports.</li>
               </ol>
               <div class="export-block">
                 <h3>Safety notes</h3>
