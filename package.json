@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "deploy": "npm run build && wrangler deploy",
+    "deploy": "bun run build && wrangler deploy",
     "preview": "astro preview",
     "test": "node --test --import tsx tests/*.test.ts",
     "check:mcp-allowlist": "node scripts/check-mcp-allowlist.mjs"
@@ -27,5 +27,6 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "wrangler": "^4.65.0"
-  }
+  },
+  "packageManager": "bun@1.2.14"
 }
