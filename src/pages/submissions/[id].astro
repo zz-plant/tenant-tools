@@ -102,15 +102,18 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
               <form class="filter-grid" method="get">
                 <label>
                   <span>Building key</span>
-                  <input class="input" name="key" type="text" placeholder="Paste building key" required />
+                  <input
+                    class="input"
+                    name="key"
+                    type="password"
+                    placeholder="Paste building key"
+                    autoComplete="new-password"
+                    spellcheck="false"
+                    required
+                  />
                 </label>
                 <button class="button" type="submit">Continue</button>
               </form>
-              <div class="access-sample">
-                <p class="access-sample-title">Example link</p>
-                <code>?key=YOUR_KEY</code>
-                <p class="helper">You can also add the key to the end of the link.</p>
-              </div>
               <p class="access-warning">Do not share the key or link in public.</p>
               <a class="button button-secondary" href="/">Back to notice builder</a>
             </div>

@@ -969,6 +969,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         </p>
                       ))}
                     </div>
+                    <p className="helper">You can draft a notice now. You need the resident key later to save a shared record.</p>
                     <label>
                       Building
                       <Select.Root
@@ -1538,7 +1539,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     </div>
                     {saveStatus === "saved" && submissionUrl && (
                       <p className="submission-note" role="status" aria-live="polite">
-                        Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>
+                        Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>. This link does not include a resident key. Open it, then enter your building key.
                       </p>
                     )}
                     {saveStatus === "error" && (

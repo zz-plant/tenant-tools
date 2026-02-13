@@ -52,7 +52,5 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   await saveSubmissionRecord(kv, record);
 
-  const keyForUrl = typeof providedKey === "string" ? providedKey.trim() : "";
-  const keyParam = keyForUrl ? `?key=${encodeURIComponent(keyForUrl)}` : "";
-  return jsonResponse({ id: record.id, url: `/submissions/${record.id}${keyParam}` }, 201);
+  return jsonResponse({ id: record.id, url: `/submissions/${record.id}` }, 201);
 };

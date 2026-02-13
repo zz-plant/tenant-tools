@@ -106,7 +106,7 @@ describe("resident key gating on submission routes", () => {
     assert.equal(validKeyResponse.status, 201);
     const createdPayload = await readJson(validKeyResponse);
     assert.ok(typeof createdPayload.id === "string");
-    assert.ok(String(createdPayload.url).includes("?key=key-2353-test"));
+    assert.equal(createdPayload.url, `/submissions/${createdPayload.id}`);
 
     const submissionId = createdPayload.id as string;
     const invalidKeyGetCount = kv.getCallCount();
