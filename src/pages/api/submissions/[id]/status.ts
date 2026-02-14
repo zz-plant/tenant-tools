@@ -1,11 +1,13 @@
 import type { APIRoute } from "astro";
-import { isAccessKeyValid } from "../../../../lib/access";
-import { enforceRateLimit, getClientIp } from "../../../../lib/rateLimit";
+import { guardApiRequest } from "../../../../lib/api/requestGuard";
+import { updateSubmissionStatusRecord } from "../../../../lib/domain/submissions";
+import { jsonError, jsonResponse } from "../../../../lib/http";
 import { isSubmissionRecord, isValidSubmissionStatus, type SubmissionRecord } from "../../../../lib/submissions";
-import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../../lib/http";
 import { fetchSubmissionRecord, getSubmissionsKv, saveSubmissionRecord } from "../../../../lib/storage/submissions";
 
 export const prerender = false;
+
+type StatusPayload = { status: SubmissionRecord["status"] };
 
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const id = params.id;
@@ -13,37 +15,38 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Submission id is required.", 400);
   }
 
-  const requiredKey = locals.runtime?.env?.STEWARD_KEY;
-  const providedKey = getRequestKey(request, "x-steward-key", "stewardKey");
-  if (!isAccessKeyValid(providedKey, requiredKey)) {
-    return jsonError("Steward access is required.", 403);
-  }
-
-  const payload = await parseJsonBody(request, {});
-  const status = payload?.status;
-  if (!isValidSubmissionStatus(status)) {
-    return jsonError("Status is invalid.", 400);
-  }
-
   const kv = getSubmissionsKv(locals.runtime?.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
 
-  const ip = getClientIp(request);
-  const rateLimit = await enforceRateLimit({
-    kv,
-    key: `rate:status:${ip}`,
-    limit: 10,
-    windowMs: 60_000,
+  const guarded = await guardApiRequest(request, locals, kv, {
+    auth: { mode: "steward" },
+    parseBody: { fallback: {} as { status?: unknown } },
+    validate: (payload) => {
+      if (!isValidSubmissionStatus(payload.status)) {
+        return { ok: false, message: "Status is invalid." };
+      }
+      return { ok: true, data: { status: payload.status } as StatusPayload };
+    },
+    rateLimit: () => ({
+      kv,
+      keyPrefix: "rate:status",
+      limit: 10,
+      windowMs: 60_000,
+      message: "Too many status updates. Try again soon.",
+    }),
+    audit: {
+      kv,
+      action: "submission.status.update",
+      scope: "steward",
+      resourceIdFromContext: () => id,
+      logRejected: true,
+    },
   });
-  if (!rateLimit.ok) {
-    return jsonError(
-      "Too many status updates. Try again soon.",
-      429,
-      {},
-      { "Retry-After": String(rateLimit.retryAfter) }
-    );
+
+  if (!guarded.ok) {
+    return guarded.response;
   }
 
   const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
@@ -51,8 +54,9 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Submission not found.", 404);
   }
 
-  const updated: SubmissionRecord = { ...record, status };
+  const updated = updateSubmissionStatusRecord(record, guarded.context.payload.status);
   await saveSubmissionRecord(kv, updated);
+  await guarded.context.logAuditSuccess(id);
 
-  return jsonResponse({ status });
+  return jsonResponse({ status: updated.status });
 };

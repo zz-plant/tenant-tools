@@ -1,47 +1,56 @@
 import type { APIRoute } from "astro";
-import { enforceRateLimit, getClientIp } from "../../../lib/rateLimit";
-import { validateWaitlistInput } from "../../../lib/waitlist";
-import { jsonError, jsonResponse, parseJsonBody } from "../../../lib/http";
+import { guardApiRequest } from "../../../lib/api/requestGuard";
+import { createWaitlistRecord } from "../../../lib/domain/waitlist";
+import { jsonError, jsonResponse } from "../../../lib/http";
 import { getWaitlistKv, saveWaitlistEntry } from "../../../lib/storage/waitlist";
+import { validateWaitlistInput } from "../../../lib/waitlist";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const payload = await parseJsonBody(request, null);
-  const validation = validateWaitlistInput(payload);
-
-  if (!validation.ok) {
-    return jsonError("We could not save this waitlist request.", 400, { details: validation.errors });
-  }
-
   const kv = getWaitlistKv(locals.runtime?.env ?? {});
   if (!kv) {
     return jsonError("Waitlist storage is not configured.", 500);
   }
 
-  const ip = getClientIp(request);
-  const rateLimit = await enforceRateLimit({
-    kv,
-    key: `rate:waitlist:${ip}`,
-    limit: 4,
-    windowMs: 60_000,
+  const guarded = await guardApiRequest(request, locals, kv, {
+    parseBody: {
+      fallback: null,
+    },
+    validate: (payload) => {
+      const validation = validateWaitlistInput(payload);
+      if (!validation.ok) {
+        return {
+          ok: false,
+          message: "We could not save this waitlist request.",
+          details: { details: validation.errors },
+        };
+      }
+      return { ok: true, data: validation.data };
+    },
+    rateLimit: () => ({
+      kv,
+      keyPrefix: "rate:waitlist",
+      limit: 4,
+      windowMs: 60_000,
+      message: "Too many waitlist requests. Try again soon.",
+    }),
+    audit: {
+      kv,
+      action: "waitlist.create",
+      scope: "public",
+      logRejected: true,
+    },
   });
-  if (!rateLimit.ok) {
-    return jsonError(
-      "Too many waitlist requests. Try again soon.",
-      429,
-      {},
-      { "Retry-After": String(rateLimit.retryAfter) }
-    );
+
+  if (!guarded.ok) {
+    return guarded.response;
   }
 
-  const record = {
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-    ...validation.data,
-  };
+  const record = createWaitlistRecord(guarded.context.payload);
 
   await saveWaitlistEntry(kv, record);
+  await guarded.context.logAuditSuccess(record.id);
 
   return jsonResponse({ id: record.id }, 201);
 };
