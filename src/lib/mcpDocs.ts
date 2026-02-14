@@ -8,7 +8,6 @@ export const docsMcpAllowlist = [
   "docs/security-checklist.md",
   "docs/testing.md",
   "docs/vision.md",
-  "docs/modernization-plan.md",
   "docs/priority-feature-roadmap-2026-02.md",
   "docs/mcp-agent-skills-research-2026-02.md",
   "docs/agent-skills-playbook.md",

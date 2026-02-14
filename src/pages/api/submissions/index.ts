@@ -1,56 +1,59 @@
 import type { APIRoute } from "astro";
-import { issueOptions } from "../../../data/noticeData";
-import { enforceRateLimit, getClientIp } from "../../../lib/rateLimit";
+import { guardApiRequest } from "../../../lib/api/requestGuard";
+import { createSubmissionRecord } from "../../../lib/domain/submissions";
+import { jsonError, jsonResponse } from "../../../lib/http";
 import { validateSubmissionInput } from "../../../lib/submissions";
-import { isBuildingAccessValid, isResidentKeyRecognized } from "../../../lib/access";
-import { getRequestKey, jsonError, jsonResponse, parseJsonBody } from "../../../lib/http";
 import { getSubmissionsKv, saveSubmissionRecord } from "../../../lib/storage/submissions";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const payload = await parseJsonBody(request, null);
-  const validation = validateSubmissionInput(payload);
-
-  if (!validation.ok) {
-    return jsonError("We could not save this submission.", 400, { details: validation.errors });
-  }
-
-  const env = locals.runtime?.env ?? {};
-  const providedKey = getRequestKey(request, "x-building-key", "key");
-  if (!isResidentKeyRecognized(providedKey, env)) {
-    return jsonError("Resident access is required.", 403);
-  }
-  if (!isBuildingAccessValid(validation.data.building, providedKey, env)) {
-    return jsonError("This key does not match the building.", 403);
-  }
-
-  const issueLabel = issueOptions.find((issue) => issue.id === validation.data.issue)?.label ?? validation.data.issue;
-  const record = {
-    id: crypto.randomUUID(),
-    createdAt: new Date().toISOString(),
-    status: "open",
-    issueLabel,
-    ...validation.data,
-  };
-
-  const kv = getSubmissionsKv(env);
+  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
 
-  const ip = getClientIp(request);
-  const rateLimit = await enforceRateLimit({
-    kv,
-    key: `rate:submission:${ip}`,
-    limit: 6,
-    windowMs: 60_000,
+  const guarded = await guardApiRequest(request, locals, kv, {
+    auth: {
+      mode: "resident",
+      buildingScopeFrom: (payload) => payload?.building ?? null,
+    },
+    parseBody: {
+      fallback: null,
+    },
+    validate: (payload) => {
+      const validation = validateSubmissionInput(payload);
+      if (!validation.ok) {
+        return {
+          ok: false,
+          message: "We could not save this submission.",
+          details: { details: validation.errors },
+        };
+      }
+      return { ok: true, data: validation.data };
+    },
+    rateLimit: () => ({
+      kv,
+      keyPrefix: "rate:submission",
+      limit: 6,
+      windowMs: 60_000,
+      message: "Too many submissions. Try again soon.",
+    }),
+    audit: {
+      kv,
+      action: "submission.create",
+      scope: "resident",
+      logRejected: true,
+    },
   });
-  if (!rateLimit.ok) {
-    return jsonError("Too many submissions. Try again soon.", 429, {}, { "Retry-After": String(rateLimit.retryAfter) });
+
+  if (!guarded.ok) {
+    return guarded.response;
   }
 
+  const record = createSubmissionRecord(guarded.context.payload);
   await saveSubmissionRecord(kv, record);
+  await guarded.context.logAuditSuccess(record.id);
 
   return jsonResponse({ id: record.id, url: `/submissions/${record.id}` }, 201);
 };

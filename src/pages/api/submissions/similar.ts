@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { issueOptions, zoneOptions } from "../../../data/noticeData";
-import { isBuildingAccessValid, isResidentKeyRecognized } from "../../../lib/access";
-import { jsonError, jsonResponse, getRequestKey } from "../../../lib/http";
+import { guardApiRequest } from "../../../lib/api/requestGuard";
+import { jsonResponse } from "../../../lib/http";
 import { isValidDateString } from "../../../lib/validation";
 import { fetchSubmissionRecord, getSubmissionsKv, listSubmissionKeys } from "../../../lib/storage/submissions";
 
@@ -22,26 +22,29 @@ export const GET: APIRoute = async ({ request, locals }) => {
   const issue = url.searchParams.get("issue") || "";
   const zone = url.searchParams.get("zone") || "";
   const startDate = url.searchParams.get("startDate") || "";
-  const providedKey = getRequestKey(request, "x-building-key", "key", url);
   const windowDays = 21;
 
   if (!building || !issue || !issueIds.has(issue) || (zone && !zoneIds.has(zone))) {
     return jsonResponse({ matches: [] });
   }
 
-  const env = locals.runtime?.env ?? {};
-  if (!isResidentKeyRecognized(providedKey, env)) {
-    return jsonError("Resident access is required.", 403, { matches: [] });
-  }
-  if (!isBuildingAccessValid(building, providedKey, env)) {
-    return jsonError("This key does not match the building.", 403, { matches: [] });
-  }
-
-  const referenceDate = isValidDateString(startDate) ? startDate : "";
-  const kv = getSubmissionsKv(env);
+  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
   if (!kv) {
     return jsonResponse({ matches: [] });
   }
+
+  const guarded = await guardApiRequest(request, locals, kv, {
+    auth: {
+      mode: "resident",
+      buildingScopeFrom: () => building,
+    },
+  });
+
+  if (!guarded.ok) {
+    return guarded.response;
+  }
+
+  const referenceDate = isValidDateString(startDate) ? startDate : "";
 
   const matches: Array<{
     id: string;

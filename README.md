@@ -125,7 +125,7 @@ Use Conventional Commit style:
 
 - Product intent: `docs/vision.md`
 - Architecture and data flow: `docs/architecture.md`
-- Active modernization plan: `docs/modernization-plan.md`
+- Modernization roadmap: `docs/priority-feature-roadmap-2026-02.md`
 - Dependency capability review: `docs/tech-stack-capability-research-2026-02.md`
 - MCP + agent skills research: `docs/mcp-agent-skills-research-2026-02.md`
 - Agent skills playbook: `docs/agent-skills-playbook.md`

@@ -9,7 +9,6 @@ Sources reviewed:
 - `README.md`
 - `docs/vision.md`
 - `docs/architecture.md`
-- `docs/modernization-plan.md`
 - `docs/mcp-agent-skills-research-2026-02.md`
 - `docs/agent-skills-playbook.md`
 - `docs/ux-audit-2026-02.md`

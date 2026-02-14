@@ -1,5 +1,43 @@
 # Changelog
 
+## 1.0.81 - 2026-02-14
+
+### Added
+
+- Extended the shared request guard to include centralized audit behavior for write endpoints, including rejected requests from failed auth, validation, or rate-limit checks.
+- Added regression coverage that verifies blocked write attempts produce rejected audit entries.
+
+### Changed
+
+- Updated write routes to use guard-provided audit success logging so route handlers do not duplicate audit plumbing.
+- Completed the modernization-plan transition by moving active roadmap references to `docs/priority-feature-roadmap-2026-02.md`.
+
+### Fixed
+
+- Ensured audit logging is part of the single request-guard layer rather than partially implemented in route handlers.
+
+### Security
+
+- Improved observability consistency for abuse and access-denied write attempts without storing direct personal identifiers.
+
+## 1.0.80 - 2026-02-14
+
+### Added
+
+- Added a shared API request guard that centralizes auth scope checks, request validation, and rate-limit enforcement for submission and waitlist endpoints.
+- Added privacy-preserving audit event storage for all write operations (submission create, status update, report increment, waitlist create).
+- Added route-level audit regression coverage to verify every write path records an audit event.
+
+### Changed
+
+- Refactored submission and waitlist write handlers to call domain-layer record builders instead of embedding creation/update logic in route files.
+- Updated read endpoints to use the same request guard flow for resident key checks and building-scope enforcement.
+
+### Security
+
+- Reduced risk of handlers accidentally skipping core access and abuse checks by routing API protection through one guard entry point.
+- Expanded consistent audit traces for mutable operations while avoiding direct personal identifier fields in event payloads.
+
 ## 1.0.79 - 2026-02-13
 
 ### Changed
