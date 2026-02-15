@@ -41,6 +41,11 @@ type GuardConfig<TPayload, TValidated> = {
   audit?: GuardAuditConfig<TValidated>;
 };
 
+const DEFAULT_RESIDENT_HEADER = "x-building-key";
+const DEFAULT_RESIDENT_QUERY = "key";
+const DEFAULT_STEWARD_HEADER = "x-steward-key";
+const DEFAULT_STEWARD_QUERY = "stewardKey";
+
 export type GuardSuccess<TValidated> = {
   request: Request;
   env: Record<string, unknown>;
@@ -83,6 +88,19 @@ const writeAudit = async (
   }
 };
 
+const rejectWithAudit = async (
+  config: GuardAuditConfig<unknown> | undefined,
+  payload: unknown,
+  url: URL,
+  message: string,
+  status: number,
+  details: Record<string, unknown> = {},
+  headers: HeadersInit = {}
+) => {
+  await writeAudit(config, "rejected", payload, url);
+  return { ok: false as const, response: jsonError(message, status, details, headers) };
+};
+
 export const guardApiRequest = async <TPayload = Record<string, unknown>, TValidated = TPayload>(
   request: Request,
   locals: { runtime?: { env?: Record<string, unknown> } } | undefined,
@@ -99,11 +117,7 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
     if (config.validate) {
       const validation = config.validate(parsedBody);
       if (!validation.ok) {
-        await writeAudit(config.audit, "rejected", payload, url);
-        return {
-          ok: false,
-          response: jsonError(validation.message, 400, validation.details ?? {}),
-        };
+        return rejectWithAudit(config.audit, payload, url, validation.message, 400, validation.details ?? {});
       }
       payload = validation.data;
     } else {
@@ -112,10 +126,10 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
   }
 
   const authMode = config.auth?.mode ?? "none";
-  const residentHeaderName = config.auth?.residentHeaderName ?? "x-building-key";
-  const residentQueryParam = config.auth?.residentQueryParam ?? "key";
-  const stewardHeaderName = config.auth?.stewardHeaderName ?? "x-steward-key";
-  const stewardQueryParam = config.auth?.stewardQueryParam ?? "stewardKey";
+  const residentHeaderName = config.auth?.residentHeaderName ?? DEFAULT_RESIDENT_HEADER;
+  const residentQueryParam = config.auth?.residentQueryParam ?? DEFAULT_RESIDENT_QUERY;
+  const stewardHeaderName = config.auth?.stewardHeaderName ?? DEFAULT_STEWARD_HEADER;
+  const stewardQueryParam = config.auth?.stewardQueryParam ?? DEFAULT_STEWARD_QUERY;
 
   let residentKey: string | null = null;
   let allowedBuildings: string[] = [];
@@ -123,15 +137,13 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
   if (authMode === "resident") {
     residentKey = getRequestKey(request, residentHeaderName, residentQueryParam, url);
     if (!isResidentKeyRecognized(residentKey, env)) {
-      await writeAudit(config.audit, "rejected", payload, url);
-      return { ok: false, response: jsonError("Resident access is required.", 403) };
+      return rejectWithAudit(config.audit, payload, url, "Resident access is required.", 403);
     }
     allowedBuildings = getBuildingIdsForKey(residentKey, env);
 
     const scopedBuilding = config.auth?.buildingScopeFrom?.(payload, url) ?? null;
     if (scopedBuilding && !isBuildingAccessValid(scopedBuilding, residentKey, env)) {
-      await writeAudit(config.audit, "rejected", payload, url);
-      return { ok: false, response: jsonError("This key does not match the building.", 403) };
+      return rejectWithAudit(config.audit, payload, url, "This key does not match the building.", 403);
     }
   }
 
@@ -139,8 +151,7 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
     const requiredKey = typeof env.STEWARD_KEY === "string" ? env.STEWARD_KEY : "";
     const providedKey = getRequestKey(request, stewardHeaderName, stewardQueryParam, url);
     if (!isAccessKeyValid(providedKey, requiredKey)) {
-      await writeAudit(config.audit, "rejected", payload, url);
-      return { ok: false, response: jsonError("Steward access is required.", 403) };
+      return rejectWithAudit(config.audit, payload, url, "Steward access is required.", 403);
     }
   }
 
@@ -154,11 +165,9 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
       windowMs: definition.windowMs,
     });
     if (!rateLimit.ok) {
-      await writeAudit(config.audit, "rejected", payload, url);
-      return {
-        ok: false,
-        response: jsonError(definition.message, 429, {}, { "Retry-After": String(rateLimit.retryAfter) }),
-      };
+      return rejectWithAudit(config.audit, payload, url, definition.message, 429, {}, {
+        "Retry-After": String(rateLimit.retryAfter),
+      });
     }
   }
 
