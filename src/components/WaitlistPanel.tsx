@@ -94,7 +94,7 @@ const WaitlistPanel = () => {
           )}
         </div>
         <Button className="button button-secondary" type="button" onClick={() => setIsExpanded((prev) => !prev)}>
-          {isExpanded ? "Hide steps" : "Start"}
+          {isExpanded ? "Hide waitlist steps" : "Start waitlist"}
         </Button>
       </div>
       {isExpanded && (
@@ -128,9 +128,7 @@ const WaitlistPanel = () => {
             {waitlistStatus === "saved" && requestId && (
               <div className="waitlist-success">
                 <h3>Step 2: Save your request code</h3>
-                <p className="helper" role="status" aria-live="polite">
-                  Saved. Keep this request code.
-                </p>
+                <p className="helper" role="status" aria-live="polite">Saved. Your request code is below.</p>
                 <div className="waitlist-actions">
                   <span className="waitlist-code">{requestId}</span>
                   <Button className="button button-secondary" type="button" onClick={handleCopyRequestId}>
@@ -148,7 +146,7 @@ const WaitlistPanel = () => {
           {waitlistStatus === "saved" && requestId && (
             <div className="waitlist-success" role="status" aria-live="polite">
               <h3>Done</h3>
-              <p className="helper">Your request is saved. Keep the request code for follow-up.</p>
+              <p className="helper">Please save this code now. You need it for follow-up.</p>
             </div>
           )}
         </div>
