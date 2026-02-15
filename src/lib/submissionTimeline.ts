@@ -11,25 +11,40 @@ type SubmissionTimelineInput = {
   stage: "A" | "B" | "C";
 };
 
-export const getSubmissionTimelineEntries = (submission: SubmissionTimelineInput): SubmissionTimelineEntry[] => {
-  const entries: Array<SubmissionTimelineEntry | null> = [
-    submission.startDate ? { label: "Issue started", date: submission.startDate } : null,
-    submission.stage === "A" && submission.reportDate
-      ? { label: "Notice sent", date: submission.reportDate }
-      : null,
-    (submission.stage === "B" || submission.stage === "C") && submission.firstMessageDate
-      ? { label: "First notice sent", date: submission.firstMessageDate }
-      : null,
-    (submission.stage === "B" || submission.stage === "C") && submission.reportDate
-      ? {
-          label: submission.stage === "B" ? "Follow-up sent" : "Final notice sent",
-          date: submission.reportDate,
-        }
-      : null,
-    submission.ticketDate ? { label: "311 ticket logged", date: submission.ticketDate } : null,
-  ];
+const stageUsesFirstNoticeDate: Record<SubmissionTimelineInput["stage"], boolean> = {
+  A: false,
+  B: true,
+  C: true,
+};
 
-  return entries
-    .filter((entry): entry is SubmissionTimelineEntry => Boolean(entry))
-    .sort((a, b) => a.date.localeCompare(b.date));
+const reportDateLabelByStage: Record<SubmissionTimelineInput["stage"], string> = {
+  A: "Notice sent",
+  B: "Follow-up sent",
+  C: "Final notice sent",
+};
+
+const pushTimelineEntry = (
+  entries: SubmissionTimelineEntry[],
+  date: string | undefined,
+  label: string
+) => {
+  if (!date) {
+    return;
+  }
+  entries.push({ label, date });
+};
+
+export const getSubmissionTimelineEntries = (submission: SubmissionTimelineInput): SubmissionTimelineEntry[] => {
+  const entries: SubmissionTimelineEntry[] = [];
+
+  pushTimelineEntry(entries, submission.startDate, "Issue started");
+
+  if (stageUsesFirstNoticeDate[submission.stage]) {
+    pushTimelineEntry(entries, submission.firstMessageDate, "First notice sent");
+  }
+
+  pushTimelineEntry(entries, submission.reportDate, reportDateLabelByStage[submission.stage]);
+  pushTimelineEntry(entries, submission.ticketDate, "311 ticket logged");
+
+  return entries.sort((a, b) => a.date.localeCompare(b.date));
 };

@@ -74,14 +74,12 @@ export const isValidSubmissionStatus = (value: unknown): value is SubmissionStat
 export const normalizeSubmissionStatus = (value: unknown): SubmissionStatus =>
   isValidSubmissionStatus(value) ? value : "open";
 
-const isValidNoticeStage = (value: unknown): value is NoticeStage =>
-  typeof value === "string" && allowedStageSet.has(value as NoticeStage);
-
-const isValidSupportedLanguage = (value: unknown): value is SupportedLanguage =>
-  typeof value === "string" && supportedLanguageSet.has(value as SupportedLanguage);
-
-const isValidPortfolioId = (value: unknown): value is PortfolioId =>
-  typeof value === "string" && allowedPortfolioSet.has(value as PortfolioId);
+const readEnumValue = <T extends string>(value: unknown, allowed: Set<T>) => {
+  if (typeof value !== "string") {
+    return null;
+  }
+  return allowed.has(value as T) ? (value as T) : null;
+};
 
 const isValidZoneId = (value: unknown): value is ZoneId =>
   typeof value === "string" && allowedZoneSet.has(value as ZoneId);
@@ -137,22 +135,22 @@ export const validateSubmissionInput = (payload: unknown) => {
     pushSensitiveErrors("Building", building, errors);
   }
 
-  const issue = asString(data.issue);
-  if (!issueIds.has(issue)) {
+  const issue = readEnumValue(data.issue, issueIds);
+  if (!issue) {
     errors.push("Issue type is invalid.");
   }
 
-  const stage = isValidNoticeStage(data.stage) ? data.stage : "";
+  const stage = readEnumValue(data.stage, allowedStageSet);
   if (!stage) {
     errors.push("Stage is invalid.");
   }
 
-  const language = isValidSupportedLanguage(data.language) ? data.language : "";
+  const language = readEnumValue(data.language, supportedLanguageSet);
   if (!language) {
     errors.push("Language is invalid.");
   }
 
-  const portfolio = isValidPortfolioId(data.portfolio) ? data.portfolio : "";
+  const portfolio = readEnumValue(data.portfolio, allowedPortfolioSet);
   if (!portfolio) {
     errors.push("Portfolio is invalid.");
   }
@@ -207,9 +205,9 @@ export const validateSubmissionInput = (payload: unknown) => {
     data: {
       building,
       issue,
-      stage: stage as SubmissionInput["stage"],
-      language: language as SubmissionInput["language"],
-      portfolio: portfolio as SubmissionInput["portfolio"],
+      stage,
+      language,
+      portfolio,
       startDate,
       reportDate,
       reportCount,
