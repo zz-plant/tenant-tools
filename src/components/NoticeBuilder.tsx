@@ -969,7 +969,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         </p>
                       ))}
                     </div>
-                    <p className="helper">You can draft a notice now. You need the resident key later to save a shared record.</p>
                     <label>
                       Building
                       <Select.Root
@@ -1047,7 +1046,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       </RadioGroup.Root>
                     </div>
 
-                    <p className="helper">You can draft a notice now. You only need a resident key to save a shared record.</p>
+                    <p className="helper">You can draft a notice now. Add the resident key later when you save.</p>
 
                     {isStep1Complete ? (
                       <>

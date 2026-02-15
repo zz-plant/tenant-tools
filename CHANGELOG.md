@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.82 - 2026-02-15
+
+### Changed
+
+- Simplified builder step-1 helper copy by removing duplicate resident-key guidance and keeping one concise save-time reminder.
+- Updated waitlist toggle and confirmation language to use clearer, action-based labels for first-time users.
+- Corrected punctuation in the no-timeline issue option label for cleaner scan readability.
+
+### Security
+
+- Kept privacy-first wording explicit in onboarding and waitlist flows without introducing any new personal-data fields or public evidence behavior.
+
 ## 1.0.81 - 2026-02-14
 
 ### Added
