@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.85 - 2026-02-16
+
+### Changed
+
+- Collapsed the preview area until step 1 is complete so first-time residents can focus on one required action before seeing copy/save tools.
+- Added an explicit step-1 completion button and gated “Next” guidance so forward prompts appear only after basics are selected.
+- Refined waitlist focus behavior with a dedicated focused-flow cue and simplified confirmation copy.
+- Updated the no-timeline issue label for clearer punctuation and scan readability.
+
+### Security
+
+- Reduced accidental sharing risk by delaying visibility of copy and save actions until the required building and issue selections are complete.
+
 ## 1.0.84 - 2026-02-16
 
 ### Changed

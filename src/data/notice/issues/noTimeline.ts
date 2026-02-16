@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const noTimelineIssue: IssueOption = {
   id: "no-timeline",
-  label: "🧾 \"We are working on it\" / no timeline",
+  label: '🧾 No timeline after "we are working on it"',
   notices: {
     A: {
       en: `Please provide the repair date.\nIf there is no date, provide the next step and the exact day it will happen.\n\n`,
