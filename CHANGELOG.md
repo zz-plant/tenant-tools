@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.0.87 - 2026-02-16
+
+### Changed
+
+- Replaced page-level ad hoc URL assembly with shared navigation helpers for dashboard and submission links so resident/steward key propagation stays consistent across pages.
+
+### Fixed
+
+- Removed brittle source-string regression checks and replaced them with URL-behavior tests that verify key propagation outputs directly.
+
+### Security
+
+- Reduced risk of broken private-route access links by centralizing access-key query construction in one reusable helper path.
+
+## 1.0.86 - 2026-02-16
+
+### Changed
+
+- Moved the preview privacy status strip next to save and copy-link actions so residents see privacy checks at the sharing moment.
+- Reduced duplicate helper copy in the building dashboard records header to keep the instruction block shorter and easier to scan.
+
+### Added
+
+- Expanded waitlist route tests for malformed JSON payload handling and IP-header precedence behavior in rate limiting.
+
+### Security
+
+- Reinforced write-endpoint abuse protections by testing that `CF-Connecting-IP` remains authoritative and alternate headers do not bypass request limits.
+
 ## 1.0.85 - 2026-02-16
 
 ### Changed

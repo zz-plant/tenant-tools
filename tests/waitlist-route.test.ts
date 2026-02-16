@@ -98,4 +98,51 @@ describe("waitlist route", () => {
     assert.equal(blockedResponse.status, 429);
     assert.ok(blockedResponse.headers.get("Retry-After"));
   });
+
+  it("uses CF-Connecting-IP when present and does not trust alternate headers for bypass", async () => {
+    const kv = createMockKv();
+    const locals = localsFor(kv);
+
+    for (let index = 0; index < 4; index += 1) {
+      const request = new Request("http://localhost/api/waitlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": "5.5.5.5",
+          "x-forwarded-for": `6.6.6.${index}`,
+        },
+        body: JSON.stringify({ building: `2400 W Wabansia ${index}`, portfolio: "continuum" }),
+      });
+      const response = await createWaitlistEntry({ request, locals } as Parameters<typeof createWaitlistEntry>[0]);
+      assert.equal(response.status, 201);
+    }
+
+    const blockedRequest = new Request("http://localhost/api/waitlist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "CF-Connecting-IP": "5.5.5.5",
+        "x-real-ip": "8.8.8.8",
+      },
+      body: JSON.stringify({ building: "2400 W Wabansia", portfolio: "continuum" }),
+    });
+    const blockedResponse = await createWaitlistEntry({ request: blockedRequest, locals } as Parameters<typeof createWaitlistEntry>[0]);
+    assert.equal(blockedResponse.status, 429);
+  });
+
+  it("rejects malformed JSON payloads", async () => {
+    const kv = createMockKv();
+    const request = new Request("http://localhost/api/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{\"building\":\"2400 W Wabansia\",\"portfolio\":",
+    });
+
+    const response = await createWaitlistEntry({ request, locals: localsFor(kv) } as Parameters<typeof createWaitlistEntry>[0]);
+    assert.equal(response.status, 400);
+
+    const payload = await readJson(response);
+    assert.ok(Array.isArray(payload.details));
+    assert.ok(payload.details.includes("Payload must be an object."));
+  });
 });

@@ -8,7 +8,7 @@ import {
   type BuildingSubmission,
 } from "../../lib/buildingDashboard";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
-import { buildAccessQuery, buildLinkSuffix } from "../../lib/navigation";
+import { buildAccessQuery, buildBuildingDashboardUrl, buildSubmissionDetailsUrl, buildLinkSuffix } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 
 export const prerender = false;
@@ -35,7 +35,7 @@ const hasFilters = issueFilter !== "all" || statusFilter !== "all";
 
 const baseQuery = buildAccessQuery({ accessKey, stewardKey });
 const linkSuffix = buildLinkSuffix(baseQuery);
-const clearFiltersUrl = `/buildings/${encodeURIComponent(buildingId)}${buildLinkSuffix(baseQuery)}`;
+const clearFiltersUrl = buildBuildingDashboardUrl({ buildingId, accessKey, stewardKey });
 
 const statusLabels = submissionStatusLabels;
 
@@ -160,8 +160,7 @@ const totalFiltered = filtered.length;
 
               <div>
                 <h2>Recent records</h2>
-                <p class="helper">Showing {totalVisible} of {totalFiltered} records.</p>
-                <p class="helper">Use the filters on the right to change this list.</p>
+                <p class="helper">Showing {totalVisible} of {totalFiltered} records. Use the filters on the right to change this list.</p>
                 <p class="helper">Small report counts are hidden to protect resident privacy.</p>
               </div>
 
@@ -201,7 +200,7 @@ const totalFiltered = filtered.length;
                             </button>
                             <a
                               class="button button-secondary button-compact"
-                              href={`/submissions/${record.id}${linkSuffix}`}
+                              href={buildSubmissionDetailsUrl({ submissionId: record.id, accessKey, stewardKey })}
                             >
                               View details
                             </a>
