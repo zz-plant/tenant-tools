@@ -163,11 +163,6 @@
 }
 
 
-.step-nav-hint {
-  display: none;
-  margin: 0;
-}
-
 .step-nav {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -591,7 +586,12 @@ code {
 .step-controls {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+}
+
+.preview-panel-mobile-hidden,
+.record-panel-mobile-hidden {
+  display: block;
 }
 
 .building-gallery {
@@ -978,10 +978,6 @@ code {
     border-color: #e6eaf6;
   }
 
-  .step-nav-hint {
-    display: block;
-    margin-top: 6px;
-  }
 
   .step-nav {
     display: flex;
@@ -993,8 +989,9 @@ code {
   }
 
   .step-button {
-    padding: 10px 12px;
-    min-width: 150px;
+    padding: 12px 14px;
+    min-width: 170px;
+    min-height: 50px;
     scroll-snap-align: start;
   }
 
@@ -1005,11 +1002,11 @@ code {
 
   .step-controls {
     position: sticky;
-    bottom: calc(12px + var(--safe-area-bottom));
-    z-index: 5;
+    bottom: calc(10px + var(--safe-area-bottom));
+    z-index: 8;
     background: #ffffff;
     border-radius: 16px;
-    border: 1px solid #e3e7f5;
+    border: 1px solid #d9e0f5;
     padding: 10px;
     padding-bottom: calc(10px + var(--safe-area-bottom));
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
@@ -1065,16 +1062,33 @@ code {
   }
 
   .review-actions,
-  .issue-actions,
-  .step-controls {
+  .issue-actions {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .review-actions .button,
-  .issue-actions .button,
+  .step-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
   .step-controls .button {
+    min-height: 46px;
+  }
+
+  .step-controls .button:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .review-actions .button,
+  .issue-actions .button {
     width: 100%;
+  }
+
+  .preview-panel-mobile-hidden,
+  .record-panel-mobile-hidden {
+    display: none;
   }
 }
 
@@ -1107,11 +1121,6 @@ code {
   margin-top: 8px;
 }
 
-.mobile-step-controls {
-  display: none;
-  gap: 8px;
-  margin-top: 8px;
-}
 
 .optional-setup {
   border: 1px dashed #d4dbf2;
@@ -1183,13 +1192,5 @@ code {
 
   .step-button {
     scroll-snap-align: start;
-  }
-
-  .mobile-step-controls {
-    display: flex;
-  }
-
-  .step-nav-hint {
-    display: block;
   }
 }

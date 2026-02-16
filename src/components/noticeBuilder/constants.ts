@@ -101,12 +101,13 @@ export const evidenceSafetyChecklist = [
   "Do not upload faces.",
   "Do not upload names, mail labels, or unit numbers.",
   "Do not upload leases or ID documents.",
+  "If a photo is blurry or dark, retake it before upload.",
   "Remove location data if you can.",
 ];
 
 
 export const evidenceSafetySummary =
-  "Do not upload photos with faces, names, mail labels, unit numbers, leases, or ID documents.";
+  "Do not upload photos with faces, names, mail labels, unit numbers, leases, or ID documents. Retake blurry or dark photos.";
 
 export const freeTextSafetyNote = "Short facts only. No names or unit numbers.";
 
