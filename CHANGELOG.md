@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.84 - 2026-02-16
+
+### Changed
+
+- Refreshed the home intro layout with soft gradient accents, clearer feature cards, and stronger visual grouping for the first screen.
+- Improved intro card styling and spacing so key actions are easier to scan on desktop while keeping compact mobile behavior.
+
+### Security
+
+- Kept privacy-first onboarding reminders explicit and unchanged while improving readability and visual hierarchy.
+
 ## 1.0.83 - 2026-02-16
 
 ### Changed
