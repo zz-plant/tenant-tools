@@ -419,6 +419,11 @@
   gap: 6px;
 }
 
+.waitlist-panel-focus {
+  border: 2px solid rgba(79, 103, 255, 0.28);
+  box-shadow: 0 16px 36px rgba(35, 48, 110, 0.12);
+}
+
 .waitlist-grid {
   display: grid;
   gap: 24px;

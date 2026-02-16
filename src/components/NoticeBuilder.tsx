@@ -826,6 +826,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     return { label: "Review + copy", step: 4 };
   }, [currentStep, formState.building, formState.issue]);
 
+  const showGuidedAction = canShowAfterBasics;
+
   const basicsChecklist = [
     { label: "Building selected", done: Boolean(formState.building) },
     { label: "Issue selected", done: Boolean(formState.issue) },
@@ -900,7 +902,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   </div>
                 </div>
                 <div className="step-privacy">
-                  <p className="helper privacy-reminder">No names or unit numbers. Use general areas.</p>
                   {!stepsLocked && <p className="helper step-now">Now: {currentStepInfo.label}</p>}
                 </div>
               </div>
@@ -955,9 +956,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   Next step
                 </Button>
               </div>
-              {stepsLocked && (
-                <p className="helper">Finish step 1 to continue.</p>
-              )}
+              {stepsLocked && <p className="helper">Finish step 1 to continue.</p>}
 
               <form className="form-grid">
                 <Tabs.Panel value="1">
@@ -1147,26 +1146,38 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                             );
                           })}
                         </div>
-                        <div className="guided-action" role="status" aria-live="polite">
-                          <p className="guided-action-label">Next: {guidedAction.label}</p>
-                          <div className="guided-action-buttons">
-                            <Button
-                              className="button button-secondary"
-                              type="button"
-                              onClick={() => setCurrentStep(guidedAction.step)}
-                            >
-                              Go now
-                            </Button>
-                            <Button
-                              className="button"
-                              type="button"
-                              onClick={handleFastTrackToPreview}
-                              disabled={!canFastTrack}
-                            >
-                              Finish setup fast
-                            </Button>
+                        {showGuidedAction && (
+                          <div className="guided-action" role="status" aria-live="polite">
+                            <p className="guided-action-label">Next: {guidedAction.label}</p>
+                            <div className="guided-action-buttons">
+                              <Button
+                                className="button button-secondary"
+                                type="button"
+                                onClick={() => setCurrentStep(guidedAction.step)}
+                              >
+                                Go now
+                              </Button>
+                              <Button
+                                className="button"
+                                type="button"
+                                onClick={handleFastTrackToPreview}
+                                disabled={!canFastTrack}
+                              >
+                                Finish setup fast
+                              </Button>
+                            </div>
                           </div>
-                        </div>
+                        )}
+
+                        {isStep1Complete && (
+                          <Button
+                            className="button"
+                            type="button"
+                            onClick={() => setCurrentStep(2)}
+                          >
+                            Done with step 1. Continue to dates.
+                          </Button>
+                        )}
                       </>
                     ) : (
                       <p className="helper">Finish building and issue first. Then optional setup appears.</p>
@@ -1346,51 +1357,65 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             </div>
           </section>
           <aside className="panel panel-highlight preview-panel" id="preview">
-          <div className="output-header">
-            <h2>Generated notice</h2>
-            <div className="output-actions">
-              <Button className="button" type="button" onClick={handleCopy} disabled={!isNoticeReady}>
-                {copyLabel}
-              </Button>
-              <Button className="button button-secondary" type="button" onClick={handleRepeatNotice} disabled={!isNoticeReady}>
-                {repeatLabel}
-              </Button>
-            </div>
-          </div>
-          {copyDisabledReason && <p className="helper action-hint">{copyDisabledReason}</p>}
-          <p className="helper" role="status" aria-live="polite">
-            {noticeStatusMessage}
-          </p>
-          <section className="preview-section">
-            <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
-              <p className="notice-status-title">{noticeReadinessTitle}</p>
-              {missingBasics.length > 0 && (
-                <ul className="quick-list">
-                  {missingBasics.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              )}
-              {!isNoticeReady && (
-                <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                  Go to step 1
-                </Button>
+            <div className="output-header">
+              <h2>Generated notice</h2>
+              {canShowAfterBasics && (
+                <div className="output-actions">
+                  <Button className="button" type="button" onClick={handleCopy} disabled={!isNoticeReady}>
+                    {copyLabel}
+                  </Button>
+                  <Button className="button button-secondary" type="button" onClick={handleRepeatNotice} disabled={!isNoticeReady}>
+                    {repeatLabel}
+                  </Button>
+                </div>
               )}
             </div>
-          </section>
-          <section className="preview-section">
-            <div className="privacy-strip" aria-live="polite">
-              <p className={`privacy-chip ${privacyStatus.hasContactHint ? "risk" : "ok"}`}>
-                {privacyStatus.hasContactHint ? "Contact info found" : "No contact info found"}
-              </p>
-              <p className={`privacy-chip ${privacyStatus.hasUnitHint ? "risk" : "ok"}`}>
-                {privacyStatus.hasUnitHint ? "Unit hint found" : "No unit hints found"}
-              </p>
-              <p className={`privacy-chip ${privacyStatus.hasEvidenceNote ? "ok" : "neutral"}`}>
-                {privacyStatus.hasEvidenceNote ? "Evidence note included" : "No evidence note"}
-              </p>
-            </div>
-          </section>
+            {!canShowAfterBasics ? (
+              <section className="preview-section">
+                <div className="notice-status needs">
+                  <p className="notice-status-title">Finish the basics</p>
+                  <p className="helper">Choose a building and issue first. Then preview and save options appear.</p>
+                  <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
+                    Go to step 1
+                  </Button>
+                </div>
+              </section>
+            ) : (
+              <>
+                {copyDisabledReason && <p className="helper action-hint">{copyDisabledReason}</p>}
+                <p className="helper" role="status" aria-live="polite">
+                  {noticeStatusMessage}
+                </p>
+                <section className="preview-section">
+                  <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
+                    <p className="notice-status-title">{noticeReadinessTitle}</p>
+                    {missingBasics.length > 0 && (
+                      <ul className="quick-list">
+                        {missingBasics.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {!isNoticeReady && (
+                      <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
+                        Go to step 1
+                      </Button>
+                    )}
+                  </div>
+                </section>
+                <section className="preview-section">
+                  <div className="privacy-strip" aria-live="polite">
+                    <p className={`privacy-chip ${privacyStatus.hasContactHint ? "risk" : "ok"}`}>
+                      {privacyStatus.hasContactHint ? "Contact info found" : "No contact info found"}
+                    </p>
+                    <p className={`privacy-chip ${privacyStatus.hasUnitHint ? "risk" : "ok"}`}>
+                      {privacyStatus.hasUnitHint ? "Unit hint found" : "No unit hints found"}
+                    </p>
+                    <p className={`privacy-chip ${privacyStatus.hasEvidenceNote ? "ok" : "neutral"}`}>
+                      {privacyStatus.hasEvidenceNote ? "Evidence note included" : "No evidence note"}
+                    </p>
+                  </div>
+                </section>
           <section className="preview-section">
             <div className="summary-header">
               <h3>Notice summary</h3>
@@ -1403,7 +1428,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </div>
               ))}
             </div>
-            <p className="helper">Privacy reminder: no names, unit numbers, or personal details.</p>
           </section>
           <section className="preview-section">
             <div className="notice-preview">
@@ -1640,6 +1664,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               )}
             </div>
           </section>
+              </>
+            )}
           </aside>
         </div>
 

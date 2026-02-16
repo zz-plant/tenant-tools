@@ -82,23 +82,20 @@ const WaitlistPanel = () => {
   };
 
   return (
-    <section className="panel waitlist-panel" id="waitlist">
+    <section className={`panel waitlist-panel ${isExpanded ? "waitlist-panel-focus" : ""}`} id="waitlist">
       <div className="waitlist-header">
         <div>
           <h2>Building not listed?</h2>
-          <p className="helper">
-            Add your building to the waitlist. No names, emails, or phone numbers.
-          </p>
-          {!isExpanded && (
-            <p className="helper">Step 1: add address. Step 2: save request code.</p>
-          )}
+          <p className="helper">Add your building to the waitlist. No names, emails, or phone numbers.</p>
+          {!isExpanded && <p className="helper">Step 1: add address. Step 2: save request code.</p>}
+          {isExpanded && <p className="helper">Focused mode: finish these two steps, then return to the builder.</p>}
         </div>
         <Button className="button button-secondary" type="button" onClick={() => setIsExpanded((prev) => !prev)}>
           {isExpanded ? "Hide waitlist steps" : "Start waitlist"}
         </Button>
       </div>
       {isExpanded && (
-        <div className="waitlist-grid">
+        <div className="waitlist-grid" role="region" aria-label="Waitlist flow">
           <form className="waitlist-form" onSubmit={handleWaitlistSubmit}>
             <h3>Step 1: Add the building</h3>
             <label>
@@ -128,7 +125,9 @@ const WaitlistPanel = () => {
             {waitlistStatus === "saved" && requestId && (
               <div className="waitlist-success">
                 <h3>Step 2: Save your request code</h3>
-                <p className="helper" role="status" aria-live="polite">Saved. Your request code is below.</p>
+                <p className="helper" role="status" aria-live="polite">
+                  Saved. Your request code is below. Please save this code now.
+                </p>
                 <div className="waitlist-actions">
                   <span className="waitlist-code">{requestId}</span>
                   <Button className="button button-secondary" type="button" onClick={handleCopyRequestId}>
@@ -143,12 +142,6 @@ const WaitlistPanel = () => {
               </p>
             )}
           </form>
-          {waitlistStatus === "saved" && requestId && (
-            <div className="waitlist-success" role="status" aria-live="polite">
-              <h3>Done</h3>
-              <p className="helper">Please save this code now. You need it for follow-up.</p>
-            </div>
-          )}
         </div>
       )}
     </section>
