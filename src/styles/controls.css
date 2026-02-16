@@ -593,8 +593,14 @@
 }
 
 .button-secondary {
-  background: rgba(79, 103, 255, 0.12);
-  color: #1b2a5a;
+  background: #dfe5ff;
+  color: #182955;
+  border: 1px solid #bcc9ff;
+}
+
+.button-secondary:hover {
+  background: #d2dbff;
+  box-shadow: 0 8px 18px rgba(73, 95, 214, 0.2);
 }
 
 .site-footer {

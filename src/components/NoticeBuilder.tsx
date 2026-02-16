@@ -141,6 +141,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const canShowAfterBasics = isStep1Complete;
   const isNoticeReady = missingBasics.length === 0;
   const noticeReadinessTitle = isNoticeReady ? "Notice ready" : "Finish the basics";
+  const copyDisabledReason = !isNoticeReady
+    ? `Copy unlocks after: ${missingBasics.join(" and ")}.`
+    : "";
   const normalizedBuildingKey = buildingKey.trim();
   const canSaveLedger = Boolean(formState.building && formState.issue && normalizedBuildingKey);
   const canFastTrack = Boolean(formState.building && formState.issue);
@@ -928,6 +931,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       <span className="step-title">{step.title}</span>
                       <span className="step-label">{step.label}</span>
                       <span className="step-requirement">{step.requirement}</span>
+                      {isLocked && <span className="step-lock-note">Locked until step 1 is complete.</span>}
                     </Tabs.Tab>
                   );
                 })}
@@ -1353,6 +1357,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               </Button>
             </div>
           </div>
+          {copyDisabledReason && <p className="helper action-hint">{copyDisabledReason}</p>}
           <p className="helper" role="status" aria-live="polite">
             {noticeStatusMessage}
           </p>
@@ -1644,7 +1649,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <p className="helper">Use this after you send the notice.</p>
           </div>
           {!canShowAfterBasics ? (
-            <p className="helper">Finish step 1 for this section.</p>
+            <div className="record-locked">
+              <p className="helper"><strong>Locked:</strong> finish step 1 to unlock this section.</p>
+              <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
+                Go to step 1
+              </Button>
+            </div>
           ) : (
             <>
               <div>
