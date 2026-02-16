@@ -827,6 +827,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   }, [currentStep, formState.building, formState.issue]);
 
   const showGuidedAction = canShowAfterBasics;
+  const builderHelperText = !isStep1Complete
+    ? "Do one task now: choose building and issue."
+    : "Next normal step: move forward with dates, facts, or review.";
 
   const basicsChecklist = [
     { label: "Building selected", done: Boolean(formState.building) },
@@ -882,7 +885,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <div className="step-header">
               <h2>Build your notice</h2>
               <p className="helper">
-                Building not listed? <a href="#waitlist">Open waitlist</a>.
+                {builderHelperText} Building not listed? <a href="#waitlist">Open waitlist</a>.
               </p>
               <div className="step-meta">
                 <div className="step-progress">
@@ -937,27 +940,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   );
                 })}
               </Tabs.List>
-              <p className="helper step-nav-hint">Use step buttons below on mobile.</p>
-              <div className="mobile-step-controls" aria-label="Mobile step controls">
-                <Button
-                  className="button button-secondary button-compact"
-                  type="button"
-                  onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
-                  disabled={currentStep === 1}
-                >
-                  Previous step
-                </Button>
-                <Button
-                  className="button button-secondary button-compact"
-                  type="button"
-                  onClick={() => setCurrentStep((prev) => Math.min(steps.length, prev + 1))}
-                  disabled={currentStep === steps.length || (currentStep === 1 && !isStep1Complete)}
-                >
-                  Next step
-                </Button>
-              </div>
-              {stepsLocked && <p className="helper">Finish step 1 to continue.</p>}
-
               <form className="form-grid">
                 <Tabs.Panel value="1">
                   <div className="form-section">
@@ -1295,8 +1277,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </Tabs.Panel>
 
                 <Tabs.Panel value="3">
-                  <p className="helper">Optional facts and evidence.</p>
-                  <p className="helper">{evidenceSafetySummary}</p>
+                  <p className="helper">Optional facts and evidence. {evidenceSafetySummary}</p>
                   {issueFields.length === 0 && (
                     <p className="helper">Select an issue to see detail fields.</p>
                   )}
@@ -1354,9 +1335,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               >
                 Next
               </Button>
+              <Button
+                className="button"
+                type="button"
+                onClick={() => setCurrentStep(4)}
+                disabled={!isStep1Complete}
+              >
+                Save draft
+              </Button>
             </div>
           </section>
-          <aside className="panel panel-highlight preview-panel" id="preview">
+          <aside className={`panel panel-highlight preview-panel${!canShowAfterBasics ? " preview-panel-mobile-hidden" : ""}`} id="preview">
             <div className="output-header">
               <h2>Generated notice</h2>
               {canShowAfterBasics && (
@@ -1667,7 +1656,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           </aside>
         </div>
 
-        <section className="panel panel-highlight record-panel" id="record">
+        <section className={`panel panel-highlight record-panel${!canShowAfterBasics ? " record-panel-mobile-hidden" : ""}`} id="record">
           <div>
             <h2>Record and next steps</h2>
             <p className="helper">Use this after you send the notice.</p>
