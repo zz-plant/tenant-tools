@@ -1403,19 +1403,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     )}
                   </div>
                 </section>
-                <section className="preview-section">
-                  <div className="privacy-strip" aria-live="polite">
-                    <p className={`privacy-chip ${privacyStatus.hasContactHint ? "risk" : "ok"}`}>
-                      {privacyStatus.hasContactHint ? "Contact info found" : "No contact info found"}
-                    </p>
-                    <p className={`privacy-chip ${privacyStatus.hasUnitHint ? "risk" : "ok"}`}>
-                      {privacyStatus.hasUnitHint ? "Unit hint found" : "No unit hints found"}
-                    </p>
-                    <p className={`privacy-chip ${privacyStatus.hasEvidenceNote ? "ok" : "neutral"}`}>
-                      {privacyStatus.hasEvidenceNote ? "Evidence note included" : "No evidence note"}
-                    </p>
-                  </div>
-                </section>
           <section className="preview-section">
             <div className="summary-header">
               <h3>Notice summary</h3>
@@ -1575,6 +1562,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         {saveError || "We could not save this record."}
                       </p>
                     )}
+                    <div className="privacy-strip" aria-live="polite">
+                      <p className={`privacy-chip ${privacyStatus.hasContactHint ? "risk" : "ok"}`}>
+                        {privacyStatus.hasContactHint ? "Contact info found" : "No contact info found"}
+                      </p>
+                      <p className={`privacy-chip ${privacyStatus.hasUnitHint ? "risk" : "ok"}`}>
+                        {privacyStatus.hasUnitHint ? "Unit hint found" : "No unit hints found"}
+                      </p>
+                      <p className={`privacy-chip ${privacyStatus.hasEvidenceNote ? "ok" : "neutral"}`}>
+                        {privacyStatus.hasEvidenceNote ? "Evidence note included" : "No evidence note"}
+                      </p>
+                    </div>
                     {submissionUrl && (
                       <div className="share-checklist-inline" aria-label="Before you copy the link">
                         <p className="helper">Before sharing this link, confirm these checks.</p>

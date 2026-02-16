@@ -6,6 +6,7 @@ import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../lib/access"
 import { formatResidentReportCount } from "../../lib/buildingDashboard";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
+import { buildBuildingDashboardUrl } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 
 export const prerender = false;
@@ -61,10 +62,9 @@ const reportCountLabel =
     ? formatResidentReportCount(submissionRecord.reportCount)
     : "Not listed";
 
-const accessKeyParam = accessKey ? `key=${encodeURIComponent(accessKey)}` : "";
 const dashboardUrl =
   submissionRecord?.building
-    ? `/buildings/${encodeURIComponent(submissionRecord.building)}${accessKeyParam ? `?${accessKeyParam}` : ""}`
+    ? buildBuildingDashboardUrl({ buildingId: submissionRecord.building, accessKey })
     : "";
 
 const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissionRecord) : [];
