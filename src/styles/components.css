@@ -243,6 +243,11 @@
   margin-top: -6px;
 }
 
+.step-lock-note {
+  font-size: 0.72rem;
+  color: #6a758f;
+}
+
 
 .quick-start-grid {
   display: grid;

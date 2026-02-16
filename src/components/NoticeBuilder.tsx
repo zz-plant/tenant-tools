@@ -931,6 +931,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       <span className="step-title">{step.title}</span>
                       <span className="step-label">{step.label}</span>
                       <span className="step-requirement">{step.requirement}</span>
+                      {isLocked && <span className="step-lock-note">Locked until step 1 is complete.</span>}
                     </Tabs.Tab>
                   );
                 })}

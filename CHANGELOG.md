@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.83 - 2026-02-16
+
+### Changed
+
+- Increased contrast for secondary action buttons to improve readability and click clarity in the builder and dashboard flows.
+- Added a clear lock note on disabled step tabs so residents can see that later steps unlock after step 1 is complete.
+
+### Security
+
+- Kept resident-safe defaults unchanged while improving clarity around locked progression states and private workflow boundaries.
+
 ## 1.0.82 - 2026-02-15
 
 ### Changed
