@@ -7,3 +7,12 @@ export const fillTemplate = (template: string, values: Record<string, string>) =
   });
   return text;
 };
+
+export const getVisibleUnlockableSteps = <T extends { unlocked: boolean }>(steps: T[]): T[] => {
+  const firstLockedIndex = steps.findIndex((step) => !step.unlocked);
+  if (firstLockedIndex < 0) {
+    return steps;
+  }
+
+  return [...steps.slice(0, firstLockedIndex), steps[firstLockedIndex]];
+};
