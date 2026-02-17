@@ -7,7 +7,7 @@ This document explains how Building Ledger is organized today, where safety chec
 - Astro `5.x` for routes/pages
 - React `19.x` for interactive UI islands
 - Cloudflare Workers runtime via `@astrojs/cloudflare`
-- Cloudflare KV for submission and waitlist persistence
+- Cloudflare KV for submission persistence
 
 Source of truth for versions: `package.json`.
 
@@ -66,25 +66,16 @@ KV is treated as internal storage. Evidence metadata and submission records rema
 2. Validate status enum + steward key
 3. Update `submission:{id}`
 
-### Waitlist entry
-
-1. `POST /api/waitlist`
-2. Validate building + portfolio fields
-3. Enforce rate limit
-4. Persist `waitlist:{id}` in `WAITLIST_KV`
-
 ## Security and privacy controls
 
 - Enum/date/length validation for structured inputs
 - Sensitive-content warnings on optional free text
-- Unit-number rejection for waitlist building address fields
 - IP/session rate limiting on write endpoints
 - Resident-key gating on protected pages and APIs
 
 ## Environment variables
 
 - `SUBMISSIONS_KV`
-- `WAITLIST_KV`
 - `BUILDING_KEYS_JSON`
 - `BUILDING_ACCESS_KEY`
 - `STEWARD_KEY`

@@ -410,69 +410,10 @@
   justify-content: flex-end;
 }
 
-.waitlist-panel {
-  gap: 24px;
-}
-
-.waitlist-header {
-  display: grid;
-  gap: 6px;
-}
-
-.waitlist-panel-focus {
-  border: 2px solid rgba(79, 103, 255, 0.28);
-  box-shadow: 0 16px 36px rgba(35, 48, 110, 0.12);
-  background: linear-gradient(180deg, #ffffff, #f8faff);
-}
-
-.waitlist-grid {
-  display: grid;
-  gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.waitlist-form {
-  display: grid;
-  gap: 16px;
-}
-
-.waitlist-focus-shell {
-  border: 1px solid #d7e0fb;
-  background: #f7f9ff;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: inset 0 0 0 1px rgba(79, 103, 255, 0.08);
-}
-
 
 .label-optional {
   color: #5a6688;
   font-weight: 500;
-}
-
-.waitlist-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-.waitlist-success {
-  display: grid;
-  gap: 10px;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(79, 103, 255, 0.18);
-  background: #f1f3ff;
-}
-
-.waitlist-code {
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  font-size: 0.85rem;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(79, 103, 255, 0.1);
 }
 
 
@@ -667,8 +608,7 @@
   .export-actions,
   .submission-actions,
   .similar-issue-actions,
-  .impact-actions,
-  .waitlist-actions {
+  .impact-actions {
     flex-direction: column;
     align-items: stretch;
   }
@@ -678,13 +618,11 @@
   .submission-actions .button,
   .similar-issue-actions .button,
   .impact-actions .button,
-  .waitlist-actions .button,
   .output-actions .calendar-link,
   .export-actions .calendar-link,
   .submission-actions .calendar-link,
   .similar-issue-actions .calendar-link,
-  .impact-actions .calendar-link,
-  .waitlist-actions .calendar-link {
+  .impact-actions .calendar-link {
     width: 100%;
   }
 

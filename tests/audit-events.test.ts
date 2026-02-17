@@ -3,7 +3,6 @@ import assert from "node:assert/strict";
 import { POST as createSubmission } from "../src/pages/api/submissions/index";
 import { POST as updateStatus } from "../src/pages/api/submissions/[id]/status";
 import { POST as reportSubmission } from "../src/pages/api/submissions/[id]/report";
-import { POST as createWaitlistEntry } from "../src/pages/api/waitlist/index";
 
 const BUILDING_KEYS_JSON = JSON.stringify({ "2353": "key-2353-test" });
 
@@ -53,7 +52,6 @@ describe("audit event logging", () => {
       runtime: {
         env: {
           SUBMISSIONS_KV: kv,
-          WAITLIST_KV: kv,
           BUILDING_KEYS_JSON,
           STEWARD_KEY: "steward-secret",
         },
@@ -105,21 +103,8 @@ describe("audit event logging", () => {
     } as Parameters<typeof reportSubmission>[0]);
     assert.equal(reportResponse.status, 200);
 
-    const waitlistResponse = await createWaitlistEntry({
-      request: new Request("http://localhost/api/waitlist", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-forwarded-for": "1.1.1.4",
-        },
-        body: JSON.stringify({ building: "2400 W Wabansia", portfolio: "continuum" }),
-      }),
-      locals,
-    } as Parameters<typeof createWaitlistEntry>[0]);
-    assert.equal(waitlistResponse.status, 201);
-
     const auditKeys = kv.keys().filter((key) => key.startsWith("audit:"));
-    assert.equal(auditKeys.length, 4);
+    assert.equal(auditKeys.length, 3);
   });
 
   it("records rejected audit events for blocked writes", async () => {
@@ -128,7 +113,6 @@ describe("audit event logging", () => {
       runtime: {
         env: {
           SUBMISSIONS_KV: kv,
-          WAITLIST_KV: kv,
           BUILDING_KEYS_JSON,
           STEWARD_KEY: "steward-secret",
         },

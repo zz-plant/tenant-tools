@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.88 - 2026-02-17
+
+### Changed
+
+- Sunset the resident waitlist flow by removing the waitlist panel and `/api/waitlist` write path so the app stays focused on core issue logging and notice workflows.
+- Removed docs MCP prototype server and maintenance MCP tool code from this repository to reduce non-resident feature surface.
+
+### Fixed
+
+- Updated audit-event tests and environment/docs references to align with the reduced feature set.
+
+### Security
+
+- Reduced write-endpoint exposure by removing the waitlist endpoint while preserving existing submission access control and rate-limit protections.
+
 ## 1.0.87 - 2026-02-16
 
 ### Changed
