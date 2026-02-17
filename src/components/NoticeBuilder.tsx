@@ -21,7 +21,6 @@ import {
 import { defaultBuildingOptions, type BuildingOption } from "../data/buildings";
 import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
-import WaitlistPanel from "./WaitlistPanel";
 import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
 import { detailCharacterLimit } from "../lib/submissions";
 import useTimedCallbacks from "../hooks/useTimedCallbacks";
@@ -888,7 +887,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <div className="step-header">
               <h2>Build your notice</h2>
               <p className="helper">
-                {builderHelperText} Building not listed? <a href="#waitlist">Open waitlist</a>.
+                {builderHelperText}
               </p>
               <div className="step-meta">
                 <div className="step-progress">
@@ -1806,8 +1805,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
           )}
         </section>
       </main>
-
-      <WaitlistPanel />
 
       <footer className="site-footer">
         <p>Safety first: evidence is optional. Public views hide personal details.</p>

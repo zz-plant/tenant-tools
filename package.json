@@ -1,15 +1,14 @@
 {
   "name": "tenant-notice-builder",
   "type": "module",
-  "version": "1.0.87",
+  "version": "1.0.88",
   "private": true,
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "deploy": "bun run build && wrangler deploy",
     "preview": "astro preview",
-    "test": "node --test --import tsx tests/*.test.ts",
-    "check:mcp-allowlist": "node scripts/check-mcp-allowlist.mjs"
+    "test": "node --test --import tsx tests/*.test.ts"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",

@@ -15,7 +15,6 @@ declare namespace App {
     runtime?: {
       env?: {
         SUBMISSIONS_KV?: KVNamespace;
-        WAITLIST_KV?: KVNamespace;
         BUILDING_ACCESS_KEY?: string;
         BUILDING_KEYS_JSON?: string;
         STEWARD_KEY?: string;

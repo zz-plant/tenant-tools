@@ -11,7 +11,6 @@ Near-term contributor tasks.
 ## Engineering
 
 - [x] Add integration tests for key propagation across dashboard and submission flows.
-- [x] Add tests for waitlist rate limiting and validation edge cases.
 - [x] Add regression tests for public-readonly count suppression behavior.
 
 ## Product safety UX

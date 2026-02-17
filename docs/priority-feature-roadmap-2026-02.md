@@ -2,6 +2,14 @@
 
 This roadmap prioritizes new work after reviewing repository policy, contributor skills, active TODOs, modernization guidance, and UX audits.
 
+## Sunset decisions (2026-02 update)
+
+The following items are now sunset and should not be scheduled in this roadmap:
+- Resident waitlist flow and `/api/waitlist` endpoint
+- Docs MCP server prototype and maintenance MCP tool surface
+
+These were removed to keep focus on resident-facing safety workflows.
+
 ## Method
 
 Sources reviewed:

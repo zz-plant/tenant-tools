@@ -75,10 +75,6 @@ The app can run without production KV, but shared data features require Cloudfla
 
 - `SUBMISSIONS_KV`
 
-### Required for waitlist storage
-
-- `WAITLIST_KV`
-
 ### Access control keys
 
 - `BUILDING_KEYS_JSON` — JSON map of building id → resident key (recommended)
@@ -128,7 +124,6 @@ Use Conventional Commit style:
 - Modernization roadmap: `docs/priority-feature-roadmap-2026-02.md`
 - Design focus shortlist: `docs/designs-to-rethink-2026-02.md`
 - Dependency capability review: `docs/tech-stack-capability-research-2026-02.md`
-- MCP + agent skills research: `docs/mcp-agent-skills-research-2026-02.md`
 - Agent skills playbook: `docs/agent-skills-playbook.md`
 - Rule data pack notes: `src/data/rules/README.md`
 - Core agent skill: `skills/building-ledger-agent/SKILL.md`
