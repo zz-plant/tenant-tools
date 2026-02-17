@@ -5,7 +5,7 @@
 This walkthrough reviews two common first-time resident routes in the current web UI:
 
 1. Route A: Home → Notice builder start (first notice draft)
-2. Route B: Home → Building not listed → Waitlist start
+2. Route B (sunset): Home → Building not listed → Waitlist start
 
 The goal is practical UX feedback in three buckets:
 - what can be removed
@@ -65,52 +65,15 @@ The goal is practical UX feedback in three buckets:
 
 ---
 
-## Route B: Home → Building Not Listed → Waitlist Start
+## Route B: Home → Building Not Listed → Waitlist Start (sunset)
 
-### What worked
+This route is now sunset and should not be expanded.
+Keep this section as archive context only.
 
-- Waitlist entry point is visible from the main builder area.
-- Safety framing is present: no names, emails, or phone numbers.
-- Two-step concept is clear (add address, then save request code).
-
-### What can be removed
-
-1. Competing page noise when waitlist opens.
-   - The full notice builder remains dominant in the same viewport.
-   - Remove non-waitlist distractions while waitlist is active.
-
-2. Redundant “Start” language.
-   - Multiple “Start” controls on one page can confuse first-time users.
-   - Keep one start trigger for builder and one clearly named trigger for waitlist.
-
-### What needs to be rebuilt
-
-1. Waitlist as a focused flow container.
-   - Rebuild as a contained panel (or modal-style region) that temporarily isolates:
-     - address input
-     - privacy warning
-     - submit action
-     - success state with request code
-   - This lowers cognitive load and prevents accidental route drift.
-
-2. Validation feedback moment.
-   - Empty submission behavior should return immediate, explicit inline guidance.
-   - Rebuild validation visibility so first-time users always see:
-     - what is missing
-     - how to fix it
-
-### What needs modification
-
-1. Button naming.
-   - Rename waitlist trigger to “Start waitlist” (or “Add building”) to avoid ambiguity with builder “Start.”
-
-2. Post-submit confirmation block.
-   - Keep it concise and action-based:
-     - “Saved. Your request code is: ____.”
-     - “Please save this code now.”
-
-3. Input helper text.
-   - Add one concrete address example without personal details.
+If waitlist UI remains in legacy builds, use maintenance-only fixes:
+- keep copy short and factual
+- keep validation explicit
+- avoid adding new steps or new data collection
 
 ---
 
@@ -125,7 +88,6 @@ The goal is practical UX feedback in three buckets:
 ### Medium priority (structural UX)
 
 1. Collapse or hide locked sections until prerequisites are complete.
-2. Isolate waitlist into a focused mini-flow with clear validation.
 
 ### Longer-term improvements
 
@@ -138,7 +100,5 @@ The goal is practical UX feedback in three buckets:
 
 - Can a first-time user complete step 1 without reading duplicate warnings?
 - Is there only one obvious “next action” at each stage?
-- Does waitlist submission show explicit inline validation on empty/invalid input?
-- Are waitlist and builder starts clearly distinguished by label?
 - Are locked panels collapsed and easy to scan?
 - Is user-facing copy short, literal, and non-idiomatic?

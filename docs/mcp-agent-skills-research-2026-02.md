@@ -103,7 +103,7 @@ Why this first:
 - immediate contributor consistency gains
 - directly aligned with existing `AGENTS.md` governance
 
-### Option B (moderate risk): local docs MCP server for contributor agents
+### Option B (moderate risk, sunset): local docs MCP server for contributor agents
 
 Target users: agents helping maintainers navigate repo policy/docs quickly.
 
@@ -118,9 +118,9 @@ Key constraints:
 - no evidence or resident data exposure
 - fixed allowlist of files
 
-Benefit: faster and more accurate policy retrieval for automated contributors.
+Status: sunset for current planning cycle. Do not schedule.
 
-### Option C (careful rollout): maintenance MCP tools for stewards/devs only
+### Option C (careful rollout, sunset): maintenance MCP tools for stewards/devs only
 
 Target users: maintainers, not residents.
 
@@ -131,6 +131,8 @@ Possible tools:
 - `run_access_audit()` for key route checks
 
 Hard rule: no tool may output raw private evidence or identifiers.
+
+Status: sunset for current planning cycle. Do not schedule.
 
 ## Guidance for agents that browse the web
 
@@ -161,14 +163,11 @@ Example allowlist seed:
 
 ### Phase 1
 
-- Add internal read-only docs MCP server for contributor agents.
-- Add CI check to ensure server only exposes allowlisted files.
+- No MCP server additions planned (sunset).
 
 ### Phase 2
 
-- Add limited maintenance tools via MCP.
-- Add audit logging for all MCP tool calls.
-- Add failure-safe behavior: deny on missing policy context.
+- No maintenance MCP tools planned (sunset).
 
 ## Safety checklist for any MCP/skill addition
 
@@ -187,10 +186,6 @@ Example allowlist seed:
 
 ## Practical next step (after current implementation)
 
-With in-repo skills now added, the next low-risk step is:
+With in-repo skills now added, keep focus on resident-facing safety work.
 
-1. Add a lightweight `research` skill for allowlisted web source capture.
-2. Add a docs-only MCP prototype that exposes policy files read-only.
-3. Add CI checks that ensure MCP file allowlists cannot drift.
-
-This keeps implementation aligned with privacy-first constraints while improving contributor throughput.
+Do not add MCP server or maintenance MCP tool surface in the current cycle.

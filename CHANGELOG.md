@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.89 - 2026-02-17
+
+### Changed
+
+- Sunset two lower-value builder features from active resident workflow: disabled-only coming-soon building entries and notice issue types for security-deposit and lockout disputes.
+- Kept notice flow focused on core maintenance issue categories used in MVP safety guidance.
+
+### Security
+
+- Reduced chance of residents selecting non-actionable paths by removing low-utility options that did not support the primary repair-notice workflow.
+
 ## 1.0.88 - 2026-02-17
 
 ### Changed
