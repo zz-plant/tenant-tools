@@ -980,22 +980,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           <Select.Positioner className="select-positioner">
                               <Select.Popup className="select-popup">
                                 <Select.List className="select-list">
-                                  {buildingOptions.map((building) => {
-                                    const isComingSoon = building.status === "coming-soon";
-                                    return (
-                                      <Select.Item
-                                        key={building.id}
-                                        value={building.id}
-                                        className="select-item"
-                                        disabled={isComingSoon}
-                                      >
-                                        <Select.ItemText>
-                                          {building.id} {isComingSoon ? "(Coming soon)" : ""}
-                                        </Select.ItemText>
-                                        <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                      </Select.Item>
-                                    );
-                                  })}
+                                  {buildingOptions.map((building) => (
+                                    <Select.Item key={building.id} value={building.id} className="select-item">
+                                      <Select.ItemText>{building.id}</Select.ItemText>
+                                      <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
+                                    </Select.Item>
+                                  ))}
                                 </Select.List>
                               </Select.Popup>
                             </Select.Positioner>

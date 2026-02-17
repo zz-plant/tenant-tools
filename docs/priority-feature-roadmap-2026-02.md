@@ -90,25 +90,7 @@ Validation:
 
 ## Priority 1 (next cycle)
 
-### 4) Waitlist rate-limit and validation edge-case coverage
-
-What to build:
-- Add tests for per-IP/session limits, malformed payloads, and unit-number style address hints in waitlist API.
-
-Why now:
-- Abuse resistance is a core requirement; waitlist is a write endpoint.
-- Already identified in TODOs.
-
-Success criteria:
-- Consistent HTTP responses for rate-limit and validation failures.
-- No bypass using missing/alternate headers.
-
-Validation:
-- Integration tests for 429 and schema validation cases.
-
----
-
-### 5) Very simple English copy-lint helper for notices
+### 4) Very simple English copy-lint helper for notices
 
 What to build:
 - Add a reusable utility/checklist to flag idioms, threatening language, and complex phrasing in notice templates.
@@ -126,7 +108,7 @@ Validation:
 
 ---
 
-### 6) Key-propagation integration tests across dashboard/submission flows
+### 5) Key-propagation integration tests across dashboard/submission flows
 
 What to build:
 - End-to-end-style integration tests that verify resident key handling from building dashboard actions to submission detail actions.
@@ -142,42 +124,6 @@ Success criteria:
 Validation:
 - Integration tests for allowed and denied transitions.
 
-## Priority 2 (after guardrails are stable)
-
-### 7) Read-only docs MCP server prototype for contributor agents
-
-What to build:
-- A local MCP server that exposes allowlisted policy/docs/skills files and helper lookups.
-
-Why later:
-- Adds contributor efficiency but is less urgent than resident-facing safety gaps.
-- Needs careful allowlisting and CI checks.
-
-Success criteria:
-- Read-only behavior only.
-- Allowlist enforced and testable in CI.
-
-Validation:
-- CI assertions that disallow non-allowlisted path exposure.
-
----
-
-### 8) Maintenance-only MCP audit tools (no resident data exposure)
-
-What to build:
-- Tools such as `run_access_audit()` and `validate_notice_copy(templateId)` for maintainers.
-
-Why later:
-- Useful for operational safety, but introduces additional surface area.
-- Should follow successful docs-MCP pilot.
-
-Success criteria:
-- No raw evidence or identifiers in outputs.
-- Tool call logging and deny-by-default behavior.
-
-Validation:
-- Contract tests for redaction and deny paths.
-
 ## De-prioritized / keep out of scope
 
 Do not prioritize in current roadmap:
@@ -192,11 +138,8 @@ Do not prioritize in current roadmap:
 1. Share checklist gate (P0)
 2. Public-readonly count suppression tests (P0)
 3. Evidence warning consistency (P0)
-4. Waitlist abuse/validation tests (P1)
-5. Very simple English lint helper (P1)
-6. Key propagation integration tests (P1)
-7. Docs MCP prototype + CI allowlist checks (P2)
-8. Maintenance MCP tools with redaction controls (P2)
+4. Very simple English lint helper (P1)
+5. Key propagation integration tests (P1)
 
 ## Release-note template for this roadmap
 
