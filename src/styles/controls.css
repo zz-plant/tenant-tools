@@ -422,6 +422,7 @@
 .waitlist-panel-focus {
   border: 2px solid rgba(79, 103, 255, 0.28);
   box-shadow: 0 16px 36px rgba(35, 48, 110, 0.12);
+  background: linear-gradient(180deg, #ffffff, #f8faff);
 }
 
 .waitlist-grid {
@@ -434,6 +435,15 @@
   display: grid;
   gap: 16px;
 }
+
+.waitlist-focus-shell {
+  border: 1px solid #d7e0fb;
+  background: #f7f9ff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: inset 0 0 0 1px rgba(79, 103, 255, 0.08);
+}
+
 
 .label-optional {
   color: #5a6688;

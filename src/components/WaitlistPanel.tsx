@@ -88,7 +88,7 @@ const WaitlistPanel = () => {
           <h2>Building not listed?</h2>
           <p className="helper">Add your building to the waitlist. No names, emails, or phone numbers.</p>
           {!isExpanded && <p className="helper">Step 1: add address. Step 2: save request code.</p>}
-          {isExpanded && <p className="helper">Focused mode: finish these two steps, then return to the builder.</p>}
+          {isExpanded && <p className="helper">Focused waitlist mode. Finish these two steps before returning to the builder.</p>}
         </div>
         <Button className="button button-secondary" type="button" onClick={() => setIsExpanded((prev) => !prev)}>
           {isExpanded ? "Hide waitlist steps" : "Start waitlist"}
@@ -96,52 +96,54 @@ const WaitlistPanel = () => {
       </div>
       {isExpanded && (
         <div className="waitlist-grid" role="region" aria-label="Waitlist flow">
-          <form className="waitlist-form" onSubmit={handleWaitlistSubmit}>
-            <h3>Step 1: Add the building</h3>
-            <label>
-              Building address
-              <Input
-                className="input"
-                value={waitlistState.building}
-                onChange={handleWaitlistChange("building")}
-                placeholder="123 Main St"
-                maxLength={waitlistBuildingLimit}
-                autoComplete="street-address"
-                aria-describedby={buildingHelperId}
-                required
-              />
-            </label>
-            <p className="helper" id={buildingHelperId}>
-              No unit numbers or resident names.
-            </p>
-            <div className="waitlist-actions">
-              <Button className="button" type="submit" disabled={waitlistStatus === "saving"}>
-                {waitlistLabel}
-              </Button>
-              <Button className="button button-secondary" type="button" onClick={handleWaitlistReset}>
-                Clear
-              </Button>
-            </div>
-            {waitlistStatus === "saved" && requestId && (
-              <div className="waitlist-success">
-                <h3>Step 2: Save your request code</h3>
-                <p className="helper" role="status" aria-live="polite">
-                  Saved. Your request code is below. Please save this code now.
-                </p>
-                <div className="waitlist-actions">
-                  <span className="waitlist-code">{requestId}</span>
-                  <Button className="button button-secondary" type="button" onClick={handleCopyRequestId}>
-                    {requestCopyLabel}
-                  </Button>
-                </div>
-              </div>
-            )}
-            {waitlistStatus === "error" && (
-              <p className="submission-error" role="alert">
-                {waitlistError}
+          <div className="waitlist-focus-shell">
+            <form className="waitlist-form" onSubmit={handleWaitlistSubmit}>
+              <h3>Step 1: Add the building</h3>
+              <label>
+                Building address
+                <Input
+                  className="input"
+                  value={waitlistState.building}
+                  onChange={handleWaitlistChange("building")}
+                  placeholder="123 Main St"
+                  maxLength={waitlistBuildingLimit}
+                  autoComplete="street-address"
+                  aria-describedby={buildingHelperId}
+                  required
+                />
+              </label>
+              <p className="helper" id={buildingHelperId}>
+                No unit numbers or resident names.
               </p>
-            )}
-          </form>
+              <div className="waitlist-actions">
+                <Button className="button" type="submit" disabled={waitlistStatus === "saving"}>
+                  {waitlistLabel}
+                </Button>
+                <Button className="button button-secondary" type="button" onClick={handleWaitlistReset}>
+                  Clear
+                </Button>
+              </div>
+              {waitlistStatus === "saved" && requestId && (
+                <div className="waitlist-success">
+                  <h3>Step 2: Save your request code</h3>
+                  <p className="helper" role="status" aria-live="polite">
+                    Saved. Your request code is below. Please save this code now.
+                  </p>
+                  <div className="waitlist-actions">
+                    <span className="waitlist-code">{requestId}</span>
+                    <Button className="button button-secondary" type="button" onClick={handleCopyRequestId}>
+                      {requestCopyLabel}
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {waitlistStatus === "error" && (
+                <p className="submission-error" role="alert">
+                  {waitlistError}
+                </p>
+              )}
+            </form>
+          </div>
         </div>
       )}
     </section>

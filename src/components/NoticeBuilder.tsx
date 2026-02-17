@@ -137,6 +137,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   }, [formState.building, formState.issue]);
 
   const isStep1Complete = Boolean(formState.building && formState.issue);
+  const showLockedStepPlaceholder = !isStep1Complete;
   const stepsLocked = !isStep1Complete;
   const canShowAfterBasics = isStep1Complete;
   const isNoticeReady = missingBasics.length === 0;
@@ -937,11 +938,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       <span className="step-title">{step.title}</span>
                       <span className="step-label">{step.label}</span>
                       <span className="step-requirement">{step.requirement}</span>
-                      {isLocked && <span className="step-lock-note">Locked until step 1 is complete.</span>}
+                      {isLocked && <span className="step-lock-note">Locked</span>}
                     </Tabs.Tab>
                   );
                 })}
               </Tabs.List>
+              <p className="helper mobile-step-hint">Use Back and Next buttons below on mobile.</p>
               <form className="form-grid">
                 <Tabs.Panel value="1">
                   <div className="form-section">
@@ -1022,7 +1024,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           <RadioGroup.Item
                             key={option.id}
                             render={<div />}
-                            className={`issue-card ${formState.issue === option.id ? "active" : ""}`}
+                            className={`issue-option-card ${formState.issue === option.id ? "active" : ""}`}
                             value={option.id}
                             aria-label={formatIssueLabel(option.label)}
                           >
@@ -1163,14 +1165,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           </Button>
                         )}
                       </>
-                    ) : (
-                      <p className="helper">Finish building and issue first. Then optional setup appears.</p>
-                    )}
+                    ) : null}
 
                   </div>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="2">
+                  {showLockedStepPlaceholder ? (
+                    <section className="locked-panel" aria-label="Step 2 locked">
+                      <h3>Step 2 is locked</h3>
+                      <p className="helper">Finish step 1 to unlock dates and language.</p>
+                    </section>
+                  ) : (
+                    <>
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Language and style</h3>
@@ -1275,47 +1282,65 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       />
                     </label>
                   </div>
+                    </>
+                  )}
 
                 </Tabs.Panel>
 
                 <Tabs.Panel value="3">
-                  <p className="helper">Optional facts and evidence. {evidenceSafetySummary}</p>
-                  {issueFields.length === 0 && (
-                    <p className="helper">Select an issue to see detail fields.</p>
-                  )}
-                  {issueFields.length > 0 && (
+                  {showLockedStepPlaceholder ? (
+                    <section className="locked-panel" aria-label="Step 3 locked">
+                      <h3>Step 3 is locked</h3>
+                      <p className="helper">Finish step 1 to unlock optional facts and evidence notes.</p>
+                    </section>
+                  ) : (
                     <>
-                      <div className="form-section">
-                        <div className="form-section-header">
-                          <h3>Issue facts</h3>
-                          <p className="helper">Optional. Keep notes short.</p>
-                        </div>
-                        {issueFields.filter((fieldKey) => fieldKey !== "attachment").length > 0 ? (
-                          issueFields.filter((fieldKey) => fieldKey !== "attachment").map((fieldKey) =>
-                            renderDetailField(fieldKey as keyof typeof fieldDefinitions)
-                          )
-                        ) : (
-                          <p className="helper">No extra facts are needed for this issue.</p>
-                        )}
-                      </div>
-                      {issueFields.filter((fieldKey) => fieldKey === "attachment").length > 0 && (
-                        <div className="form-section">
-                          <div className="form-section-header">
-                            <h3>Evidence note</h3>
+                      <p className="helper">Optional facts and evidence. {evidenceSafetySummary}</p>
+                      {issueFields.length === 0 && (
+                        <p className="helper">Select an issue to see detail fields.</p>
+                      )}
+                      {issueFields.length > 0 && (
+                        <>
+                          <div className="form-section">
+                            <div className="form-section-header">
+                              <h3>Issue facts</h3>
+                              <p className="helper">Optional. Keep notes short.</p>
+                            </div>
+                            {issueFields.filter((fieldKey) => fieldKey !== "attachment").length > 0 ? (
+                              issueFields.filter((fieldKey) => fieldKey !== "attachment").map((fieldKey) =>
+                                renderDetailField(fieldKey as keyof typeof fieldDefinitions)
+                              )
+                            ) : (
+                              <p className="helper">No extra facts are needed for this issue.</p>
+                            )}
                           </div>
-                          {issueFields
-                            .filter((fieldKey) => fieldKey === "attachment")
-                            .map((fieldKey) => renderDetailField(fieldKey as keyof typeof fieldDefinitions))}
-                        </div>
+                          {issueFields.filter((fieldKey) => fieldKey === "attachment").length > 0 && (
+                            <div className="form-section">
+                              <div className="form-section-header">
+                                <h3>Evidence note</h3>
+                              </div>
+                              {issueFields
+                                .filter((fieldKey) => fieldKey === "attachment")
+                                .map((fieldKey) => renderDetailField(fieldKey as keyof typeof fieldDefinitions))}
+                            </div>
+                          )}
+                        </>
                       )}
                     </>
                   )}
                 </Tabs.Panel>
 
                 <Tabs.Panel value="4">
-                  <p className="helper">
-                    Review the preview. Copy and save. Dates and repeats help.
-                  </p>
+                  {showLockedStepPlaceholder ? (
+                    <section className="locked-panel" aria-label="Step 4 locked">
+                      <h3>Step 4 is locked</h3>
+                      <p className="helper">Finish step 1 to unlock review, copy, and save.</p>
+                    </section>
+                  ) : (
+                    <p className="helper">
+                      Review the preview. Copy and save. Dates and repeats help.
+                    </p>
+                  )}
                 </Tabs.Panel>
               </form>
             </Tabs.Root>
