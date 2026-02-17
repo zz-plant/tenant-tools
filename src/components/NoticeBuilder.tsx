@@ -26,7 +26,7 @@ import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
 import { detailCharacterLimit } from "../lib/submissions";
 import useTimedCallbacks from "../hooks/useTimedCallbacks";
 import { addDays, formatCalendarDate, formatDate, formatTimelineDate, getCurrentTime } from "../lib/dateUtils";
-import { fillTemplate, formatIssueLabel } from "../lib/noticeUtils";
+import { fillTemplate, formatIssueLabel, getVisibleUnlockableSteps } from "../lib/noticeUtils";
 import { detectSensitiveContent } from "../lib/validation";
 import {
   detailWarningThreshold,
@@ -477,6 +477,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     });
   }, [formState.startDate, formState.today, formState.building, selectedIssue?.label]);
 
+  const visibleNextSteps = useMemo(() => getVisibleUnlockableSteps(nextSteps), [nextSteps]);
+
   const exportSummary = useMemo(() => {
     const building = formState.building || "[ADDRESS]";
     const portfolioLabel = selectedPortfolio?.label || "Not listed";
@@ -651,7 +653,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   };
 
   const handleBuildingKeyInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setBuildingKey(event.currentTarget.value.trim());
+    setBuildingKey(event.currentTarget.value);
   };
 
   const handleReset = () => {
@@ -1689,14 +1691,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               <div>
                 <h3>What usually happens next</h3>
                 <ul className="next-steps">
-                  {nextSteps.map((step) => (
+                  {visibleNextSteps.map((step) => (
                     <li key={step.label} className={step.unlocked ? "" : "locked"}>
                       <div className="next-step-row">
                         <div>
                           <p className="next-step-title">
                             {step.unlocked
                               ? step.label
-                              : `${step.label} (unlock in ${Math.abs(step.remaining)} days)`}
+                              : `${step.label} (next normal step unlocks in ${Math.abs(step.remaining)} days)`}
                           </p>
                           <p className="helper">Reminder date: {step.reminderDateLabel}</p>
                           <p className="helper">
