@@ -6,35 +6,7 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  position: relative;
-}
-
-.page::before,
-.page::after {
-  content: "";
-  position: fixed;
-  z-index: -1;
-  border-radius: 999px;
-  filter: blur(60px);
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-.page::before {
-  width: 280px;
-  height: 280px;
-  background: #d8dfff;
-  top: -70px;
-  left: max(8px, calc(50% - 620px));
-}
-
-.page::after {
-  width: 220px;
-  height: 220px;
-  background: #e7f3ff;
-  top: 240px;
-  right: max(8px, calc(50% - 580px));
+  gap: 28px;
 }
 
 .hero {
@@ -196,26 +168,25 @@
 }
 
 .panel {
-  background: #ffffff;
+  background: #fbfbfc;
   border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e1e4ea;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .panel-highlight {
-  border: 1px solid rgba(71, 85, 105, 0.1);
-  background: linear-gradient(135deg, #f7f8ff, #ffffff);
+  border: 1px solid #dde1ea;
+  background: #f8f9fb;
 }
 
 
 .home-intro-panel {
   display: grid;
   gap: 18px;
-  border: 1px solid #dfe5f8;
-  box-shadow: 0 20px 45px rgba(45, 61, 109, 0.12);
+  border: 1px solid #dde2eb;
 }
 
 .home-intro-copy {
@@ -247,8 +218,8 @@
 .home-intro-metrics p {
   margin: 0;
   border-radius: 14px;
-  border: 1px solid #d7dff5;
-  background: linear-gradient(180deg, #ffffff, #f8faff);
+  border: 1px solid #d7dde8;
+  background: #ffffff;
   padding: 12px;
   display: grid;
   gap: 4px;
