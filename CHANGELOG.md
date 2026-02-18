@@ -1,5 +1,41 @@
 # Changelog
 
+## 1.0.93 - 2026-02-18
+
+### Changed
+
+- Fixed responsive issue-card layout conflicts so issue choices now render in two columns on tablet widths and one column on narrow phones for cleaner scanning.
+- Simplified mobile step controls by removing sticky bottom behavior and keeping action buttons in normal flow to reduce jumpy placement.
+- Added softer panel and issue-card elevation cues for clearer section boundaries on desktop and mobile without adding visual noise.
+
+### Security
+
+- Kept privacy defaults, resident-key gating, and evidence visibility behavior unchanged.
+
+## 1.0.92 - 2026-02-18
+
+### Changed
+
+- Increased desktop content width and adjusted two-column notice-builder proportions so the primary workflow has more room while keeping preview context visible.
+- Improved responsive spacing with larger desktop rhythm and token-driven gutters for a more balanced layout across screen sizes.
+- Improved issue selection cards on small screens with two-column tablet behavior and tighter horizontal card layout for faster scanning.
+
+### Security
+
+- Kept privacy, key-gating, and evidence handling behavior unchanged while refining presentation-only styles.
+
+## 1.0.91 - 2026-02-18
+
+### Changed
+
+- Refactored shared layout width tokens so page gutters, max content width, and responsive grid minimums are controlled from a single root variable set.
+- Normalized responsive grid width thresholds across builder and dashboard sections to keep cards and controls consistent at each breakpoint.
+- Removed duplicate page padding overrides from control styles so layout width behavior is defined in one place.
+
+### Security
+
+- Kept private-mode gating and data handling unchanged while reducing CSS duplication that could cause inconsistent UI states across screens.
+
 ## 1.0.90 - 2026-02-18
 
 ### Changed

@@ -65,7 +65,7 @@
 
 .detail-grid strong {
   display: inline-block;
-  min-width: 140px;
+  min-width: var(--grid-min-sm);
   color: #1c2436;
 }
 
@@ -420,7 +420,7 @@
 .impact-slider {
   display: grid;
   gap: 6px;
-  min-width: 180px;
+  min-width: var(--grid-min-md);
 }
 
 .slider-control {
@@ -460,12 +460,9 @@
 }
 
 @media (max-width: 1024px) {
-  .page {
-    padding: 32px 5vw 56px;
-  }
 
   .hero {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-lg), 1fr));
     padding: 28px;
   }
 
@@ -482,13 +479,6 @@
     gap: 16px;
   }
 
-  .building-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  }
-
-  .issue-grid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
 }
 
 @media (max-width: 720px) {
@@ -567,9 +557,6 @@
 }
 
 @media (max-width: 720px) {
-  .page {
-    padding: 16px 16px 36px;
-  }
 
   .hero {
     padding: 18px;
