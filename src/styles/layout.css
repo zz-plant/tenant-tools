@@ -188,13 +188,32 @@
 .home-intro-panel {
   display: grid;
   gap: 18px;
-  border: 1px solid #dde2eb;
+  border: 1px solid #d5ddef;
+  border-top: 3px solid #4f67ff;
+  background: linear-gradient(180deg, #f5f7ff 0%, #fafbfe 100%);
 }
 
 .home-intro-copy {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   max-width: 76ch;
+}
+
+.home-intro-copy h1 {
+  font-size: clamp(1.8rem, 2.8vw, 2.5rem);
+  line-height: 1.2;
+  color: #172445;
+}
+
+.home-intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.home-intro-cta {
+  width: fit-content;
 }
 
 @media (min-width: 1200px) {
@@ -251,12 +270,11 @@
 
 .home-intro-list li {
   border-radius: 12px;
-  border: 1px solid #ccd6f2;
-  background: linear-gradient(180deg, #ffffff, #f8faff);
+  border: 1px solid #d7deef;
+  background: #ffffff;
   padding: 10px 12px;
   font-size: 0.95rem;
   color: #273148;
-  box-shadow: 0 8px 18px rgba(20, 28, 50, 0.06);
 }
 
 .intro-panel {
@@ -358,6 +376,10 @@
   .home-intro-list li {
     font-size: 0.9rem;
     padding: 8px 10px;
+  }
+
+  .home-intro-cta {
+    width: 100%;
   }
 
   .intro-panel {
