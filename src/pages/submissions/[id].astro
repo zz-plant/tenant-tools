@@ -8,6 +8,7 @@ import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 import { buildBuildingDashboardUrl } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
+import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 
 export const prerender = false;
 
@@ -93,30 +94,17 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
       <main class="layout" id="main">
         <section class="panel panel-highlight preview-panel">
           {!hasAccess ? (
-            <div class="access-panel">
-              <h2>Access key required</h2>
-              <p class="helper">This record is private to residents in the building.</p>
-              <p class="helper">The link can include private details.</p>
-              <p class="helper">Ask a resident steward for the key.</p>
-              <p class="helper">If the key is correct but this still does not load, ask a steward to check the link.</p>
-              <form class="filter-grid" method="get">
-                <label>
-                  <span>Building key</span>
-                  <input
-                    class="input"
-                    name="key"
-                    type="password"
-                    placeholder="Paste building key"
-                    autoComplete="new-password"
-                    spellcheck="false"
-                    required
-                  />
-                </label>
-                <button class="button" type="submit">Continue</button>
-              </form>
-              <p class="access-warning">Do not share the key or link in public.</p>
-              <a class="button button-secondary" href="/">Back to notice builder</a>
-            </div>
+            <AccessKeyPanel
+              title="Access key required"
+              helperLines={[
+                "This record is private to residents in the building.",
+                "The link can include private details.",
+                "Ask a resident steward for the key.",
+                "If the key is correct but this still does not load, ask a steward to check the link.",
+              ]}
+              warning="Do not share the key or link in public."
+              backLabel="Back to notice builder"
+            />
           ) : submissionRecord ? (
             <>
               <div class="summary-grid">
