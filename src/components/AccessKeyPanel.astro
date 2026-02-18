@@ -1,0 +1,61 @@
+---
+export type Props = {
+  title: string;
+  helperLines: string[];
+  warning: string;
+  backLabel: string;
+  backHref?: string;
+  keyLabel?: string;
+  keyPlaceholder?: string;
+  submitLabel?: string;
+  hiddenFields?: Array<{ name: string; value: string }>;
+  steps?: string[];
+};
+
+const {
+  title,
+  helperLines,
+  warning,
+  backLabel,
+  backHref = "/",
+  keyLabel = "Building key",
+  keyPlaceholder = "Paste building key",
+  submitLabel = "Continue",
+  hiddenFields = [],
+  steps = [],
+} = Astro.props;
+---
+
+<div class="access-panel">
+  <h2>{title}</h2>
+  {helperLines.map((line) => (
+    <p class="helper">{line}</p>
+  ))}
+  {steps.length > 0 && (
+    <ol class="helper-list">
+      {steps.map((step) => (
+        <li>{step}</li>
+      ))}
+    </ol>
+  )}
+  <form class="filter-grid" method="get">
+    {hiddenFields.map((field) => (
+      <input type="hidden" name={field.name} value={field.value} />
+    ))}
+    <label>
+      <span>{keyLabel}</span>
+      <input
+        class="input"
+        name="key"
+        type="password"
+        placeholder={keyPlaceholder}
+        autoComplete="new-password"
+        spellcheck="false"
+        required
+      />
+    </label>
+    <button class="button" type="submit">{submitLabel}</button>
+  </form>
+  <p class="access-warning">{warning}</p>
+  <a class="button button-secondary" href={backHref}>{backLabel}</a>
+</div>

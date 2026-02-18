@@ -10,6 +10,7 @@ import {
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
 import { buildAccessQuery, buildBuildingDashboardUrl, buildSubmissionDetailsUrl, buildLinkSuffix } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
+import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 
 export const prerender = false;
 
@@ -101,33 +102,17 @@ const totalFiltered = filtered.length;
       <main class="layout" id="main">
         <section class="panel panel-highlight dashboard-grid">
           {!hasAccess ? (
-            <div class="access-panel">
-              <h2>Key required</h2>
-              <p class="helper">Residents only.</p>
-              <p class="helper">Ask a steward for the building key.</p>
-              <ol class="helper-list">
-                <li>Get the building key from a resident steward.</li>
-                <li>Paste the key below and continue.</li>
-              </ol>
-              <form class="filter-grid" method="get">
-                {stewardKey && <input type="hidden" name="stewardKey" value={stewardKey} />}
-                <label>
-                  <span>Building key</span>
-                  <input
-                    class="input"
-                    name="key"
-                    type="password"
-                    placeholder="Paste building key"
-                    autoComplete="new-password"
-                    spellcheck="false"
-                    required
-                  />
-                </label>
-                <button class="button" type="submit">Continue</button>
-              </form>
-              <p class="access-warning">Do not share the key publicly.</p>
-              <a class="button button-secondary" href="/">Back to notice builder</a>
-            </div>
+            <AccessKeyPanel
+              title="Key required"
+              helperLines={["Residents only.", "Ask a steward for the building key."]}
+              steps={[
+                "Get the building key from a resident steward.",
+                "Paste the key below and continue.",
+              ]}
+              hiddenFields={stewardKey ? [{ name: "stewardKey", value: stewardKey }] : []}
+              warning="Do not share the key publicly."
+              backLabel="Back to notice builder"
+            />
           ) : !kv ? (
             <div>
               <h2>Ledger storage is not configured.</h2>
