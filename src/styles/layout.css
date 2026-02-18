@@ -1,18 +1,19 @@
 .page {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: calc(40px + var(--safe-area-top)) 6vw calc(64px + var(--safe-area-bottom));
-  width: min(1100px, 100%);
+  padding: calc(40px + var(--safe-area-top)) var(--layout-gutter-desktop) calc(64px + var(--safe-area-bottom));
+  width: 100%;
+  max-width: var(--layout-max-width);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 32px;
 }
 
 .hero {
   display: grid;
   gap: 24px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-xl), 1fr));
   align-items: start;
   background: linear-gradient(135deg, #101729, #2a3560);
   color: #f7f8ff;
@@ -120,8 +121,8 @@
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-  gap: 24px;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.95fr);
+  gap: 28px;
   align-items: start;
 }
 
@@ -170,8 +171,9 @@
 .panel {
   background: #fbfbfc;
   border-radius: 20px;
-  padding: 24px;
+  padding: clamp(20px, 2vw, 28px);
   border: 1px solid #e1e4ea;
+  box-shadow: 0 10px 28px rgba(20, 28, 50, 0.04);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -192,7 +194,18 @@
 .home-intro-copy {
   display: grid;
   gap: 8px;
-  max-width: 70ch;
+  max-width: 76ch;
+}
+
+@media (min-width: 1200px) {
+  .hero {
+    padding: 36px;
+  }
+
+  .layout {
+    grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+    gap: 32px;
+  }
 }
 
 .home-intro-copy h1,
@@ -205,13 +218,13 @@
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-lg), 1fr));
   gap: 10px;
 }
 
 .home-intro-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-md), 1fr));
   gap: 10px;
 }
 
@@ -253,7 +266,7 @@
 .intro-grid {
   display: grid;
   gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-lg), 1fr));
 }
 
 .intro-card h2 {
@@ -299,7 +312,7 @@
 
 @media (max-width: 720px) {
   .page {
-    padding: calc(16px + var(--safe-area-top)) 16px calc(36px + var(--safe-area-bottom));
+    padding: calc(16px + var(--safe-area-top)) var(--layout-gutter-tablet) calc(36px + var(--safe-area-bottom));
     gap: 24px;
   }
 
@@ -333,7 +346,7 @@
   .panel {
     padding: 16px;
     border-radius: 16px;
-    box-shadow: none;
+    box-shadow: 0 6px 16px rgba(20, 28, 50, 0.04);
     border: 1px solid #e3e7f5;
   }
 
@@ -368,7 +381,7 @@
 
 @media (max-width: 480px) {
   .page {
-    padding: calc(12px + var(--safe-area-top)) 12px calc(32px + var(--safe-area-bottom));
+    padding: calc(12px + var(--safe-area-top)) var(--layout-gutter-mobile) calc(32px + var(--safe-area-bottom));
     gap: 20px;
   }
 
