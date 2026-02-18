@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.90 - 2026-02-18
+
+### Changed
+
+- Reduced visual chrome across core screens by removing decorative page glows, flattening gradients, and lowering elevation effects on panels and cards.
+- Shifted interactive cards to calmer border-and-background state changes instead of lift animations for a cleaner and steadier interface.
+
+### Security
+
+- Kept privacy and access behavior unchanged while simplifying visual styling, avoiding any new data collection or public exposure paths.
+
 ## 1.0.89 - 2026-02-17
 
 ### Changed
