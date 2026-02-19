@@ -172,7 +172,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
               <div class="export-block share-checklist" id="share-checklist">
                 <div>
                   <h3>Before you share</h3>
-                  <p class="helper">Check all items. Then copy the link.</p>
+                  <p class="helper">Check all items before you copy the link.</p>
                 </div>
                 <label class="checkbox-label">
                   <input type="checkbox" class="share-check" />
@@ -187,7 +187,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                   I removed phone numbers and email addresses.
                 </label>
                 <button class="button button-secondary" type="button" data-copy-link disabled title="Complete all checks to copy the link">Copy this record link</button>
-                <p class="helper" data-share-status role="status" aria-live="polite"></p>
+                <p class="helper" data-share-status role="status" aria-live="polite">Complete all checks to copy the link.</p>
               </div>
 
               <div class="export-block">
@@ -198,12 +198,12 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
                   <ul class="submission-detail-list detail-grid">
                     {submissionRecord.ticketDate && (
-                      <li>
+                      <li key="ticket-date">
                         <strong>311 ticket date:</strong> {submissionRecord.ticketDate}
                       </li>
                     )}
                     {submissionRecord.ticketNumber && (
-                      <li>
+                      <li key="ticket-number">
                         <strong>311 ticket number:</strong> {submissionRecord.ticketNumber}
                       </li>
                     )}
@@ -252,7 +252,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
         if (copyButton instanceof HTMLButtonElement) {
           copyButton.disabled = !done;
           copyButton.setAttribute('aria-disabled', String(!done));
-          copyButton.title = done ? 'Copy this record link' : 'Complete all checks to copy the link';
+          copyButton.title = done ? 'Copy record link' : 'Complete all checks to copy the link';
         }
         status.textContent = done ? 'Checklist complete. You can copy the link.' : 'Complete all checks to copy the link.';
       };

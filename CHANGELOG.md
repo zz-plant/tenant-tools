@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.95 - 2026-02-19
+
+### Changed
+
+- Improved share-flow clarity by adding a visible helper when the copy-link button is locked until checklist checks are complete.
+- Refined mobile step-navigation hint text to match the current layout.
+- Tightened checklist instructions and default status copy on the saved-record page to reduce uncertainty before sharing.
+- Added stable keys for 311 ticket rows on the saved-record details list.
+
+### Security
+
+- Kept resident-key access and private evidence behavior unchanged while improving link-sharing safeguards.
+
 ## 1.0.94 - 2026-02-19
 
 ### Changed
