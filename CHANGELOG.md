@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.94 - 2026-02-19
+
+### Changed
+
+- Updated step-navigation helper copy on mobile and added explicit sharing-result microcopy in export selection to make outcomes clearer before sharing.
+- Improved copy-link button feedback with disabled-state guidance and consistent checklist wording in both builder and saved-record views.
+- Added stable list keys for timeline and detail rows on the saved-record page to prevent UI reconciliation glitches.
+
+### Security
+
+- Kept resident-key gating and private evidence defaults unchanged while reinforcing checklist prompts before link sharing.
+
 ## 1.0.93 - 2026-02-18
 
 ### Changed

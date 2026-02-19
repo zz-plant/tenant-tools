@@ -942,7 +942,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   );
                 })}
               </Tabs.List>
-              <p className="helper mobile-step-hint">Use Back and Next buttons below on mobile.</p>
+              <p className="helper mobile-step-hint">Use step buttons below on mobile.</p>
               <form className="form-grid">
                 <Tabs.Panel value="1">
                   <div className="form-section">
@@ -1445,6 +1445,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="export-header">
                     <div>
                       <h3>{selectedAudience.label} export</h3>
+                      <p className="helper">Sharing result: {selectedAudience.description}</p>
                     </div>
                     <div className="export-actions">
                       <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
@@ -1552,6 +1553,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           type="button"
                           onClick={handleCopyLink}
                           disabled={!canCopyPermalink}
+                          aria-disabled={!canCopyPermalink}
+                          title={canCopyPermalink ? "Copy permalink" : "Complete all checks to copy the link"}
                         >
                           {linkCopyLabel}
                         </Button>
@@ -1580,7 +1583,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     </div>
                     {submissionUrl && (
                       <div className="share-checklist-inline" aria-label="Before you copy the link">
-                        <p className="helper">Before sharing this link, confirm these checks.</p>
+                        <p className="helper">Before sharing this link, confirm all checks.</p>
                         <label className="checkbox-label">
                           <Checkbox.Root
                             checked={shareChecks.names}
