@@ -5,13 +5,13 @@ export const depositIssue: IssueOption = {
   label: "💰 Security deposit (move-out deadlines)",
   notices: {
     A: {
-      en: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nCondition: no itemized list of deductions received.\nPlease send the itemized list.\n\n`,
+      en: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nCondition: I did not receive a list of charges.\nPlease send the list of charges.\n\n`,
       es: `Hola,\n\nMe mudé de [ADDRESS] el [MOVE-OUT DATE].\nNo he recibido una lista detallada de deducciones.\nPor favor envíe la lista detallada.\n\nGracias,\n`,
       hi: `नमस्ते,\n\nमैं [ADDRESS] से [MOVE-OUT DATE] को स्थानांतरित हुआ/हुई।\nमुझे कटौतियों की आइटमाइज़्ड सूची नहीं मिली है।\nकृपया सूची भेजें।\n\nधन्यवाद,\n`,
       pl: `Dzień dobry,\n\nWyprowadziłem/am się z [ADDRESS] dnia [MOVE-OUT DATE].\nNie otrzymałem/am wyszczególnionej listy potrąceń.\nProszę przesłać listę.\n\nDziękuję,\n`,
     },
     B: {
-      en: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nCondition: security deposit not returned.\nPlease return the security deposit and any required interest.\n\n`,
+      en: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nCondition: security deposit not returned.\nPlease return the security deposit and any interest required by local rules.\n\n`,
       es: `Hola,\n\nMe mudé de [ADDRESS] el [MOVE-OUT DATE].\nNo he recibido mi depósito de seguridad.\nPor favor devuelva mi depósito y cualquier interés requerido.\n\nGracias,\n`,
       hi: `नमस्ते,\n\nमैं [ADDRESS] से [MOVE-OUT DATE] को स्थानांतरित हुआ/हुई।\nमुझे मेरा सुरक्षा जमा वापस नहीं मिला है।\nकृपया मेरा जमा और आवश्यक ब्याज वापस करें।\n\nधन्यवाद,\n`,
       pl: `Dzień dobry,\n\nWyprowadziłem/am się z [ADDRESS] dnia [MOVE-OUT DATE].\nNie otrzymałem/am zwrotu kaucji.\nProszę zwrócić kaucję i wymagane odsetki.\n\nDziękuję,\n`,

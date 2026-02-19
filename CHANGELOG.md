@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.97 - 2026-02-19
+
+### Changed
+
+- Simplified issue labels for lockout and missing-repair-date flows to reduce reading load for ESL users.
+- Reworded selected English notice templates to reduce legal-heavy phrasing and keep “next normal step” language calm.
+- Clarified builder step guidance by replacing internal jargon with plain-language wording.
+
+### Security
+
+- Kept private-evidence defaults and resident-key access behavior unchanged while improving copy clarity.
+
 ## 1.0.96 - 2026-02-19
 
 ### Changed

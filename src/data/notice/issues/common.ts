@@ -17,7 +17,7 @@ export const commonIssue: IssueOption = {
       pl: `Dzień dobry,\n\nPisałem/am do Państwa [DATE OF FIRST MESSAGE] w sprawie części wspólnych.\nNadal nie jest naprawione.\nProszę podać datę naprawy.\n\nDziękuję,\n`,
     },
     C: {
-      en: `Start date: [START DATE].\nCondition today: common area issue still not fixed.\nPlease confirm the repair date today.\nIf it is not addressed soon, I will contact the City (311) to report it.\n\n`,
+      en: `Start date: [START DATE].\nCondition today: common area issue still not fixed.\nPlease confirm the repair date today.\nIf there is still no repair date, the next normal step is to contact 311.\n\n`,
       es: `Hola,\n\nEl problema en el área común comenzó el [START DATE] y aún no está arreglado.\nPor favor confirme la fecha de reparación hoy.\nSi no se atiende pronto, contactaré a la Ciudad (311) para reportarlo.\n\nGracias,\n`,
       hi: `नमस्ते,\n\nसाझा क्षेत्र की समस्या [START DATE] को शुरू हुई और अब भी ठीक नहीं है।\nकृपया आज मरम्मत की तारीख की पुष्टि करें।\nयदि जल्द समाधान नहीं हुआ, तो मैं City (311) को रिपोर्ट करूंगा/करूंगी।\n\nधन्यवाद,\n`,
       pl: `Dzień dobry,\n\nProblem w częściach wspólnych zaczął się [START DATE] i nadal nie jest naprawiony.\nProszę dziś potwierdzić datę naprawy.\nJeśli nie zostanie szybko rozwiązany, skontaktuję się z miastem (311).\n\nDziękuję,\n`,
