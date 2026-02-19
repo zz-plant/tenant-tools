@@ -146,6 +146,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     : "";
   const normalizedBuildingKey = buildingKey.trim();
   const canSaveLedger = Boolean(formState.building && formState.issue && normalizedBuildingKey);
+  const saveDisabledMessage = !formState.building || !formState.issue
+    ? "Choose a building and issue to enable saving."
+    : !normalizedBuildingKey
+      ? "Add the resident key to enable saving."
+      : "";
   const canFastTrack = Boolean(formState.building && formState.issue);
   const canCopyPermalink = shareChecks.names && shareChecks.units && shareChecks.contact;
 
@@ -1534,8 +1539,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           spellCheck={false}
                         />
                       </label>
-                      {!formState.building || !formState.issue ? (
-                        <p className="helper">Choose a building and issue to enable saving.</p>
+                      {saveDisabledMessage ? (
+                        <p className="helper">{saveDisabledMessage}</p>
                       ) : null}
                     </div>
                     <div className="submission-actions">
@@ -1562,7 +1567,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       )}
                     </div>
                     {submissionUrl && !canCopyPermalink && (
-                      <p className="helper" id="copy-link-requirements">Complete all checks below to copy the link.</p>
+                      <p className="helper" id="copy-link-requirements" role="status" aria-live="polite">Complete all checks below to copy the link.</p>
                     )}
                     {saveStatus === "saved" && submissionUrl && (
                       <p className="submission-note" role="status" aria-live="polite">

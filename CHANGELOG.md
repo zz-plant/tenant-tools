@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.96 - 2026-02-19
+
+### Changed
+
+- Improved save-state guidance in the builder so residents see whether saving is blocked by missing basics or missing resident key.
+- Added live helper feedback for locked copy-link action in the builder to make next steps clearer.
+- Improved saved-record share block with a static privacy reminder and more consistent copy-button wording.
+- Updated saved-record copy button success text to "Link copied" for clearer confirmation.
+
+### Security
+
+- Kept private access and evidence defaults unchanged while improving share-time safety prompts.
+
 ## 1.0.95 - 2026-02-19
 
 ### Changed
