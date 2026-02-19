@@ -146,6 +146,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     : "";
   const normalizedBuildingKey = buildingKey.trim();
   const canSaveLedger = Boolean(formState.building && formState.issue && normalizedBuildingKey);
+  const saveDisabledMessage = !formState.building || !formState.issue
+    ? "Choose a building and issue to enable saving."
+    : !normalizedBuildingKey
+      ? "Add the resident key to enable saving."
+      : "";
   const canFastTrack = Boolean(formState.building && formState.issue);
   const canCopyPermalink = shareChecks.names && shareChecks.units && shareChecks.contact;
 
@@ -646,7 +651,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       return;
     }
     await navigator.clipboard.writeText(`${window.location.origin}${submissionUrl}`);
-    setLinkCopyLabel("Link copied");
+    setLinkCopyLabel("Copied link");
     setLinkStatusMessage("Permalink copied.");
     scheduleTimeout("link-copy-label", () => setLinkCopyLabel("Copy link"), 1500);
     scheduleTimeout("link-status", () => setLinkStatusMessage(""), 2000);
@@ -942,7 +947,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   );
                 })}
               </Tabs.List>
-              <p className="helper mobile-step-hint">Use Back and Next buttons below on mobile.</p>
+              <p className="helper mobile-step-hint">Use step buttons above on mobile.</p>
               <form className="form-grid">
                 <Tabs.Panel value="1">
                   <div className="form-section">
@@ -1445,6 +1450,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="export-header">
                     <div>
                       <h3>{selectedAudience.label} export</h3>
+                      <p className="helper">Sharing result: {selectedAudience.description}</p>
                     </div>
                     <div className="export-actions">
                       <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
@@ -1533,8 +1539,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           spellCheck={false}
                         />
                       </label>
-                      {!formState.building || !formState.issue ? (
-                        <p className="helper">Choose a building and issue to enable saving.</p>
+                      {saveDisabledMessage ? (
+                        <p className="helper">{saveDisabledMessage}</p>
                       ) : null}
                     </div>
                     <div className="submission-actions">
@@ -1552,11 +1558,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           type="button"
                           onClick={handleCopyLink}
                           disabled={!canCopyPermalink}
+                          aria-disabled={!canCopyPermalink}
+                          title={canCopyPermalink ? "Copy permalink" : "Complete all checks to copy the link"}
+                          aria-describedby={!canCopyPermalink ? "copy-link-requirements" : undefined}
                         >
                           {linkCopyLabel}
                         </Button>
                       )}
                     </div>
+                    {submissionUrl && !canCopyPermalink && (
+                      <p className="helper" id="copy-link-requirements" role="status" aria-live="polite">Complete all checks below to copy the link.</p>
+                    )}
                     {saveStatus === "saved" && submissionUrl && (
                       <p className="submission-note" role="status" aria-live="polite">
                         Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>. This link does not include a resident key. Open it, then enter your building key.
@@ -1580,7 +1592,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     </div>
                     {submissionUrl && (
                       <div className="share-checklist-inline" aria-label="Before you copy the link">
-                        <p className="helper">Before sharing this link, confirm these checks.</p>
+                        <p className="helper">Before sharing this link, confirm all checks.</p>
                         <label className="checkbox-label">
                           <Checkbox.Root
                             checked={shareChecks.names}

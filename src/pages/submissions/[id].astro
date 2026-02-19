@@ -156,7 +156,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                 {timelineEntries.length > 0 ? (
                   <ul class="timeline">
                     {timelineEntries.map((entry) => (
-                      <li>
+                      <li key={`${entry.label}-${entry.date}`}>
                         <p class="timeline-date">{formatTimelineDate(entry.date)}</p>
                         <p class="timeline-label">{entry.label}</p>
                       </li>
@@ -172,7 +172,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
               <div class="export-block share-checklist" id="share-checklist">
                 <div>
                   <h3>Before you share</h3>
-                  <p class="helper">Check these items first.</p>
+                  <p class="helper">Check all items before you copy the link.</p>
                 </div>
                 <label class="checkbox-label">
                   <input type="checkbox" class="share-check" />
@@ -186,8 +186,9 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                   <input type="checkbox" class="share-check" />
                   I removed phone numbers and email addresses.
                 </label>
-                <button class="button button-secondary" type="button" data-copy-link disabled>Copy this record link</button>
-                <p class="helper" data-share-status role="status" aria-live="polite"></p>
+                <button class="button button-secondary" type="button" data-copy-link disabled title="Complete all checks to copy the link">Copy this record link</button>
+                <p class="helper">Share only with residents who have the key.</p>
+                <p class="helper" data-share-status role="status" aria-live="polite">Complete all checks to copy the link.</p>
               </div>
 
               <div class="export-block">
@@ -198,12 +199,12 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
                   <ul class="submission-detail-list detail-grid">
                     {submissionRecord.ticketDate && (
-                      <li>
+                      <li key="ticket-date">
                         <strong>311 ticket date:</strong> {submissionRecord.ticketDate}
                       </li>
                     )}
                     {submissionRecord.ticketNumber && (
-                      <li>
+                      <li key="ticket-number">
                         <strong>311 ticket number:</strong> {submissionRecord.ticketNumber}
                       </li>
                     )}
@@ -214,7 +215,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                     {detailEntries.map(([key, value]) => {
                       const label = fieldDefinitions[key as keyof typeof fieldDefinitions]?.label || key;
                       return (
-                        <li>
+                        <li key={key}>
                           <strong>{label}:</strong> {value}
                         </li>
                       );
@@ -251,6 +252,8 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
         const done = checks.every((item) => item instanceof HTMLInputElement && item.checked);
         if (copyButton instanceof HTMLButtonElement) {
           copyButton.disabled = !done;
+          copyButton.setAttribute('aria-disabled', String(!done));
+          copyButton.title = done ? 'Copy this record link' : 'Complete all checks to copy the link';
         }
         status.textContent = done ? 'Checklist complete. You can copy the link.' : 'Complete all checks to copy the link.';
       };
@@ -269,7 +272,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
           if (status) {
             status.textContent = 'Link copied. Share only with residents who have the key.';
           }
-          copyButton.textContent = 'Copied';
+          copyButton.textContent = 'Link copied';
           window.setTimeout(() => {
             copyButton.textContent = 'Copy this record link';
             refreshShareStatus();

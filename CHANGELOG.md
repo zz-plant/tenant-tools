@@ -1,5 +1,43 @@
 # Changelog
 
+## 1.0.96 - 2026-02-19
+
+### Changed
+
+- Improved save-state guidance in the builder so residents see whether saving is blocked by missing basics or missing resident key.
+- Added live helper feedback for locked copy-link action in the builder to make next steps clearer.
+- Improved saved-record share block with a static privacy reminder and more consistent copy-button wording.
+- Updated saved-record copy button success text to "Link copied" for clearer confirmation.
+
+### Security
+
+- Kept private access and evidence defaults unchanged while improving share-time safety prompts.
+
+## 1.0.95 - 2026-02-19
+
+### Changed
+
+- Improved share-flow clarity by adding a visible helper when the copy-link button is locked until checklist checks are complete.
+- Refined mobile step-navigation hint text to match the current layout.
+- Tightened checklist instructions and default status copy on the saved-record page to reduce uncertainty before sharing.
+- Added stable keys for 311 ticket rows on the saved-record details list.
+
+### Security
+
+- Kept resident-key access and private evidence behavior unchanged while improving link-sharing safeguards.
+
+## 1.0.94 - 2026-02-19
+
+### Changed
+
+- Updated step-navigation helper copy on mobile and added explicit sharing-result microcopy in export selection to make outcomes clearer before sharing.
+- Improved copy-link button feedback with disabled-state guidance and consistent checklist wording in both builder and saved-record views.
+- Added stable list keys for timeline and detail rows on the saved-record page to prevent UI reconciliation glitches.
+
+### Security
+
+- Kept resident-key gating and private evidence defaults unchanged while reinforcing checklist prompts before link sharing.
+
 ## 1.0.93 - 2026-02-18
 
 ### Changed
