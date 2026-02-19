@@ -71,8 +71,6 @@ const initialState = {
 };
 
 type FormState = typeof initialState;
-type QuickStartPreset = "first_notice" | "follow_up" | "final_reminder";
-
 const detailEntries = Object.entries(fieldDefinitions);
 
 const RadioGroup = {
@@ -151,23 +149,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     : !normalizedBuildingKey
       ? "Add the resident key to enable saving."
       : "";
-  const canFastTrack = Boolean(formState.building && formState.issue);
   const canCopyPermalink = shareChecks.names && shareChecks.units && shareChecks.contact;
-
-  const quickStartSummary: Record<QuickStartPreset, { title: string; description: string }> = {
-    first_notice: {
-      title: "First notice",
-      description: "Best for a new issue.",
-    },
-    follow_up: {
-      title: "Follow-up",
-      description: "Use after your first notice.",
-    },
-    final_reminder: {
-      title: "Final reminder",
-      description: "Use after a follow-up.",
-    },
-  };
 
   const renderDetailField = (fieldKey: keyof typeof fieldDefinitions) => {
     const field = fieldDefinitions[fieldKey];
@@ -276,76 +258,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     });
   };
 
-  const handleFastTrackToPreview = () => {
-    if (!formState.building || !formState.issue) {
-      setNoticeStatusMessage("Choose building and issue first.");
-      scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
-      return;
-    }
-
-    const today = new Date();
-    const formattedToday = formatDate(today);
-    setFormState((prev) => ({
-      ...prev,
-      stage: prev.stage || "A",
-      simpleEnglish: true,
-      autoDates: true,
-      today: prev.today || formattedToday,
-      startDate: prev.startDate || formattedToday,
-      time: prev.time || getCurrentTime(today),
-    }));
-    setCurrentStep(4);
-    setNoticeStatusMessage("Preview is ready. Review it, then copy.");
-    scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
-  };
-
-  const handleQuickStart = (preset: QuickStartPreset) => {
-    const today = new Date();
-    const formattedToday = formatDate(today);
-    const followUpDate = formatDate(addDays(today, -3));
-    const finalReminderDate = formatDate(addDays(today, -6));
-
-    setFormState((prev) => {
-      if (preset === "first_notice") {
-        return {
-          ...prev,
-          stage: "A",
-          simpleEnglish: true,
-          autoDates: true,
-          today: formattedToday,
-          startDate: formattedToday,
-          firstMessageDate: "",
-        };
-      }
-
-      if (preset === "follow_up") {
-        return {
-          ...prev,
-          stage: "B",
-          simpleEnglish: true,
-          autoDates: true,
-          today: formattedToday,
-          startDate: followUpDate,
-          firstMessageDate: followUpDate,
-        };
-      }
-
-      return {
-        ...prev,
-        stage: "C",
-        simpleEnglish: true,
-        autoDates: true,
-        today: formattedToday,
-        startDate: finalReminderDate,
-        firstMessageDate: finalReminderDate,
-      };
-    });
-
-    setCurrentStep((prev) => (prev < 2 ? 2 : prev));
-    const presetTitle = quickStartSummary[preset].title;
-    setNoticeStatusMessage(`${presetTitle} is ready. Continue with the basic details.`);
-    scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2200);
-  };
 
   const selectedIssue = issueOptions.find((option) => option.id === formState.issue);
   const issueFields = issueFieldMap[formState.issue] || [];
@@ -820,20 +732,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     return Array.from(sourceMap, ([url, title]) => ({ url, title }));
   }, [ruleCards]);
 
-  const guidedAction = useMemo(() => {
-    if (!formState.building) {
-      return { label: "Choose building", step: 1 };
-    }
-    if (!formState.issue) {
-      return { label: "Choose issue", step: 1 };
-    }
-    if (currentStep < steps.length) {
-      return { label: `Step ${currentStep + 1}`, step: currentStep + 1 };
-    }
-    return { label: "Review + copy", step: 4 };
-  }, [currentStep, formState.building, formState.issue]);
-
-  const showGuidedAction = canShowAfterBasics;
   const builderHelperText = !isStep1Complete
     ? "Do one task now: choose building and issue."
     : "Next normal step: move forward with dates, facts, or review.";
@@ -1109,45 +1007,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                             </>
                           )}
                         </div>
-
-                        <div className="quick-start-grid" aria-label="Quick start options">
-                          {(Object.keys(quickStartSummary) as QuickStartPreset[]).map((preset) => {
-                            const option = quickStartSummary[preset];
-                            return (
-                              <button
-                                key={preset}
-                                type="button"
-                                className="quick-start-card"
-                                onClick={() => handleQuickStart(preset)}
-                              >
-                                <span className="quick-start-title">{option.title}</span>
-                                <span className="quick-start-description">{option.description}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                        {showGuidedAction && (
-                          <div className="guided-action" role="status" aria-live="polite">
-                            <p className="guided-action-label">Next: {guidedAction.label}</p>
-                            <div className="guided-action-buttons">
-                              <Button
-                                className="button button-secondary"
-                                type="button"
-                                onClick={() => setCurrentStep(guidedAction.step)}
-                              >
-                                Go now
-                              </Button>
-                              <Button
-                                className="button"
-                                type="button"
-                                onClick={handleFastTrackToPreview}
-                                disabled={!canFastTrack}
-                              >
-                                Finish setup fast
-                              </Button>
-                            </div>
-                          </div>
-                        )}
 
                         {isStep1Complete && (
                           <Button
