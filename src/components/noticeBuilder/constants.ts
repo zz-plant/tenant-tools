@@ -11,7 +11,7 @@ export const steps = [
     id: 1,
     title: "Choose basics",
     label: "Building & issue",
-    description: "Pick building, issue, stage.",
+    description: "Pick your building, issue type, and notice step.",
     requirement: "Required",
   },
   {

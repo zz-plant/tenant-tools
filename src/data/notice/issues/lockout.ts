@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const lockoutIssue: IssueOption = {
   id: "lockout",
-  label: "🚫 Lockout / utility shutoff threats",
+  label: "🚫 Lockout / utility shutoff risk",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nStatement received: [LOCK ME OUT / SHUT OFF UTILITIES] on [DATE].\nThat is not allowed in Chicago without a court process.\nPlease confirm in writing that you will not lock me out or shut off utilities.\n\n`,
