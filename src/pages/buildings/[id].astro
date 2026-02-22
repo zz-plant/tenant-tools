@@ -308,15 +308,13 @@ const totalFiltered = filtered.length;
     </div>
 
     {hasAccess && kv && (
-      <>
-        <script define:vars={{ isSteward, accessKey }}>
-          window.__BUILDING_DASHBOARD__ = {
-            isSteward,
-            accessKey: accessKey || "",
-          };
-        </script>
-        <script type="module" src={Astro.resolve("../../scripts/buildingDashboard.ts")}></script>
-      </>
+      <script
+        type="module"
+        data-dashboard-config
+        data-is-steward={isSteward ? "true" : "false"}
+        data-access-key={accessKey ?? ""}
+        src={Astro.resolve("../../scripts/buildingDashboard.ts")}
+      ></script>
     )}
   </body>
 </html>
