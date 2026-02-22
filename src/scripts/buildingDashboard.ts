@@ -1,16 +1,7 @@
-declare global {
-  interface Window {
-    __BUILDING_DASHBOARD__?: {
-      isSteward?: boolean;
-      accessKey?: string;
-    };
-  }
-}
-
-const dashboardConfig = window.__BUILDING_DASHBOARD__;
+const dashboardScript = document.querySelector("script[data-dashboard-config]") as HTMLScriptElement | null;
 const stewardKeyValue = new URLSearchParams(window.location.search).get("stewardKey")?.trim() ?? "";
-const isStewardMode = Boolean(dashboardConfig?.isSteward);
-const accessKeyValue = dashboardConfig?.accessKey?.trim() ?? "";
+const isStewardMode = dashboardScript?.dataset.isSteward === "true";
+const accessKeyValue = dashboardScript?.dataset.accessKey?.trim() ?? "";
 
 type SubmissionStatus = "open" | "resolved" | "archived";
 const statusOrder: SubmissionStatus[] = ["open", "resolved", "archived"];
