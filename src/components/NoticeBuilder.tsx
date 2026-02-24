@@ -732,38 +732,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     return Array.from(sourceMap, ([url, title]) => ({ url, title }));
   }, [ruleCards]);
 
-  const builderHelperText = !isStep1Complete
-    ? "Do one task now: choose building and issue."
-    : "Next normal step: move forward with dates, facts, or review.";
-
   return (
     <div className="page">
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
-      <header className="hero">
-        <div className="hero-main">
-          <p className="eyebrow">Building Ledger</p>
-          <h1>Tenant Notice Builder</h1>
-          <p className="tagline">Make a notice fast.</p>
-          <div className="hero-actions">
-            <a className="button hero-button" href="#builder">
-              Start
-            </a>
-          </div>
-          <p className="helper">No names. No unit numbers. Evidence stays private.</p>
-        </div>
-        <p className="helper">Use the step buttons below to move from basics to review.</p>
-      </header>
-
       <main id="main">
         <div className="layout">
           <section className="panel" id="builder">
             <div className="step-header">
-              <h2>Build your notice</h2>
-              <p className="helper">
-                {builderHelperText}
-              </p>
+              <h1>Build your notice</h1>
               <div className="step-meta">
                 <div className="step-progress">
                   <div className="step-progress-row">
