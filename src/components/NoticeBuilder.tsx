@@ -732,66 +732,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     return Array.from(sourceMap, ([url, title]) => ({ url, title }));
   }, [ruleCards]);
 
-  const builderHelperText = !isStep1Complete
-    ? "Do one task now: choose building and issue."
-    : "Next normal step: move forward with dates, facts, or review.";
-
-  const basicsChecklist = [
-    { label: "Building selected", done: Boolean(formState.building) },
-    { label: "Issue selected", done: Boolean(formState.issue) },
-    { label: "Simple English on", done: formState.simpleEnglish },
-  ];
-
   return (
     <div className="page">
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
-      <header className="hero">
-        <div className="hero-main">
-          <p className="eyebrow">Building Ledger</p>
-          <h1>Tenant Notice Builder</h1>
-          <p className="tagline">Make a notice fast.</p>
-          <div className="hero-actions">
-            <a className="button hero-button" href="#builder">
-              Start
-            </a>
-          </div>
-          <div className="tag-row">
-            <span>No names saved</span>
-            <span>Short facts only</span>
-            <span>Evidence stays private</span>
-            <span>Resident key needed to save</span>
-          </div>
-        </div>
-        <div className="hero-steps" aria-label="Quick steps">
-          <div className="hero-step-card">
-            <p className="hero-step-title">1. Basics</p>
-            <p className="helper">Pick building and issue.</p>
-          </div>
-          <div className="hero-step-card">
-            <p className="hero-step-title">2. Dates</p>
-            <p className="helper">Check dates and language.</p>
-          </div>
-          <div className="hero-step-card">
-            <p className="hero-step-title">3. Add facts</p>
-            <p className="helper">Optional short facts.</p>
-          </div>
-          <div className="hero-step-card">
-            <p className="hero-step-title">4. Review</p>
-            <p className="helper">Preview, save, and export.</p>
-          </div>
-        </div>
-      </header>
-
       <main id="main">
         <div className="layout">
           <section className="panel" id="builder">
             <div className="step-header">
-              <h2>Build your notice</h2>
-              <p className="helper">
-                {builderHelperText}
-              </p>
+              <h1>Build your notice</h1>
               <div className="step-meta">
                 <div className="step-progress">
                   <div className="step-progress-row">
@@ -852,13 +802,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     <div className="form-section-header">
                       <h3>Building basics</h3>
                       <p className="helper">Required first.</p>
-                    </div>
-                    <div className="basics-checklist" aria-label="Basics checklist">
-                      {basicsChecklist.map((item) => (
-                        <p key={item.label} className={`check-item ${item.done ? "done" : ""}`}>
-                          {item.done ? "✓" : "○"} {item.label}
-                        </p>
-                      ))}
                     </div>
                     <label>
                       Building
@@ -1213,16 +1156,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 onClick={() => setCurrentStep((prev) => Math.min(steps.length, prev + 1))}
                 disabled={currentStep === steps.length || (currentStep === 1 && !isStep1Complete)}
               >
-                Next
+                {currentStep === 1 && !isStep1Complete ? "Finish step 1 to continue" : "Next"}
               </Button>
-              <Button
-                className="button"
-                type="button"
-                onClick={() => setCurrentStep(4)}
-                disabled={!isStep1Complete}
-              >
-                Save draft
-              </Button>
+              {isStep1Complete && (
+                <Button
+                  className="button"
+                  type="button"
+                  onClick={() => setCurrentStep(4)}
+                >
+                  Save draft
+                </Button>
+              )}
             </div>
           </section>
           <aside className={`panel panel-highlight preview-panel${!canShowAfterBasics ? " preview-panel-mobile-hidden" : ""}`} id="preview">
@@ -1243,10 +1187,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               <section className="preview-section">
                 <div className="notice-status needs">
                   <p className="notice-status-title">Finish the basics</p>
-                  <p className="helper">Choose a building and issue first. Then preview and save options appear.</p>
-                  <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                    Go to step 1
-                  </Button>
+                  <p className="helper">Choose a building and issue in step 1. Then preview and save options appear.</p>
                 </div>
               </section>
             ) : (
@@ -1258,18 +1199,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 <section className="preview-section">
                   <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
                     <p className="notice-status-title">{noticeReadinessTitle}</p>
-                    {missingBasics.length > 0 && (
-                      <ul className="quick-list">
-                        {missingBasics.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    )}
-                    {!isNoticeReady && (
-                      <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                        Go to step 1
-                      </Button>
-                    )}
                   </div>
                 </section>
           <section className="preview-section">
