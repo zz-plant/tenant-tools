@@ -1213,16 +1213,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 onClick={() => setCurrentStep((prev) => Math.min(steps.length, prev + 1))}
                 disabled={currentStep === steps.length || (currentStep === 1 && !isStep1Complete)}
               >
-                Next
+                {currentStep === 1 && !isStep1Complete ? "Finish step 1 to continue" : "Next"}
               </Button>
-              <Button
-                className="button"
-                type="button"
-                onClick={() => setCurrentStep(4)}
-                disabled={!isStep1Complete}
-              >
-                Save draft
-              </Button>
+              {isStep1Complete && (
+                <Button
+                  className="button"
+                  type="button"
+                  onClick={() => setCurrentStep(4)}
+                >
+                  Save draft
+                </Button>
+              )}
             </div>
           </section>
           <aside className={`panel panel-highlight preview-panel${!canShowAfterBasics ? " preview-panel-mobile-hidden" : ""}`} id="preview">
@@ -1243,10 +1244,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               <section className="preview-section">
                 <div className="notice-status needs">
                   <p className="notice-status-title">Finish the basics</p>
-                  <p className="helper">Choose a building and issue first. Then preview and save options appear.</p>
-                  <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                    Go to step 1
-                  </Button>
+                  <p className="helper">Choose a building and issue in step 1. Then preview and save options appear.</p>
                 </div>
               </section>
             ) : (
@@ -1258,18 +1256,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 <section className="preview-section">
                   <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
                     <p className="notice-status-title">{noticeReadinessTitle}</p>
-                    {missingBasics.length > 0 && (
-                      <ul className="quick-list">
-                        {missingBasics.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    )}
-                    {!isNoticeReady && (
-                      <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                        Go to step 1
-                      </Button>
-                    )}
                   </div>
                 </section>
           <section className="preview-section">
