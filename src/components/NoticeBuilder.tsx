@@ -736,12 +736,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     ? "Do one task now: choose building and issue."
     : "Next normal step: move forward with dates, facts, or review.";
 
-  const basicsChecklist = [
-    { label: "Building selected", done: Boolean(formState.building) },
-    { label: "Issue selected", done: Boolean(formState.issue) },
-    { label: "Simple English on", done: formState.simpleEnglish },
-  ];
-
   return (
     <div className="page">
       <a className="skip-link" href="#main">
@@ -757,31 +751,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               Start
             </a>
           </div>
-          <div className="tag-row">
-            <span>No names saved</span>
-            <span>Short facts only</span>
-            <span>Evidence stays private</span>
-            <span>Resident key needed to save</span>
-          </div>
+          <p className="helper">No names. No unit numbers. Evidence stays private.</p>
         </div>
-        <div className="hero-steps" aria-label="Quick steps">
-          <div className="hero-step-card">
-            <p className="hero-step-title">1. Basics</p>
-            <p className="helper">Pick building and issue.</p>
-          </div>
-          <div className="hero-step-card">
-            <p className="hero-step-title">2. Dates</p>
-            <p className="helper">Check dates and language.</p>
-          </div>
-          <div className="hero-step-card">
-            <p className="hero-step-title">3. Add facts</p>
-            <p className="helper">Optional short facts.</p>
-          </div>
-          <div className="hero-step-card">
-            <p className="hero-step-title">4. Review</p>
-            <p className="helper">Preview, save, and export.</p>
-          </div>
-        </div>
+        <p className="helper">Use the step buttons below to move from basics to review.</p>
       </header>
 
       <main id="main">
@@ -852,13 +824,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     <div className="form-section-header">
                       <h3>Building basics</h3>
                       <p className="helper">Required first.</p>
-                    </div>
-                    <div className="basics-checklist" aria-label="Basics checklist">
-                      {basicsChecklist.map((item) => (
-                        <p key={item.label} className={`check-item ${item.done ? "done" : ""}`}>
-                          {item.done ? "✓" : "○"} {item.label}
-                        </p>
-                      ))}
                     </div>
                     <label>
                       Building
