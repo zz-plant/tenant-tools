@@ -1,0 +1,33 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Building Ledger Record Summary</title>
+  <desc id="desc">Private issue record summary preview.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF2FF"/>
+      <stop offset="1" stop-color="#E2E9FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="136" y="98" width="928" height="434" rx="28" fill="white"/>
+
+  <rect x="176" y="138" width="214" height="42" rx="21" fill="#E7EDFF"/>
+  <text x="283" y="164" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" fill="#2B3E83">Private record</text>
+
+  <text x="176" y="252" font-family="Inter, Arial, sans-serif" font-size="56" font-weight="800" fill="#1B2858">Issue summary</text>
+  <text x="176" y="304" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="500" fill="#42538E">Timeline and key facts for residents.</text>
+  <text x="176" y="346" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="500" fill="#42538E">Share only with trusted key holders.</text>
+
+  <g transform="translate(708 170)">
+    <rect width="300" height="288" rx="22" fill="#F7F9FF" stroke="#D1DCFF" stroke-width="2"/>
+    <text x="28" y="44" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#2D3F84">Timeline</text>
+    <line x1="40" y1="72" x2="40" y2="240" stroke="#B6C7FF" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="40" cy="96" r="9" fill="#4367DF"/>
+    <circle cx="40" cy="150" r="9" fill="#4367DF"/>
+    <circle cx="40" cy="204" r="9" fill="#4367DF"/>
+    <rect x="62" y="86" width="200" height="12" rx="6" fill="#D9E4FF"/>
+    <rect x="62" y="140" width="170" height="12" rx="6" fill="#D9E4FF"/>
+    <rect x="62" y="194" width="192" height="12" rx="6" fill="#D9E4FF"/>
+  </g>
+
+  <text x="176" y="476" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="600" fill="#223268">Building Ledger</text>
+</svg>
