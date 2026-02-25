@@ -1,0 +1,32 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Building Ledger Private Dashboard</title>
+  <desc id="desc">Private resident dashboard preview without personal details.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#141D3F"/>
+      <stop offset="1" stop-color="#1F2E63"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="92" y="86" width="1016" height="458" rx="28" fill="#F7F9FF"/>
+  <rect x="132" y="126" width="230" height="42" rx="21" fill="#E2E9FF"/>
+  <text x="247" y="152" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700" fill="#2B3E83">Private dashboard</text>
+
+  <text x="132" y="236" font-family="Inter, Arial, sans-serif" font-size="54" font-weight="800" fill="#18244F">Resident records</text>
+  <text x="132" y="290" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="500" fill="#40518A">Secure view. Access key required.</text>
+  <text x="132" y="334" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="500" fill="#40518A">No personal details in preview cards.</text>
+
+  <g transform="translate(712 178)">
+    <rect width="340" height="254" rx="20" fill="white" stroke="#CDD9FF" stroke-width="2"/>
+    <rect x="24" y="26" width="124" height="16" rx="8" fill="#C8D6FF"/>
+    <rect x="24" y="56" width="292" height="12" rx="6" fill="#E0E8FF"/>
+    <rect x="24" y="78" width="270" height="12" rx="6" fill="#E0E8FF"/>
+    <rect x="24" y="116" width="138" height="38" rx="19" fill="#3E60D7"/>
+    <text x="93" y="140" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="white">Open issues</text>
+    <rect x="24" y="172" width="292" height="58" rx="14" fill="#F4F7FF"/>
+    <rect x="44" y="191" width="162" height="10" rx="5" fill="#D4E0FF"/>
+    <rect x="44" y="209" width="116" height="10" rx="5" fill="#D4E0FF"/>
+  </g>
+
+  <text x="132" y="492" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="600" fill="#223268">Building Ledger</text>
+</svg>
