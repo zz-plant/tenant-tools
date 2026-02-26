@@ -65,11 +65,44 @@ bun run test
 bun run build
 ```
 
+### Preview production build locally
+
+```bash
+bun run build
+bun run preview
+```
+
+### Deploy
+
+```bash
+bun run deploy
+```
+
+---
+
+## Stack at a glance
+
+- Astro app runtime
+- React UI components
+- Cloudflare adapter/deploy target
+- Cloudflare KV for shared submissions (`SUBMISSIONS_KV`)
+- Node test runner with `tsx` for TypeScript tests
+
 ---
 
 ## Environment setup
 
 The app can run without production KV, but shared data features require Cloudflare bindings.
+
+### Where to define local environment variables
+
+Use one of the following local-only options:
+
+- `.dev.vars` (recommended for Cloudflare-style local runs)
+- `.env` for local shell/session loading
+- Wrangler environment config for deploy environments
+
+Do not commit files that contain real keys.
 
 ### Required for shared submission storage
 
@@ -95,6 +128,13 @@ Example `BUILDING_KEYS_JSON`:
 ```
 
 Never commit real keys to git.
+
+### Troubleshooting
+
+- If `bun` is not found, install Bun 1.2+ and restart the shell.
+- If `bun run test` fails on TypeScript import errors, run `bun install` again to ensure `tsx` and types are installed.
+- If shared submissions are not persisting, verify `SUBMISSIONS_KV` is bound in the active environment.
+- If `bun run deploy` fails, verify Wrangler auth and Cloudflare account access are configured in your shell.
 
 ---
 
