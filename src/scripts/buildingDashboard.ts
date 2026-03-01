@@ -1,3 +1,5 @@
+import { formatResidentReportCount } from "../lib/reportCount";
+
 const dashboardScript = document.querySelector("script[data-dashboard-config]") as HTMLScriptElement | null;
 const stewardKeyValue = new URLSearchParams(window.location.search).get("stewardKey")?.trim() ?? "";
 const isStewardMode = dashboardScript?.dataset.isSteward === "true";
@@ -6,16 +8,6 @@ const accessKeyValue = dashboardScript?.dataset.accessKey?.trim() ?? "";
 type SubmissionStatus = "open" | "resolved" | "archived";
 const statusOrder: SubmissionStatus[] = ["open", "resolved", "archived"];
 
-
-const formatResidentReportCount = (count: number) => {
-  if (!Number.isFinite(count) || count <= 0) {
-    return "0";
-  }
-  if (count < 3) {
-    return "<3";
-  }
-  return String(Math.floor(count));
-};
 
 const updateReportCount = (id: string, nextCount: number) => {
   const countEl = document.querySelector(`[data-report-count="${id}"]`);
