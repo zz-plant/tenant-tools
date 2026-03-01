@@ -1,4 +1,7 @@
+import { formatPublicReadonlyCount, formatResidentReportCount } from "./reportCount";
 import { normalizeSubmissionStatus, type SubmissionStatus } from "./submissions";
+
+export { formatPublicReadonlyCount, formatResidentReportCount };
 
 type SubmissionsKv = {
   list: (options: { prefix: string; cursor?: string; limit?: number }) => Promise<{
@@ -19,26 +22,6 @@ export type BuildingSubmission = {
   reportCount: number;
   createdAt: string;
   status: SubmissionStatus;
-};
-
-export const formatResidentReportCount = (count: number) => {
-  if (!Number.isFinite(count) || count <= 0) {
-    return "0";
-  }
-  if (count < 3) {
-    return "<3";
-  }
-  return String(Math.floor(count));
-};
-
-export const formatPublicReadonlyCount = (count: number) => {
-  if (!Number.isFinite(count) || count <= 0) {
-    return "0";
-  }
-  if (count < 3) {
-    return "Not shown";
-  }
-  return String(Math.floor(count));
 };
 
 type LoadBuildingSubmissionsOptions = {
