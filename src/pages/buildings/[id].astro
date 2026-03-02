@@ -23,6 +23,7 @@ const requiredStewardKey = Astro.locals.runtime?.env?.STEWARD_KEY;
 const buildingId = decodeURIComponent(id ?? "");
 
 const hasAccess = isBuildingAccessValid(buildingId, accessKey, Astro.locals.runtime?.env ?? {});
+const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
 const isSteward = isAccessKeyValid(stewardKey, requiredStewardKey);
 
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
@@ -106,13 +107,11 @@ const totalFiltered = filtered.length;
           {!hasAccess ? (
             <AccessKeyPanel
               title="Key required"
-              helperLines={["Residents only.", "Ask a steward for the building key."]}
-              steps={[
-                "Get the building key from a resident steward.",
-                "Paste the key below and continue.",
-              ]}
+              helperLines={["Residents only.", "Ask a steward for the current building key."]}
+              steps={["Paste the key below and select Continue."]}
               hiddenFields={stewardKey ? [{ name: "stewardKey", value: stewardKey }] : []}
               warning="Do not share the key publicly."
+              errorMessage={hasAccessAttempt ? "Key does not match this building." : ""}
               backLabel="Back to notice builder"
             />
           ) : !kv ? (
@@ -240,7 +239,7 @@ const totalFiltered = filtered.length;
                 <p class="helper">Building keys keep resident reports private.</p>
               </div>
               <ol class="helper-list">
-                <li>Get the key from a resident steward.</li>
+                <li>Ask for the current building key for {buildingId || "this building"}.</li>
                 <li>Paste the key and select Continue.</li>
               </ol>
               <div class="export-block">
