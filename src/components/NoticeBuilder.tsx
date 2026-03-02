@@ -136,6 +136,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const isStep1Complete = Boolean(formState.building && formState.issue);
   const showLockedStepPlaceholder = !isStep1Complete;
   const stepsLocked = !isStep1Complete;
+  const visibleBuilderSteps = useMemo(
+    () => (stepsLocked ? steps.filter((step) => step.id <= 2) : steps),
+    [stepsLocked]
+  );
   const canShowAfterBasics = isStep1Complete;
   const isNoticeReady = missingBasics.length === 0;
   const noticeReadinessTitle = isNoticeReady ? "Notice ready" : "Finish the basics";
@@ -777,7 +781,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               }}
             >
               <Tabs.List className="step-nav">
-                {steps.map((step) => {
+                {visibleBuilderSteps.map((step) => {
                   const isLocked = stepsLocked && step.id > 1;
                   return (
                     <Tabs.Tab
@@ -795,6 +799,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   );
                 })}
               </Tabs.List>
+              {stepsLocked && <p className="helper">Complete step 1 to unlock steps 2 to 4.</p>}
               <p className="helper mobile-step-hint">Use step buttons above on mobile.</p>
               <form className="form-grid">
                 <Tabs.Panel value="1">
@@ -970,7 +975,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   {showLockedStepPlaceholder ? (
                     <section className="locked-panel" aria-label="Step 2 locked">
                       <h3>Step 2 is locked</h3>
-                      <p className="helper">Finish step 1 to unlock dates and language.</p>
+                      <p className="helper">Complete step 1 first.</p>
                     </section>
                   ) : (
                     <>
@@ -1087,7 +1092,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   {showLockedStepPlaceholder ? (
                     <section className="locked-panel" aria-label="Step 3 locked">
                       <h3>Step 3 is locked</h3>
-                      <p className="helper">Finish step 1 to unlock optional facts and evidence notes.</p>
+                      <p className="helper">Complete step 1 first.</p>
                     </section>
                   ) : (
                     <>
@@ -1130,7 +1135,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   {showLockedStepPlaceholder ? (
                     <section className="locked-panel" aria-label="Step 4 locked">
                       <h3>Step 4 is locked</h3>
-                      <p className="helper">Finish step 1 to unlock review, copy, and save.</p>
+                      <p className="helper">Complete step 1 first.</p>
                     </section>
                   ) : (
                     <p className="helper">

@@ -10,6 +10,7 @@ export type Props = {
   submitLabel?: string;
   hiddenFields?: Array<{ name: string; value: string }>;
   steps?: string[];
+  errorMessage?: string;
 };
 
 const {
@@ -23,6 +24,7 @@ const {
   submitLabel = "Continue",
   hiddenFields = [],
   steps = [],
+  errorMessage = "",
 } = Astro.props;
 ---
 
@@ -55,6 +57,7 @@ const {
       />
     </label>
     <button class="button" type="submit">{submitLabel}</button>
+    {errorMessage && <p class="helper" role="status">{errorMessage}</p>}
   </form>
   <p class="access-warning">{warning}</p>
   <a class="button button-secondary" href={backHref}>{backLabel}</a>

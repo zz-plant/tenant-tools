@@ -18,6 +18,7 @@ const url = new URL(Astro.request.url);
 const accessKey = url.searchParams.get("key");
 const env = Astro.locals.runtime?.env ?? {};
 const hasAccess = isResidentKeyRecognized(accessKey, env);
+const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
 const submission = id && kv && hasAccess ? await kv.get(`submission:${id}`, { type: "json" }) : null;
 
 type SubmissionShape = {
@@ -105,6 +106,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                 "If the key is correct but this still does not load, ask a steward to check the link.",
               ]}
               warning="Do not share the key or link in public."
+              errorMessage={hasAccessAttempt ? "Key does not match this record." : ""}
               backLabel="Back to notice builder"
             />
           ) : submissionRecord ? (
