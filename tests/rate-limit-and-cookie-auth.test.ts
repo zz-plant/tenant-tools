@@ -112,4 +112,46 @@ describe("cookie auth and session-aware rate limiting", () => {
 
     assert.equal(lastStatus, 429);
   });
+
+  it("does not throttle unrelated sessions that share a resident access key", async () => {
+    const kv = createMockKv();
+    const locals = localsFor(kv);
+
+    let rateLimited = false;
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      const request = new Request("http://localhost/api/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          cookie: "bl_resident_key=key-2353-test; bl_session_id=session-heavy",
+          "x-forwarded-for": "9.9.9.9",
+        },
+        body: JSON.stringify(basePayload),
+      });
+      const response = await createSubmission({ request, locals } as Parameters<typeof createSubmission>[0]);
+      if (response.status === 429) {
+        rateLimited = true;
+        break;
+      }
+    }
+
+    assert.equal(rateLimited, true);
+
+    const separateResidentRequest = new Request("http://localhost/api/submissions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        cookie: "bl_resident_key=key-2353-test; bl_session_id=session-fresh",
+        "x-forwarded-for": "8.8.8.8",
+      },
+      body: JSON.stringify(basePayload),
+    });
+
+    const separateResidentResponse = await createSubmission({
+      request: separateResidentRequest,
+      locals,
+    } as Parameters<typeof createSubmission>[0]);
+
+    assert.equal(separateResidentResponse.status, 201);
+  });
 });

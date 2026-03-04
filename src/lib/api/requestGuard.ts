@@ -172,8 +172,6 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
     const dimensionKeys = [
       `ip:${clientIp}`,
       sessionId ? `session:${sessionId}` : null,
-      residentKey ? `resident:${residentKey}` : null,
-      stewardKey ? `steward:${stewardKey}` : null,
     ].filter((entry): entry is string => Boolean(entry));
 
     for (const dimensionKey of dimensionKeys) {
