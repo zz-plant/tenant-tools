@@ -2,13 +2,14 @@
 import "../../styles/global.css";
 import { issueOptions } from "../../data/noticeData";
 import { isAccessKeyValid, isBuildingAccessValid } from "../../lib/access";
+import { RESIDENT_KEY_COOKIE, STEWARD_KEY_COOKIE } from "../../lib/api/requestGuard";
 import {
   formatResidentReportCount,
   loadBuildingSubmissions,
   type BuildingSubmission,
 } from "../../lib/buildingDashboard";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
-import { buildAccessQuery, buildBuildingDashboardUrl, buildSubmissionDetailsUrl, buildLinkSuffix } from "../../lib/navigation";
+import { buildBuildingDashboardUrl, buildSubmissionDetailsUrl } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 
@@ -17,8 +18,8 @@ export const prerender = false;
 const { id } = Astro.params;
 const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
 const url = new URL(Astro.request.url);
-const accessKey = url.searchParams.get("key");
-const stewardKey = url.searchParams.get("stewardKey");
+const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? url.searchParams.get("key");
+const stewardKey = Astro.cookies.get(STEWARD_KEY_COOKIE)?.value ?? url.searchParams.get("stewardKey");
 const requiredStewardKey = Astro.locals.runtime?.env?.STEWARD_KEY;
 const buildingId = decodeURIComponent(id ?? "");
 
@@ -35,9 +36,7 @@ const statusFilterRaw = url.searchParams.get("status") || "all";
 const statusFilter = statusIds.includes(statusFilterRaw as SubmissionStatus) ? statusFilterRaw : "all";
 const hasFilters = issueFilter !== "all" || statusFilter !== "all";
 
-const baseQuery = buildAccessQuery({ accessKey, stewardKey });
-const linkSuffix = buildLinkSuffix(baseQuery);
-const clearFiltersUrl = buildBuildingDashboardUrl({ buildingId, accessKey, stewardKey });
+const clearFiltersUrl = buildBuildingDashboardUrl({ buildingId });
 
 const statusLabels = submissionStatusLabels;
 
@@ -109,7 +108,6 @@ const totalFiltered = filtered.length;
               title="Key required"
               helperLines={["Residents only.", "Ask a steward for the current building key."]}
               steps={["Paste the key below and select Continue."]}
-              hiddenFields={stewardKey ? [{ name: "stewardKey", value: stewardKey }] : []}
               warning="Do not share the key publicly."
               errorMessage={hasAccessAttempt ? "Key does not match this building." : ""}
               backLabel="Back to notice builder"
@@ -186,7 +184,7 @@ const totalFiltered = filtered.length;
                             </button>
                             <a
                               class="button button-secondary button-compact"
-                              href={buildSubmissionDetailsUrl({ submissionId: record.id, accessKey, stewardKey })}
+                              href={buildSubmissionDetailsUrl({ submissionId: record.id })}
                             >
                               View details
                             </a>
@@ -258,9 +256,7 @@ const totalFiltered = filtered.length;
                 <p class="helper">Filter by issue type or status.</p>
               </div>
               <form class="filter-grid" method="get">
-                {accessKey && <input type="hidden" name="key" value={accessKey} />}
-                {stewardKey && <input type="hidden" name="stewardKey" value={stewardKey} />}
-                <label>
+                                <label>
                   <span>Issue type</span>
                   <select class="input" name="issue">
                     <option value="all" selected={issueFilter === "all"}>All issues</option>
@@ -313,7 +309,6 @@ const totalFiltered = filtered.length;
         type="module"
         data-dashboard-config
         data-is-steward={isSteward ? "true" : "false"}
-        data-access-key={accessKey ?? ""}
         src={Astro.resolve("../../scripts/buildingDashboard.ts")}
       ></script>
     )}

@@ -16,18 +16,48 @@ export const jsonError = (
   headers: JsonHeaders = {}
 ) => jsonResponse({ error: message, ...extras }, status, headers);
 
+export const getCookieValue = (request: Request, cookieName: string) => {
+  const cookieHeader = request.headers.get("cookie") || "";
+  if (!cookieHeader) {
+    return null;
+  }
+
+  const cookie = cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${cookieName}=`));
+
+  if (!cookie) {
+    return null;
+  }
+
+  const value = cookie.slice(cookieName.length + 1);
+  return value ? decodeURIComponent(value) : null;
+};
+
 export const getRequestKey = (
   request: Request,
   headerName: string,
   queryParam: string,
-  url?: URL
+  url?: URL,
+  cookieName?: string
 ) => {
   const headerValue = request.headers.get(headerName);
   if (headerValue) {
     return headerValue;
   }
+
   const resolvedUrl = url ?? new URL(request.url);
-  return resolvedUrl.searchParams.get(queryParam);
+  const queryValue = resolvedUrl.searchParams.get(queryParam);
+  if (queryValue) {
+    return queryValue;
+  }
+
+  if (cookieName) {
+    return getCookieValue(request, cookieName);
+  }
+
+  return null;
 };
 
 export const parseJsonBody = async <T>(request: Request, fallback: T): Promise<T> => {

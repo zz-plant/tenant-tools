@@ -1,9 +1,7 @@
 import { formatResidentReportCount } from "../lib/reportCount";
 
 const dashboardScript = document.querySelector("script[data-dashboard-config]") as HTMLScriptElement | null;
-const stewardKeyValue = new URLSearchParams(window.location.search).get("stewardKey")?.trim() ?? "";
 const isStewardMode = dashboardScript?.dataset.isSteward === "true";
-const accessKeyValue = dashboardScript?.dataset.accessKey?.trim() ?? "";
 
 type SubmissionStatus = "open" | "resolved" | "archived";
 const statusOrder: SubmissionStatus[] = ["open", "resolved", "archived"];
@@ -78,7 +76,6 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          ...(accessKeyValue ? { "x-building-key": accessKeyValue } : {}),
         },
         body: JSON.stringify({ increment: 1 }),
       });
@@ -132,7 +129,6 @@ document.querySelectorAll("[data-status-save]").forEach((button) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(stewardKeyValue ? { "x-steward-key": stewardKeyValue } : {}),
           },
           body: JSON.stringify({ status: nextStatus }),
         }

@@ -6,6 +6,10 @@ import { saveAuditEvent } from "../storage/audit";
 
 export type GuardAuthMode = "none" | "resident" | "steward";
 
+export const RESIDENT_KEY_COOKIE = "bl_resident_key";
+export const STEWARD_KEY_COOKIE = "bl_steward_key";
+export const SESSION_ID_COOKIE = "bl_session_id";
+
 type GuardRateLimitConfig = {
   kv: KVNamespace;
   keyPrefix: string;
@@ -27,8 +31,10 @@ type GuardConfig<TPayload, TValidated> = {
     mode: GuardAuthMode;
     residentHeaderName?: string;
     residentQueryParam?: string;
+    residentCookieName?: string;
     stewardHeaderName?: string;
     stewardQueryParam?: string;
+    stewardCookieName?: string;
     buildingScopeFrom?: (payload: TValidated | null, url: URL) => string | null;
   };
   parseBody?: {
@@ -128,14 +134,17 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
   const authMode = config.auth?.mode ?? "none";
   const residentHeaderName = config.auth?.residentHeaderName ?? DEFAULT_RESIDENT_HEADER;
   const residentQueryParam = config.auth?.residentQueryParam ?? DEFAULT_RESIDENT_QUERY;
+  const residentCookieName = config.auth?.residentCookieName ?? RESIDENT_KEY_COOKIE;
   const stewardHeaderName = config.auth?.stewardHeaderName ?? DEFAULT_STEWARD_HEADER;
   const stewardQueryParam = config.auth?.stewardQueryParam ?? DEFAULT_STEWARD_QUERY;
+  const stewardCookieName = config.auth?.stewardCookieName ?? STEWARD_KEY_COOKIE;
 
   let residentKey: string | null = null;
+  let stewardKey: string | null = null;
   let allowedBuildings: string[] = [];
 
   if (authMode === "resident") {
-    residentKey = getRequestKey(request, residentHeaderName, residentQueryParam, url);
+    residentKey = getRequestKey(request, residentHeaderName, residentQueryParam, url, residentCookieName);
     if (!isResidentKeyRecognized(residentKey, env)) {
       return rejectWithAudit(config.audit, payload, url, "Resident access is required.", 403);
     }
@@ -149,25 +158,36 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
 
   if (authMode === "steward") {
     const requiredKey = typeof env.STEWARD_KEY === "string" ? env.STEWARD_KEY : "";
-    const providedKey = getRequestKey(request, stewardHeaderName, stewardQueryParam, url);
-    if (!isAccessKeyValid(providedKey, requiredKey)) {
+    stewardKey = getRequestKey(request, stewardHeaderName, stewardQueryParam, url, stewardCookieName);
+    if (!isAccessKeyValid(stewardKey, requiredKey)) {
       return rejectWithAudit(config.audit, payload, url, "Steward access is required.", 403);
     }
   }
 
   const clientIp = getClientIp(request);
+  const sessionId = getRequestKey(request, "x-session-id", "session", url, SESSION_ID_COOKIE);
+
   if (config.rateLimit) {
     const definition = config.rateLimit({ kv, clientIp, payload });
-    const rateLimit = await enforceRateLimit({
-      kv: definition.kv,
-      key: `${definition.keyPrefix}:${clientIp}`,
-      limit: definition.limit,
-      windowMs: definition.windowMs,
-    });
-    if (!rateLimit.ok) {
-      return rejectWithAudit(config.audit, payload, url, definition.message, 429, {}, {
-        "Retry-After": String(rateLimit.retryAfter),
+    const dimensionKeys = [
+      `ip:${clientIp}`,
+      sessionId ? `session:${sessionId}` : null,
+      residentKey ? `resident:${residentKey}` : null,
+      stewardKey ? `steward:${stewardKey}` : null,
+    ].filter((entry): entry is string => Boolean(entry));
+
+    for (const dimensionKey of dimensionKeys) {
+      const rateLimit = await enforceRateLimit({
+        kv: definition.kv,
+        key: `${definition.keyPrefix}:${dimensionKey}`,
+        limit: definition.limit,
+        windowMs: definition.windowMs,
       });
+      if (!rateLimit.ok) {
+        return rejectWithAudit(config.audit, payload, url, definition.message, 429, {}, {
+          "Retry-After": String(rateLimit.retryAfter),
+        });
+      }
     }
   }
 

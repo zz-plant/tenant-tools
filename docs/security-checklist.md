@@ -12,6 +12,7 @@ Use this list before release and for high-risk PRs.
 
 - [ ] No new required personal identifiers (name, email, phone, unit).
 - [ ] Optional free-text fields stay length-limited.
+- [ ] Free-text warnings flag potential names and accusation terms.
 - [ ] New fields are justified and documented.
 
 ## 3) Evidence safety

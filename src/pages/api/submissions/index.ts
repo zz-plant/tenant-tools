@@ -51,9 +51,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return guarded.response;
   }
 
-  const record = createSubmissionRecord(guarded.context.payload);
+  const validatedPayload = guarded.context.payload;
+  if (!validatedPayload) {
+    return jsonError("We could not save this submission.", 400);
+  }
+
+  const warningValidation = validateSubmissionInput(validatedPayload);
+  const warnings = warningValidation.ok ? warningValidation.warnings : [];
+
+  const record = createSubmissionRecord(validatedPayload);
   await saveSubmissionRecord(kv, record);
   await guarded.context.logAuditSuccess(record.id);
 
-  return jsonResponse({ id: record.id, url: `/submissions/${record.id}` }, 201);
+  return jsonResponse(
+    {
+      id: record.id,
+      url: `/submissions/${record.id}`,
+      warnings,
+    },
+    201
+  );
 };
