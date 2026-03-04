@@ -71,4 +71,26 @@ describe("submission validation sensitive content checks", () => {
     });
     assert.equal(result.ok, true);
   });
+
+  it("rejects impossible calendar dates for required fields", () => {
+    const result = validateSubmissionInput({
+      ...basePayload,
+      startDate: "2026-02-31",
+      reportDate: "2026-13-01",
+    });
+    assert.equal(result.ok, false);
+    assert.ok(result.errors.includes("Start date is invalid."));
+    assert.ok(result.errors.includes("Report date is invalid."));
+  });
+
+  it("returns soft warnings for names and accusation terms", () => {
+    const result = validateSubmissionInput({
+      ...basePayload,
+      issueDetails: { location: "Mr Smith said this is illegal." },
+    });
+    assert.equal(result.ok, true);
+    assert.ok(result.warnings.includes("Details: Do not include names of individuals."));
+    assert.ok(result.warnings.includes("Details: Avoid accusation terms. Write only observable facts."));
+  });
+
 });

@@ -3,6 +3,7 @@ import "../../styles/global.css";
 import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
 import { portfolioOptions } from "../../data/portfolioOptions";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../lib/access";
+import { RESIDENT_KEY_COOKIE } from "../../lib/api/requestGuard";
 import { formatResidentReportCount } from "../../lib/buildingDashboard";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
@@ -15,7 +16,7 @@ export const prerender = false;
 const { id } = Astro.params;
 const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
 const url = new URL(Astro.request.url);
-const accessKey = url.searchParams.get("key");
+const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? url.searchParams.get("key");
 const env = Astro.locals.runtime?.env ?? {};
 const hasAccess = isResidentKeyRecognized(accessKey, env);
 const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
@@ -66,7 +67,7 @@ const reportCountLabel =
 
 const dashboardUrl =
   submissionRecord?.building
-    ? buildBuildingDashboardUrl({ buildingId: submissionRecord.building, accessKey })
+    ? buildBuildingDashboardUrl({ buildingId: submissionRecord.building })
     : "";
 
 const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissionRecord) : [];

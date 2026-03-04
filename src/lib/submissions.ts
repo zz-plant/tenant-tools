@@ -13,7 +13,12 @@ import type {
   SupportedLanguage,
   ZoneId,
 } from "../data/submissionOptions";
-import { getSensitiveContentMessages, isValidDateString, sanitizeLimitedText } from "./validation";
+import {
+  getSensitiveContentMessages,
+  getSoftContentWarningMessages,
+  isValidDateString,
+  sanitizeLimitedText,
+} from "./validation";
 
 const issueIds = new Set(issueOptions.map((issue) => issue.id));
 const allowedDetailKeys = new Set(Object.keys(fieldDefinitions));
@@ -104,6 +109,12 @@ const pushSensitiveErrors = (label: string, value: string, errors: string[]) => 
   });
 };
 
+const pushSoftWarnings = (label: string, value: string, warnings: string[]) => {
+  getSoftContentWarningMessages(value).forEach((message) => {
+    warnings.push(`${label}: ${message}`);
+  });
+};
+
 const asString = (value: unknown) => (typeof value === "string" ? value : "");
 
 const asNumber = (value: unknown) => (typeof value === "number" ? value : Number(value));
@@ -127,12 +138,14 @@ export const validateSubmissionInput = (payload: unknown) => {
 
   const data = payload as Record<string, unknown>;
   const errors: string[] = [];
+  const warnings: string[] = [];
 
   const building = sanitizeLimitedText(asString(data.building), maxBuildingLength);
   if (!building) {
     errors.push("Building is required.");
   } else {
     pushSensitiveErrors("Building", building, errors);
+    pushSoftWarnings("Building", building, warnings);
   }
 
   const issue = readEnumValue(data.issue, issueIds);
@@ -180,6 +193,7 @@ export const validateSubmissionInput = (payload: unknown) => {
   const ticketNumber = sanitizeLimitedText(asString(data.ticketNumber), ticketNumberCharacterLimit);
   if (ticketNumber) {
     pushSensitiveErrors("Ticket number", ticketNumber, errors);
+    pushSoftWarnings("Ticket number", ticketNumber, warnings);
   }
 
   const simpleEnglish = Boolean(data.simpleEnglish);
@@ -190,10 +204,13 @@ export const validateSubmissionInput = (payload: unknown) => {
 
   if (Object.keys(issueDetails).length > 0) {
     const detailMessages = new Set<string>();
+    const detailWarnings = new Set<string>();
     Object.values(issueDetails).forEach((value) => {
       getSensitiveContentMessages(value).forEach((message) => detailMessages.add(message));
+      getSoftContentWarningMessages(value).forEach((message) => detailWarnings.add(message));
     });
     detailMessages.forEach((message) => errors.push(`Details: ${message}`));
+    detailWarnings.forEach((message) => warnings.push(`Details: ${message}`));
   }
 
   if (errors.length > 0) {
@@ -202,6 +219,7 @@ export const validateSubmissionInput = (payload: unknown) => {
 
   return {
     ok: true,
+    warnings,
     data: {
       building,
       issue,

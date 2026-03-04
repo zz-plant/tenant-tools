@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.98 - 2026-03-04
+
+### Changed
+
+- Stopped propagating resident and steward keys through URL helpers and internal dashboard/submission links.
+- Added middleware that migrates legacy `?key=` and `?stewardKey=` links into short-lived HttpOnly cookies, then redirects to clean URLs.
+- Expanded write-endpoint rate limiting to enforce both IP and session/key dimensions in the shared API guard.
+- Tightened date validation so impossible calendar dates are rejected instead of rolling over.
+- Added soft safety warnings for likely names and accusation terms in optional free-text fields, while keeping hard blocks for contact info and unit hints.
+
+### Security
+
+- Reduced key leakage risk from copied links, referrers, and browser history by moving access credentials out of query strings.
+- Improved abuse resistance by enforcing per-IP and per-session/key throttling on write endpoints.
+
 ## 1.0.97 - 2026-02-19
 
 ### Changed

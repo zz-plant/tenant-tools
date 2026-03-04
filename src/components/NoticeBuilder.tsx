@@ -108,6 +108,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [saveLabel, setSaveLabel] = useState("Save record");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveError, setSaveError] = useState("");
+  const [saveWarnings, setSaveWarnings] = useState<string[]>([]);
   const [submissionUrl, setSubmissionUrl] = useState("");
   const [linkCopyLabel, setLinkCopyLabel] = useState("Copy link");
   const [repeatLabel, setRepeatLabel] = useState("Repeat with today's date");
@@ -506,6 +507,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
     setSaveStatus("saving");
     setSaveError("");
+    setSaveWarnings([]);
     setSaveLabel("Saving...");
 
     const issueDetails = issueFields.reduce<Record<string, string>>((acc, fieldKey) => {
@@ -553,6 +555,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
       setSubmissionUrl(payload.url || "");
       setShareChecks({ names: false, units: false, contact: false });
+      setSaveWarnings(Array.isArray(payload?.warnings) ? payload.warnings.filter((item: unknown): item is string => typeof item === "string") : []);
       setSaveStatus("saved");
       setSaveLabel("Saved");
     } catch (error) {
@@ -597,6 +600,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     setSaveLabel("Save record");
     setSaveStatus("idle");
     setSaveError("");
+    setSaveWarnings([]);
     setSubmissionUrl("");
     setLinkCopyLabel("Copy link");
     setNoticeStatusMessage("");
@@ -1371,6 +1375,16 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       <p className="submission-error" role="alert">
                         {saveError || "We could not save this record."}
                       </p>
+                    )}
+                    {saveStatus === "saved" && saveWarnings.length > 0 && (
+                      <div className="export-block" role="status" aria-live="polite">
+                        <p className="helper">Please review these safety warnings before sharing.</p>
+                        <ul className="helper-list">
+                          {saveWarnings.map((warning) => (
+                            <li key={warning}>{warning}</li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
                     <div className="privacy-strip" aria-live="polite">
                       <p className={`privacy-chip ${privacyStatus.hasContactHint ? "risk" : "ok"}`}>
