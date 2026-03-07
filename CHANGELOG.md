@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.101 - 2026-03-07
+
+### Fixed
+
+- Prevented disabled buttons from receiving hover lift/color styles so locked actions no longer look clickable.
+- Kept disabled button contrast improvements while making interaction state clearer on gated actions such as “Copy this record link”.
+
+### Security
+
+- Reduced confusion around intentionally locked actions without changing access controls or evidence visibility behavior.
+
 ## 1.0.99 - 2026-03-07
 
 ### Changed
