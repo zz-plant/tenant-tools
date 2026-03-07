@@ -106,8 +106,11 @@ const totalFiltered = filtered.length;
           {!hasAccess ? (
             <AccessKeyPanel
               title="Key required"
-              helperLines={["Residents only.", "Ask a steward for the current building key."]}
-              steps={["Paste the key below and select Continue."]}
+              helperLines={[
+                "Residents only.",
+                `Ask a steward for the current key for ${buildingId || "this building"}.`,
+                "Paste the key below and select Continue.",
+              ]}
               warning="Do not share the key publicly."
               errorMessage={hasAccessAttempt ? "Key does not match this building." : ""}
               backLabel="Back to notice builder"
@@ -233,13 +236,9 @@ const totalFiltered = filtered.length;
           {!hasAccess ? (
             <>
               <div>
-                <h2>Access help</h2>
-                <p class="helper">Building keys keep resident reports private.</p>
+                <h2>Why this is private</h2>
+                <p class="helper">Building keys keep resident issue records resident-only.</p>
               </div>
-              <ol class="helper-list">
-                <li>Ask for the current building key for {buildingId || "this building"}.</li>
-                <li>Paste the key and select Continue.</li>
-              </ol>
               <div class="export-block">
                 <h3>Safety notes</h3>
                 <ul class="submission-detail-list">

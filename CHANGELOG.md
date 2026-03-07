@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.99 - 2026-03-07
+
+### Changed
+
+- Simplified the home intro so the primary action is immediately focused on selecting building and issue in the builder below.
+- Shortened builder step titles to "1. Basics", "2. Dates", "3. Details", and "4. Save" for faster scanning.
+- Reduced duplicate access-gate instructions on the building dashboard and converted the sidebar into a concise privacy explainer.
+- Clarified submission access-gate helper copy to explain that a valid key can still fail if the link is incorrect or expired.
+- Increased contrast for disabled and secondary button states to improve readability and action-state clarity.
+
+### Security
+
+- Kept resident-key gating and private evidence defaults unchanged while improving clarity around private-access behavior.
+
 ## 1.0.98 - 2026-03-04
 
 ### Changed
