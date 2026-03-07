@@ -9,28 +9,28 @@ import type { Stage } from "./types";
 export const steps = [
   {
     id: 1,
-    title: "Choose basics",
+    title: "1. Basics",
     label: "Building & issue",
     description: "Pick your building, issue type, and notice step.",
     requirement: "Required",
   },
   {
     id: 2,
-    title: "Confirm dates",
+    title: "2. Dates",
     label: "Dates & language",
     description: "Set dates and reading level.",
     requirement: "Required",
   },
   {
     id: 3,
-    title: "Add facts",
+    title: "3. Details",
     label: "Facts & evidence",
     description: "Add short facts if needed.",
     requirement: "Optional",
   },
   {
     id: 4,
-    title: "Review & save",
+    title: "4. Save",
     label: "Preview & export",
     description: "Copy or save the record.",
     requirement: "Review",

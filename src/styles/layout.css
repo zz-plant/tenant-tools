@@ -187,7 +187,7 @@
 
 .home-intro-panel {
   display: grid;
-  gap: 18px;
+  gap: 14px;
   border: 1px solid #d5ddef;
   border-top: 3px solid #4f67ff;
   background: linear-gradient(180deg, #f5f7ff 0%, #fafbfe 100%);
@@ -195,7 +195,7 @@
 
 .home-intro-copy {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   max-width: 76ch;
 }
 
@@ -205,15 +205,9 @@
   color: #172445;
 }
 
-.home-intro-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 4px;
-}
-
-.home-intro-cta {
-  width: fit-content;
+.home-intro-lead {
+  color: #334155;
+  font-weight: 600;
 }
 
 @media (min-width: 1200px) {
@@ -376,10 +370,6 @@
   .home-intro-list li {
     font-size: 0.9rem;
     padding: 8px 10px;
-  }
-
-  .home-intro-cta {
-    width: 100%;
   }
 
   .intro-panel {

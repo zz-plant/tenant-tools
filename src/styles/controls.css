@@ -527,26 +527,36 @@
 }
 
 .button:disabled {
-  opacity: 0.5;
+  opacity: 1;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+  background: #d5ddf5;
+  border-color: #b5c2eb;
+  color: #233462;
 }
 
-.button:hover {
+.button:not(:disabled):hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(79, 103, 255, 0.3);
 }
 
 .button-secondary {
-  background: #dfe5ff;
-  color: #182955;
-  border: 1px solid #bcc9ff;
+  background: #d3ddff;
+  color: #142a62;
+  border: 1px solid #99acec;
 }
 
-.button-secondary:hover {
-  background: #d2dbff;
+.button-secondary:not(:disabled):hover {
+  background: #c3d1ff;
   box-shadow: 0 8px 18px rgba(73, 95, 214, 0.2);
+}
+
+.button:disabled:hover,
+.button-secondary:disabled:hover {
+  transform: none;
+  box-shadow: none;
+  background: #d5ddf5;
 }
 
 .site-footer {
