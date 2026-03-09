@@ -165,6 +165,8 @@ Use Conventional Commit style:
 - Dependency capability review: `docs/tech-stack-capability-research-2026-02.md`
 - Agent skills playbook: `docs/agent-skills-playbook.md`
 - Rule data pack notes: `src/data/rules/README.md`
+- Internal competitor battlecard: `docs/competitor-battlecard-2026-03.md`
+- External homepage copy angles: `docs/external-homepage-copy-angles.md`
 - Core agent skill: `skills/building-ledger-agent/SKILL.md`
 - Release-note skill: `skills/building-ledger-release-note/SKILL.md`
 
