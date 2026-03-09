@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.102 - 2026-03-09
+
+### Added
+
+- Added an internal competitor battlecard with segment, buyer, strongest claim, weakest point, and approved copy-angle guidance.
+- Added an external homepage copy-angle reference with short, neutral lines for public messaging.
+
+### Changed
+
+- Updated the home hero headline and helper text to align with the privacy-first positioning and shared-timeline framing.
+
+### Security
+
+- Kept private-evidence defaults and resident-only access expectations unchanged while clarifying public messaging boundaries.
+
 ## 1.0.101 - 2026-03-07
 
 ### Fixed
