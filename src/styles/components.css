@@ -178,6 +178,7 @@
   cursor: pointer;
   display: grid;
   gap: 4px;
+  transition: background var(--ease-standard), border-color var(--ease-standard), transform var(--ease-standard);
 }
 
 .step-button.disabled,
@@ -191,6 +192,11 @@
   border-color: #4f67ff;
   background: #eef1f8;
   box-shadow: none;
+}
+
+.step-button:not(:disabled):hover {
+  transform: translateY(-1px);
+  border-color: #c4cde7;
 }
 
 .step-button:focus-visible,
@@ -479,6 +485,7 @@ label {
   font-size: 0.93rem;
   color: #4f5769;
   line-height: 1.5;
+  text-wrap: pretty;
   margin: 0;
 }
 
@@ -833,7 +840,7 @@ code {
   padding: 20px;
   min-height: 180px;
   white-space: pre-wrap;
-  line-height: 1.6;
+  line-height: 1.65;
   font-family: "Inter", "SF Pro Text", system-ui, sans-serif;
   font-size: 1rem;
 }

@@ -173,7 +173,8 @@
   border-radius: 20px;
   padding: clamp(20px, 2vw, 28px);
   border: 1px solid #e1e4ea;
-  box-shadow: 0 10px 28px rgba(20, 28, 50, 0.04);
+  box-shadow: var(--shadow-soft);
+  transition: border-color var(--ease-standard), box-shadow var(--ease-standard), transform var(--ease-standard);
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -182,6 +183,10 @@
 .panel-highlight {
   border: 1px solid #dde1ea;
   background: #f8f9fb;
+}
+
+.panel:hover {
+  border-color: #d5ddec;
 }
 
 
@@ -201,7 +206,9 @@
 
 .home-intro-copy h1 {
   font-size: clamp(1.8rem, 2.8vw, 2.5rem);
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
   color: #172445;
 }
 
@@ -235,32 +242,6 @@
   gap: 10px;
 }
 
-.home-intro-metrics {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-md), 1fr));
-  gap: 10px;
-}
-
-.home-intro-metrics p {
-  margin: 0;
-  border-radius: 14px;
-  border: 1px solid #d7dde8;
-  background: #ffffff;
-  padding: 12px;
-  display: grid;
-  gap: 4px;
-}
-
-.home-intro-metrics strong {
-  color: #1e2e5e;
-  font-size: 0.92rem;
-}
-
-.home-intro-metrics span {
-  color: #4b556b;
-  font-size: 0.86rem;
-  line-height: 1.35;
-}
 
 .home-intro-list li {
   border-radius: 12px;
