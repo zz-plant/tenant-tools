@@ -515,6 +515,7 @@
   border: none;
   padding: 10px 18px;
   font-weight: 600;
+  letter-spacing: 0.01em;
   background: #4f67ff;
   color: #ffffff;
   cursor: pointer;
@@ -523,7 +524,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform var(--ease-standard), box-shadow var(--ease-standard), background var(--ease-standard);
 }
 
 .button:disabled {
@@ -539,6 +540,16 @@
 .button:not(:disabled):hover {
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(79, 103, 255, 0.3);
+}
+
+.button:focus-visible {
+  outline: 2px solid rgba(70, 90, 255, 0.35);
+  outline-offset: 2px;
+}
+
+.button:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(79, 103, 255, 0.25);
 }
 
 .button-secondary {
