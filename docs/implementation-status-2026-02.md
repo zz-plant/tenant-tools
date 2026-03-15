@@ -18,20 +18,13 @@ This is the single source for completed and pending implementation work for the 
 - [x] Testing guide added.
 - [x] Security checklist added for release-time verification.
 
+### Recently completed UI follow-up items
+
+- [x] Intro panel now has one clear primary call-to-action.
+- [x] Helper and metadata text contrast was increased for readability.
+- [x] PR template now includes a visual QA checklist for CTA clarity, interaction states, and mobile readability.
+
 ## Remaining implementation priorities
-
-### P0 — UX clarity and error prevention
-
-1. **Primary intro call-to-action and hierarchy update**
-   - Add one clear top-level action in the intro panel.
-   - Increase visual distinction for the intro panel with calm styling.
-
-2. **Helper-text and metadata contrast pass**
-   - Improve contrast for small helper text and metadata text.
-   - Recheck readability on mobile widths.
-
-3. **Design QA checklist in PR workflow**
-   - Add a short per-PR visual QA checklist for CTA visibility, contrast, focus/selected states, and mobile readability.
 
 ### P1 — Consistency and maintainability
 

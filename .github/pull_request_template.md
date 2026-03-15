@@ -36,6 +36,12 @@
 - [ ] “Very simple English” copy remains short and literal.
 - [ ] Small counts do not expose individual participation.
 
+### Visual QA checklist
+- [ ] Intro panel has one clear primary action.
+- [ ] Helper and metadata text pass contrast/readability checks.
+- [ ] Focus, selected, and disabled states are visually distinct.
+- [ ] Mobile layout keeps helper text readable without overlap.
+
 ## Migration plan (if schema or runtime behavior changed)
 - Describe migration steps.
 - Note feature flags or rollout steps.

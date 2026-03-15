@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.103 - 2026-03-15
+
+### Changed
+
+- Added a single primary action button in the home intro panel so residents can start the builder flow with one clear click target.
+- Increased helper and metadata text contrast in builder step UI so small instructional text is easier to read.
+- Added a visual QA checklist section to the PR template for CTA clarity, interaction-state checks, and mobile readability.
+- Updated the implementation status document to mark the P0 UX clarity items as complete.
+
+### Security
+
+- Kept resident-key gating, private evidence defaults, and anti-doxxing safeguards unchanged while improving visual clarity and process checks.
+
 ## 1.0.102 - 2026-03-09
 
 ### Added

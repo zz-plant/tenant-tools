@@ -200,7 +200,7 @@
 
 .home-intro-copy {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   max-width: 76ch;
 }
 
@@ -231,6 +231,11 @@
 .home-intro-copy h1,
 .home-intro-copy .helper {
   margin: 0;
+}
+
+.intro-primary-cta {
+  width: fit-content;
+  margin-top: 2px;
 }
 
 .home-intro-list {
