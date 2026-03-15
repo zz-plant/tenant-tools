@@ -114,12 +114,12 @@
 .step-progress-label {
   margin: 0;
   font-weight: 600;
-  color: #1c2436;
+  color: #1a2338;
 }
 
 .step-progress-pill {
   background: #eef1ff;
-  color: #1b2a5a;
+  color: #172857;
   border-radius: 999px;
   padding: 2px 10px;
   font-size: 0.75rem;
@@ -219,7 +219,7 @@
 .step-title {
   letter-spacing: 0.01em;
   font-size: 0.78rem;
-  color: #4f5d7a;
+  color: #3f4f72;
   font-weight: 600;
 }
 
@@ -233,7 +233,7 @@
   padding: 2px 8px;
   border-radius: 999px;
   background: #eef2ff;
-  color: #4a5cc7;
+  color: #3348b0;
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -246,7 +246,7 @@
 
 .step-lock-note {
   font-size: 0.72rem;
-  color: #6a758f;
+  color: #4d5d7d;
 }
 
 .mobile-step-hint {
@@ -483,7 +483,7 @@ label {
 
 .helper {
   font-size: 0.93rem;
-  color: #4f5769;
+  color: #3c465d;
   line-height: 1.5;
   text-wrap: pretty;
   margin: 0;
