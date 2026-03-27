@@ -103,14 +103,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
   const [impactCount] = useState(1);
-  const [copyLabel, setCopyLabel] = useState("Copy notice");
-  const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy summary");
+  const [copyLabel, setCopyLabel] = useState("Copy notice text");
+  const [summaryCopyLabel, setSummaryCopyLabel] = useState("Copy inspector summary");
   const [saveLabel, setSaveLabel] = useState("Save record");
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [saveError, setSaveError] = useState("");
   const [saveWarnings, setSaveWarnings] = useState<string[]>([]);
   const [submissionUrl, setSubmissionUrl] = useState("");
-  const [linkCopyLabel, setLinkCopyLabel] = useState("Copy link");
+  const [linkCopyLabel, setLinkCopyLabel] = useState("Copy resident link");
   const [repeatLabel, setRepeatLabel] = useState("Repeat with today's date");
   const [exportAudience, setExportAudience] = useState<ExportAudience>("inspector");
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
@@ -155,6 +155,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       ? "Add the resident key to enable saving."
       : "";
   const canCopyPermalink = shareChecks.names && shareChecks.units && shareChecks.contact;
+  const saveReadinessLabel = canSaveLedger ? "Ready to save" : "Resident key missing";
 
   const renderDetailField = (fieldKey: keyof typeof fieldDefinitions) => {
     const field = fieldDefinitions[fieldKey];
@@ -465,7 +466,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     await navigator.clipboard.writeText(noticeText);
     setCopyLabel("Copied!");
     setNoticeStatusMessage("Notice copied.");
-    scheduleTimeout("copy-label", () => setCopyLabel("Copy notice"), 1500);
+    scheduleTimeout("copy-label", () => setCopyLabel("Copy notice text"), 1500);
     scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2000);
   };
 
@@ -473,7 +474,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     await navigator.clipboard.writeText(exportSummary);
     setSummaryCopyLabel("Copied!");
     setExportStatusMessage("Summary copied.");
-    scheduleTimeout("summary-copy-label", () => setSummaryCopyLabel("Copy summary"), 1500);
+    scheduleTimeout("summary-copy-label", () => setSummaryCopyLabel("Copy inspector summary"), 1500);
     scheduleTimeout("export-status", () => setExportStatusMessage(""), 2000);
   };
 
@@ -570,9 +571,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       return;
     }
     await navigator.clipboard.writeText(`${window.location.origin}${submissionUrl}`);
-    setLinkCopyLabel("Copied link");
+    setLinkCopyLabel("Copied resident link");
     setLinkStatusMessage("Permalink copied.");
-    scheduleTimeout("link-copy-label", () => setLinkCopyLabel("Copy link"), 1500);
+    scheduleTimeout("link-copy-label", () => setLinkCopyLabel("Copy resident link"), 1500);
     scheduleTimeout("link-status", () => setLinkStatusMessage(""), 2000);
   };
 
@@ -595,14 +596,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     });
     setCurrentStep(1);
     setPlainMeaningVisible(false);
-    setCopyLabel("Copy notice");
-    setSummaryCopyLabel("Copy summary");
+    setCopyLabel("Copy notice text");
+    setSummaryCopyLabel("Copy inspector summary");
     setSaveLabel("Save record");
     setSaveStatus("idle");
     setSaveError("");
     setSaveWarnings([]);
     setSubmissionUrl("");
-    setLinkCopyLabel("Copy link");
+    setLinkCopyLabel("Copy resident link");
     setNoticeStatusMessage("");
     setExportStatusMessage("");
     setLinkStatusMessage("");
@@ -772,18 +773,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 </div>
               </div>
             </div>
-            <Tabs.Root
-              value={String(currentStep)}
-              onValueChange={(value) => {
-                if (value) {
-                  const nextStep = Number(value);
-                  if (stepsLocked && nextStep > 1) {
-                    return;
-                  }
-                  setCurrentStep(nextStep);
-                }
-              }}
-            >
+            <Tabs.Root value={String(currentStep)}>
               <Tabs.List className="step-nav">
                 {visibleBuilderSteps.map((step) => {
                   const isLocked = stepsLocked && step.id > 1;
@@ -791,7 +781,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     <Tabs.Tab
                       key={step.id}
                       value={String(step.id)}
-                      disabled={isLocked}
+                      disabled={true}
                       className={`step-button ${currentStep === step.id ? "active" : ""}${isLocked ? " disabled" : ""}`}
                       aria-current={currentStep === step.id ? "step" : undefined}
                     >
@@ -804,6 +794,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 })}
               </Tabs.List>
               {stepsLocked && <p className="helper">Complete step 1 to unlock steps 2 to 4.</p>}
+              <p className="helper">Use Next to continue. You can go back any time.</p>
               <p className="helper mobile-step-hint">Use step buttons above on mobile.</p>
               <form className="form-grid">
                 <Tabs.Panel value="1">
@@ -880,6 +871,26 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                     </div>
 
                     <p className="helper">You can draft a notice now. Add the resident key later when you save.</p>
+
+                    <div className="submission-block">
+                      <h3>Resident key for saving</h3>
+                      <p className="helper">You can draft without a key. Saving needs this key.</p>
+                      <label>
+                        Resident key
+                        <Input
+                          className="input"
+                          type="password"
+                          value={buildingKey}
+                          onChange={handleBuildingKeyInput}
+                          placeholder="Paste resident key"
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                      </label>
+                      <p className="helper" role="status" aria-live="polite">
+                        {saveReadinessLabel}
+                      </p>
+                    </div>
 
                     {isStep1Complete ? (
                       <>
@@ -960,15 +971,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                           )}
                         </div>
 
-                        {isStep1Complete && (
-                          <Button
-                            className="button"
-                            type="button"
-                            onClick={() => setCurrentStep(2)}
-                          >
-                            Done with step 1. Continue to dates.
-                          </Button>
-                        )}
                       </>
                     ) : null}
 
@@ -1167,16 +1169,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
               >
                 {currentStep === 1 && !isStep1Complete ? "Finish step 1 to continue" : "Next"}
               </Button>
-              {isStep1Complete && (
-                <Button
-                  className="button"
-                  type="button"
-                  onClick={() => setCurrentStep(4)}
-                >
-                  Save draft
-                </Button>
-              )}
             </div>
+            {isStep1Complete && (
+              <p className="helper" role="status" aria-live="polite">
+                Save status: {saveReadinessLabel}. Saving is in step 4.
+              </p>
+            )}
           </section>
           <aside className={`panel panel-highlight preview-panel${!canShowAfterBasics ? " preview-panel-mobile-hidden" : ""}`} id="preview">
             <div className="output-header">
@@ -1227,7 +1225,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
             <div className="notice-preview">
               <div className="notice-preview-header">
                 <div>
-                  <p className="notice-preview-title">Notice message</p>
+                  <p className="notice-preview-title">Send to management</p>
+                  <p className="helper">Use this text for your notice.</p>
                 </div>
                 <div className="notice-preview-tags">
                   <span className="notice-tag">{selectedIssue?.label || "Issue"}</span>
@@ -1246,7 +1245,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                 <>
                   <div className="export-header">
                     <div>
-                      <h3>{selectedAudience.label} export</h3>
+                      <h3>Share with inspector or aid</h3>
                       <p className="helper">Sharing result: {selectedAudience.description}</p>
                     </div>
                     <div className="export-actions">
@@ -1322,7 +1321,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <pre className="output output-summary">{exportSummary}</pre>
                   <div className="submission-block">
                     <div>
-                      <h3>Save to shared records</h3>
+                      <h3>Save in resident ledger</h3>
                       <p className="helper">Use the resident key from your organizer. Keep this key private.</p>
                       <label>
                         Resident key
@@ -1339,6 +1338,42 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       {saveDisabledMessage ? (
                         <p className="helper">{saveDisabledMessage}</p>
                       ) : null}
+                    </div>
+                    <div className="share-checklist-inline" aria-label="Privacy checks before sharing">
+                      <p className="helper">Before saving or sharing, confirm all checks.</p>
+                      <label className="checkbox-label">
+                        <Checkbox.Root
+                          checked={shareChecks.names}
+                          onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, names: checked === true }))}
+                          className="checkbox-root"
+                        >
+                          <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                        </Checkbox.Root>
+                        I removed names.
+                      </label>
+                      <label className="checkbox-label">
+                        <Checkbox.Root
+                          checked={shareChecks.units}
+                          onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, units: checked === true }))}
+                          className="checkbox-root"
+                        >
+                          <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                        </Checkbox.Root>
+                        I removed unit numbers.
+                      </label>
+                      <label className="checkbox-label">
+                        <Checkbox.Root
+                          checked={shareChecks.contact}
+                          onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, contact: checked === true }))}
+                          className="checkbox-root"
+                        >
+                          <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
+                        </Checkbox.Root>
+                        I removed phone numbers and email addresses.
+                      </label>
+                      <p className="helper" role="status" aria-live="polite">
+                        {canCopyPermalink ? "Checklist complete. You can copy the link." : "Complete all checks to copy the link."}
+                      </p>
                     </div>
                     <div className="submission-actions">
                       <Button
@@ -1397,44 +1432,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                         {privacyStatus.hasEvidenceNote ? "Evidence note included" : "No evidence note"}
                       </p>
                     </div>
-                    {submissionUrl && (
-                      <div className="share-checklist-inline" aria-label="Before you copy the link">
-                        <p className="helper">Before sharing this link, confirm all checks.</p>
-                        <label className="checkbox-label">
-                          <Checkbox.Root
-                            checked={shareChecks.names}
-                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, names: checked === true }))}
-                            className="checkbox-root"
-                          >
-                            <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
-                          </Checkbox.Root>
-                          I removed names.
-                        </label>
-                        <label className="checkbox-label">
-                          <Checkbox.Root
-                            checked={shareChecks.units}
-                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, units: checked === true }))}
-                            className="checkbox-root"
-                          >
-                            <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
-                          </Checkbox.Root>
-                          I removed unit numbers.
-                        </label>
-                        <label className="checkbox-label">
-                          <Checkbox.Root
-                            checked={shareChecks.contact}
-                            onCheckedChange={(checked) => setShareChecks((prev) => ({ ...prev, contact: checked === true }))}
-                            className="checkbox-root"
-                          >
-                            <Checkbox.Indicator className="checkbox-indicator">✓</Checkbox.Indicator>
-                          </Checkbox.Root>
-                          I removed phone numbers and email addresses.
-                        </label>
-                        <p className="helper" role="status" aria-live="polite">
-                          {canCopyPermalink ? "Checklist complete. You can copy the link." : "Complete all checks to copy the link."}
-                        </p>
-                      </div>
-                    )}
                     {linkStatusMessage && (
                       <p className="helper" role="status" aria-live="polite">
                         {linkStatusMessage}
