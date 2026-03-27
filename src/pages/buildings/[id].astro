@@ -35,10 +35,26 @@ const issueFilter = issueIds.has(issueFilterRaw) ? issueFilterRaw : "all";
 const statusFilterRaw = url.searchParams.get("status") || "all";
 const statusFilter = statusIds.includes(statusFilterRaw as SubmissionStatus) ? statusFilterRaw : "all";
 const hasFilters = issueFilter !== "all" || statusFilter !== "all";
+const statusLabels = submissionStatusLabels;
 
 const clearFiltersUrl = buildBuildingDashboardUrl({ buildingId });
-
-const statusLabels = submissionStatusLabels;
+const buildFilterUrl = (nextIssue: string, nextStatus: string) => {
+  const params = new URLSearchParams();
+  if (nextIssue !== "all") {
+    params.set("issue", nextIssue);
+  }
+  if (nextStatus !== "all") {
+    params.set("status", nextStatus);
+  }
+  const query = params.toString();
+  return `${clearFiltersUrl}${query ? `?${query}` : ""}`;
+};
+const clearIssueUrl = buildFilterUrl("all", statusFilter);
+const clearStatusUrl = buildFilterUrl(issueFilter, "all");
+const activeIssueLabel = issueFilter === "all"
+  ? ""
+  : (issueOptions.find((issue) => issue.id === issueFilter)?.label ?? issueFilter);
+const activeStatusLabel = statusFilter === "all" ? "" : statusLabels[statusFilter as SubmissionStatus];
 
 const submissions: BuildingSubmission[] =
   hasAccess && kv && buildingId
@@ -149,6 +165,22 @@ const totalFiltered = filtered.length;
                 <h2>Recent records</h2>
                 <p class="helper">Showing {totalVisible} of {totalFiltered} records. Use the filters on the right to change this list.</p>
                 <p class="helper">Small report counts are hidden to protect resident privacy.</p>
+                {hasFilters && (
+                  <div class="tag-row">
+                    {issueFilter !== "all" && (
+                      <span>
+                        Filtered by issue: {activeIssueLabel}.{" "}
+                        <a href={clearIssueUrl}>Clear issue filter</a>
+                      </span>
+                    )}
+                    {statusFilter !== "all" && (
+                      <span>
+                        Filtered by status: {activeStatusLabel}.{" "}
+                        <a href={clearStatusUrl}>Clear status filter</a>
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {totalFiltered === 0 ? (
