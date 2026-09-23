@@ -60,13 +60,14 @@ export type GuardSuccess<TValidated> = {
   residentKey: string | null;
   allowedBuildings: string[];
   clientIp: string;
+  sessionId: string | null;
   logAuditSuccess: (resourceId?: string) => Promise<void>;
 };
 
-const writeAudit = async (
-  config: GuardAuditConfig<unknown> | undefined,
+const writeAudit = async <TValidated>(
+  config: GuardAuditConfig<TValidated> | undefined,
   outcome: "success" | "rejected",
-  payload: unknown,
+  payload: TValidated | null,
   url: URL,
   resourceId?: string
 ) => {
@@ -94,9 +95,9 @@ const writeAudit = async (
   }
 };
 
-const rejectWithAudit = async (
-  config: GuardAuditConfig<unknown> | undefined,
-  payload: unknown,
+const rejectWithAudit = async <TValidated>(
+  config: GuardAuditConfig<TValidated> | undefined,
+  payload: TValidated | null,
   url: URL,
   message: string,
   status: number,
@@ -199,6 +200,7 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
       residentKey,
       allowedBuildings,
       clientIp,
+      sessionId,
       logAuditSuccess: async (resourceId) => writeAudit(config.audit, "success", payload, url, resourceId),
     },
   };

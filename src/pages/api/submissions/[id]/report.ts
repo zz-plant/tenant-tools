@@ -2,9 +2,9 @@ import type { APIRoute } from "astro";
 import { guardApiRequest } from "../../../../lib/api/requestGuard";
 import { createSubmissionReportEntry, incrementSubmissionReportCount } from "../../../../lib/domain/submissions";
 import { jsonError, jsonResponse } from "../../../../lib/http";
-import { REPORT_ENTRY_TTL_SECONDS } from "../../../../lib/reports";
+import { hashReporterSession, REPORT_ENTRY_TTL_SECONDS } from "../../../../lib/reports";
 import type { SubmissionRecord } from "../../../../lib/submissions";
-import { saveReportEntry } from "../../../../lib/storage/reports";
+import { hasReporterMarker, saveReportEntry, saveReporterMarker } from "../../../../lib/storage/reports";
 import { fetchSubmissionRecord, getSubmissionsKv, saveSubmissionRecord } from "../../../../lib/storage/submissions";
 
 export const prerender = false;
@@ -51,6 +51,10 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   if (!guarded.ok) {
     return guarded.response;
   }
+  const payload = guarded.context.payload;
+  if (!payload) {
+    return jsonError("Request body is invalid.", 400);
+  }
 
   const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
   if (!record) {
@@ -62,13 +66,24 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Submission not found.", 404);
   }
 
-  const updated = incrementSubmissionReportCount(record, guarded.context.payload.increment);
+  const sessionId = guarded.context.sessionId;
+  if (!sessionId) {
+    return jsonError("Open the building page first, then try again.", 400);
+  }
+
+  const reporterHash = await hashReporterSession(id, sessionId);
+  if (await hasReporterMarker(kv, id, reporterHash)) {
+    return jsonResponse({ reportCount: record.reportCount, alreadyReported: true });
+  }
+
+  const updated = incrementSubmissionReportCount(record, payload.increment);
   await saveSubmissionRecord(kv, updated);
+  await saveReporterMarker(kv, id, reporterHash, { expirationTtl: REPORT_ENTRY_TTL_SECONDS });
 
   const entry = createSubmissionReportEntry(id);
   await saveReportEntry(kv, entry, { expirationTtl: REPORT_ENTRY_TTL_SECONDS });
 
   await guarded.context.logAuditSuccess(id);
 
-  return jsonResponse({ reportCount: updated.reportCount });
+  return jsonResponse({ reportCount: updated.reportCount, alreadyReported: false });
 };

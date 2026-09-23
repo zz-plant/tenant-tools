@@ -69,7 +69,7 @@ describe("audit event logging", () => {
         body: JSON.stringify(basePayload),
       }),
       locals,
-    } as Parameters<typeof createSubmission>[0]);
+    } as unknown as Parameters<typeof createSubmission>[0]);
     assert.equal(createResponse.status, 201);
     const created = await readJson(createResponse);
 
@@ -85,7 +85,7 @@ describe("audit event logging", () => {
         body: JSON.stringify({ status: "resolved" }),
       }),
       locals,
-    } as Parameters<typeof updateStatus>[0]);
+    } as unknown as Parameters<typeof updateStatus>[0]);
     assert.equal(statusResponse.status, 200);
 
     const reportResponse = await reportSubmission({
@@ -96,11 +96,12 @@ describe("audit event logging", () => {
           "Content-Type": "application/json",
           "x-building-key": "key-2353-test",
           "x-forwarded-for": "1.1.1.3",
+          cookie: "bl_session_id=session-audit",
         },
         body: JSON.stringify({ increment: 1 }),
       }),
       locals,
-    } as Parameters<typeof reportSubmission>[0]);
+    } as unknown as Parameters<typeof reportSubmission>[0]);
     assert.equal(reportResponse.status, 200);
 
     const auditKeys = kv.keys().filter((key) => key.startsWith("audit:"));
@@ -129,7 +130,7 @@ describe("audit event logging", () => {
         body: JSON.stringify(basePayload),
       }),
       locals,
-    } as Parameters<typeof createSubmission>[0]);
+    } as unknown as Parameters<typeof createSubmission>[0]);
 
     assert.equal(blockedResponse.status, 403);
 
