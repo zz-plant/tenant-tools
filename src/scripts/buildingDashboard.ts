@@ -1,7 +1,7 @@
 import { formatResidentReportCount } from "../lib/reportCount";
 
-const dashboardScript = document.querySelector("script[data-dashboard-config]") as HTMLScriptElement | null;
-const isStewardMode = dashboardScript?.dataset.isSteward === "true";
+const dashboardConfig = document.querySelector("[data-dashboard-config]") as HTMLElement | null;
+const isStewardMode = dashboardConfig?.dataset.isSteward === "true";
 
 type SubmissionStatus = "open" | "resolved" | "archived";
 const statusOrder: SubmissionStatus[] = ["open", "resolved", "archived"];
@@ -84,7 +84,12 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
         throw new Error(payload?.error || "We could not update the report count.");
       }
       updateReportCount(id, payload.reportCount ?? 0);
-      setReportStatus(id, "Your report was added. No personal details were saved.");
+      setReportStatus(
+        id,
+        payload.alreadyReported
+          ? "You already added your report on this device."
+          : "Your report was added. No personal details were saved."
+      );
     } catch (error) {
       setReportStatus(id, error instanceof Error ? error.message : "We could not add your report.", true);
     } finally {

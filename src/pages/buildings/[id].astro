@@ -332,16 +332,18 @@ const totalFiltered = filtered.length;
 
       <footer class="site-footer">
         <p>Safety first: this dashboard does not show names, unit numbers, or evidence files.</p>
+        {hasAccess && (
+          <p><a href="?forget=1">Forget key on this device</a>. Use this on a shared phone.</p>
+        )}
       </footer>
     </div>
 
     {hasAccess && kv && (
-      <script
-        type="module"
-        data-dashboard-config
-        data-is-steward={isSteward ? "true" : "false"}
-        src={Astro.resolve("../../scripts/buildingDashboard.ts")}
-      ></script>
+      <div hidden data-dashboard-config data-is-steward={isSteward ? "true" : "false"}></div>
     )}
+    <script>
+      // Astro bundles this import. The script does nothing when the dashboard is locked.
+      import "../../scripts/buildingDashboard.ts";
+    </script>
   </body>
 </html>
