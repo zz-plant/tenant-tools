@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "../ui";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import type { SubmissionTimelineEntry } from "../../lib/submissionTimeline";

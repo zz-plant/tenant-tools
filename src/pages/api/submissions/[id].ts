@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { guardApiRequest } from "../../../lib/api/requestGuard";
 import { jsonError, jsonResponse } from "../../../lib/http";
-import type { SubmissionRecord } from "../../../lib/submissions";
 import { fetchSubmissionRecord, getSubmissionsKv } from "../../../lib/storage/submissions";
 
 export const prerender = false;

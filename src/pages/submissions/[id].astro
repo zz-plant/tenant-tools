@@ -188,7 +188,7 @@ const groupChatText = submissionRecord
                 {timelineEntries.length > 0 ? (
                   <ul class="timeline">
                     {timelineEntries.map((entry) => (
-                      <li key={`${entry.label}-${entry.date}`}>
+                      <li>
                         <p class="timeline-date">{formatTimelineDate(entry.date)}</p>
                         <p class="timeline-label">{entry.label}</p>
                       </li>
@@ -273,12 +273,12 @@ const groupChatText = submissionRecord
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
                   <ul class="submission-detail-list detail-grid">
                     {submissionRecord.ticketDate && (
-                      <li key="ticket-date">
+                      <li>
                         <strong>311 ticket date:</strong> {submissionRecord.ticketDate}
                       </li>
                     )}
                     {submissionRecord.ticketNumber && (
-                      <li key="ticket-number">
+                      <li>
                         <strong>311 ticket number:</strong> {submissionRecord.ticketNumber}
                       </li>
                     )}
@@ -289,7 +289,7 @@ const groupChatText = submissionRecord
                     {detailEntries.map(([key, value]) => {
                       const label = fieldDefinitions[key as keyof typeof fieldDefinitions]?.label || key;
                       return (
-                        <li key={key}>
+                        <li>
                           <strong>{label}:</strong> {value}
                         </li>
                       );

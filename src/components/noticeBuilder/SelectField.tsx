@@ -1,4 +1,3 @@
-import React from "react";
 import { Select } from "../ui";
 
 export type SelectOption = { id: string; label: string };
