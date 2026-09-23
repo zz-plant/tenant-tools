@@ -72,6 +72,14 @@ const initialState = {
 
 type FormState = typeof initialState;
 const detailEntries = Object.entries(fieldDefinitions);
+type FieldDefinition = { label: string; type?: string; placeholder?: string };
+type IssueFieldKey = keyof typeof fieldDefinitions;
+
+const ResidentSessionNote = () => (
+  <p className="helper">
+    Your resident key is saved on this device. <a href="/?forget=1">Forget key on this device</a>
+  </p>
+);
 
 const RadioGroup = {
   Root: BaseRadioGroup,
@@ -81,9 +89,11 @@ const RadioGroup = {
 
 type NoticeBuilderProps = {
   buildingOptions?: BuildingOption[];
+  /** Building ids the resident key cookie on this device unlocks. `"*"` means every building. */
+  residentBuildings?: string[];
 };
 
-const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuilderProps) => {
+const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuildings = [] }: NoticeBuilderProps) => {
   const [formState, setFormState] = useState<FormState>(() => {
     const today = new Date();
     const formatted = formatDate(today);
@@ -95,11 +105,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     };
   });
   const [buildingKey, setBuildingKey] = useState("");
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const key = params.get("key") || "";
-    setBuildingKey(key);
-  }, []);
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
   const [impactCount] = useState(1);
@@ -148,17 +153,27 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     ? `Copy unlocks after: ${missingBasics.join(" and ")}.`
     : "";
   const normalizedBuildingKey = buildingKey.trim();
-  const canSaveLedger = Boolean(formState.building && formState.issue && normalizedBuildingKey);
+  // The middleware stores the key from a resident link in an httpOnly cookie, and same-origin
+  // fetches send it. Residents who opened a key link do not need to paste the key again.
+  const hasResidentSession = Boolean(
+    formState.building && (residentBuildings.includes("*") || residentBuildings.includes(formState.building))
+  );
+  const hasSaveAccess = Boolean(normalizedBuildingKey) || hasResidentSession;
+  const canSaveLedger = Boolean(formState.building && formState.issue && hasSaveAccess);
   const saveDisabledMessage = !formState.building || !formState.issue
     ? "Choose a building and issue to enable saving."
-    : !normalizedBuildingKey
+    : !hasSaveAccess
       ? "Add the resident key to enable saving."
       : "";
   const canCopyPermalink = shareChecks.names && shareChecks.units && shareChecks.contact;
-  const saveReadinessLabel = canSaveLedger ? "Ready to save" : "Resident key missing";
+  const saveReadinessLabel = canSaveLedger
+    ? "Ready to save"
+    : hasSaveAccess
+      ? "Choose a building and issue to save"
+      : "Resident key missing";
 
   const renderDetailField = (fieldKey: keyof typeof fieldDefinitions) => {
-    const field = fieldDefinitions[fieldKey];
+    const field: FieldDefinition | undefined = fieldDefinitions[fieldKey];
     if (!field) {
       return null;
     }
@@ -226,10 +241,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     (key: keyof FormState) =>
     (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
       const { value, type } = event.currentTarget;
-      const isCheckbox = type === "checkbox" && "checked" in event.currentTarget;
+      const target = event.currentTarget;
+      const checkedValue = target instanceof HTMLInputElement && type === "checkbox" ? target.checked : null;
       setFormState((prev) => ({
         ...prev,
-        [key]: isCheckbox ? event.currentTarget.checked : value,
+        [key]: checkedValue ?? value,
       }));
     };
 
@@ -266,7 +282,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
 
 
   const selectedIssue = issueOptions.find((option) => option.id === formState.issue);
-  const issueFields = issueFieldMap[formState.issue] || [];
+  const issueFields: readonly IssueFieldKey[] =
+    issueFieldMap[formState.issue as keyof typeof issueFieldMap] || [];
   const stageLabel = stages[formState.stage as Stage] || stages.A;
 
   const selectedZone = zoneOptions.find((option) => option.id === formState.zone);
@@ -335,7 +352,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     return buildNoticeText(formState);
   }, [formState, selectedIssue]);
 
-  const meaningItems = meaningMap[formState.stage] || meaningMap.A;
+  const meaningItems = meaningMap[formState.stage as Stage] || meaningMap.A;
 
   const daysOpen = useMemo(() => {
     const startDate = formState.startDate ? new Date(formState.startDate) : null;
@@ -410,7 +427,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     const statusLabel = selectedExportStatus.label;
 
     const issueDetails = issueFields
-      .map((fieldKey) => {
+      .map((fieldKey): { key: string; label: string; value: string } | null => {
         const field = fieldDefinitions[fieldKey];
         const value = String(formState[fieldKey as keyof FormState] ?? "").trim();
         if (!field || !value) {
@@ -499,7 +516,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       setSaveError("Select a building and issue before saving this record.");
       return;
     }
-    if (!normalizedBuildingKey) {
+    if (!hasSaveAccess) {
       setSaveStatus("error");
       setSaveLabel("Save record");
       setSaveError("Add your building key before saving this record.");
@@ -548,7 +565,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
         const details = Array.isArray(payload?.details)
-          ? payload.details.filter((item): item is string => typeof item === "string")
+          ? payload.details.filter((item: unknown): item is string => typeof item === "string")
           : [];
         const detailText = details.length > 0 ? ` ${details.join(" ")}` : "";
         throw new Error(`${payload?.error || "Unable to save this record right now."}${detailText}`);
@@ -610,10 +627,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     setShareChecks({ names: false, units: false, contact: false });
     setRepeatLabel("Repeat with today's date");
     setExportAudience("inspector");
-    setSimilarIssues([]);
-    setSimilarNotice("");
-    setSimilarError("");
-    setDismissSimilar(false);
   };
 
   const handleRepeatNotice = async () => {
@@ -718,7 +731,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
     return entries.sort((a, b) => a.date.localeCompare(b.date));
   }, [formState.firstMessageDate, formState.startDate, formState.stage, formState.ticketDate, formState.today]);
 
-  const issueGuidance = formState.issue ? issue311Guidance[formState.issue] : null;
+  const issueGuidance =
+    formState.issue in issue311Guidance
+      ? issue311Guidance[formState.issue as keyof typeof issue311Guidance]
+      : null;
   const guidanceScript = issueGuidance
     ? issueGuidance.script
         .replace("[START DATE]", formState.startDate || "[START DATE]")
@@ -870,23 +886,31 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                       </RadioGroup.Root>
                     </div>
 
-                    <p className="helper">You can draft a notice now. Add the resident key later when you save.</p>
+                    {!hasResidentSession && (
+                      <p className="helper">You can draft a notice now. Add the resident key later when you save.</p>
+                    )}
 
                     <div className="submission-block">
                       <h3>Resident key for saving</h3>
-                      <p className="helper">You can draft without a key. Saving needs this key.</p>
-                      <label>
-                        Resident key
-                        <Input
-                          className="input"
-                          type="password"
-                          value={buildingKey}
-                          onChange={handleBuildingKeyInput}
-                          placeholder="Paste resident key"
-                          autoComplete="off"
-                          spellCheck={false}
-                        />
-                      </label>
+                      {hasResidentSession ? (
+                        <ResidentSessionNote />
+                      ) : (
+                        <>
+                          <p className="helper">You can draft without a key. Saving needs this key.</p>
+                          <label>
+                            Resident key
+                            <Input
+                              className="input"
+                              type="password"
+                              value={buildingKey}
+                              onChange={handleBuildingKeyInput}
+                              placeholder="Paste resident key"
+                              autoComplete="off"
+                              spellCheck={false}
+                            />
+                          </label>
+                        </>
+                      )}
                       <p className="helper" role="status" aria-live="polite">
                         {saveReadinessLabel}
                       </p>
@@ -1322,19 +1346,25 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions }: NoticeBuild
                   <div className="submission-block">
                     <div>
                       <h3>Save in resident ledger</h3>
-                      <p className="helper">Use the resident key from your organizer. Keep this key private.</p>
-                      <label>
-                        Resident key
-                        <Input
-                          className="input"
-                          type="password"
-                          value={buildingKey}
-                          onChange={handleBuildingKeyInput}
-                          placeholder="Paste resident key"
-                          autoComplete="off"
-                          spellCheck={false}
-                        />
-                      </label>
+                      {hasResidentSession ? (
+                        <ResidentSessionNote />
+                      ) : (
+                        <>
+                          <p className="helper">Use the resident key from your organizer. Keep this key private.</p>
+                          <label>
+                            Resident key
+                            <Input
+                              className="input"
+                              type="password"
+                              value={buildingKey}
+                              onChange={handleBuildingKeyInput}
+                              placeholder="Paste resident key"
+                              autoComplete="off"
+                              spellCheck={false}
+                            />
+                          </label>
+                        </>
+                      )}
                       {saveDisabledMessage ? (
                         <p className="helper">{saveDisabledMessage}</p>
                       ) : null}

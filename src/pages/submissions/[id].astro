@@ -8,6 +8,7 @@ import { formatResidentReportCount } from "../../lib/buildingDashboard";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 import { buildBuildingDashboardUrl } from "../../lib/navigation";
+import { formatIssueLabel } from "../../lib/noticeUtils";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 
@@ -71,6 +72,16 @@ const dashboardUrl =
     : "";
 
 const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissionRecord) : [];
+
+// Text for the resident group chat. It never includes the key, the building, or any details.
+const groupChatText = submissionRecord
+  ? [
+      `Building issue saved: ${formatIssueLabel(issueLabel)}.`,
+      `Started: ${startDateLabel}.`,
+      "If you have this problem too, open the link and tap \u201cMe too\u201d.",
+      "No names are saved.",
+    ].join("\n")
+  : "";
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -146,6 +157,12 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                   <p class="summary-value">{reportCountLabel}</p>
                 </div>
               </div>
+              <div class="issue-actions">
+                <button class="button" type="button" data-me-too data-submission-id={id}>Me too</button>
+              </div>
+              <p class="helper" data-me-too-status role="status" aria-live="polite">
+                Tap “Me too” if you have this problem. No personal details are saved.
+              </p>
               <p class="helper">Review this summary before sharing. Small report counts may be hidden for privacy.</p>
               {dashboardUrl && (
                 <a class="button button-secondary" href={dashboardUrl}>
@@ -191,7 +208,9 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
                   <input type="checkbox" class="share-check" />
                   I removed phone numbers and email addresses.
                 </label>
+                <button class="button" type="button" data-share-chat data-share-text={groupChatText} disabled title="Complete all checks to share">Share in group chat</button>
                 <button class="button button-secondary" type="button" data-copy-link disabled title="Complete all checks to copy the link">Copy this record link</button>
+                <p class="helper">The shared message has the issue type, start date, and link. It does not include the key.</p>
                 <p class="helper">Share only with residents who have the key.</p>
                 <p class="helper" data-share-status role="status" aria-live="polite">Complete all checks to copy the link.</p>
               </div>
@@ -243,6 +262,9 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
 
       <footer class="site-footer">
         <p>Safety first: review this summary before sharing.</p>
+        {hasAccess && (
+          <p><a href="?forget=1">Forget key on this device</a>. Use this on a shared phone.</p>
+        )}
       </footer>
     </div>
 
@@ -250,6 +272,9 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
       const checks = Array.from(document.querySelectorAll('.share-check'));
       const status = document.querySelector('[data-share-status]');
       const copyButton = document.querySelector('[data-copy-link]');
+      const shareButton = document.querySelector('[data-share-chat]');
+      const meTooButton = document.querySelector('[data-me-too]');
+      const meTooStatus = document.querySelector('[data-me-too-status]');
       const refreshShareStatus = () => {
         if (!status || checks.length === 0) {
           return;
@@ -259,6 +284,11 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
           copyButton.disabled = !done;
           copyButton.setAttribute('aria-disabled', String(!done));
           copyButton.title = done ? 'Copy this record link' : 'Complete all checks to copy the link';
+        }
+        if (shareButton instanceof HTMLButtonElement) {
+          shareButton.disabled = !done;
+          shareButton.setAttribute('aria-disabled', String(!done));
+          shareButton.title = done ? 'Share in group chat' : 'Complete all checks to share';
         }
         status.textContent = done ? 'Checklist complete. You can copy the link.' : 'Complete all checks to copy the link.';
       };
@@ -273,7 +303,7 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
         copyButton.textContent = 'Copying...';
 
         try {
-          await navigator.clipboard.writeText(window.location.href);
+          await navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}`);
           if (status) {
             status.textContent = 'Link copied. Share only with residents who have the key.';
           }
@@ -291,7 +321,77 @@ const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissi
         }
       };
 
+      const shareToGroupChat = async () => {
+        if (!(shareButton instanceof HTMLButtonElement) || shareButton.disabled) {
+          return;
+        }
+        // The address bar never holds the key: middleware moves it to a cookie and removes it.
+        const link = `${window.location.origin}${window.location.pathname}`;
+        const text = shareButton.dataset.shareText || '';
+        try {
+          if (navigator.share) {
+            await navigator.share({ text: `${text}\n${link}` });
+            if (status) {
+              status.textContent = 'Shared. Only residents with the key can open the record.';
+            }
+            return;
+          }
+          await navigator.clipboard.writeText(`${text}\n${link}`);
+          if (status) {
+            status.textContent = 'Message copied. Paste it in the group chat.';
+          }
+        } catch (error) {
+          if (error instanceof DOMException && error.name === 'AbortError') {
+            return;
+          }
+          if (status) {
+            status.textContent = 'Could not share. Copy the link from the address bar.';
+          }
+        }
+      };
+
+      const addMeToo = async () => {
+        if (!(meTooButton instanceof HTMLButtonElement)) {
+          return;
+        }
+        const submissionId = meTooButton.dataset.submissionId;
+        if (!submissionId) {
+          return;
+        }
+        meTooButton.disabled = true;
+        meTooButton.textContent = 'Saving...';
+        try {
+          const response = await fetch(`/api/submissions/${encodeURIComponent(submissionId)}/report`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ increment: 1 }),
+          });
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            throw new Error(payload?.error || 'We could not add your report.');
+          }
+          if (meTooStatus) {
+            meTooStatus.textContent = payload.alreadyReported
+              ? 'You already added your report on this device.'
+              : 'Your report was added. No personal details were saved.';
+          }
+          meTooButton.textContent = 'Report added';
+        } catch (error) {
+          if (meTooStatus) {
+            meTooStatus.textContent = error instanceof Error ? error.message : 'We could not add your report.';
+          }
+          meTooButton.disabled = false;
+          meTooButton.textContent = 'Me too';
+        }
+      };
+
       checks.forEach((item) => item.addEventListener('change', refreshShareStatus));
+      if (shareButton instanceof HTMLButtonElement) {
+        shareButton.addEventListener('click', shareToGroupChat);
+      }
+      if (meTooButton instanceof HTMLButtonElement) {
+        meTooButton.addEventListener('click', addMeToo);
+      }
       if (copyButton instanceof HTMLButtonElement) {
         copyButton.addEventListener('click', copyRecordLink);
       }

@@ -3,11 +3,14 @@ import "../styles/global.css";
 import NoticeBuilder from "../components/NoticeBuilder";
 import SeoHead from "../components/SeoHead.astro";
 import { getBuildingOptions } from "../data/buildings";
-import { parseBuildingKeys } from "../lib/access";
+import { getBuildingIdsForKey, parseBuildingKeys } from "../lib/access";
+import { RESIDENT_KEY_COOKIE } from "../lib/api/requestGuard";
 
 const env = Astro.locals.runtime?.env ?? {};
 const buildingKeys = parseBuildingKeys(env.BUILDING_KEYS_JSON);
 const buildingOptions = getBuildingOptions(buildingKeys);
+// Only building ids reach the client. The key itself stays in the httpOnly cookie.
+const residentBuildings = getBuildingIdsForKey(Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value, env);
 ---
 
 <!DOCTYPE html>
@@ -35,6 +38,7 @@ const buildingOptions = getBuildingOptions(buildingKeys);
       <NoticeBuilder
         client:load
         buildingOptions={buildingOptions}
+        residentBuildings={residentBuildings}
       />
     </main>
   </body>
