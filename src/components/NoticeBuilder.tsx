@@ -5,13 +5,11 @@ import {
   Input,
   Radio,
   RadioGroup as BaseRadioGroup,
-  Select,
   Switch,
   Tabs,
 } from "./ui";
 import {
   fieldDefinitions,
-  issue311Guidance,
   issueFieldMap,
   issueOptions,
   meaningMap,
@@ -19,61 +17,48 @@ import {
   zoneOptions,
 } from "../data/noticeData";
 import { defaultBuildingOptions, type BuildingOption } from "../data/buildings";
-import { getRuleCardsForIssue } from "../data/rules";
 import { portfolioOptions } from "../data/portfolioOptions";
 import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
-import { detailCharacterLimit } from "../lib/submissions";
 import useTimedCallbacks from "../hooks/useTimedCallbacks";
-import { addDays, formatCalendarDate, formatDate, formatTimelineDate, getCurrentTime } from "../lib/dateUtils";
-import { fillTemplate, formatIssueLabel, getVisibleUnlockableSteps } from "../lib/noticeUtils";
+import { formatDate, getCurrentTime } from "../lib/dateUtils";
+import { formatIssueLabel, getVisibleUnlockableSteps } from "../lib/noticeUtils";
 import { detectSensitiveContent } from "../lib/validation";
 import {
-  detailWarningThreshold,
-  evidenceSafetyChecklist,
   evidenceSafetySummary,
   exportAudienceOptions,
   exportStatusOptions,
-  factualTagOptions,
-  freeTextSafetyNote,
   stageOptions,
   steps,
 } from "./noticeBuilder/constants";
 import { issueIcons } from "./noticeBuilder/issueIcons";
+import DetailField from "./noticeBuilder/DetailField";
+import RecordPanel from "./noticeBuilder/RecordPanel";
+import SelectField from "./noticeBuilder/SelectField";
+import StepProgressHeader from "./noticeBuilder/StepProgressHeader";
+import {
+  buildGuidanceScript,
+  buildNextSteps,
+  buildNoticeText,
+  collectIssueDetails,
+  collectRuleSources,
+  computeDaysOpen,
+  createInitialFormState,
+  getIssueGuidance,
+  type FormState,
+  type IssueFieldKey,
+} from "./noticeBuilder/logic";
+import { getSubmissionTimelineEntries } from "../lib/submissionTimeline";
 import type { Stage } from "./noticeBuilder/types";
 
-const initialState = {
-  building: "",
-  zone: "",
-  issue: "",
-  stage: "A",
-  exportStatus: "open",
-  language: "en",
-  portfolio: "continuum",
-  simpleEnglish: true,
-  autoDates: true,
-  startDate: "",
-  firstMessageDate: "",
-  today: "",
-  time: "",
-  temp: "",
-  eventDate: "",
-  eventDates: "",
-  eventDateTime: "",
-  moveOutDate: "",
-  pestType: "",
-  commonArea: "",
-  lockoutAction: "",
-  location: "",
-  issueDescription: "",
-  attachment: "",
-  ticketDate: "",
-  ticketNumber: "",
-};
 
-type FormState = typeof initialState;
 const detailEntries = Object.entries(fieldDefinitions);
-type FieldDefinition = { label: string; type?: string; placeholder?: string };
-type IssueFieldKey = keyof typeof fieldDefinitions;
+
+const languageOptions = [
+  { id: "en", label: "English" },
+  { id: "es", label: "Español" },
+  { id: "hi", label: "हिंदी" },
+  { id: "pl", label: "Polski" },
+] as const;
 
 const ResidentSessionNote = () => (
   <p className="helper">
@@ -94,16 +79,11 @@ type NoticeBuilderProps = {
 };
 
 const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuildings = [] }: NoticeBuilderProps) => {
-  const [formState, setFormState] = useState<FormState>(() => {
-    const today = new Date();
-    const formatted = formatDate(today);
-    return {
-      ...initialState,
-      today: formatted,
-      startDate: formatted,
-      time: getCurrentTime(today),
-    };
-  });
+  const [formState, setFormState] = useState<FormState>(() => createInitialFormState());
+  const buildingSelectOptions = useMemo(
+    () => buildingOptions.map((building) => ({ id: building.id, label: building.id })),
+    [buildingOptions]
+  );
   const [buildingKey, setBuildingKey] = useState("");
   const [currentStep, setCurrentStep] = useState(1);
   const [plainMeaningVisible, setPlainMeaningVisible] = useState(false);
@@ -172,70 +152,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       ? "Choose a building and issue to save"
       : "Resident key missing";
 
-  const renderDetailField = (fieldKey: keyof typeof fieldDefinitions) => {
-    const field: FieldDefinition | undefined = fieldDefinitions[fieldKey];
-    if (!field) {
-      return null;
-    }
-    const isAttachmentField = fieldKey === "attachment";
-    const fieldValue = String(formState[fieldKey as keyof FormState] ?? "");
-    const trimmedLength = fieldValue.trim().length;
-    const isTextField = !field.type;
-    const tags = isTextField ? factualTagOptions[fieldKey] : undefined;
-    const showLimitWarning = isTextField && trimmedLength >= detailWarningThreshold;
-    const limitText = isTextField
-      ? `Limit: ${detailCharacterLimit} characters${trimmedLength > 0 ? ` (${trimmedLength}/${detailCharacterLimit})` : "."}`
-      : "";
-    const helperText = isTextField ? `${limitText} ${freeTextSafetyNote}` : "";
-    const helperId = isTextField ? `detail-${fieldKey}-helper` : undefined;
-    return (
-      <label key={fieldKey}>
-        {field.label}
-        {isAttachmentField && (
-          <div className="evidence-warning" role="note">
-            <p className="evidence-warning-title">Evidence safety check</p>
-            <ul className="evidence-warning-list">
-              {evidenceSafetyChecklist.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-        <Input
-          className="input"
-          type={field.type || "text"}
-          value={fieldValue}
-          onChange={updateField(fieldKey as keyof FormState)}
-          placeholder={field.placeholder}
-          maxLength={isTextField ? detailCharacterLimit : undefined}
-          aria-describedby={helperId}
-        />
-        {tags && (
-          <div className="fact-tags" aria-label={`${field.label} quick facts`}>
-            <p className="helper">Quick facts:</p>
-            <div className="fact-tag-row">
-              {tags.map((tag) => (
-                <button
-                  key={tag}
-                  className="fact-tag"
-                  type="button"
-                  onClick={() => handleTagClick(fieldKey as keyof FormState, tag)}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-        {isTextField && (
-          <p className={`helper${showLimitWarning ? " helper-warning" : ""}`} id={helperId}>
-            {helperText}
-            {trimmedLength > detailCharacterLimit && " Extra text is removed when saving."}
-          </p>
-        )}
-      </label>
-    );
-  };
+  const renderDetailField = (fieldKey: IssueFieldKey) => (
+    <DetailField
+      key={fieldKey}
+      fieldKey={fieldKey}
+      value={String(formState[fieldKey as keyof FormState] ?? "")}
+      onChange={(value) => setFormState((prev) => ({ ...prev, [fieldKey]: value }))}
+      onTagClick={(tag) => handleTagClick(fieldKey as keyof FormState, tag)}
+    />
+  );
 
   const updateField =
     (key: keyof FormState) =>
@@ -293,46 +218,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     exportStatusOptions.find((option) => option.id === formState.exportStatus) || exportStatusOptions[0];
   const selectedPortfolio = portfolioOptions.find((option) => option.id === formState.portfolio);
 
-  const buildNoticeText = (state: FormState) => {
-    if (!selectedIssue) {
-      return "";
-    }
-
-    const template = state.simpleEnglish
-      ? selectedIssue.simple.en
-      : selectedIssue.notices[state.stage]?.[state.language] ||
-        selectedIssue.notices[state.stage]?.en ||
-        selectedIssue.notices.A.en;
-
-    const values: Record<string, string> = {
-      ADDRESS: state.building || "[ADDRESS]",
-      ISSUE: state.issueDescription || "[ISSUE]",
-      LOCATION: state.location || "[LOCATION]",
-      "START DATE": state.startDate || "[START DATE]",
-      TODAY: state.today || "[TODAY]",
-      TIME: state.time || "[TIME]",
-      TEMP: state.temp || "[TEMP]",
-      "DATE OF FIRST MESSAGE": state.firstMessageDate || "[DATE OF FIRST MESSAGE]",
-      "MOVE-OUT DATE": state.moveOutDate || "[MOVE-OUT DATE]",
-      DATE: state.eventDate || "[DATE]",
-      DATES: state.eventDates || "[DATES]",
-      "DATE/TIME": state.eventDateTime || "[DATE/TIME]",
-      "PHOTO/VIDEO": state.attachment || "[PHOTO/VIDEO]",
-      "ROACHES/RATS/BEDBUGS": state.pestType || "[ROACHES/RATS/BEDBUGS]",
-      "ELEVATOR / GARAGE DOOR / HALL LIGHTS / TRASH ROOM":
-        state.commonArea || "[ELEVATOR / GARAGE DOOR / HALL LIGHTS / TRASH ROOM]",
-      "LOCK ME OUT / SHUT OFF UTILITIES":
-        state.lockoutAction || "[LOCK ME OUT / SHUT OFF UTILITIES]",
-    };
-
-    if (state.autoDates) {
-      const today = state.today || formatDate(new Date());
-      values["START DATE"] = state.startDate || today;
-      values.TODAY = today;
-    }
-
-    return fillTemplate(template, values);
-  };
 
   useEffect(() => {
     if (!formState.autoDates) {
@@ -348,74 +233,25 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     }));
   }, [formState.autoDates]);
 
-  const noticeText = useMemo(() => {
-    return buildNoticeText(formState);
-  }, [formState, selectedIssue]);
+  const noticeText = useMemo(() => buildNoticeText(formState, selectedIssue), [formState, selectedIssue]);
 
   const meaningItems = meaningMap[formState.stage as Stage] || meaningMap.A;
 
-  const daysOpen = useMemo(() => {
-    const startDate = formState.startDate ? new Date(formState.startDate) : null;
-    const todayDate = formState.today ? new Date(formState.today) : new Date(formatDate(new Date()));
-    if (!startDate) {
-      return 0;
-    }
-    return Math.max(0, Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
-  }, [formState.startDate, formState.today]);
+  const daysOpen = useMemo(
+    () => computeDaysOpen(formState.startDate, formState.today),
+    [formState.startDate, formState.today]
+  );
 
-  const nextSteps = useMemo(() => {
-    const startDate = formState.startDate ? new Date(formState.startDate) : null;
-    const todayDate = formState.today ? new Date(formState.today) : new Date(formatDate(new Date()));
-    const daysOpen = startDate
-      ? Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-      : 0;
-    const issueLabel = selectedIssue?.label || "maintenance issue";
-    const buildingLabel = formState.building || "your building";
-
-    const steps = [
-      {
-        label: "Common path: first written notice window",
-        unlockDay: 0,
-        calendarLabel: "Initial notice window",
-        detail:
-          "Common paths tenants encounter start with a written record. A risk is missing dates, copies, or who received it.",
-      },
-      {
-        label: "Common path: follow-up window after a few days",
-        unlockDay: 3,
-        calendarLabel: "Follow-up notice window",
-        detail:
-          "Common paths tenants encounter include a follow-up. A risk is a documentation gap when dates or prior messages are not linked.",
-      },
-      {
-        label: "Common path: final reminder window",
-        unlockDay: 6,
-        calendarLabel: "Final reminder window",
-        detail:
-          "Common paths tenants encounter include a last reminder. A risk is unclear timelines when records are incomplete.",
-      },
-    ];
-
-    return steps.map((step) => {
-      const reminderDate = startDate ? addDays(startDate, step.unlockDay) : null;
-      const calendarDate = reminderDate ? formatCalendarDate(reminderDate) : "";
-      const calendarLink = reminderDate
-        ? `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-            `${step.calendarLabel}: ${issueLabel}`
-          )}&details=${encodeURIComponent(
-            `${step.detail}\nBuilding: ${buildingLabel}\nIssue: ${issueLabel}`
-          )}&dates=${calendarDate}/${calendarDate}`
-        : "";
-
-      return {
-        ...step,
-        unlocked: daysOpen >= step.unlockDay,
-        remaining: step.unlockDay - daysOpen,
-        calendarLink,
-        reminderDateLabel: reminderDate ? formatDate(reminderDate) : "Add a start date",
-      };
-    });
-  }, [formState.startDate, formState.today, formState.building, selectedIssue?.label]);
+  const nextSteps = useMemo(
+    () =>
+      buildNextSteps({
+        startDate: formState.startDate,
+        today: formState.today,
+        building: formState.building,
+        issueLabel: selectedIssue?.label,
+      }),
+    [formState.startDate, formState.today, formState.building, selectedIssue?.label]
+  );
 
   const visibleNextSteps = useMemo(() => getVisibleUnlockableSteps(nextSteps), [nextSteps]);
 
@@ -426,16 +262,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     const zoneLabel = selectedZone?.label || "Not listed";
     const statusLabel = selectedExportStatus.label;
 
-    const issueDetails = issueFields
-      .map((fieldKey): { key: string; label: string; value: string } | null => {
-        const field = fieldDefinitions[fieldKey];
-        const value = String(formState[fieldKey as keyof FormState] ?? "").trim();
-        if (!field || !value) {
-          return null;
-        }
-        return { key: fieldKey, label: field.label, value };
-      })
-      .filter((detail): detail is { key: string; label: string; value: string } => Boolean(detail));
+    const issueDetails = collectIssueDetails(formState, issueFields);
 
     return buildExportSummary({
       exportAudience,
@@ -456,21 +283,13 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       ticketNumber: formState.ticketNumber || undefined,
     });
   }, [
-    formState.attachment,
-    formState.building,
-    formState.exportStatus,
-    formState.language,
-    formState.portfolio,
-    formState.startDate,
-    formState.today,
+    formState,
     impactCount,
     issueFields,
     daysOpen,
     selectedIssue?.label,
     stageLabel,
     exportAudience,
-    formState.ticketDate,
-    formState.ticketNumber,
     selectedZone?.label,
     selectedPortfolio?.label,
     selectedExportStatus.label,
@@ -528,13 +347,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     setSaveWarnings([]);
     setSaveLabel("Saving...");
 
-    const issueDetails = issueFields.reduce<Record<string, string>>((acc, fieldKey) => {
-      const rawValue = String(formState[fieldKey as keyof FormState] ?? "").trim();
-      if (rawValue) {
-        acc[fieldKey] = rawValue;
-      }
-      return acc;
-    }, {});
+    const issueDetails = Object.fromEntries(
+      collectIssueDetails(formState, issueFields).map((detail) => [detail.key, detail.value])
+    );
 
     try {
       const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -603,14 +418,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     if (!confirmed) {
       return;
     }
-    const today = new Date();
-    const formatted = formatDate(today);
-    setFormState({
-      ...initialState,
-      today: formatted,
-      startDate: formatted,
-      time: getCurrentTime(today),
-    });
+    setFormState(createInitialFormState(new Date()));
     setCurrentStep(1);
     setPlainMeaningVisible(false);
     setCopyLabel("Copy notice text");
@@ -638,7 +446,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       ...formState,
       today,
     };
-    const repeatedText = buildNoticeText(nextState);
+    const repeatedText = buildNoticeText(nextState, selectedIssue);
     await navigator.clipboard.writeText(repeatedText);
     setFormState(nextState);
     setRepeatLabel("Copied with today's date");
@@ -704,58 +512,21 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     formState.ticketNumber ? { label: "311 ticket number", value: formState.ticketNumber } : null,
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 
-  const timelineEntries = useMemo(() => {
-    const entries: Array<{ label: string; date: string }> = [];
-    if (formState.startDate) {
-      entries.push({ label: "Issue started", date: formState.startDate });
-    }
-    if (formState.stage === "A") {
-      if (formState.today) {
-        entries.push({ label: "Notice sent", date: formState.today });
-      }
-    }
-    if (formState.stage === "B" || formState.stage === "C") {
-      if (formState.firstMessageDate) {
-        entries.push({ label: "First notice sent", date: formState.firstMessageDate });
-      }
-      if (formState.today) {
-        entries.push({
-          label: formState.stage === "B" ? "Follow-up sent" : "Final notice sent",
-          date: formState.today,
-        });
-      }
-    }
-    if (formState.ticketDate) {
-      entries.push({ label: "311 ticket logged", date: formState.ticketDate });
-    }
-    return entries.sort((a, b) => a.date.localeCompare(b.date));
-  }, [formState.firstMessageDate, formState.startDate, formState.stage, formState.ticketDate, formState.today]);
+  const timelineEntries = useMemo(
+    () =>
+      getSubmissionTimelineEntries({
+        startDate: formState.startDate,
+        reportDate: formState.today,
+        firstMessageDate: formState.firstMessageDate,
+        ticketDate: formState.ticketDate,
+        stage: formState.stage as Stage,
+      }),
+    [formState.firstMessageDate, formState.startDate, formState.stage, formState.ticketDate, formState.today]
+  );
 
-  const issueGuidance =
-    formState.issue in issue311Guidance
-      ? issue311Guidance[formState.issue as keyof typeof issue311Guidance]
-      : null;
-  const guidanceScript = issueGuidance
-    ? issueGuidance.script
-        .replace("[START DATE]", formState.startDate || "[START DATE]")
-        .replace("[LOCATION]", formState.location || "[LOCATION]")
-        .replace("[DATE]", formState.eventDate || "[DATE]")
-    : "";
-
-  const ruleCards = useMemo(() => getRuleCardsForIssue(formState.issue), [formState.issue]);
-  const ruleSources = useMemo(() => {
-    const sourceMap = new Map<string, string>();
-
-    ruleCards.forEach((card) => {
-      card.sources.forEach((source) => {
-        if (!sourceMap.has(source.url)) {
-          sourceMap.set(source.url, source.title);
-        }
-      });
-    });
-
-    return Array.from(sourceMap, ([url, title]) => ({ url, title }));
-  }, [ruleCards]);
+  const issueGuidance = getIssueGuidance(formState.issue);
+  const guidanceScript = issueGuidance ? buildGuidanceScript(issueGuidance.script, formState) : "";
+  const ruleSources = useMemo(() => collectRuleSources(formState.issue), [formState.issue]);
 
   return (
     <div className="page">
@@ -765,30 +536,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       <main id="main">
         <div className="layout">
           <section className="panel" id="builder">
-            <div className="step-header">
-              <h1>Build your notice</h1>
-              <div className="step-meta">
-                <div className="step-progress">
-                  <div className="step-progress-row">
-                    <p className="step-progress-label">Step {currentStep} of {steps.length}</p>
-                    <span className="step-progress-pill">{progressPillLabel}</span>
-                  </div>
-                  <div
-                    className="step-progress-track"
-                    role="progressbar"
-                    aria-valuenow={stepProgress}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label="Step progress"
-                  >
-                    <span className="step-progress-bar" style={{ width: `${stepProgress}%` }} />
-                  </div>
-                </div>
-                <div className="step-privacy">
-                  {!stepsLocked && <p className="helper step-now">Now: {currentStepInfo.label}</p>}
-                </div>
-              </div>
-            </div>
+            <StepProgressHeader
+              currentStep={currentStep}
+              totalSteps={steps.length}
+              stepProgress={stepProgress}
+              progressPillLabel={progressPillLabel}
+              stepsLocked={stepsLocked}
+              currentStepLabel={currentStepInfo.label}
+            />
             <Tabs.Root value={String(currentStep)}>
               <Tabs.List className="step-nav">
                 {visibleBuilderSteps.map((step) => {
@@ -821,7 +576,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     </div>
                     <label>
                       Building
-                      <Select.Root
+                      <SelectField
                         value={formState.building || null}
                         onValueChange={(value) =>
                           setFormState((prev) => ({
@@ -830,29 +585,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             portfolio: value ? "continuum" : prev.portfolio,
                           }))
                         }
+                        options={buildingSelectOptions}
+                        ariaLabel="Building"
+                        placeholder="Select building"
                         required
-                      >
-                        <Select.Trigger className="select-trigger" aria-label="Building">
-                          <Select.Value placeholder="Select building" />
-                          <Select.Icon className="select-icon">
-                            <span aria-hidden="true">▾</span>
-                          </Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Positioner className="select-positioner">
-                              <Select.Popup className="select-popup">
-                                <Select.List className="select-list">
-                                  {buildingOptions.map((building) => (
-                                    <Select.Item key={building.id} value={building.id} className="select-item">
-                                      <Select.ItemText>{building.id}</Select.ItemText>
-                                      <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                    </Select.Item>
-                                  ))}
-                                </Select.List>
-                              </Select.Popup>
-                            </Select.Positioner>
-                          </Select.Portal>
-                      </Select.Root>
+                      />
                     </label>
 
                     <div className="issue-gallery">
@@ -933,28 +670,13 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                               <div className="optional-setup-body">
                         <label>
                           Location zone (optional)
-                          <Select.Root value={formState.zone || null} onValueChange={updateSelect("zone")}>
-                            <Select.Trigger className="select-trigger" aria-label="Issue location zone">
-                              <Select.Value placeholder="Select zone" />
-                              <Select.Icon className="select-icon">
-                                <span aria-hidden="true">▾</span>
-                              </Select.Icon>
-                            </Select.Trigger>
-                            <Select.Portal>
-                              <Select.Positioner className="select-positioner">
-                                <Select.Popup className="select-popup">
-                                  <Select.List className="select-list">
-                                    {zoneOptions.map((option) => (
-                                      <Select.Item key={option.id} value={option.id} className="select-item">
-                                        <Select.ItemText>{option.label}</Select.ItemText>
-                                        <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                      </Select.Item>
-                                    ))}
-                                  </Select.List>
-                                </Select.Popup>
-                              </Select.Positioner>
-                            </Select.Portal>
-                          </Select.Root>
+                          <SelectField
+                            value={formState.zone || null}
+                            onValueChange={updateSelect("zone")}
+                            options={zoneOptions}
+                            ariaLabel="Issue location zone"
+                            placeholder="Select zone"
+                          />
                           <p className="helper">General area only. No unit numbers.</p>
                         </label>
 
@@ -1016,38 +738,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     </div>
                     <label>
                       Language
-                      <Select.Root value={formState.language} onValueChange={updateSelect("language")} required>
-                        <Select.Trigger className="select-trigger" aria-label="Language">
-                          <Select.Value placeholder="Select language" />
-                          <Select.Icon className="select-icon">
-                            <span aria-hidden="true">▾</span>
-                          </Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Positioner className="select-positioner">
-                            <Select.Popup className="select-popup">
-                              <Select.List className="select-list">
-                                <Select.Item value="en" className="select-item">
-                                  <Select.ItemText>English</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                                <Select.Item value="es" className="select-item">
-                                  <Select.ItemText>Español</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                                <Select.Item value="hi" className="select-item">
-                                  <Select.ItemText>हिंदी</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                                <Select.Item value="pl" className="select-item">
-                                  <Select.ItemText>Polski</Select.ItemText>
-                                  <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                </Select.Item>
-                              </Select.List>
-                            </Select.Popup>
-                          </Select.Positioner>
-                        </Select.Portal>
-                      </Select.Root>
+                      <SelectField
+                        value={formState.language}
+                        onValueChange={updateSelect("language")}
+                        options={languageOptions}
+                        ariaLabel="Language"
+                        placeholder="Select language"
+                        required
+                      />
                     </label>
 
                     <div className="checkbox-row">
@@ -1287,30 +985,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                   <div className="export-status">
                     <label>
                       Issue status
-                      <Select.Root value={formState.exportStatus} onValueChange={updateSelect("exportStatus")} required>
-                        <Select.Trigger className="select-trigger" aria-label="Issue status">
-                          <Select.Value placeholder="Select status" />
-                          <Select.Icon className="select-icon">
-                            <span aria-hidden="true">▾</span>
-                          </Select.Icon>
-                        </Select.Trigger>
-                        <Select.Portal>
-                          <Select.Positioner className="select-positioner">
-                            <Select.Popup className="select-popup">
-                              <Select.List className="select-list">
-                                {exportStatusOptions.map((option) => (
-                                  <Select.Item key={option.id} value={option.id} className="select-item">
-                                    <Select.ItemText>
-                                      {option.label}
-                                    </Select.ItemText>
-                                    <Select.ItemIndicator className="select-item-indicator">✓</Select.ItemIndicator>
-                                  </Select.Item>
-                                ))}
-                              </Select.List>
-                            </Select.Popup>
-                          </Select.Positioner>
-                        </Select.Portal>
-                      </Select.Root>
+                      <SelectField
+                        value={formState.exportStatus}
+                        onValueChange={updateSelect("exportStatus")}
+                        options={exportStatusOptions}
+                        ariaLabel="Issue status"
+                        placeholder="Select status"
+                        required
+                      />
                     </label>
                   </div>
                   <RadioGroup.Root
@@ -1518,128 +1200,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
           </aside>
         </div>
 
-        <section className={`panel panel-highlight record-panel${!canShowAfterBasics ? " record-panel-mobile-hidden" : ""}`} id="record">
-          <div>
-            <h2>Record and next steps</h2>
-            <p className="helper">Use this after you send the notice.</p>
-          </div>
-          {!canShowAfterBasics ? (
-            <div className="record-locked">
-              <p className="helper"><strong>Locked:</strong> finish step 1 to unlock this section.</p>
-              <Button className="button button-secondary" type="button" onClick={() => setCurrentStep(1)}>
-                Go to step 1
-              </Button>
-            </div>
-          ) : (
-            <>
-              <div>
-                <h3>Issue timeline</h3>
-                {timelineEntries.length > 0 ? (
-                  <ul className="timeline">
-                    {timelineEntries.map((entry) => (
-                      <li key={`${entry.label}-${entry.date}`}>
-                        <p className="timeline-date">{formatTimelineDate(entry.date)}</p>
-                        <p className="timeline-label">{entry.label}</p>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="helper">Add a date above to show the timeline.</p>
-                )}
-              </div>
-
-              <div>
-                <h3>What usually happens next</h3>
-                <ul className="next-steps">
-                  {visibleNextSteps.map((step) => (
-                    <li key={step.label} className={step.unlocked ? "" : "locked"}>
-                      <div className="next-step-row">
-                        <div>
-                          <p className="next-step-title">
-                            {step.unlocked
-                              ? step.label
-                              : `${step.label} (next normal step unlocks in ${Math.abs(step.remaining)} days)`}
-                          </p>
-                          <p className="helper">Reminder date: {step.reminderDateLabel}</p>
-                          <p className="helper">
-                            {step.unlocked
-                              ? `Unlocked at ${daysOpen} days open.`
-                              : `Unlocks after ${step.unlockDay} days open.`}
-                          </p>
-                        </div>
-                        <a
-                          className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
-                          href={step.calendarLink || "#"}
-                          target="_blank"
-                          rel="noreferrer"
-                          aria-disabled={!step.calendarLink}
-                          onClick={(event) => {
-                            if (!step.calendarLink) {
-                              event.preventDefault();
-                            }
-                          }}
-                        >
-                          Add Google Calendar reminder
-                        </a>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div>
-                <h3>Community impact</h3>
-                <div className="impact">
-                  <div className="impact-summary">
-                    <p className="impact-count">{impactCount}</p>
-                    <div>
-                      <p className="impact-label">Total reports</p>
-                      <p className="impact-hint">Reports start at 1. Use “Me too” to add yours.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3>Help and sources</h3>
-                <p className="helper">Information only. Not legal advice.</p>
-                {issueGuidance && (
-                  <details className="helper-card">
-                    <summary>311 call info</summary>
-                    <div className="helper-card-body">
-                      <p>
-                        <strong>Category to choose:</strong> {issueGuidance.category}
-                      </p>
-                      <p>
-                        <strong>What to say:</strong> {guidanceScript}
-                      </p>
-                      <p>
-                        <strong>What happens next:</strong> {issueGuidance.nextStep}
-                      </p>
-                    </div>
-                  </details>
-                )}
-
-                {ruleSources.length > 0 && (
-                  <details className="helper-card">
-                    <summary>Local rules (information only)</summary>
-                    <div className="helper-card-body">
-                      <ul className="rule-sources">
-                        {ruleSources.map((source) => (
-                          <li key={source.url}>
-                            <a href={source.url} target="_blank" rel="noreferrer">
-                              {source.title}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </details>
-                )}
-              </div>
-            </>
-          )}
-        </section>
+        <RecordPanel
+          canShowAfterBasics={canShowAfterBasics}
+          onGoToStep1={() => setCurrentStep(1)}
+          timelineEntries={timelineEntries}
+          visibleNextSteps={visibleNextSteps}
+          daysOpen={daysOpen}
+          impactCount={impactCount}
+          issueGuidance={issueGuidance}
+          guidanceScript={guidanceScript}
+          ruleSources={ruleSources}
+        />
       </main>
 
       <footer className="site-footer">
