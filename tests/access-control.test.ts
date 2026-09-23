@@ -78,7 +78,7 @@ describe("resident key gating on submission routes", () => {
       headers: { "Content-Type": "application/json", "x-forwarded-for": "1.1.1.1" },
       body: JSON.stringify(basePayload),
     });
-    const missingKeyResponse = await createSubmission({ request: missingKeyRequest, locals } as Parameters<typeof createSubmission>[0]);
+    const missingKeyResponse = await createSubmission({ request: missingKeyRequest, locals } as unknown as Parameters<typeof createSubmission>[0]);
     assert.equal(missingKeyResponse.status, 403);
 
     const wrongKeyRequest = new Request("http://localhost/api/submissions", {
@@ -90,7 +90,7 @@ describe("resident key gating on submission routes", () => {
       },
       body: JSON.stringify(basePayload),
     });
-    const wrongKeyResponse = await createSubmission({ request: wrongKeyRequest, locals } as Parameters<typeof createSubmission>[0]);
+    const wrongKeyResponse = await createSubmission({ request: wrongKeyRequest, locals } as unknown as Parameters<typeof createSubmission>[0]);
     assert.equal(wrongKeyResponse.status, 403);
 
     const validKeyRequest = new Request("http://localhost/api/submissions", {
@@ -102,7 +102,7 @@ describe("resident key gating on submission routes", () => {
       },
       body: JSON.stringify(basePayload),
     });
-    const validKeyResponse = await createSubmission({ request: validKeyRequest, locals } as Parameters<typeof createSubmission>[0]);
+    const validKeyResponse = await createSubmission({ request: validKeyRequest, locals } as unknown as Parameters<typeof createSubmission>[0]);
     assert.equal(validKeyResponse.status, 201);
     const createdPayload = await readJson(validKeyResponse);
     assert.ok(typeof createdPayload.id === "string");
@@ -113,20 +113,20 @@ describe("resident key gating on submission routes", () => {
     const invalidKeyRequest = new Request(`http://localhost/api/submissions/${submissionId}?key=99999`, {
       method: "GET",
     });
-    const invalidKeyResponse = await getSubmission({ params: { id: submissionId }, request: invalidKeyRequest, locals } as Parameters<typeof getSubmission>[0]);
+    const invalidKeyResponse = await getSubmission({ params: { id: submissionId }, request: invalidKeyRequest, locals } as unknown as Parameters<typeof getSubmission>[0]);
     assert.equal(invalidKeyResponse.status, 403);
     assert.equal(kv.getCallCount(), invalidKeyGetCount);
 
     const otherBuildingRequest = new Request(`http://localhost/api/submissions/${submissionId}?key=key-2400-test`, {
       method: "GET",
     });
-    const otherBuildingResponse = await getSubmission({ params: { id: submissionId }, request: otherBuildingRequest, locals } as Parameters<typeof getSubmission>[0]);
+    const otherBuildingResponse = await getSubmission({ params: { id: submissionId }, request: otherBuildingRequest, locals } as unknown as Parameters<typeof getSubmission>[0]);
     assert.equal(otherBuildingResponse.status, 404);
 
     const correctBuildingRequest = new Request(`http://localhost/api/submissions/${submissionId}?key=key-2353-test`, {
       method: "GET",
     });
-    const correctBuildingResponse = await getSubmission({ params: { id: submissionId }, request: correctBuildingRequest, locals } as Parameters<typeof getSubmission>[0]);
+    const correctBuildingResponse = await getSubmission({ params: { id: submissionId }, request: correctBuildingRequest, locals } as unknown as Parameters<typeof getSubmission>[0]);
     assert.equal(correctBuildingResponse.status, 200);
 
     const missingKeyReportRequest = new Request(`http://localhost/api/submissions/${submissionId}/report`, {
@@ -134,7 +134,7 @@ describe("resident key gating on submission routes", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ increment: 1 }),
     });
-    const missingKeyReportResponse = await reportSubmission({ params: { id: submissionId }, request: missingKeyReportRequest, locals } as Parameters<typeof reportSubmission>[0]);
+    const missingKeyReportResponse = await reportSubmission({ params: { id: submissionId }, request: missingKeyReportRequest, locals } as unknown as Parameters<typeof reportSubmission>[0]);
     assert.equal(missingKeyReportResponse.status, 403);
 
     const otherBuildingReportRequest = new Request(`http://localhost/api/submissions/${submissionId}/report`, {
@@ -142,7 +142,7 @@ describe("resident key gating on submission routes", () => {
       headers: { "Content-Type": "application/json", "x-building-key": "key-2400-test" },
       body: JSON.stringify({ increment: 1 }),
     });
-    const otherBuildingReportResponse = await reportSubmission({ params: { id: submissionId }, request: otherBuildingReportRequest, locals } as Parameters<typeof reportSubmission>[0]);
+    const otherBuildingReportResponse = await reportSubmission({ params: { id: submissionId }, request: otherBuildingReportRequest, locals } as unknown as Parameters<typeof reportSubmission>[0]);
     assert.equal(otherBuildingReportResponse.status, 404);
 
     const invalidIncrementRequest = new Request(`http://localhost/api/submissions/${submissionId}/report`, {
@@ -153,7 +153,7 @@ describe("resident key gating on submission routes", () => {
       },
       body: JSON.stringify({ increment: 1.5 }),
     });
-    const invalidIncrementResponse = await reportSubmission({ params: { id: submissionId }, request: invalidIncrementRequest, locals } as Parameters<typeof reportSubmission>[0]);
+    const invalidIncrementResponse = await reportSubmission({ params: { id: submissionId }, request: invalidIncrementRequest, locals } as unknown as Parameters<typeof reportSubmission>[0]);
     assert.equal(invalidIncrementResponse.status, 400);
 
     const queryKeyReportRequest = new Request(`http://localhost/api/submissions/${submissionId}/report?key=key-2353-test`, {
@@ -161,10 +161,11 @@ describe("resident key gating on submission routes", () => {
       headers: {
         "Content-Type": "application/json",
         "x-forwarded-for": "1.1.1.2",
+        cookie: "bl_session_id=session-query-key",
       },
       body: JSON.stringify({ increment: 1 }),
     });
-    const queryKeyReportResponse = await reportSubmission({ params: { id: submissionId }, request: queryKeyReportRequest, locals } as Parameters<typeof reportSubmission>[0]);
+    const queryKeyReportResponse = await reportSubmission({ params: { id: submissionId }, request: queryKeyReportRequest, locals } as unknown as Parameters<typeof reportSubmission>[0]);
     assert.equal(queryKeyReportResponse.status, 200);
 
     const correctBuildingReportRequest = new Request(`http://localhost/api/submissions/${submissionId}/report`, {
@@ -173,10 +174,11 @@ describe("resident key gating on submission routes", () => {
         "Content-Type": "application/json",
         "x-building-key": "key-2353-test",
         "x-forwarded-for": "1.1.1.1",
+        cookie: "bl_session_id=session-header-key",
       },
       body: JSON.stringify({ increment: 1 }),
     });
-    const correctBuildingReportResponse = await reportSubmission({ params: { id: submissionId }, request: correctBuildingReportRequest, locals } as Parameters<typeof reportSubmission>[0]);
+    const correctBuildingReportResponse = await reportSubmission({ params: { id: submissionId }, request: correctBuildingReportRequest, locals } as unknown as Parameters<typeof reportSubmission>[0]);
     assert.equal(correctBuildingReportResponse.status, 200);
     const reportPayload = await readJson(correctBuildingReportResponse);
     assert.equal(reportPayload.reportCount, 3);

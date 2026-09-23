@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { guardApiRequest } from "../../../lib/api/requestGuard";
 import { createSubmissionRecord } from "../../../lib/domain/submissions";
 import { jsonError, jsonResponse } from "../../../lib/http";
-import { validateSubmissionInput } from "../../../lib/submissions";
+import { validateSubmissionInput, type SubmissionInput } from "../../../lib/submissions";
 import { getSubmissionsKv, saveSubmissionRecord } from "../../../lib/storage/submissions";
 
 export const prerender = false;
@@ -13,13 +13,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     return jsonError("Ledger storage is not configured.", 500);
   }
 
-  const guarded = await guardApiRequest(request, locals, kv, {
+  const guarded = await guardApiRequest<unknown, SubmissionInput>(request, locals, kv, {
     auth: {
       mode: "resident",
       buildingScopeFrom: (payload) => payload?.building ?? null,
     },
     parseBody: {
-      fallback: null,
+      fallback: null as unknown,
     },
     validate: (payload) => {
       const validation = validateSubmissionInput(payload);
@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         return {
           ok: false,
           message: "We could not save this submission.",
-          details: { details: validation.errors },
+          details: { details: [...validation.errors] },
         };
       }
       return { ok: true, data: validation.data };

@@ -79,6 +79,12 @@ for (const record of visibleSubmissions) {
   grouped[record.status].push(record);
 }
 
+// Records a steward can merge a duplicate into: same issue type, not already merged.
+const mergeTargetsFor = (record: BuildingSubmission) =>
+  submissions.filter(
+    (candidate) => candidate.id !== record.id && candidate.issue === record.issue && !candidate.mergedInto
+  );
+
 const totalVisible = visibleSubmissions.length;
 const totalFiltered = filtered.length;
 ---
@@ -208,15 +214,19 @@ const totalFiltered = filtered.length;
                             </p>
                           </div>
                           <div class="issue-actions">
-                            <button
-                              class="button button-compact"
-                              type="button"
-                              data-report-button
-                              data-submission-id={record.id}
-                              data-default-label="Me too"
-                            >
-                              Me too
-                            </button>
+                            {record.mergedInto ? (
+                              <p class="helper">Merged into another record.</p>
+                            ) : (
+                              <button
+                                class="button button-compact"
+                                type="button"
+                                data-report-button
+                                data-submission-id={record.id}
+                                data-default-label="Me too"
+                              >
+                                Me too
+                              </button>
+                            )}
                             <a
                               class="button button-secondary button-compact"
                               href={buildSubmissionDetailsUrl({ submissionId: record.id })}
@@ -225,7 +235,7 @@ const totalFiltered = filtered.length;
                             </a>
                           </div>
                           <p class="helper" data-report-status={record.id} role="status" aria-live="polite"></p>
-                          {isSteward && (
+                          {isSteward && !record.mergedInto && (
                             <div class="steward-row">
                               <label class="steward-inline">
                                 <span>Update status</span>
@@ -252,6 +262,28 @@ const totalFiltered = filtered.length;
                               </label>
                               <p class="helper" data-status-note={record.id} role="status" aria-live="polite"></p>
                               <p class="helper">Use this only after residents confirm the issue is fixed.</p>
+                              {mergeTargetsFor(record).length > 0 && (
+                                <label class="steward-inline">
+                                  <span>Duplicate of</span>
+                                  <select class="input" data-merge-select data-submission-id={record.id}>
+                                    <option value="">Choose the main record</option>
+                                    {mergeTargetsFor(record).map((target) => (
+                                      <option value={target.id}>
+                                        Started {target.startDate || "date not listed"} ({statusLabels[target.status]})
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <button
+                                    class="button button-compact button-secondary"
+                                    type="button"
+                                    data-merge-save
+                                    data-submission-id={record.id}
+                                  >
+                                    Merge
+                                  </button>
+                                </label>
+                              )}
+                              <p class="helper" data-merge-note={record.id} role="status" aria-live="polite"></p>
                             </div>
                           )}
                         </article>
@@ -317,10 +349,16 @@ const totalFiltered = filtered.length;
                 )}
               </form>
               <div class="export-block">
+                <h3>Export</h3>
+                <p class="helper">A printable summary for an inspector or legal aid. No names or evidence files.</p>
+                <a class="button button-secondary" href={`${clearFiltersUrl}/export`}>Open printable summary</a>
+              </div>
+              <div class="export-block">
                 <h3>Notes</h3>
                 <ul class="submission-detail-list">
                   <li>Use “Me too” to add your report without writing.</li>
                   <li>Stewards can update status for clear records.</li>
+                  <li>Stewards can merge duplicate records. Reports move to the main record.</li>
                   <li>Counts are resident-reported and not verified.</li>
                   <li>Small counts are hidden to protect resident privacy.</li>
                 </ul>
@@ -332,16 +370,18 @@ const totalFiltered = filtered.length;
 
       <footer class="site-footer">
         <p>Safety first: this dashboard does not show names, unit numbers, or evidence files.</p>
+        {hasAccess && (
+          <p><a href="?forget=1">Forget key on this device</a>. Use this on a shared phone.</p>
+        )}
       </footer>
     </div>
 
     {hasAccess && kv && (
-      <script
-        type="module"
-        data-dashboard-config
-        data-is-steward={isSteward ? "true" : "false"}
-        src={Astro.resolve("../../scripts/buildingDashboard.ts")}
-      ></script>
+      <div hidden data-dashboard-config data-is-steward={isSteward ? "true" : "false"}></div>
     )}
+    <script>
+      // Astro bundles this import. The script does nothing when the dashboard is locked.
+      import "../../scripts/buildingDashboard.ts";
+    </script>
   </body>
 </html>

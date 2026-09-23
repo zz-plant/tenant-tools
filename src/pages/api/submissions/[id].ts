@@ -1,7 +1,6 @@
 import type { APIRoute } from "astro";
 import { guardApiRequest } from "../../../lib/api/requestGuard";
 import { jsonError, jsonResponse } from "../../../lib/http";
-import type { SubmissionRecord } from "../../../lib/submissions";
 import { fetchSubmissionRecord, getSubmissionsKv } from "../../../lib/storage/submissions";
 
 export const prerender = false;
@@ -24,7 +23,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     return guarded.response;
   }
 
-  const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
+  const record = await fetchSubmissionRecord(kv, id);
   if (!record) {
     return jsonError("Submission not found.", 404);
   }

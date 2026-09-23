@@ -1,33 +1,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { createMockKv } from "./helpers/mockKv";
 import { POST as createSubmission } from "../src/pages/api/submissions/index";
 import { POST as updateStatus } from "../src/pages/api/submissions/[id]/status";
 import { POST as reportSubmission } from "../src/pages/api/submissions/[id]/report";
 
 const BUILDING_KEYS_JSON = JSON.stringify({ "2353": "key-2353-test" });
 
-const createMockKv = () => {
-  const store = new Map<string, string>();
 
-  return {
-    async get(key: string, options?: { type?: "json" }) {
-      const value = store.get(key);
-      if (value === undefined) {
-        return null;
-      }
-      if (options?.type === "json") {
-        return JSON.parse(value);
-      }
-      return value;
-    },
-    async put(key: string, value: string) {
-      store.set(key, value);
-    },
-    keys() {
-      return [...store.keys()];
-    },
-  };
-};
 
 const basePayload = {
   building: "2353",
@@ -69,7 +49,7 @@ describe("audit event logging", () => {
         body: JSON.stringify(basePayload),
       }),
       locals,
-    } as Parameters<typeof createSubmission>[0]);
+    } as unknown as Parameters<typeof createSubmission>[0]);
     assert.equal(createResponse.status, 201);
     const created = await readJson(createResponse);
 
@@ -85,7 +65,7 @@ describe("audit event logging", () => {
         body: JSON.stringify({ status: "resolved" }),
       }),
       locals,
-    } as Parameters<typeof updateStatus>[0]);
+    } as unknown as Parameters<typeof updateStatus>[0]);
     assert.equal(statusResponse.status, 200);
 
     const reportResponse = await reportSubmission({
@@ -96,11 +76,12 @@ describe("audit event logging", () => {
           "Content-Type": "application/json",
           "x-building-key": "key-2353-test",
           "x-forwarded-for": "1.1.1.3",
+          cookie: "bl_session_id=session-audit",
         },
         body: JSON.stringify({ increment: 1 }),
       }),
       locals,
-    } as Parameters<typeof reportSubmission>[0]);
+    } as unknown as Parameters<typeof reportSubmission>[0]);
     assert.equal(reportResponse.status, 200);
 
     const auditKeys = kv.keys().filter((key) => key.startsWith("audit:"));
@@ -129,7 +110,7 @@ describe("audit event logging", () => {
         body: JSON.stringify(basePayload),
       }),
       locals,
-    } as Parameters<typeof createSubmission>[0]);
+    } as unknown as Parameters<typeof createSubmission>[0]);
 
     assert.equal(blockedResponse.status, 403);
 

@@ -59,6 +59,12 @@ bun run dev
 bun run test
 ```
 
+### Type check
+
+```bash
+bun run typecheck
+```
+
 ### Build
 
 ```bash
@@ -114,6 +120,30 @@ Do not commit files that contain real keys.
 - `BUILDING_ACCESS_KEY` — fallback key when a building does not exist in `BUILDING_KEYS_JSON`
 - `STEWARD_KEY` — required for status updates and steward actions
 
+### Private evidence photos (optional)
+
+Photo upload is off until both of these are set. Without them, the record page says upload is not set up.
+
+- `EVIDENCE_BUCKET` — R2 bucket binding (already in `wrangler.jsonc`). Create the bucket once:
+
+  ```bash
+  wrangler r2 bucket create building-ledger-evidence
+  ```
+
+  Never turn on public access for this bucket.
+- `EVIDENCE_SIGNING_KEY` — secret used to sign short-lived photo links. Use a long random value:
+
+  ```bash
+  wrangler secret put EVIDENCE_SIGNING_KEY
+  ```
+
+Local run with KV and R2 simulated:
+
+```bash
+bun run build
+npx wrangler pages dev dist --kv SUBMISSIONS_KV --r2 EVIDENCE_BUCKET --compatibility-flags nodejs_compat
+```
+
 ### SEO and sitemap
 
 - `SITE_URL` — preferred full site origin used to build canonical URLs and sitemap entries (example: `https://app.example.org`). If unset, build tooling may fall back to deploy URL environment variables and will log a warning.
@@ -143,7 +173,7 @@ Never commit real keys to git.
 1. Read [`AGENTS.md`](AGENTS.md) before changing product behavior or copy.
 2. Keep changes small and scoped.
 3. Add tests when touching access, validation, evidence, export, or notice logic.
-4. Run `bun run test` before opening a PR.
+4. Run `bun run typecheck` and `bun run test` before opening a PR. CI runs both, plus the build.
 5. For UI changes, include screenshots.
 6. Update `CHANGELOG.md` for user-visible behavior changes.
 
@@ -161,6 +191,7 @@ Use Conventional Commit style:
 
 - Product intent: `docs/vision.md`
 - Architecture and data flow: `docs/architecture.md`
+- Audit and improvement plan (current): `docs/audit-and-plan-2026-09.md`
 - Consolidated implementation status: `docs/implementation-status-2026-02.md`
 - Dependency capability review: `docs/tech-stack-capability-research-2026-02.md`
 - Agent skills playbook: `docs/agent-skills-playbook.md`

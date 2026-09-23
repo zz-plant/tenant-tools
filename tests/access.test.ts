@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   getBuildingIdsForKey,
   isAccessKeyValid,
+  timingSafeEqual,
   isBuildingAccessValid,
   isResidentKeyRecognized,
   parseBuildingKeys,
@@ -69,5 +70,15 @@ describe("building key helpers", () => {
 
     const envWithFallback = { BUILDING_ACCESS_KEY: "fallback" };
     assert.deepEqual(getBuildingIdsForKey("fallback", envWithFallback), ["*"]);
+  });
+});
+
+describe("timingSafeEqual", () => {
+  it("matches only identical strings", () => {
+    assert.equal(timingSafeEqual("abc", "abc"), true);
+    assert.equal(timingSafeEqual("abc", "abd"), false);
+    assert.equal(timingSafeEqual("abc", "abcd"), false);
+    assert.equal(timingSafeEqual("", ""), true);
+    assert.equal(timingSafeEqual("ключ", "ключ"), true);
   });
 });

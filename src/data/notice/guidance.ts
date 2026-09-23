@@ -1,5 +1,3 @@
-import type { IssueId } from "./issueOptions";
-
 export const zoneOptions = [
   { id: "common_area", label: "Common area" },
   { id: "hallway", label: "Hallway or stairwell" },
@@ -10,7 +8,7 @@ export const zoneOptions = [
 
 export type ZoneId = (typeof zoneOptions)[number]["id"];
 
-type Issue311GuidanceId = Extract<IssueId, "heat" | "leak" | "pests" | "entry" | "common">;
+type Issue311GuidanceId = "heat" | "leak" | "pests" | "entry" | "common";
 
 export const issue311Guidance: Record<
   Issue311GuidanceId,

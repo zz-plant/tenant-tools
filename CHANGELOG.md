@@ -1,5 +1,65 @@
 # Changelog
 
+## 1.2.0 - 2026-09-23
+
+### Added
+
+- Residents can add private evidence photos to a record. Photos are JPEG or PNG, up to 5 MB, 10 per record.
+- Stewards can remove unsafe photos.
+- Stewards can merge a duplicate record into the main record. Reports move to the main record.
+- Added a printable building summary for inspectors and legal aid (`/buildings/:id/export`).
+- Record pages have a "Print or save as PDF" button and print styles.
+- `bun run typecheck` now also checks `.astro` files.
+
+### Changed
+
+- The dashboard reads a per-building index. The first view after this update copies older records into the index.
+- "Me too" counts are rebuilt from one marker per tap, so taps at the same moment are no longer lost.
+- The notice builder is split into smaller, tested parts.
+
+### Fixed
+
+- The export summary in the builder now updates when detail fields change.
+
+### Security
+
+- Photo location and camera details are removed in the browser and again on the server.
+- Photo links expire after 5 minutes and also need the resident key.
+- Photos are stored under random keys in a private bucket. Keys never include the building.
+- Access keys are compared in constant time.
+- Removed an old copy of the rules data (`building-ledger-rules-pack.zip`).
+
+## 1.1.0 - 2026-09-23
+
+### Added
+
+- Added "Me too" on the record page, so residents who open a link from the group chat can add a report with one tap.
+- Added "Share in group chat" on the record page. The message has the issue type, start date, and link only. It never has the key.
+- Added "Forget key on this device" on private pages and in the builder.
+- Added quick facts for door fobs, entry door locks, and window cleaning.
+- Added an audit and phased plan: `docs/audit-and-plan-2026-09.md`.
+- Added `tsconfig.json`, a `typecheck` script, and a CI workflow (type check, tests, build).
+
+### Changed
+
+- Residents who open a key link can save records without typing the key again.
+- The resident key cookie now lasts 14 days instead of 30 minutes.
+- The dashboard reads record summaries from KV list metadata. It no longer reads every record for every building.
+- The "Portfolio" option no longer shows names of management staff.
+- The name warning no longer fires on common building words such as "Front Door" or "Water Leak".
+
+### Fixed
+
+- The building dashboard no longer crashes for residents with a valid key.
+- "Start over" in the builder no longer throws an error.
+
+### Security
+
+- Phone numbers written as "(773)555-0100" or "7735550100" are now rejected in details.
+- "Me too" counts once per browser session per record. Only a one-way hash of the session id is stored, and it cannot link one resident across records.
+- Removed the unused `/api/submissions/similar` endpoint, which scanned all records.
+- `.dev.vars` and `.env` are now ignored by git.
+
 ## 1.0.103 - 2026-03-15
 
 ### Changed

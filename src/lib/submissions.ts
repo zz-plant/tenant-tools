@@ -62,6 +62,14 @@ export type SubmissionRecord = SubmissionInput & {
   createdAt: string;
   issueLabel: string;
   status: SubmissionStatus;
+  /** Count saved by the resident who created the record. "Me too" markers are added on top. */
+  baseReportCount?: number;
+  /** Reports carried over from duplicate records a steward merged into this one. */
+  mergedReportCount?: number;
+  /** Set on a duplicate after a steward merges it into another record. */
+  mergedInto?: string;
+  /** Number of private evidence files on this record. Files are never listed publicly. */
+  evidenceCount?: number;
 };
 
 export const isSubmissionRecord = (value: unknown): value is SubmissionRecord => {
@@ -73,8 +81,63 @@ export const isSubmissionRecord = (value: unknown): value is SubmissionRecord =>
   return typeof candidate.id === "string" && candidate.id.length > 0;
 };
 
+const readString = (value: unknown) => (typeof value === "string" ? value : "");
+
+const readOptionalString = (value: unknown) => (typeof value === "string" && value ? value : undefined);
+
+const readCount = (value: unknown) => {
+  const count = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+};
+
+const readOptionalCount = (value: unknown) => (value === undefined ? undefined : readCount(value));
+
+/**
+ * The one place that turns stored KV JSON into a `SubmissionRecord`.
+ * Stored records can be older than the current type, so every field is read defensively.
+ */
+export const parseSubmissionRecord = (value: unknown): SubmissionRecord | null => {
+  if (!isSubmissionRecord(value)) {
+    return null;
+  }
+  const raw = value as unknown as Record<string, unknown>;
+  const issue = readString(raw.issue);
+  const details = raw.issueDetails && typeof raw.issueDetails === "object" ? raw.issueDetails : {};
+  const issueDetails = Object.fromEntries(
+    Object.entries(details as Record<string, unknown>).filter(
+      (entry): entry is [string, string] => typeof entry[1] === "string"
+    )
+  );
+  const zone = readString(raw.zone);
+
+  return {
+    id: readString(raw.id),
+    createdAt: readString(raw.createdAt),
+    building: readString(raw.building),
+    issue,
+    issueLabel: readString(raw.issueLabel) || issueOptions.find((option) => option.id === issue)?.label || issue,
+    status: normalizeSubmissionStatus(raw.status),
+    stage: readEnumValue(raw.stage, allowedStageSet) ?? "A",
+    language: readEnumValue(raw.language, supportedLanguageSet) ?? "en",
+    portfolio: readEnumValue(raw.portfolio, allowedPortfolioSet) ?? "other",
+    startDate: readString(raw.startDate),
+    reportDate: readString(raw.reportDate),
+    reportCount: readCount(raw.reportCount),
+    simpleEnglish: Boolean(raw.simpleEnglish),
+    zone: isValidZoneId(zone) ? zone : "",
+    firstMessageDate: readOptionalString(raw.firstMessageDate),
+    ticketDate: readOptionalString(raw.ticketDate),
+    ticketNumber: readOptionalString(raw.ticketNumber),
+    issueDetails,
+    baseReportCount: readOptionalCount(raw.baseReportCount),
+    mergedReportCount: readOptionalCount(raw.mergedReportCount),
+    mergedInto: readOptionalString(raw.mergedInto),
+    evidenceCount: readOptionalCount(raw.evidenceCount),
+  };
+};
+
 export const isValidSubmissionStatus = (value: unknown): value is SubmissionStatus =>
-  typeof value === "string" && allowedStatusSet.has(value);
+  typeof value === "string" && allowedStatusSet.has(value as SubmissionStatus);
 
 export const normalizeSubmissionStatus = (value: unknown): SubmissionStatus =>
   isValidSubmissionStatus(value) ? value : "open";
@@ -103,8 +166,13 @@ const sanitizeDetails = (details: Record<string, unknown>) => {
   return cleaned;
 };
 
-const pushSensitiveErrors = (label: string, value: string, errors: string[]) => {
-  getSensitiveContentMessages(value).forEach((message) => {
+const pushSensitiveErrors = (
+  label: string,
+  value: string,
+  errors: string[],
+  options: { allowBareDigitRuns?: boolean } = {}
+) => {
+  getSensitiveContentMessages(value, options).forEach((message) => {
     errors.push(`${label}: ${message}`);
   });
 };
@@ -133,7 +201,7 @@ const validateOptionalDate = (label: string, value: string, errors: string[]) =>
 
 export const validateSubmissionInput = (payload: unknown) => {
   if (!payload || typeof payload !== "object") {
-    return { ok: false, errors: ["Payload must be an object."] } as const;
+    return { ok: false, errors: ["Payload must be an object."] as string[] } as const;
   }
 
   const data = payload as Record<string, unknown>;
@@ -192,7 +260,8 @@ export const validateSubmissionInput = (payload: unknown) => {
 
   const ticketNumber = sanitizeLimitedText(asString(data.ticketNumber), ticketNumberCharacterLimit);
   if (ticketNumber) {
-    pushSensitiveErrors("Ticket number", ticketNumber, errors);
+    // 311 ticket numbers can be 10 digits, so only formatted phone numbers are rejected here.
+    pushSensitiveErrors("Ticket number", ticketNumber, errors, { allowBareDigitRuns: true });
     pushSoftWarnings("Ticket number", ticketNumber, warnings);
   }
 
@@ -213,7 +282,7 @@ export const validateSubmissionInput = (payload: unknown) => {
     detailWarnings.forEach((message) => warnings.push(`Details: ${message}`));
   }
 
-  if (errors.length > 0) {
+  if (errors.length > 0 || !issue || !stage || !language || !portfolio) {
     return { ok: false, errors } as const;
   }
 
@@ -230,11 +299,11 @@ export const validateSubmissionInput = (payload: unknown) => {
       reportDate,
       reportCount,
       simpleEnglish,
-      zone,
+      zone: zone as ZoneId | "",
       firstMessageDate: firstMessageDate || undefined,
       ticketDate: ticketDate || undefined,
       ticketNumber: ticketNumber || undefined,
       issueDetails,
-    },
+    } satisfies SubmissionInput,
   } as const;
 };

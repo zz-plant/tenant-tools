@@ -1,7 +1,7 @@
 import { formatResidentReportCount } from "../lib/reportCount";
 
-const dashboardScript = document.querySelector("script[data-dashboard-config]") as HTMLScriptElement | null;
-const isStewardMode = dashboardScript?.dataset.isSteward === "true";
+const dashboardConfig = document.querySelector("[data-dashboard-config]") as HTMLElement | null;
+const isStewardMode = dashboardConfig?.dataset.isSteward === "true";
 
 type SubmissionStatus = "open" | "resolved" | "archived";
 const statusOrder: SubmissionStatus[] = ["open", "resolved", "archived"];
@@ -84,7 +84,12 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
         throw new Error(payload?.error || "We could not update the report count.");
       }
       updateReportCount(id, payload.reportCount ?? 0);
-      setReportStatus(id, "Your report was added. No personal details were saved.");
+      setReportStatus(
+        id,
+        payload.alreadyReported
+          ? "You already added your report on this device."
+          : "Your report was added. No personal details were saved."
+      );
     } catch (error) {
       setReportStatus(id, error instanceof Error ? error.message : "We could not add your report.", true);
     } finally {
@@ -150,6 +155,42 @@ document.querySelectorAll("[data-status-save]").forEach((button) => {
     } finally {
       button.removeAttribute("disabled");
       button.textContent = defaultLabel;
+    }
+  });
+});
+
+document.querySelectorAll("[data-merge-save]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const id = button.getAttribute("data-submission-id");
+    if (!id || !isStewardMode) return;
+    const select = document.querySelector(`[data-merge-select][data-submission-id="${id}"]`) as HTMLSelectElement | null;
+    const note = document.querySelector(`[data-merge-note="${id}"]`) as HTMLElement | null;
+    const into = select?.value;
+    if (!into) {
+      if (note) note.textContent = "Choose the main record first.";
+      return;
+    }
+    if (!window.confirm("Merge this record into the main record? Its reports will move. This cannot be undone here.")) {
+      return;
+    }
+    button.setAttribute("disabled", "true");
+    if (note) note.textContent = "Merging...";
+    try {
+      const response = await fetch(`/api/submissions/${encodeURIComponent(id)}/merge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ into }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload?.error || "We could not merge these records.");
+      }
+      updateReportCount(into, payload.reportCount ?? 0);
+      moveCardToStatusGroup(id, "archived");
+      if (note) note.textContent = "Merged. Reports moved to the main record.";
+    } catch (error) {
+      if (note) note.textContent = error instanceof Error ? error.message : "We could not merge these records.";
+      button.removeAttribute("disabled");
     }
   });
 });

@@ -3,7 +3,10 @@ export const AUDIT_EVENT_TTL_SECONDS = 60 * 60 * 24 * 90;
 export type AuditEventAction =
   | "submission.create"
   | "submission.status.update"
-  | "submission.report.increment";
+  | "submission.report.increment"
+  | "submission.merge"
+  | "evidence.upload"
+  | "evidence.delete";
 
 export type AuditEventOutcome = "success" | "rejected";
 

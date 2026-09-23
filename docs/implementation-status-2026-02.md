@@ -2,6 +2,8 @@
 
 This is the single source for completed and pending implementation work for the current planning cycle.
 
+> Update 2026-09: see `docs/audit-and-plan-2026-09.md` for the current audit and phased plan.
+
 ## Completed since last planning pass
 
 ### Core safety and quality work

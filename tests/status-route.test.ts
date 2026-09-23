@@ -68,7 +68,7 @@ describe("submission status route", () => {
           },
         },
       },
-    } as Parameters<typeof updateStatus>[0]);
+    } as unknown as Parameters<typeof updateStatus>[0]);
 
     assert.equal(response.status, 200);
     const payload = await readJson(response);

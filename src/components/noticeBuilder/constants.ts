@@ -117,7 +117,7 @@ export const factualTagOptions: Partial<Record<keyof typeof fieldDefinitions, st
   location: ["kitchen", "bathroom", "ceiling", "hallway"],
   attachment: ["photo", "video", "screenshot"],
   pestType: ["roaches", "rats", "bedbugs"],
-  commonArea: ["elevator", "garage door", "hall lights", "trash room"],
+  commonArea: ["elevator", "garage door", "hall lights", "trash room", "door fobs", "entry door lock", "window cleaning"],
   lockoutAction: ["locked out", "utilities shut off"],
-  issueDescription: ["broken elevator", "water leak", "no heat", "mold smell"],
+  issueDescription: ["broken elevator", "water leak", "no heat", "mold smell", "door fobs not working", "windows not cleaned"],
 };

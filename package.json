@@ -1,14 +1,15 @@
 {
   "name": "tenant-notice-builder",
   "type": "module",
-  "version": "1.0.103",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "deploy": "bun run build && wrangler deploy",
     "preview": "astro preview",
-    "test": "node --test --import tsx tests/*.test.ts"
+    "test": "node --test --import tsx tests/*.test.ts",
+    "typecheck": "astro check && tsc --noEmit"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
@@ -21,6 +22,7 @@
     "tslib": "^2.8.1"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "tsx": "^4.21.0",
