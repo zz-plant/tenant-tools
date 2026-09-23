@@ -74,7 +74,7 @@ export const isSubmissionRecord = (value: unknown): value is SubmissionRecord =>
 };
 
 export const isValidSubmissionStatus = (value: unknown): value is SubmissionStatus =>
-  typeof value === "string" && allowedStatusSet.has(value);
+  typeof value === "string" && allowedStatusSet.has(value as SubmissionStatus);
 
 export const normalizeSubmissionStatus = (value: unknown): SubmissionStatus =>
   isValidSubmissionStatus(value) ? value : "open";
@@ -103,8 +103,13 @@ const sanitizeDetails = (details: Record<string, unknown>) => {
   return cleaned;
 };
 
-const pushSensitiveErrors = (label: string, value: string, errors: string[]) => {
-  getSensitiveContentMessages(value).forEach((message) => {
+const pushSensitiveErrors = (
+  label: string,
+  value: string,
+  errors: string[],
+  options: { allowBareDigitRuns?: boolean } = {}
+) => {
+  getSensitiveContentMessages(value, options).forEach((message) => {
     errors.push(`${label}: ${message}`);
   });
 };
@@ -133,7 +138,7 @@ const validateOptionalDate = (label: string, value: string, errors: string[]) =>
 
 export const validateSubmissionInput = (payload: unknown) => {
   if (!payload || typeof payload !== "object") {
-    return { ok: false, errors: ["Payload must be an object."] } as const;
+    return { ok: false, errors: ["Payload must be an object."] as string[] } as const;
   }
 
   const data = payload as Record<string, unknown>;
@@ -192,7 +197,8 @@ export const validateSubmissionInput = (payload: unknown) => {
 
   const ticketNumber = sanitizeLimitedText(asString(data.ticketNumber), ticketNumberCharacterLimit);
   if (ticketNumber) {
-    pushSensitiveErrors("Ticket number", ticketNumber, errors);
+    // 311 ticket numbers can be 10 digits, so only formatted phone numbers are rejected here.
+    pushSensitiveErrors("Ticket number", ticketNumber, errors, { allowBareDigitRuns: true });
     pushSoftWarnings("Ticket number", ticketNumber, warnings);
   }
 
@@ -213,7 +219,7 @@ export const validateSubmissionInput = (payload: unknown) => {
     detailWarnings.forEach((message) => warnings.push(`Details: ${message}`));
   }
 
-  if (errors.length > 0) {
+  if (errors.length > 0 || !issue || !stage || !language || !portfolio) {
     return { ok: false, errors } as const;
   }
 
@@ -230,11 +236,11 @@ export const validateSubmissionInput = (payload: unknown) => {
       reportDate,
       reportCount,
       simpleEnglish,
-      zone,
+      zone: zone as ZoneId | "",
       firstMessageDate: firstMessageDate || undefined,
       ticketDate: ticketDate || undefined,
       ticketNumber: ticketNumber || undefined,
       issueDetails,
-    },
+    } satisfies SubmissionInput,
   } as const;
 };

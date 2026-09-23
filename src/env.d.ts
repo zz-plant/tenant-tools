@@ -1,10 +1,10 @@
 /// <reference path="../.astro/types.d.ts" />
 
 type KVNamespace = {
-  get: (key: string, options?: { type: "json" }) => Promise<unknown | null>;
-  put: (key: string, value: string, options?: { expirationTtl?: number }) => Promise<void>;
+  get: <T = unknown>(key: string, options?: { type?: "json" }) => Promise<T | null>;
+  put: (key: string, value: string, options?: { expirationTtl?: number; metadata?: unknown }) => Promise<void>;
   list: (options: { prefix: string; cursor?: string; limit?: number }) => Promise<{
-    keys: Array<{ name: string }>;
+    keys: Array<{ name: string; metadata?: unknown }>;
     list_complete: boolean;
     cursor?: string;
   }>;

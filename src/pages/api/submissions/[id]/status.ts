@@ -48,13 +48,17 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   if (!guarded.ok) {
     return guarded.response;
   }
+  const payload = guarded.context.payload;
+  if (!payload) {
+    return jsonError("Request body is invalid.", 400);
+  }
 
   const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
   if (!isSubmissionRecord(record)) {
     return jsonError("Submission not found.", 404);
   }
 
-  const updated = updateSubmissionStatusRecord(record, guarded.context.payload.status);
+  const updated = updateSubmissionStatusRecord(record, payload.status);
   await saveSubmissionRecord(kv, updated);
   await guarded.context.logAuditSuccess(id);
 

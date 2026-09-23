@@ -76,7 +76,7 @@ describe("cookie auth and session-aware rate limiting", () => {
       body: JSON.stringify(basePayload),
     });
 
-    const createResponse = await createSubmission({ request: createRequest, locals } as Parameters<typeof createSubmission>[0]);
+    const createResponse = await createSubmission({ request: createRequest, locals } as unknown as Parameters<typeof createSubmission>[0]);
     assert.equal(createResponse.status, 201);
     const created = await readJson(createResponse);
 
@@ -87,7 +87,7 @@ describe("cookie auth and session-aware rate limiting", () => {
       },
     });
 
-    const getResponse = await getSubmission({ params: { id: created.id }, request: getRequest, locals } as Parameters<typeof getSubmission>[0]);
+    const getResponse = await getSubmission({ params: { id: created.id }, request: getRequest, locals } as unknown as Parameters<typeof getSubmission>[0]);
     assert.equal(getResponse.status, 200);
   });
 
@@ -106,7 +106,7 @@ describe("cookie auth and session-aware rate limiting", () => {
         },
         body: JSON.stringify(basePayload),
       });
-      const response = await createSubmission({ request, locals } as Parameters<typeof createSubmission>[0]);
+      const response = await createSubmission({ request, locals } as unknown as Parameters<typeof createSubmission>[0]);
       lastStatus = response.status;
     }
 
@@ -128,7 +128,7 @@ describe("cookie auth and session-aware rate limiting", () => {
         },
         body: JSON.stringify(basePayload),
       });
-      const response = await createSubmission({ request, locals } as Parameters<typeof createSubmission>[0]);
+      const response = await createSubmission({ request, locals } as unknown as Parameters<typeof createSubmission>[0]);
       if (response.status === 429) {
         rateLimited = true;
         break;
@@ -150,7 +150,7 @@ describe("cookie auth and session-aware rate limiting", () => {
     const separateResidentResponse = await createSubmission({
       request: separateResidentRequest,
       locals,
-    } as Parameters<typeof createSubmission>[0]);
+    } as unknown as Parameters<typeof createSubmission>[0]);
 
     assert.equal(separateResidentResponse.status, 201);
   });
