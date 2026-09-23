@@ -7,13 +7,29 @@ type BuildingKeys = Record<string, string>;
 
 const normalizeKey = (value: string | null | undefined) => (typeof value === "string" ? value.trim() : "");
 
+/**
+ * Compares two strings in time that depends only on their lengths, not on where they differ.
+ * This removes a timing signal an attacker could use to guess a key one character at a time.
+ */
+export const timingSafeEqual = (left: string, right: string) => {
+  const encoder = new TextEncoder();
+  const a = encoder.encode(left);
+  const b = encoder.encode(right);
+  const length = Math.max(a.length, b.length);
+  let diff = a.length ^ b.length;
+  for (let index = 0; index < length; index += 1) {
+    diff |= (a[index] ?? 0) ^ (b[index] ?? 0);
+  }
+  return diff === 0;
+};
+
 export const isAccessKeyValid = (provided: string | null | undefined, required: string | null | undefined) => {
   const requiredKey = normalizeKey(required);
   const providedKey = normalizeKey(provided);
   if (!requiredKey || !providedKey) {
     return false;
   }
-  return providedKey === requiredKey;
+  return timingSafeEqual(providedKey, requiredKey);
 };
 
 export const parseBuildingKeys = (raw: string | null | undefined): BuildingKeys => {
