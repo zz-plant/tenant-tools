@@ -45,3 +45,30 @@ export const createMockKv = () => {
 export type MockKv = ReturnType<typeof createMockKv>;
 
 export const asKv = (kv: MockKv) => kv as unknown as KVNamespace;
+
+/** In-memory stand-in for an R2 bucket. */
+export const createMockBucket = () => {
+  const objects = new Map<string, { bytes: Uint8Array; contentType?: string }>();
+  const bucket = {
+    async put(key: string, value: ArrayBuffer | Uint8Array, options?: { httpMetadata?: { contentType?: string } }) {
+      const bytes = value instanceof Uint8Array ? value : new Uint8Array(value);
+      objects.set(key, { bytes: new Uint8Array(bytes), contentType: options?.httpMetadata?.contentType });
+    },
+    async get(key: string) {
+      const object = objects.get(key);
+      if (!object) return null;
+      return {
+        body: new Response(object.bytes as unknown as BodyInit).body as ReadableStream,
+        size: object.bytes.length,
+        httpMetadata: { contentType: object.contentType },
+        arrayBuffer: async () => object.bytes.buffer.slice(0) as ArrayBuffer,
+      };
+    },
+    async delete(key: string) {
+      objects.delete(key);
+    },
+    keys: () => [...objects.keys()],
+    bytesOf: (key: string) => objects.get(key)?.bytes ?? null,
+  };
+  return bucket;
+};

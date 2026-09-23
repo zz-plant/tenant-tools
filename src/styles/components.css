@@ -1312,3 +1312,33 @@ code {
     text-decoration: none;
   }
 }
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.evidence-item {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.evidence-item img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+  background: var(--surface-soft);
+}
+
+.evidence-form {
+  display: grid;
+  gap: 10px;
+}
+
+.evidence-warning p {
+  margin: 0;
+}

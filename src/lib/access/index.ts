@@ -102,3 +102,7 @@ export const isBuildingAccessValid = (buildingId: string, providedKey: string | 
   const required = getRequiredBuildingKey(buildingId, env);
   return isAccessKeyValid(providedKey, required);
 };
+
+/** True when a resident's allowed building list (from `getBuildingIdsForKey`) covers this building. */
+export const isBuildingAllowed = (allowedBuildings: string[], building: string) =>
+  allowedBuildings.includes("*") || allowedBuildings.includes(building);

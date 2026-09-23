@@ -3,7 +3,9 @@ import "../../styles/global.css";
 import { fieldDefinitions, issueOptions, stages, zoneOptions } from "../../data/noticeData";
 import { portfolioOptions } from "../../data/portfolioOptions";
 import { getBuildingIdsForKey, isResidentKeyRecognized } from "../../lib/access";
-import { RESIDENT_KEY_COOKIE } from "../../lib/api/requestGuard";
+import { RESIDENT_KEY_COOKIE, STEWARD_KEY_COOKIE } from "../../lib/api/requestGuard";
+import { isAccessKeyValid } from "../../lib/access";
+import { getEvidenceConfig } from "../../lib/storage/evidence";
 import { formatResidentReportCount } from "../../lib/buildingDashboard";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
@@ -38,6 +40,9 @@ if (submissionRecord && kv && !submissionRecord.mergedInto) {
     submissionRecord = reconciled;
   }
 }
+const isSteward = isAccessKeyValid(Astro.cookies.get(STEWARD_KEY_COOKIE)?.value, env.STEWARD_KEY);
+const evidenceEnabled = Boolean(getEvidenceConfig(env));
+const evidenceCount = submissionRecord?.evidenceCount ?? 0;
 const mergedIntoUrl = submissionRecord?.mergedInto
   ? `/submissions/${encodeURIComponent(submissionRecord.mergedInto)}`
   : "";
@@ -220,10 +225,50 @@ const groupChatText = submissionRecord
                 <p class="helper" data-share-status role="status" aria-live="polite">Complete all checks to copy the link.</p>
               </div>
 
+              <div
+                class="export-block"
+                id="evidence"
+                data-evidence={evidenceEnabled ? "" : undefined}
+                data-submission-id={id}
+                data-is-steward={isSteward ? "true" : "false"}
+              >
+                <div>
+                  <h3>Private evidence</h3>
+                  <p class="helper">Photos are private. Only residents with the key can see them.</p>
+                  <p class="helper">Photos on file: <span data-evidence-count>{evidenceCount}</span></p>
+                </div>
+                {!evidenceEnabled ? (
+                  <p class="helper">Photo upload is not set up for this site yet.</p>
+                ) : (
+                  <>
+                    <div class="evidence-grid no-print" data-evidence-grid></div>
+                    {!mergedIntoUrl && (
+                      <form class="evidence-form no-print" data-evidence-form>
+                        <div class="evidence-warning" role="note">
+                          <p class="evidence-warning-title">Before you upload</p>
+                          <p>Do not upload photos with faces, mail labels, unit numbers, leases, or anything with your name.</p>
+                          <p>Location and camera details are removed from the photo.</p>
+                        </div>
+                        <label class="checkbox-label">
+                          <input type="checkbox" data-evidence-confirm />
+                          I checked the photo. It has no faces, names, mail labels, unit numbers, or leases.
+                        </label>
+                        <label>
+                          Photo (JPEG or PNG, up to 5 MB)
+                          <input class="input" type="file" accept="image/jpeg,image/png" data-evidence-file />
+                        </label>
+                        <button class="button" type="submit" disabled data-evidence-submit>Upload photo</button>
+                        <p class="helper" data-evidence-status role="status" aria-live="polite"></p>
+                      </form>
+                    )}
+                  </>
+                )}
+              </div>
+
               <div class="export-block">
                 <div>
                   <h3>Details saved</h3>
-                  <p class="helper">Short factual details only. Evidence files are not shown here.</p>
+                  <p class="helper">Short factual details only. Photos are in the private evidence section.</p>
                 </div>
                 {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
                   <ul class="submission-detail-list detail-grid">
@@ -273,6 +318,9 @@ const groupChatText = submissionRecord
       </footer>
     </div>
 
+    <script>
+      import "../../scripts/evidence.ts";
+    </script>
     <script>
       const checks = Array.from(document.querySelectorAll('.share-check'));
       const status = document.querySelector('[data-share-status]');

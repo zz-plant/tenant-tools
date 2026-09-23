@@ -5,6 +5,14 @@
   "assets": {
     "directory": "./dist"
   },
+  // Private evidence photos. Create once with: wrangler r2 bucket create building-ledger-evidence
+  // Never enable public access on this bucket. Photos are served only through signed, key-gated links.
+  "r2_buckets": [
+    {
+      "binding": "EVIDENCE_BUCKET",
+      "bucket_name": "building-ledger-evidence"
+    }
+  ],
   "kv_namespaces": [
     {
       "binding": "SUBMISSIONS_KV",
