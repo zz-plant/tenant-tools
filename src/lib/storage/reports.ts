@@ -7,15 +7,3 @@ export const saveReportEntry = async (
   entry: ReportEntry,
   options: { expirationTtl?: number } = {}
 ) => kv.put(reportKey(entry.submissionId, entry.id), JSON.stringify(entry), options);
-
-const reporterKey = (submissionId: string, reporterHash: string) => `metoo:${submissionId}:${reporterHash}`;
-
-export const hasReporterMarker = async (kv: KVNamespace, submissionId: string, reporterHash: string) =>
-  (await kv.get(reporterKey(submissionId, reporterHash))) !== null;
-
-export const saveReporterMarker = async (
-  kv: KVNamespace,
-  submissionId: string,
-  reporterHash: string,
-  options: { expirationTtl?: number } = {}
-) => kv.put(reporterKey(submissionId, reporterHash), "1", options);

@@ -53,7 +53,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Request body is invalid.", 400);
   }
 
-  const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
+  const record = await fetchSubmissionRecord(kv, id);
   if (!isSubmissionRecord(record)) {
     return jsonError("Submission not found.", 404);
   }

@@ -62,6 +62,14 @@ export type SubmissionRecord = SubmissionInput & {
   createdAt: string;
   issueLabel: string;
   status: SubmissionStatus;
+  /** Count saved by the resident who created the record. "Me too" markers are added on top. */
+  baseReportCount?: number;
+  /** Reports carried over from duplicate records a steward merged into this one. */
+  mergedReportCount?: number;
+  /** Set on a duplicate after a steward merges it into another record. */
+  mergedInto?: string;
+  /** Number of private evidence files on this record. Files are never listed publicly. */
+  evidenceCount?: number;
 };
 
 export const isSubmissionRecord = (value: unknown): value is SubmissionRecord => {
@@ -71,6 +79,61 @@ export const isSubmissionRecord = (value: unknown): value is SubmissionRecord =>
 
   const candidate = value as Partial<SubmissionRecord>;
   return typeof candidate.id === "string" && candidate.id.length > 0;
+};
+
+const readString = (value: unknown) => (typeof value === "string" ? value : "");
+
+const readOptionalString = (value: unknown) => (typeof value === "string" && value ? value : undefined);
+
+const readCount = (value: unknown) => {
+  const count = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
+};
+
+const readOptionalCount = (value: unknown) => (value === undefined ? undefined : readCount(value));
+
+/**
+ * The one place that turns stored KV JSON into a `SubmissionRecord`.
+ * Stored records can be older than the current type, so every field is read defensively.
+ */
+export const parseSubmissionRecord = (value: unknown): SubmissionRecord | null => {
+  if (!isSubmissionRecord(value)) {
+    return null;
+  }
+  const raw = value as unknown as Record<string, unknown>;
+  const issue = readString(raw.issue);
+  const details = raw.issueDetails && typeof raw.issueDetails === "object" ? raw.issueDetails : {};
+  const issueDetails = Object.fromEntries(
+    Object.entries(details as Record<string, unknown>).filter(
+      (entry): entry is [string, string] => typeof entry[1] === "string"
+    )
+  );
+  const zone = readString(raw.zone);
+
+  return {
+    id: readString(raw.id),
+    createdAt: readString(raw.createdAt),
+    building: readString(raw.building),
+    issue,
+    issueLabel: readString(raw.issueLabel) || issueOptions.find((option) => option.id === issue)?.label || issue,
+    status: normalizeSubmissionStatus(raw.status),
+    stage: readEnumValue(raw.stage, allowedStageSet) ?? "A",
+    language: readEnumValue(raw.language, supportedLanguageSet) ?? "en",
+    portfolio: readEnumValue(raw.portfolio, allowedPortfolioSet) ?? "other",
+    startDate: readString(raw.startDate),
+    reportDate: readString(raw.reportDate),
+    reportCount: readCount(raw.reportCount),
+    simpleEnglish: Boolean(raw.simpleEnglish),
+    zone: isValidZoneId(zone) ? zone : "",
+    firstMessageDate: readOptionalString(raw.firstMessageDate),
+    ticketDate: readOptionalString(raw.ticketDate),
+    ticketNumber: readOptionalString(raw.ticketNumber),
+    issueDetails,
+    baseReportCount: readOptionalCount(raw.baseReportCount),
+    mergedReportCount: readOptionalCount(raw.mergedReportCount),
+    mergedInto: readOptionalString(raw.mergedInto),
+    evidenceCount: readOptionalCount(raw.evidenceCount),
+  };
 };
 
 export const isValidSubmissionStatus = (value: unknown): value is SubmissionStatus =>

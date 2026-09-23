@@ -6,6 +6,8 @@ import {
   loadBuildingSubmissions,
 } from "../src/lib/buildingDashboard";
 import { saveSubmissionRecord } from "../src/lib/storage/submissions";
+import type { SubmissionRecord } from "../src/lib/submissions";
+import { asKv, createMockKv } from "./helpers/mockKv";
 
 describe("resident report count formatting", () => {
   it("shows 0 for invalid and non-positive values", () => {
@@ -39,60 +41,52 @@ describe("public-readonly count suppression", () => {
 });
 
 describe("loadBuildingSubmissions", () => {
-  const createListKv = () => {
-    const store = new Map<string, { value: string; metadata?: unknown }>();
-    let getCalls = 0;
-    const kv = {
-      async get(key: string) {
-        getCalls += 1;
-        const entry = store.get(key);
-        return entry ? JSON.parse(entry.value) : null;
-      },
-      async put(key: string, value: string, options: { metadata?: unknown } = {}) {
-        store.set(key, { value, metadata: options.metadata });
-      },
-      async list({ prefix }: { prefix: string }) {
-        const keys = [...store.entries()]
-          .filter(([name]) => name.startsWith(prefix))
-          .map(([name, entry]) => ({ name, metadata: entry.metadata }));
-        return { keys, list_complete: true };
-      },
-      getCallCount: () => getCalls,
-    };
-    return kv;
-  };
-
-  const record = (id: string, building: string) => ({
+  const record = (id: string, building: string): SubmissionRecord => ({
     id,
     building,
     issue: "common",
     issueLabel: "Elevator / common areas",
+    stage: "A",
+    language: "en",
+    portfolio: "other",
     startDate: "2026-09-01",
     reportDate: "2026-09-02",
     reportCount: 4,
+    simpleEnglish: true,
+    zone: "",
+    issueDetails: {},
     createdAt: "2026-09-02T00:00:00.000Z",
     status: "open",
   });
 
-  it("uses list metadata and skips reads for other buildings", async () => {
-    const kv = createListKv();
-    await saveSubmissionRecord(kv as unknown as KVNamespace, record("a", "2400 W Wabansia"));
-    await saveSubmissionRecord(kv as unknown as KVNamespace, record("b", "2353 W Wabansia"));
+  it("backfills the building index once, then reads only the index", async () => {
+    const kv = createMockKv();
+    // Older records: saved before list metadata and the index existed.
+    await kv.put("submission:a", JSON.stringify(record("a", "2400 W Wabansia")));
+    await kv.put("submission:b", JSON.stringify(record("b", "2353 W Wabansia")));
 
-    const results = await loadBuildingSubmissions({ kv, buildingId: "2400 W Wabansia" });
-    assert.equal(results.length, 1);
-    assert.equal(results[0].id, "a");
-    assert.equal(results[0].reportCount, 4);
-    assert.equal(kv.getCallCount(), 0);
+    const first = await loadBuildingSubmissions({ kv: asKv(kv), buildingId: "2400 W Wabansia" });
+    assert.deepEqual(first.map((item) => item.id), ["a"]);
+    assert.ok(kv.keys().some((key) => key.startsWith("bidx-ready:")));
+    assert.ok(!kv.keys().some((key) => key.includes("Wabansia") && !key.startsWith("submission:")));
+
+    kv.resetReads();
+    const second = await loadBuildingSubmissions({ kv: asKv(kv), buildingId: "2400 W Wabansia" });
+    assert.deepEqual(second.map((item) => item.id), ["a"]);
+    assert.equal(second[0].reportCount, 4);
+    assert.equal(second[0].issueLabel.includes("Elevator"), true);
+    assert.equal(kv.recordReadCount(), 0);
   });
 
-  it("falls back to a read for records saved without metadata", async () => {
-    const kv = createListKv();
-    await kv.put("submission:legacy", JSON.stringify(record("legacy", "2400 W Wabansia")));
+  it("includes records saved after the index is ready", async () => {
+    const kv = createMockKv();
+    await loadBuildingSubmissions({ kv: asKv(kv), buildingId: "2400 W Wabansia" });
+    await saveSubmissionRecord(asKv(kv), record("new", "2400 W Wabansia"));
+    await saveSubmissionRecord(asKv(kv), record("other", "2353 W Wabansia"));
 
-    const results = await loadBuildingSubmissions({ kv, buildingId: "2400 W Wabansia" });
-    assert.equal(results.length, 1);
-    assert.equal(results[0].id, "legacy");
-    assert.equal(kv.getCallCount(), 1);
+    kv.resetReads();
+    const results = await loadBuildingSubmissions({ kv: asKv(kv), buildingId: "2400 W Wabansia" });
+    assert.deepEqual(results.map((item) => item.id), ["new"]);
+    assert.equal(kv.recordReadCount(), 0);
   });
 });

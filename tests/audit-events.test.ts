@@ -1,33 +1,13 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { createMockKv } from "./helpers/mockKv";
 import { POST as createSubmission } from "../src/pages/api/submissions/index";
 import { POST as updateStatus } from "../src/pages/api/submissions/[id]/status";
 import { POST as reportSubmission } from "../src/pages/api/submissions/[id]/report";
 
 const BUILDING_KEYS_JSON = JSON.stringify({ "2353": "key-2353-test" });
 
-const createMockKv = () => {
-  const store = new Map<string, string>();
 
-  return {
-    async get(key: string, options?: { type?: "json" }) {
-      const value = store.get(key);
-      if (value === undefined) {
-        return null;
-      }
-      if (options?.type === "json") {
-        return JSON.parse(value);
-      }
-      return value;
-    },
-    async put(key: string, value: string) {
-      store.set(key, value);
-    },
-    keys() {
-      return [...store.keys()];
-    },
-  };
-};
 
 const basePayload = {
   building: "2353",

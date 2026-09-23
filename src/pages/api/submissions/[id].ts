@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     return guarded.response;
   }
 
-  const record = await fetchSubmissionRecord<SubmissionRecord>(kv, id);
+  const record = await fetchSubmissionRecord(kv, id);
   if (!record) {
     return jsonError("Submission not found.", 404);
   }

@@ -7,6 +7,8 @@ import { RESIDENT_KEY_COOKIE } from "../../lib/api/requestGuard";
 import { formatResidentReportCount } from "../../lib/buildingDashboard";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
+import { reconcileReportCount } from "../../lib/domain/submissions";
+import { countReporterMarkers, fetchSubmissionRecord, saveSubmissionRecord } from "../../lib/storage/submissions";
 import { buildBuildingDashboardUrl } from "../../lib/navigation";
 import { formatIssueLabel } from "../../lib/noticeUtils";
 import SeoHead from "../../components/SeoHead.astro";
@@ -21,32 +23,24 @@ const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? url.searchPar
 const env = Astro.locals.runtime?.env ?? {};
 const hasAccess = isResidentKeyRecognized(accessKey, env);
 const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
-const submission = id && kv && hasAccess ? await kv.get(`submission:${id}`, { type: "json" }) : null;
-
-type SubmissionShape = {
-  building: string;
-  issue: string;
-  issueLabel: string;
-  stage: "A" | "B" | "C";
-  language: string;
-  portfolio: "continuum" | "other";
-  startDate: string;
-  reportDate: string;
-  reportCount: number;
-  simpleEnglish: boolean;
-  zone?: string;
-  firstMessageDate?: string;
-  ticketDate?: string;
-  ticketNumber?: string;
-  issueDetails: Record<string, string>;
-};
-
-const rawSubmissionRecord = submission as SubmissionShape | null;
+const rawSubmissionRecord = id && kv && hasAccess ? await fetchSubmissionRecord(kv, id) : null;
 const allowedBuildingIds = getBuildingIdsForKey(accessKey, env);
 const hasBuildingAccess = rawSubmissionRecord
   ? allowedBuildingIds.includes("*") || allowedBuildingIds.includes(rawSubmissionRecord.building)
   : false;
-const submissionRecord = hasAccess && hasBuildingAccess ? rawSubmissionRecord : null;
+let submissionRecord = hasAccess && hasBuildingAccess ? rawSubmissionRecord : null;
+
+// Heal a count that lost a concurrent "me too" write. See reconcileReportCount.
+if (submissionRecord && kv && !submissionRecord.mergedInto) {
+  const reconciled = reconcileReportCount(submissionRecord, await countReporterMarkers(kv, submissionRecord.id));
+  if (reconciled.reportCount > submissionRecord.reportCount) {
+    await saveSubmissionRecord(kv, reconciled);
+    submissionRecord = reconciled;
+  }
+}
+const mergedIntoUrl = submissionRecord?.mergedInto
+  ? `/submissions/${encodeURIComponent(submissionRecord.mergedInto)}`
+  : "";
 
 const issueLabel =
   submissionRecord?.issueLabel ||
@@ -157,12 +151,21 @@ const groupChatText = submissionRecord
                   <p class="summary-value">{reportCountLabel}</p>
                 </div>
               </div>
-              <div class="issue-actions">
-                <button class="button" type="button" data-me-too data-submission-id={id}>Me too</button>
-              </div>
-              <p class="helper" data-me-too-status role="status" aria-live="polite">
-                Tap “Me too” if you have this problem. No personal details are saved.
-              </p>
+              {mergedIntoUrl ? (
+                <div class="merged-notice" role="note">
+                  <p>This record is a duplicate. A steward merged it into the main record.</p>
+                  <a class="button" href={mergedIntoUrl}>Open the main record</a>
+                </div>
+              ) : (
+                <>
+                  <div class="issue-actions">
+                    <button class="button" type="button" data-me-too data-submission-id={id}>Me too</button>
+                  </div>
+                  <p class="helper" data-me-too-status role="status" aria-live="polite">
+                    Tap “Me too” if you have this problem. No personal details are saved.
+                  </p>
+                </>
+              )}
               <p class="helper">Review this summary before sharing. Small report counts may be hidden for privacy.</p>
               {dashboardUrl && (
                 <a class="button button-secondary" href={dashboardUrl}>

@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { POST as createSubmission } from "../src/pages/api/submissions/index";
 import { POST as reportSubmission } from "../src/pages/api/submissions/[id]/report";
 import { hashReporterSession } from "../src/lib/reports";
+import { reconcileReportCount } from "../src/lib/domain/submissions";
+import { countReporterMarkers, fetchSubmissionRecord } from "../src/lib/storage/submissions";
 
 const BUILDING_KEYS_JSON = JSON.stringify({ "2353 W Wabansia": "key-2353-test" });
 
@@ -106,5 +108,20 @@ describe("me too dedupe", () => {
 
   it("uses a different hash for the same session on different records", async () => {
     assert.notEqual(await hashReporterSession("record-1", "same"), await hashReporterSession("record-2", "same"));
+  });
+});
+
+describe("me too under concurrent taps", () => {
+  it("keeps one marker per tap so the count can always be rebuilt", async () => {
+    const { kv, locals, id } = await setup();
+    await Promise.all(
+      ["p1", "p2", "p3", "p4", "p5"].map((session, index) => meToo(id, locals, session, `3.3.3.${index}`))
+    );
+    const markers = await countReporterMarkers(kv as unknown as KVNamespace, id);
+    assert.equal(markers, 5);
+
+    const stored = await fetchSubmissionRecord(kv as unknown as KVNamespace, id);
+    assert.ok(stored);
+    assert.equal(reconcileReportCount(stored, markers).reportCount, 6);
   });
 });
