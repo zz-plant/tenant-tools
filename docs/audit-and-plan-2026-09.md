@@ -112,7 +112,7 @@ Severity: **P0** = fix before launch. **P1** = fix soon after launch. **P2** = i
 
 ## 3) Plan
 
-### Phase 1: launch blockers (this PR)
+### Phase 1: launch blockers (done)
 
 | Item | Fixes |
 | --- | --- |
@@ -131,22 +131,31 @@ Severity: **P0** = fix before launch. **P1** = fix soon after launch. **P2** = i
 | Add `tsconfig.json`, a `typecheck` script, and a CI workflow. Fix the ~40 type errors this found. | D1, D2 |
 | Ignore `.dev.vars` and `.env` in git. The README tells contributors to put keys there. | Safety |
 
-### Phase 2: after launch (next 2–4 weeks)
+### Phase 2 (done)
 
-0. **Type-check `.astro` files.** `tsc` does not read `.astro` files. Add `@astrojs/check` and run `astro check` in CI.
+| Item | How it was done | Fixes |
+| --- | --- | --- |
+| Type-check `.astro` files | `@astrojs/check` added. `bun run typecheck` runs `astro check` and `tsc`. CI runs it. | D1 |
+| Race-free "me too" counts | Each tap writes its own `metoo:` marker. The count is rebuilt from the base count, merged count, and markers. A stale count heals on the next tap or record view. No Durable Object needed. | B4 |
+| Private evidence upload | R2 bucket with no public access. Random `ev/{uuid}` object keys. JPEG and PNG only, 5 MB, magic-byte check. EXIF is removed in the browser (canvas re-encode) and again on the server. Links are signed, expire in 5 minutes, and also need the resident key. Stewards can delete a photo. | E1 |
+| Split `NoticeBuilder.tsx` | Pure logic moved to `noticeBuilder/logic.ts` with unit tests. `RecordPanel`, `StepProgressHeader`, `SelectField`, and `DetailField` extracted. The builder went from 1,652 to about 1,220 lines. This also fixed a stale export summary. | D3 |
+| One submission type | `parseSubmissionRecord` reads every stored record. Pages and APIs use it. | D4 |
 
-1. **Atomic "me too" counts (B4).** Count "me too" rows by listing the `metoo:{id}:` prefix, or move counts to a Durable Object. This removes lost updates.
-2. **Private evidence upload (E1).** Use R2 with no public bucket. Use random object keys with no building id. Strip EXIF in the browser before upload. Use short-lived signed URLs. Set a size limit and a file type allowlist. Show the upload warning from AGENTS.md §17.
-3. **Split `NoticeBuilder.tsx` (D3).** Move state to a `useReducer` hook. Split each step into its own component: `IssueStep`, `DetailsStep`, `NoticeStep`, `ExportStep`. Add tests for the reducer.
-4. **One submission type (D4).** Parse KV records with one `parseSubmissionRecord` helper and use it on every page.
+### Phase 3 (done)
 
-### Phase 3: later
+| Item | How it was done | Fixes |
+| --- | --- | --- |
+| Steward merge duplicates | `POST /api/submissions/:id/merge`. The duplicate is archived and points to the main record. Its reports move to the main record. Resident text is not edited. | E2 |
+| Print/PDF export | `/buildings/:id/export` prints a summary for inspectors and legal aid: issue, start date, days open, bucketed count, 311 ticket, and evidence count. No free text or zones. The record page has print styles too. | E3 |
+| Constant-time key compare | `timingSafeEqual` in `lib/access`. | A4 |
+| Rules pack zip | It was an old copy of `src/data/rules`. Removed. | D6 |
+| Per-building index | `bidx:{buildingHash}:{id}` keys with summary metadata. The hash hides the address. The first dashboard view copies older records into the index, then marks it ready. No manual migration. | C1 |
 
-1. Steward merge-duplicates (E2).
-2. Print/PDF export layout (E3).
-3. Constant-time key compare (A4).
-4. Review the rules pack zip (D6): document its source or remove it.
-5. Per-building KV key prefix (for example `submission:{buildingHash}:{id}`) to remove full scans. Needs a data migration.
+### Still open
+
+1. The `increment` field on `POST /report` is validated but ignored. Remove it after old clients are gone.
+2. A resident who taps "Me too" on two duplicates is counted twice after a merge. Markers are per record on purpose, so sessions cannot be matched across records.
+3. Evidence is kept on the duplicate after a merge. It is still visible from the duplicate's record page.
 
 ### Out of scope (by policy)
 
@@ -160,6 +169,7 @@ Severity: **P0** = fix before launch. **P1** = fix soon after launch. **P2** = i
 ## 4) Launch checklist for the group chat
 
 1. Set `BUILDING_KEYS_JSON` and `STEWARD_KEY` in the deploy environment.
+   For photos, create the R2 bucket and set `EVIDENCE_SIGNING_KEY` (see README).
 2. Share the building key once, in the Announcements group or in person. Do not post it in General.
 3. Post the base link (no key) in General with one short line, for example:
    "Log building issues here. Tap Me too if it affects you. No names are saved."

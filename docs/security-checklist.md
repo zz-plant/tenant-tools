@@ -21,6 +21,10 @@ Use this list before release and for high-risk PRs.
 - [ ] Public/read-only views never expose evidence files.
 - [ ] File upload limits and allowlists are enforced.
 - [ ] Upload warning copy reminds users to avoid faces/names/unit hints.
+- [ ] The R2 evidence bucket has no public access and no custom public domain.
+- [ ] Evidence object keys are random (`ev/{uuid}`) and never include a building or address.
+- [ ] Evidence links need both a valid signature (5-minute expiry) and the resident key.
+- [ ] Uploaded photos have EXIF/text metadata removed on the server, not only in the browser.
 
 ## 4) Public-mode protections (if touched)
 
@@ -40,6 +44,7 @@ Use this list before release and for high-risk PRs.
 
 Run and record outputs:
 
+- `bun run typecheck`
 - `bun run test`
 - `bun run build`
 

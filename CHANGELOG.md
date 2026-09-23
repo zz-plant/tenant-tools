@@ -1,5 +1,34 @@
 # Changelog
 
+## 1.2.0 - 2026-09-23
+
+### Added
+
+- Residents can add private evidence photos to a record. Photos are JPEG or PNG, up to 5 MB, 10 per record.
+- Stewards can remove unsafe photos.
+- Stewards can merge a duplicate record into the main record. Reports move to the main record.
+- Added a printable building summary for inspectors and legal aid (`/buildings/:id/export`).
+- Record pages have a "Print or save as PDF" button and print styles.
+- `bun run typecheck` now also checks `.astro` files.
+
+### Changed
+
+- The dashboard reads a per-building index. The first view after this update copies older records into the index.
+- "Me too" counts are rebuilt from one marker per tap, so taps at the same moment are no longer lost.
+- The notice builder is split into smaller, tested parts.
+
+### Fixed
+
+- The export summary in the builder now updates when detail fields change.
+
+### Security
+
+- Photo location and camera details are removed in the browser and again on the server.
+- Photo links expire after 5 minutes and also need the resident key.
+- Photos are stored under random keys in a private bucket. Keys never include the building.
+- Access keys are compared in constant time.
+- Removed an old copy of the rules data (`building-ledger-rules-pack.zip`).
+
 ## 1.1.0 - 2026-09-23
 
 ### Added

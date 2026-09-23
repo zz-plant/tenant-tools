@@ -120,6 +120,30 @@ Do not commit files that contain real keys.
 - `BUILDING_ACCESS_KEY` — fallback key when a building does not exist in `BUILDING_KEYS_JSON`
 - `STEWARD_KEY` — required for status updates and steward actions
 
+### Private evidence photos (optional)
+
+Photo upload is off until both of these are set. Without them, the record page says upload is not set up.
+
+- `EVIDENCE_BUCKET` — R2 bucket binding (already in `wrangler.jsonc`). Create the bucket once:
+
+  ```bash
+  wrangler r2 bucket create building-ledger-evidence
+  ```
+
+  Never turn on public access for this bucket.
+- `EVIDENCE_SIGNING_KEY` — secret used to sign short-lived photo links. Use a long random value:
+
+  ```bash
+  wrangler secret put EVIDENCE_SIGNING_KEY
+  ```
+
+Local run with KV and R2 simulated:
+
+```bash
+bun run build
+npx wrangler pages dev dist --kv SUBMISSIONS_KV --r2 EVIDENCE_BUCKET --compatibility-flags nodejs_compat
+```
+
 ### SEO and sitemap
 
 - `SITE_URL` — preferred full site origin used to build canonical URLs and sitemap entries (example: `https://app.example.org`). If unset, build tooling may fall back to deploy URL environment variables and will log a warning.
