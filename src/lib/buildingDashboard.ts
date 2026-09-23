@@ -1,11 +1,15 @@
 import { formatPublicReadonlyCount, formatResidentReportCount } from "./reportCount";
 import { normalizeSubmissionStatus, type SubmissionStatus } from "./submissions";
+import { isSubmissionListMetadata } from "./storage/submissions";
+import { issueOptions } from "../data/noticeData";
+
+const issueLabelById = new Map<string, string>(issueOptions.map((option) => [option.id, option.label]));
 
 export { formatPublicReadonlyCount, formatResidentReportCount };
 
 type SubmissionsKv = {
   list: (options: { prefix: string; cursor?: string; limit?: number }) => Promise<{
-    keys: Array<{ name: string }>;
+    keys: Array<{ name: string; metadata?: unknown }>;
     list_complete?: boolean;
     cursor?: string;
   }>;
@@ -45,7 +49,14 @@ export const loadBuildingSubmissions = async ({
     cursor = listResult.list_complete ? undefined : listResult.cursor;
 
     for (const key of listResult.keys) {
-      const record = await kv.get(key.name, { type: "json" });
+      // Newer records carry a summary in list metadata. Skip other buildings without a read.
+      const metadata = isSubmissionListMetadata(key.metadata) ? key.metadata : null;
+      if (metadata && metadata.building !== buildingId) {
+        continue;
+      }
+      const record: Record<string, unknown> | null = metadata
+        ? { ...metadata, id: key.name.replace(/^submission:/, "") }
+        : await kv.get(key.name, { type: "json" });
       if (!record) {
         continue;
       }
@@ -59,7 +70,7 @@ export const loadBuildingSubmissions = async ({
       submissions.push({
         id: String(record.id || ""),
         issue: String(record.issue || ""),
-        issueLabel: String(record.issueLabel || record.issue || "Issue"),
+        issueLabel: String(record.issueLabel || issueLabelById.get(String(record.issue)) || record.issue || "Issue"),
         building: String(record.building || ""),
         startDate: String(record.startDate || ""),
         reportDate: String(record.reportDate || ""),
