@@ -1,8 +1,8 @@
 export const portfolioOptions = [
   {
     id: "continuum",
-    label: "Continuum (Yelena + Ivan)",
-    description: "Buildings with the Yelena and Ivan contacts.",
+    label: "Main management company",
+    description: "Buildings with the main management and maintenance contacts.",
   },
   {
     id: "other",
