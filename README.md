@@ -59,6 +59,12 @@ bun run dev
 bun run test
 ```
 
+### Type check
+
+```bash
+bun run typecheck
+```
+
 ### Build
 
 ```bash
@@ -143,7 +149,7 @@ Never commit real keys to git.
 1. Read [`AGENTS.md`](AGENTS.md) before changing product behavior or copy.
 2. Keep changes small and scoped.
 3. Add tests when touching access, validation, evidence, export, or notice logic.
-4. Run `bun run test` before opening a PR.
+4. Run `bun run typecheck` and `bun run test` before opening a PR. CI runs both, plus the build.
 5. For UI changes, include screenshots.
 6. Update `CHANGELOG.md` for user-visible behavior changes.
 
@@ -161,6 +167,7 @@ Use Conventional Commit style:
 
 - Product intent: `docs/vision.md`
 - Architecture and data flow: `docs/architecture.md`
+- Audit and improvement plan (current): `docs/audit-and-plan-2026-09.md`
 - Consolidated implementation status: `docs/implementation-status-2026-02.md`
 - Dependency capability review: `docs/tech-stack-capability-research-2026-02.md`
 - Agent skills playbook: `docs/agent-skills-playbook.md`

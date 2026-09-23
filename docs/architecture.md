@@ -57,8 +57,22 @@ KV is treated as internal storage. Evidence metadata and submission records rema
 
 1. `POST /api/submissions/:id/report`
 2. Validate input, key scope, and rate limit
-3. Update report count on `submission:{id}`
-4. Write audit entry `report:{submissionId}:{reportId}` (TTL)
+3. Require a session id (`bl_session_id` cookie, set by middleware)
+4. Check `metoo:{submissionId}:{sha256(submissionId:sessionId)}`. If present, return the current count with `alreadyReported: true`
+5. Update report count on `submission:{id}` and write the `metoo:` marker (TTL)
+6. Write audit entry `report:{submissionId}:{reportId}` (TTL)
+
+### Dashboard listing
+
+`submission:{id}` is saved with KV list metadata (building, issue, dates, count, status).
+The dashboard reads that metadata from `kv.list` and skips records for other buildings without a `kv.get`.
+Older records without metadata are still read with `kv.get`.
+
+### Resident session
+
+Middleware moves `?key=` into the httpOnly `bl_resident_key` cookie (14 days) and removes it from the URL.
+`?forget=1` clears the resident and steward cookies.
+The builder gets only the building ids the cookie unlocks, never the key.
 
 ### Status update (steward)
 
