@@ -57,6 +57,9 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
   if (!isSubmissionRecord(record)) {
     return jsonError("Submission not found.", 404);
   }
+  if (record.mergedInto) {
+    return jsonError("This record was merged. Update the main record instead.", 409);
+  }
 
   const updated = updateSubmissionStatusRecord(record, payload.status);
   await saveSubmissionRecord(kv, updated);

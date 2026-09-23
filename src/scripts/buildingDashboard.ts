@@ -158,3 +158,39 @@ document.querySelectorAll("[data-status-save]").forEach((button) => {
     }
   });
 });
+
+document.querySelectorAll("[data-merge-save]").forEach((button) => {
+  button.addEventListener("click", async () => {
+    const id = button.getAttribute("data-submission-id");
+    if (!id || !isStewardMode) return;
+    const select = document.querySelector(`[data-merge-select][data-submission-id="${id}"]`) as HTMLSelectElement | null;
+    const note = document.querySelector(`[data-merge-note="${id}"]`) as HTMLElement | null;
+    const into = select?.value;
+    if (!into) {
+      if (note) note.textContent = "Choose the main record first.";
+      return;
+    }
+    if (!window.confirm("Merge this record into the main record? Its reports will move. This cannot be undone here.")) {
+      return;
+    }
+    button.setAttribute("disabled", "true");
+    if (note) note.textContent = "Merging...";
+    try {
+      const response = await fetch(`/api/submissions/${encodeURIComponent(id)}/merge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ into }),
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload?.error || "We could not merge these records.");
+      }
+      updateReportCount(into, payload.reportCount ?? 0);
+      moveCardToStatusGroup(id, "archived");
+      if (note) note.textContent = "Merged. Reports moved to the main record.";
+    } catch (error) {
+      if (note) note.textContent = error instanceof Error ? error.message : "We could not merge these records.";
+      button.removeAttribute("disabled");
+    }
+  });
+});

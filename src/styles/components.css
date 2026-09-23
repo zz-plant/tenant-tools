@@ -1233,3 +1233,17 @@ code {
     scroll-snap-align: start;
   }
 }
+
+.merged-notice {
+  border: 1px solid var(--border-soft);
+  background: var(--surface-soft);
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.merged-notice p {
+  margin: 0;
+  color: var(--text-primary);
+}

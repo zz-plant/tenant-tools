@@ -46,3 +46,40 @@ export const reconcileReportCount = (record: SubmissionRecord, markerCount: numb
 };
 
 export const createSubmissionReportEntry = (submissionId: string) => createReportEntry(submissionId);
+
+export type MergeResult =
+  | { ok: true; source: SubmissionRecord; target: SubmissionRecord }
+  | { ok: false; status: number; message: string };
+
+/**
+ * Steward housekeeping: fold a duplicate record into the main record.
+ * The duplicate is archived and points to the main record. Its reports move to the main record.
+ * Resident text is never edited. A resident who tapped "Me too" on both records is counted twice;
+ * markers are per record, so sessions cannot be matched across records.
+ */
+export const mergeSubmissionRecords = (
+  source: SubmissionRecord,
+  target: SubmissionRecord,
+  targetMarkerCount: number
+): MergeResult => {
+  if (source.id === target.id) {
+    return { ok: false, status: 400, message: "Choose a different record to merge into." };
+  }
+  if (source.building !== target.building) {
+    return { ok: false, status: 400, message: "Records must be in the same building." };
+  }
+  if (source.mergedInto) {
+    return { ok: false, status: 409, message: "This record was already merged." };
+  }
+  if (target.mergedInto) {
+    return { ok: false, status: 409, message: "The main record was merged into another record." };
+  }
+
+  const withBase = { ...target, baseReportCount: resolveBaseReportCount(target, targetMarkerCount) };
+  const mergedTarget = reconcileReportCount(
+    { ...withBase, mergedReportCount: (target.mergedReportCount ?? 0) + source.reportCount },
+    targetMarkerCount
+  );
+  const archivedSource: SubmissionRecord = { ...source, status: "archived", mergedInto: target.id };
+  return { ok: true, source: archivedSource, target: mergedTarget };
+};
