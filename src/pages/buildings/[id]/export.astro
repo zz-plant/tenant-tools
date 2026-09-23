@@ -1,0 +1,143 @@
+---
+import "../../../styles/global.css";
+import { isBuildingAccessValid } from "../../../lib/access";
+import { RESIDENT_KEY_COOKIE } from "../../../lib/api/requestGuard";
+import { loadBuildingSubmissions } from "../../../lib/buildingDashboard";
+import { buildBuildingReport, type BuildingReportRow } from "../../../lib/buildingReport";
+import { formatDate } from "../../../lib/dateUtils";
+import { buildBuildingDashboardUrl } from "../../../lib/navigation";
+import { fetchSubmissionRecord } from "../../../lib/storage/submissions";
+import type { SubmissionRecord } from "../../../lib/submissions";
+import SeoHead from "../../../components/SeoHead.astro";
+import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const env = Astro.locals.runtime?.env ?? {};
+const kv = env.SUBMISSIONS_KV;
+const buildingId = decodeURIComponent(id ?? "");
+const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? null;
+const hasAccess = Boolean(buildingId) && isBuildingAccessValid(buildingId, accessKey, env);
+const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
+
+// The index has summaries only. The export needs 311 ticket fields, so read each full record.
+const summaries = hasAccess && kv ? await loadBuildingSubmissions({ kv, buildingId }) : [];
+const records = (
+  kv ? await Promise.all(summaries.map((summary) => fetchSubmissionRecord(kv, summary.id))) : []
+).filter((record): record is SubmissionRecord => Boolean(record));
+const report = buildBuildingReport(buildingId, records, formatDate(new Date()));
+const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
+
+const ticketLabel = (row: BuildingReportRow) =>
+  [row.ticketNumber, row.ticketDate ? `(${row.ticketDate})` : ""].filter(Boolean).join(" ") || "None";
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Building summary | Building Ledger"
+      description="Private printable summary of resident-reported building issues."
+      canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/export`}
+      imagePath="/og/private-dashboard.svg"
+      imageAlt="Building Ledger private summary preview"
+      noindex={true}
+    />
+  </head>
+  <body>
+    <div class="page">
+      <main class="layout print-report" id="main">
+        {!hasAccess ? (
+          <section class="panel">
+            <AccessKeyPanel
+              title="Key required"
+              helperLines={["Residents only.", "Ask a steward for the current key."]}
+              warning="Do not share the key publicly."
+              errorMessage={hasAccessAttempt ? "Key does not match this building." : ""}
+              backLabel="Back to notice builder"
+            />
+          </section>
+        ) : (
+          <section class="panel report-sheet">
+            <header class="report-header">
+              <p class="eyebrow">Building ledger</p>
+              <h1>Building issue summary</h1>
+              <p><strong>Building:</strong> {report.building}</p>
+              <p><strong>Date:</strong> {report.generatedOn}</p>
+            </header>
+
+            <div class="no-print report-actions">
+              <button class="button" type="button" data-print>Print or save as PDF</button>
+              <a class="button button-secondary" href={dashboardUrl}>Back to building dashboard</a>
+              <p class="helper">Check the summary before you share it. It has no names, units, or evidence files.</p>
+            </div>
+
+            <h2>Open issues ({report.open.length})</h2>
+            {report.open.length === 0 ? (
+              <p>No open issues.</p>
+            ) : (
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Issue</th>
+                    <th scope="col">Start date</th>
+                    <th scope="col">Days open</th>
+                    <th scope="col">Residents reporting</th>
+                    <th scope="col">311 ticket</th>
+                    <th scope="col">Evidence on file</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {report.open.map((row) => (
+                    <tr>
+                      <td>{row.issueLabel}</td>
+                      <td>{row.startDate}</td>
+                      <td>{row.daysOpen ?? "Not listed"}</td>
+                      <td>{row.reports}</td>
+                      <td>{ticketLabel(row)}</td>
+                      <td>{row.evidenceOnFile}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <h2>Resolved or archived ({report.closed.length})</h2>
+            {report.closed.length === 0 ? (
+              <p>None.</p>
+            ) : (
+              <table class="report-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Issue</th>
+                    <th scope="col">Start date</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Residents reporting</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {report.closed.map((row) => (
+                    <tr>
+                      <td>{row.issueLabel}</td>
+                      <td>{row.startDate}</td>
+                      <td>{row.statusLabel}</td>
+                      <td>{row.reports}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            <h2>Notes</h2>
+            <ul>
+              {report.notes.map((note) => <li>{note}</li>)}
+            </ul>
+          </section>
+        )}
+      </main>
+    </div>
+    <script>
+      document.querySelector("[data-print]")?.addEventListener("click", () => window.print());
+    </script>
+  </body>
+</html>

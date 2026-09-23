@@ -167,6 +167,8 @@ const groupChatText = submissionRecord
                 </>
               )}
               <p class="helper">Review this summary before sharing. Small report counts may be hidden for privacy.</p>
+              <p class="helper">Resident-reported. Not verified.</p>
+              <button class="button button-secondary no-print" type="button" data-print>Print or save as PDF</button>
               {dashboardUrl && (
                 <a class="button button-secondary" href={dashboardUrl}>
                   Back to building dashboard
@@ -388,6 +390,7 @@ const groupChatText = submissionRecord
         }
       };
 
+      document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
       checks.forEach((item) => item.addEventListener('change', refreshShareStatus));
       if (shareButton instanceof HTMLButtonElement) {
         shareButton.addEventListener('click', shareToGroupChat);
