@@ -79,7 +79,15 @@ type NoticeBuilderProps = {
 };
 
 const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuildings = [] }: NoticeBuilderProps) => {
-  const [formState, setFormState] = useState<FormState>(() => createInitialFormState());
+  const defaultBuilding = useMemo(() => {
+    if (residentBuildings.includes("2400 W Wabansia")) return "2400 W Wabansia";
+    if (buildingOptions.some((b) => b.id === "2400 W Wabansia")) return "2400 W Wabansia";
+    return buildingOptions[0]?.id || "";
+  }, [buildingOptions, residentBuildings]);
+
+  const [formState, setFormState] = useState<FormState>(() =>
+    createInitialFormState(new Date(), defaultBuilding)
+  );
   const buildingSelectOptions = useMemo(
     () => buildingOptions.map((building) => ({ id: building.id, label: building.id })),
     [buildingOptions]
@@ -646,6 +654,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         ))}
                       </RadioGroup.Root>
                     </div>
+
+                    {formState.issue === "heat" && (
+                      <div className="helper-card" role="note" style={{ marginTop: "12px" }}>
+                        <p className="helper">
+                          <strong>Chicago Heat Ordinance active (Sept 15 – June 1):</strong> Required minimum indoor temperature is 68°F day (8:30 AM–10:30 PM) and 66°F night (10:30 PM–8:30 AM). Landlords must restore heat promptly when temperatures fall below these levels.
+                        </p>
+                      </div>
+                    )}
 
                     {isNoticeReady && (
                       <div className="quick-notice-banner" role="region" aria-label="Quick notice actions">

@@ -28,18 +28,19 @@ const hasResidentKey = residentBuildings.length > 0;
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
-    <AppHeader statusBadge={hasResidentKey ? "Device key active" : undefined} />
+    <AppHeader subtitle="2400 W Wabansia" statusBadge={hasResidentKey ? "Device key active" : undefined} />
     <main class="page" id="main">
       <section class="home-intro-panel" aria-labelledby="home-title">
         <div class="home-intro-copy">
-          <p class="eyebrow">Tenant tools</p>
+          <p class="eyebrow">Tenant tools • 2400 W Wabansia</p>
           <h1 id="home-title">Issue tracking for residents</h1>
           <p class="home-intro-lead">
             Document building repair issues with facts and dates. Create neutral repair notices for management without legal jargon.
           </p>
-          <p class="helper">Use short facts and dates. Choose a building and issue type to start.</p>
+          <p class="helper">Use short facts and dates. Choose an issue type to draft or view existing records.</p>
           <div class="hero-actions">
-            <a class="button intro-primary-cta" href="#builder">Start now: choose building and issue</a>
+            <a class="button intro-primary-cta" href="#builder">Draft a notice</a>
+            <a class="button button-secondary" href="/buildings/2400%20W%20Wabansia">Open 2400 W Wabansia ledger →</a>
           </div>
           <ul class="home-intro-list">
             <li><strong>Private by default:</strong> No names, emails, or phone numbers are saved.</li>

@@ -114,10 +114,31 @@ export const freeTextSafetyNote = "Short facts only. No names or unit numbers.";
 export const detailWarningThreshold = detailCharacterLimit - 40;
 
 export const factualTagOptions: Partial<Record<keyof typeof fieldDefinitions, string[]>> = {
-  location: ["kitchen", "bathroom", "ceiling", "hallway"],
-  attachment: ["photo", "video", "screenshot"],
-  pestType: ["roaches", "rats", "bedbugs"],
-  commonArea: ["elevator", "garage door", "hall lights", "trash room", "door fobs", "entry door lock", "window cleaning"],
-  lockoutAction: ["locked out", "utilities shut off"],
-  issueDescription: ["broken elevator", "water leak", "no heat", "mold smell", "door fobs not working", "windows not cleaned"],
+  location: [
+    "kitchen ceiling",
+    "bathroom ceiling",
+    "radiator pipe",
+    "living room window",
+    "under kitchen sink",
+    "hallway outside unit",
+  ],
+  attachment: ["photo taken today", "video of leak", "screenshot of portal request"],
+  pestType: ["roaches", "mice / rats", "bedbugs", "fruit flies"],
+  commonArea: [
+    "elevator out of service",
+    "garage door stuck",
+    "hallway lights out",
+    "package room fobs",
+    "trash chute blocked",
+    "front entry callbox",
+  ],
+  lockoutAction: ["locked out", "water shut off", "heat shut off", "power shut off"],
+  issueDescription: [
+    "no heat / radiators cold",
+    "water leak from above",
+    "elevator not working",
+    "front entry door unlatched",
+    "door fobs not scanning",
+    "hot water not working",
+  ],
 };

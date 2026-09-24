@@ -40,9 +40,15 @@ export const initialFormState = {
 export type FormState = typeof initialFormState;
 export type IssueFieldKey = keyof typeof fieldDefinitions;
 
-export const createInitialFormState = (now: Date = new Date()): FormState => {
+export const createInitialFormState = (now: Date = new Date(), initialBuilding: string = ""): FormState => {
   const formatted = formatDate(now);
-  return { ...initialFormState, today: formatted, startDate: formatted, time: getCurrentTime(now) };
+  return {
+    ...initialFormState,
+    building: initialBuilding,
+    today: formatted,
+    startDate: formatted,
+    time: getCurrentTime(now),
+  };
 };
 
 export const buildNoticeText = (state: FormState, issue: IssueOption | undefined, now: Date = new Date()) => {
