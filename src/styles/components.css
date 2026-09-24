@@ -332,10 +332,12 @@
 }
 
 .issue-option-card.active,
-.issue-option-card[data-state="checked"] {
+.issue-option-card[data-state="checked"],
+.issue-option-card[data-checked],
+.issue-option-card[aria-checked="true"] {
   border-color: var(--color-primary);
-  background: var(--color-surface-subtle);
-  box-shadow: 0 0 0 1px var(--color-primary);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
 .issue-icon {
@@ -350,9 +352,11 @@
   border: 1px solid var(--color-border);
 }
 
-.issue-option-card.active .issue-icon {
-  background: var(--color-surface);
-  border-color: var(--color-border-strong);
+.issue-option-card.active .issue-icon,
+.issue-option-card[data-checked] .issue-icon,
+.issue-option-card[aria-checked="true"] .issue-icon {
+  background: var(--color-surface-subtle);
+  border-color: var(--color-primary);
 }
 
 .issue-icon svg {
@@ -368,8 +372,52 @@
   line-height: 1.3;
 }
 
-.issue-option-card.active .issue-label {
+.issue-option-card.active .issue-label,
+.issue-option-card[data-checked] .issue-label,
+.issue-option-card[aria-checked="true"] .issue-label {
   font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ==========================================================================
+   QUICK NOTICE ACTION BANNER (FAST PATH)
+   ========================================================================== */
+.quick-notice-banner {
+  margin: 16px 0 8px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-xs);
+}
+
+.quick-notice-info {
+  display: grid;
+  gap: 2px;
+}
+
+.quick-notice-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.quick-notice-subtitle {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.quick-notice-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 /* ==========================================================================

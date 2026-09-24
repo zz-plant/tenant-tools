@@ -647,35 +647,28 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                       </RadioGroup.Root>
                     </div>
 
-                    {!hasResidentSession && (
-                      <p className="helper">You can draft a notice now. Add the resident key later when you save.</p>
+                    {isNoticeReady && (
+                      <div className="quick-notice-banner" role="region" aria-label="Quick notice actions">
+                        <div className="quick-notice-info">
+                          <span className="quick-notice-title">Notice ready to send</span>
+                          <span className="quick-notice-subtitle">
+                            {formState.building} • {formatIssueLabel(selectedIssue?.label || "")}
+                          </span>
+                        </div>
+                        <div className="quick-notice-actions">
+                          <Button className="button button-compact" type="button" onClick={handleCopy}>
+                            {copyLabel}
+                          </Button>
+                          <Button
+                            className="button button-secondary button-compact"
+                            type="button"
+                            onClick={() => setCurrentStep(4)}
+                          >
+                            Review & Save →
+                          </Button>
+                        </div>
+                      </div>
                     )}
-
-                    <div className="submission-block">
-                      <h3>Resident key for saving</h3>
-                      {hasResidentSession ? (
-                        <ResidentSessionNote />
-                      ) : (
-                        <>
-                          <p className="helper">You can draft without a key. Saving needs this key.</p>
-                          <label>
-                            Resident key
-                            <Input
-                              className="input"
-                              type="password"
-                              value={buildingKey}
-                              onChange={handleBuildingKeyInput}
-                              placeholder="Paste resident key"
-                              autoComplete="off"
-                              spellCheck={false}
-                            />
-                          </label>
-                        </>
-                      )}
-                      <p className="helper" role="status" aria-live="polite">
-                        {saveReadinessLabel}
-                      </p>
-                    </div>
 
                     {isStep1Complete ? (
                       <>
@@ -1011,7 +1004,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                 onClick={() => setCurrentStep((prev) => Math.min(steps.length, prev + 1))}
                 disabled={currentStep === steps.length || (currentStep === 1 && !isStep1Complete)}
               >
-                {currentStep === 1 && !isStep1Complete ? "Finish step 1 to continue" : "Next"}
+                {currentStep === 1
+                  ? !formState.building
+                    ? "Choose building to continue"
+                    : !formState.issue
+                      ? "Choose issue type to continue"
+                      : "Continue to details (Step 2) →"
+                  : currentStep === 2
+                    ? "Continue to facts (Step 3) →"
+                    : currentStep === 3
+                      ? "Review notice & copy (Step 4) →"
+                      : "Notice ready"}
               </Button>
             </div>
             {isStep1Complete && (
