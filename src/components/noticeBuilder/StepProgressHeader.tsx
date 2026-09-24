@@ -1,4 +1,3 @@
-
 type StepProgressHeaderProps = {
   currentStep: number;
   totalSteps: number;
@@ -17,11 +16,18 @@ const StepProgressHeader = ({
   currentStepLabel,
 }: StepProgressHeaderProps) => (
   <div className="step-header">
-    <h1>Build your notice</h1>
+    <div className="step-header-title-row">
+      <h1>Build your notice</h1>
+      {!stepsLocked && (
+        <span className="step-now-badge">
+          Current: {currentStepLabel}
+        </span>
+      )}
+    </div>
     <div className="step-meta">
       <div className="step-progress">
         <div className="step-progress-row">
-          <p className="step-progress-label">Step {currentStep} of {totalSteps}</p>
+          <p className="step-progress-label">Step {currentStep} of {totalSteps}: {currentStepLabel}</p>
           <span className="step-progress-pill">{progressPillLabel}</span>
         </div>
         <div
@@ -34,9 +40,6 @@ const StepProgressHeader = ({
         >
           <span className="step-progress-bar" style={{ width: `${stepProgress}%` }} />
         </div>
-      </div>
-      <div className="step-privacy">
-        {!stepsLocked && <p className="helper step-now">Now: {currentStepLabel}</p>}
       </div>
     </div>
   </div>

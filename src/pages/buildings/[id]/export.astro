@@ -10,6 +10,7 @@ import { fetchSubmissionRecord } from "../../../lib/storage/submissions";
 import type { SubmissionRecord } from "../../../lib/submissions";
 import SeoHead from "../../../components/SeoHead.astro";
 import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
+import AppHeader from "../../../components/AppHeader.astro";
 
 export const prerender = false;
 
@@ -45,6 +46,14 @@ const ticketLabel = (row: BuildingReportRow) =>
     />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Building Ledger"
+      subtitle={`Building: ${buildingId || "Not listed"}`}
+      backHref={dashboardUrl}
+      backLabel="Building dashboard"
+      statusBadge={hasAccess ? "Verified access" : "Access key needed"}
+    />
     <div class="page">
       <main class="layout print-report" id="main">
         {!hasAccess ? (

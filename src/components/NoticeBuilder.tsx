@@ -455,6 +455,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2000);
   };
 
+  const handleQuickStartDate = (daysAgo: number) => {
+    const target = new Date();
+    target.setDate(target.getDate() - daysAgo);
+    setFormState((prev) => ({
+      ...prev,
+      startDate: formatDate(target),
+    }));
+  };
+
   const summaryItems = [
     { label: "Building", value: formState.building || "Select a building" },
     { label: "Portfolio", value: selectedPortfolio?.label || "Not listed" },
@@ -529,13 +538,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const ruleSources = useMemo(() => collectRuleSources(formState.issue), [formState.issue]);
 
   return (
-    <div className="page">
-      <a className="skip-link" href="#main">
-        Skip to main content
-      </a>
-      <main id="main">
-        <div className="layout">
-          <section className="panel" id="builder">
+    <div className="notice-builder-container">
+      <div className="layout">
+        <section className="panel" id="builder">
             <StepProgressHeader
               currentStep={currentStep}
               totalSteps={steps.length}
@@ -544,19 +549,38 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
               stepsLocked={stepsLocked}
               currentStepLabel={currentStepInfo.label}
             />
-            <Tabs.Root value={String(currentStep)}>
-              <Tabs.List className="step-nav">
+            <Tabs.Root
+              value={String(currentStep)}
+              onValueChange={(val) => {
+                const nextStep = Number(val);
+                if (!isNaN(nextStep) && (nextStep === 1 || isStep1Complete)) {
+                  setCurrentStep(nextStep);
+                }
+              }}
+            >
+              <Tabs.List className="step-nav" aria-label="Notice builder steps">
                 {visibleBuilderSteps.map((step) => {
                   const isLocked = stepsLocked && step.id > 1;
                   return (
                     <Tabs.Tab
                       key={step.id}
                       value={String(step.id)}
-                      disabled={true}
+                      disabled={isLocked}
+                      onClick={() => {
+                        if (!isLocked) {
+                          setCurrentStep(step.id);
+                        }
+                      }}
                       className={`step-button ${currentStep === step.id ? "active" : ""}${isLocked ? " disabled" : ""}`}
                       aria-current={currentStep === step.id ? "step" : undefined}
+                      title={isLocked ? "Complete step 1 first to unlock" : `Go to Step ${step.id}: ${step.label}`}
                     >
-                      <span className="step-title">{step.title}</span>
+                      <div className="step-button-top">
+                        <span className="step-number-circle" aria-hidden="true">
+                          {currentStep > step.id ? "✓" : step.id}
+                        </span>
+                        <span className="step-title">{step.title}</span>
+                      </div>
                       <span className="step-label">{step.label}</span>
                       <span className="step-requirement">{step.requirement}</span>
                       {isLocked && <span className="step-lock-note">Locked</span>}
@@ -786,6 +810,46 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         value={formState.startDate}
                         onChange={updateField("startDate")}
                       />
+                      <div className="fact-tags" aria-label="Quick start date choices">
+                        <p className="helper">Quick set:</p>
+                        <div className="fact-tag-row">
+                          <button
+                            type="button"
+                            className={`fact-tag ${formState.startDate === formatDate(new Date()) ? "fact-tag-included" : ""}`}
+                            onClick={() => handleQuickStartDate(0)}
+                          >
+                            Today
+                          </button>
+                          <button
+                            type="button"
+                            className="fact-tag"
+                            onClick={() => handleQuickStartDate(1)}
+                          >
+                            Yesterday
+                          </button>
+                          <button
+                            type="button"
+                            className="fact-tag"
+                            onClick={() => handleQuickStartDate(3)}
+                          >
+                            3 days ago
+                          </button>
+                          <button
+                            type="button"
+                            className="fact-tag"
+                            onClick={() => handleQuickStartDate(7)}
+                          >
+                            1 week ago
+                          </button>
+                          <button
+                            type="button"
+                            className="fact-tag"
+                            onClick={() => handleQuickStartDate(14)}
+                          >
+                            2 weeks ago
+                          </button>
+                        </div>
+                      </div>
                     </label>
 
                     {(formState.stage === "B" || formState.stage === "C") && (
@@ -866,9 +930,67 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                       <p className="helper">Complete step 1 first.</p>
                     </section>
                   ) : (
-                    <p className="helper">
-                      Review the preview. Copy and save. Dates and repeats help.
-                    </p>
+                    <div className="form-section">
+                      <div className="form-section-header">
+                        <h3>Review and send notice</h3>
+                        <p className="helper">Your notice text is ready. Copy and send it to your landlord or property management.</p>
+                      </div>
+
+                      <div className="summary-grid">
+                        <div className="summary-card">
+                          <p className="summary-label">Building</p>
+                          <p className="summary-value">{formState.building || "None selected"}</p>
+                        </div>
+                        <div className="summary-card">
+                          <p className="summary-label">Issue</p>
+                          <p className="summary-value">{selectedIssue?.label || "None selected"}</p>
+                        </div>
+                        <div className="summary-card">
+                          <p className="summary-label">Start date</p>
+                          <p className="summary-value">{formState.startDate || "Today"}</p>
+                        </div>
+                        <div className="summary-card">
+                          <p className="summary-label">Days open</p>
+                          <p className="summary-value">{daysOpen} day{daysOpen === 1 ? "" : "s"}</p>
+                        </div>
+                      </div>
+
+                      <div className="output-actions">
+                        <Button
+                          className="button"
+                          type="button"
+                          onClick={handleCopy}
+                          disabled={!isNoticeReady}
+                        >
+                          {copyLabel}
+                        </Button>
+                        <Button
+                          className="button button-secondary"
+                          type="button"
+                          onClick={handleRepeatNotice}
+                          disabled={!isNoticeReady}
+                        >
+                          {repeatLabel}
+                        </Button>
+                      </div>
+
+                      {noticeStatusMessage && (
+                        <p className="submission-note" role="status" aria-live="polite">
+                          {noticeStatusMessage}
+                        </p>
+                      )}
+
+                      <label>
+                        Notice text
+                        <pre className="output-notice">{noticeText}</pre>
+                      </label>
+
+                      <div className="helper-card">
+                        <p className="helper">
+                          <strong>Next step:</strong> Send this notice by email, text message, or resident portal. Keep a screenshot of your message and the date you sent it.
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </Tabs.Panel>
               </form>
@@ -1211,7 +1333,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
           guidanceScript={guidanceScript}
           ruleSources={ruleSources}
         />
-      </main>
 
       <footer className="site-footer">
         <p>Safety first: evidence is optional. Public views hide personal details.</p>

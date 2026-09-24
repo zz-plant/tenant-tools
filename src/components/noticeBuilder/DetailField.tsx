@@ -53,18 +53,23 @@ const DetailField = ({ fieldKey, value, onChange, onTagClick }: DetailFieldProps
       />
       {tags && (
         <div className="fact-tags" aria-label={`${field.label} quick facts`}>
-          <p className="helper">Quick facts:</p>
+          <p className="helper">Quick facts (tap to add):</p>
           <div className="fact-tag-row">
-            {tags.map((tag) => (
-              <button
-                key={tag}
-                className="fact-tag"
-                type="button"
-                onClick={() => onTagClick(tag)}
-              >
-                {tag}
-              </button>
-            ))}
+            {tags.map((tag) => {
+              const isIncluded = value.toLowerCase().includes(tag.toLowerCase());
+              return (
+                <button
+                  key={tag}
+                  className={`fact-tag ${isIncluded ? "fact-tag-included" : ""}`}
+                  type="button"
+                  onClick={() => onTagClick(tag)}
+                  aria-pressed={isIncluded}
+                  title={isIncluded ? `"${tag}" already added` : `Add "${tag}"`}
+                >
+                  {isIncluded ? `✓ ${tag}` : `+ ${tag}`}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

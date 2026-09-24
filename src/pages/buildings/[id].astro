@@ -12,6 +12,7 @@ import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submiss
 import { buildBuildingDashboardUrl, buildSubmissionDetailsUrl } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
+import AppHeader from "../../components/AppHeader.astro";
 
 export const prerender = false;
 
@@ -101,8 +102,16 @@ const totalFiltered = filtered.length;
     />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Building Ledger"
+      subtitle={`Building: ${buildingId || "Not listed"}`}
+      backHref="/"
+      backLabel="Notice builder"
+      statusBadge={hasAccess ? "Verified resident access" : "Access key needed"}
+      isSteward={isSteward}
+    />
     <div class="page">
-      <a class="skip-link" href="#main">Skip to main content</a>
       <header class="hero">
         <div class="hero-main">
           <p class="eyebrow">Building ledger</p>

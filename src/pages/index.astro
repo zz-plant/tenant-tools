@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import NoticeBuilder from "../components/NoticeBuilder";
 import SeoHead from "../components/SeoHead.astro";
+import AppHeader from "../components/AppHeader.astro";
 import { getBuildingOptions } from "../data/buildings";
 import { getBuildingIdsForKey, parseBuildingKeys } from "../lib/access";
 import { RESIDENT_KEY_COOKIE } from "../lib/api/requestGuard";
@@ -11,6 +12,7 @@ const buildingKeys = parseBuildingKeys(env.BUILDING_KEYS_JSON);
 const buildingOptions = getBuildingOptions(buildingKeys);
 // Only building ids reach the client. The key itself stays in the httpOnly cookie.
 const residentBuildings = getBuildingIdsForKey(Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value, env);
+const hasResidentKey = residentBuildings.length > 0;
 ---
 
 <!DOCTYPE html>
@@ -25,13 +27,25 @@ const residentBuildings = getBuildingIdsForKey(Astro.cookies.get(RESIDENT_KEY_CO
     />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader statusBadge={hasResidentKey ? "Device key active" : undefined} />
     <main class="page" id="main">
-      <section class="panel panel-highlight home-intro-panel" aria-labelledby="home-title">
+      <section class="home-intro-panel" aria-labelledby="home-title">
         <div class="home-intro-copy">
-          <p class="eyebrow">Building ledger</p>
+          <p class="eyebrow">Tenant tools</p>
           <h1 id="home-title">Issue tracking for residents</h1>
+          <p class="home-intro-lead">
+            Document building repair issues with facts and dates. Create neutral repair notices for management without legal jargon.
+          </p>
           <p class="helper">Use short facts and dates. Choose a building and issue type to start.</p>
-          <a class="button intro-primary-cta" href="#builder">Start now: choose building and issue</a>
+          <div class="hero-actions">
+            <a class="button intro-primary-cta" href="#builder">Start now: choose building and issue</a>
+          </div>
+          <ul class="home-intro-list">
+            <li><strong>Private by default:</strong> No names, emails, or phone numbers are saved.</li>
+            <li><strong>Factual notices:</strong> Neutral drafts based on dates and conditions.</li>
+            <li><strong>Me too count:</strong> Simple participation for neighbors without writing.</li>
+          </ul>
         </div>
       </section>
 

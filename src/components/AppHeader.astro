@@ -1,0 +1,70 @@
+---
+export type Props = {
+  title?: string;
+  subtitle?: string;
+  backHref?: string;
+  backLabel?: string;
+  statusBadge?: string;
+  isSteward?: boolean;
+};
+
+const {
+  title = "Building Ledger",
+  subtitle = "Resident issue tracker & notice builder",
+  backHref,
+  backLabel,
+  statusBadge,
+  isSteward = false,
+} = Astro.props;
+---
+
+<header class="app-navbar" role="banner">
+  <div class="app-navbar-inner">
+    <div class="app-brand">
+      <a href="/" class="app-brand-link" aria-label="Building Ledger Home">
+        <span class="app-brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18" />
+            <path d="M5 21V7l8-4v18" />
+            <path d="M19 21V11l-6-4" />
+            <path d="M9 9h.01" />
+            <path d="M9 13h.01" />
+            <path d="M9 17h.01" />
+          </svg>
+        </span>
+        <div class="app-brand-text">
+          <span class="app-brand-name">{title}</span>
+          <span class="app-brand-sub">{subtitle}</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="app-navbar-meta">
+      {backHref && backLabel && (
+        <a href={backHref} class="app-back-link">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
+            <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/>
+          </svg>
+          <span>{backLabel}</span>
+        </a>
+      )}
+
+      {statusBadge && (
+        <span class="app-badge app-badge-status">
+          <span class="app-badge-dot" aria-hidden="true"></span>
+          {statusBadge}
+        </span>
+      )}
+
+      {isSteward && (
+        <span class="app-badge app-badge-steward">
+          Steward
+        </span>
+      )}
+
+      <span class="app-badge app-badge-privacy" title="Safety first: no login required, no real names collected">
+        Private mode
+      </span>
+    </div>
+  </div>
+</header>

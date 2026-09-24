@@ -1,11 +1,22 @@
 {
   "name": "tenant-notice-builder",
+  "main": "./dist/_worker.js/index.js",
   "compatibility_date": "2026-01-23",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
   "minify": true,
   "assets": {
+    "binding": "ASSETS",
     "directory": "./dist"
   },
-  // Private evidence photos. Create once with: wrangler r2 bucket create building-ledger-evidence
+  "routes": [
+    {
+      "pattern": "galina.kanav.net",
+      "custom_domain": true
+    }
+  ],
+  // Private evidence photos.
   // Never enable public access on this bucket. Photos are served only through signed, key-gated links.
   "r2_buckets": [
     {
@@ -16,8 +27,7 @@
   "kv_namespaces": [
     {
       "binding": "SUBMISSIONS_KV",
-      "id": "REPLACE_WITH_KV_ID",
-      "preview_id": "REPLACE_WITH_PREVIEW_KV_ID"
+      "id": "d2a59d442141478dae1fc35a3344e952"
     }
   ]
 }

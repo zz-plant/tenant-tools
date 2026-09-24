@@ -15,6 +15,7 @@ import { buildBuildingDashboardUrl } from "../../lib/navigation";
 import { formatIssueLabel } from "../../lib/noticeUtils";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
+import AppHeader from "../../components/AppHeader.astro";
 
 export const prerender = false;
 
@@ -95,8 +96,16 @@ const groupChatText = submissionRecord
     />
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Building Ledger"
+      subtitle={submissionRecord?.building ? `Record for ${submissionRecord.building}` : "Issue Record"}
+      backHref={dashboardUrl || "/"}
+      backLabel={dashboardUrl ? "Building dashboard" : "Notice builder"}
+      statusBadge={hasAccess ? "Verified access" : "Access key needed"}
+      isSteward={isSteward}
+    />
     <div class="page">
-      <a class="skip-link" href="#main">Skip to main content</a>
       <header class="hero">
         <div class="hero-main">
           <p class="eyebrow">Shared ledger record</p>
