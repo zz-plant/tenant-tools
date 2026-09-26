@@ -9,7 +9,7 @@
   font-size: 0.9rem;
   letter-spacing: -0.01em;
   background: var(--color-primary);
-  color: #ffffff;
+  color: var(--color-primary-contrast);
   cursor: pointer;
   min-height: 40px;
   display: inline-flex;
@@ -264,7 +264,7 @@ label {
 }
 
 .checkbox-indicator {
-  color: #ffffff;
+  color: var(--color-primary-contrast);
   font-size: 0.72rem;
   font-weight: 700;
 }
@@ -290,7 +290,7 @@ label {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #ffffff;
+  background: var(--color-surface);
   box-shadow: var(--shadow-xs);
   transition: transform var(--ease-standard);
   transform: translateX(0);
@@ -362,7 +362,7 @@ label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
+  background: var(--color-surface);
   transition: border-color var(--ease-standard);
 }
 
