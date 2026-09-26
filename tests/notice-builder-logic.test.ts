@@ -45,6 +45,20 @@ describe("buildNoticeText", () => {
     assert.ok(buildNoticeText(state, building, now).startsWith("We are residents"));
   });
 
+  it("uses Spanish template when selected", () => {
+    const heat = issueOptions.find((option) => option.id === "heat");
+    const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language: "es" };
+    const text = buildNoticeText(state, heat, now);
+    assert.ok(text.includes("Vivo en 2400 W Wabansia"));
+  });
+
+  it("uses Polish template when selected", () => {
+    const heat = issueOptions.find((option) => option.id === "heat");
+    const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language: "pl" };
+    const text = buildNoticeText(state, heat, now);
+    assert.ok(text.includes("Mieszkam pod adresem 2400 W Wabansia"));
+  });
+
   it("falls back to English when a language has no template", () => {
     const state = { ...createInitialFormState(now), simpleEnglish: false, language: "xx" };
     assert.ok(leak);

@@ -1021,13 +1021,23 @@
 }
 
 @media print {
+  @page {
+    margin: 1.5cm;
+    size: letter portrait;
+  }
+
   body,
   .page,
-  .panel {
+  .panel,
+  .report-sheet {
     background: #ffffff !important;
     box-shadow: none !important;
     border: 0 !important;
     color: #000000 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    font-size: 11pt !important;
+    line-height: 1.45 !important;
   }
 
   .app-navbar,
@@ -1036,13 +1046,47 @@
   .site-footer,
   .share-checklist,
   .issue-actions,
+  .report-actions,
   button {
     display: none !important;
   }
 
+  .report-header {
+    border-bottom: 2pt solid #000000 !important;
+    padding-bottom: 12pt !important;
+    margin-bottom: 16pt !important;
+  }
+
+  .report-header h1 {
+    font-size: 20pt !important;
+    color: #000000 !important;
+    margin: 4pt 0 8pt !important;
+  }
+
+  .report-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 12pt 0 !important;
+  }
+
   .report-table th,
   .report-table td {
-    border-color: #000000 !important;
+    border: 1pt solid #000000 !important;
+    padding: 6pt 8pt !important;
+    font-size: 10pt !important;
+    color: #000000 !important;
+  }
+
+  .report-table th {
+    background: #f4f4f4 !important;
+    font-weight: 700 !important;
+  }
+
+  tr,
+  .report-header,
+  .report-table {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
   a {

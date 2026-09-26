@@ -56,9 +56,12 @@ export const buildNoticeText = (state: FormState, issue: IssueOption | undefined
     return "";
   }
 
-  const template = state.simpleEnglish
-    ? issue.simple.en
-    : issue.notices[state.stage]?.[state.language] || issue.notices[state.stage]?.en || issue.notices.A.en;
+  const template =
+    state.language === "en" && state.simpleEnglish
+      ? issue.simple.en
+      : issue.notices[state.stage]?.[state.language] ||
+        issue.notices[state.stage]?.en ||
+        issue.notices.A.en;
 
   const values: Record<string, string> = {
     ADDRESS: state.building || "[ADDRESS]",

@@ -56,5 +56,12 @@ const hasResidentKey = residentBuildings.length > 0;
         residentBuildings={residentBuildings}
       />
     </main>
+    <script is:inline>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker.register("/sw.js").catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>

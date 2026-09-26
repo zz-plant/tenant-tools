@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "../ui";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import type { SubmissionTimelineEntry } from "../../lib/submissionTimeline";
@@ -26,8 +27,11 @@ const RecordPanel = ({
   issueGuidance,
   guidanceScript,
   ruleSources,
-}: RecordPanelProps) => (
-  <section className={`panel panel-highlight record-panel${!canShowAfterBasics ? " record-panel-mobile-hidden" : ""}`} id="record">
+}: RecordPanelProps) => {
+  const [scriptCopyLabel, setScriptCopyLabel] = useState("Copy 311 script");
+
+  return (
+    <section className={`panel panel-highlight record-panel${!canShowAfterBasics ? " record-panel-mobile-hidden" : ""}`} id="record">
     <div>
       <h2>Record and next steps</h2>
       <p className="helper">Use this after you send the notice.</p>
@@ -125,6 +129,32 @@ const RecordPanel = ({
                 <p>
                   <strong>What happens next:</strong> {issueGuidance.nextStep}
                 </p>
+                <div style={{ marginTop: "12px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <a className="button button-compact" href="tel:311">
+                    Call 311
+                  </a>
+                  <Button
+                    className="button button-secondary button-compact"
+                    type="button"
+                    onClick={async () => {
+                      if (guidanceScript) {
+                        await navigator.clipboard.writeText(guidanceScript);
+                        setScriptCopyLabel("Copied script ✓");
+                        setTimeout(() => setScriptCopyLabel("Copy 311 script"), 2000);
+                      }
+                    }}
+                  >
+                    {scriptCopyLabel}
+                  </Button>
+                  <a
+                    className="button button-secondary button-compact"
+                    href="https://311.chicago.gov"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open 311.chicago.gov ↗
+                  </a>
+                </div>
               </div>
             </details>
           )}
@@ -150,5 +180,6 @@ const RecordPanel = ({
     )}
   </section>
 );
+};
 
 export default RecordPanel;
