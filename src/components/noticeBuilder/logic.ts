@@ -120,25 +120,23 @@ export type NextStep = {
 
 const nextStepDefinitions = [
   {
-    label: "Common path: first written notice window",
+    label: "Send the first notice",
     unlockDay: 0,
-    calendarLabel: "Initial notice window",
-    detail:
-      "Common paths tenants encounter start with a written record. A risk is missing dates, copies, or who received it.",
+    calendarLabel: "Send first notice",
+    detail: "Send a short written notice. Keep a copy. Write down the date you sent it.",
   },
   {
-    label: "Common path: follow-up window after a few days",
+    label: "Send a follow-up",
     unlockDay: 3,
-    calendarLabel: "Follow-up notice window",
-    detail:
-      "Common paths tenants encounter include a follow-up. A risk is a documentation gap when dates or prior messages are not linked.",
+    calendarLabel: "Send follow-up notice",
+    detail: "If there is no repair date yet, send a follow-up. Include the date of your first message.",
   },
   {
-    label: "Common path: final reminder window",
+    label: "Send a final reminder",
     unlockDay: 6,
-    calendarLabel: "Final reminder window",
+    calendarLabel: "Send final reminder",
     detail:
-      "Common paths tenants encounter include a last reminder. A risk is unclear timelines when records are incomplete.",
+      "If there is still no repair date, send a final calm reminder. The next normal step after this is a 311 inspection request.",
   },
 ];
 

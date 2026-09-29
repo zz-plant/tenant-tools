@@ -32,9 +32,9 @@ export const issueFieldMap = {
 } satisfies IssueFieldMap;
 
 export const stages = {
-  A: "Initial notice",
+  A: "First notice",
   B: "Follow-up",
-  C: "Final notice",
+  C: "Final reminder",
 };
 
 export const meaningMap = {

@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const depositIssue: IssueOption = {
   id: "deposit",
-  label: "💰 Security deposit (move-out deadlines)",
+  label: "Security deposit (move-out deadlines)",
   notices: {
     A: {
       en: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nCondition: I did not receive a list of charges.\nPlease send the list of charges.\n\n`,

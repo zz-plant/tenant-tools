@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const buildingIssue: IssueOption = {
   id: "building",
-  label: "🏢 Building-wide message",
+  label: "Building-wide message",
   notices: {
     A: {
       en: `We are residents at [ADDRESS].\nCondition: multiple residents report the same issue.\nIssue: [ISSUE].\nStart date: around [START DATE].\nPlease provide the repair plan and expected repair date.\n\nResidents of [ADDRESS]`,

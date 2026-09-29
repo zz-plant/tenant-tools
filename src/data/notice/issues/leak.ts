@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const leakIssue: IssueOption = {
   id: "leak",
-  label: "💧 Water leak / ceiling leak / water damage",
+  label: "Water leak / ceiling leak / water damage",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nCondition: water leak / water coming in at [LOCATION].\nStart date: [START DATE].\nPlease provide the repair date and time.\nI am attaching photos/videos.\n\n`,

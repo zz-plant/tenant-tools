@@ -36,7 +36,7 @@ export type { SubmissionStatus } from "../data/submissionOptions";
 
 export const submissionStatusLabels: Record<SubmissionStatus, string> = {
   open: "Open",
-  resolved: "Verified restored",
+  resolved: "Resolved",
   archived: "Archived",
 };
 

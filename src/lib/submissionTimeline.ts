@@ -20,7 +20,7 @@ const stageUsesFirstNoticeDate: Record<SubmissionTimelineInput["stage"], boolean
 const reportDateLabelByStage: Record<SubmissionTimelineInput["stage"], string> = {
   A: "Notice sent",
   B: "Follow-up sent",
-  C: "Final notice sent",
+  C: "Final reminder sent",
 };
 
 const pushTimelineEntry = (

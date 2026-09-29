@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const entryIssue: IssueOption = {
   id: "entry",
-  label: "🚪 Entry without notice / access problems",
+  label: "Entry without notice / access problems",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nEntry without notice happened on [DATE].\nIn Chicago, 48-hour notice is required before entry unless there is an emergency.\nPlease confirm future entry will follow the 48-hour notice rule.\n\n`,

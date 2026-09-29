@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const pestsIssue: IssueOption = {
   id: "pests",
-  label: "🪳 Pests (roaches / rats / bedbugs)",
+  label: "Pests (roaches / rats / bedbugs)",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nCondition: [ROACHES/RATS/BEDBUGS] seen.\nDate seen: [START DATE].\nCondition today: still happening.\nPlease schedule pest treatment and provide the date and time.\nI can share photos if needed.\n\n`,

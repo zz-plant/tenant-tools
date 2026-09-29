@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const commonIssue: IssueOption = {
   id: "common",
-  label: "🛗 Elevator / common areas",
+  label: "Elevator / common areas",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nCondition: problem with [ELEVATOR / GARAGE DOOR / HALL LIGHTS / TRASH ROOM].\nStart date: [START DATE].\nPlease provide the repair date and time.\n\n`,

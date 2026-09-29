@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const heatIssue: IssueOption = {
   id: "heat",
-  label: "🔥 Heat not working / not warm enough",
+  label: "Heat not working / not warm enough",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nCondition: heat not working / not warm enough.\nStart date: [START DATE].\nToday: [TODAY]. Temperature: [TEMP]°F at [TIME].\nPlease provide the repair date and time.\n\n`,

@@ -32,7 +32,7 @@ describe("getSubmissionTimelineEntries", () => {
     });
 
     assert.equal(stageB[1]?.label, "Follow-up sent");
-    assert.equal(stageC[1]?.label, "Final notice sent");
+    assert.equal(stageC[1]?.label, "Final reminder sent");
   });
 
   it("sorts entries by date", () => {

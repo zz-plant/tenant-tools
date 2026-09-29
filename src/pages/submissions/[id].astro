@@ -48,11 +48,13 @@ const mergedIntoUrl = submissionRecord?.mergedInto
   ? `/submissions/${encodeURIComponent(submissionRecord.mergedInto)}`
   : "";
 
-const issueLabel =
+// Older records saved the label with a leading emoji. formatIssueLabel removes it.
+const issueLabel = formatIssueLabel(
   submissionRecord?.issueLabel ||
-  issueOptions.find((issue) => issue.id === submissionRecord?.issue)?.label ||
-  submissionRecord?.issue ||
-  "Issue";
+    issueOptions.find((issue) => issue.id === submissionRecord?.issue)?.label ||
+    submissionRecord?.issue ||
+    "Issue"
+);
 
 const stageLabel = submissionRecord ? stages[submissionRecord.stage] : "";
 const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDetails || {}) : [];
