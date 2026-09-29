@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.1 - 2026-09-29
+
+### Fixed
+
+- "No repair date shared", "Building-wide message", and "Lockout / utility shutoff risk" now have a Standard English final reminder. Before, the final reminder showed the first notice.
+- Other languages still use English for these final reminders until reviewed translations are added.
+
 ## 1.3.0 - 2026-09-29
 
 ### Added
