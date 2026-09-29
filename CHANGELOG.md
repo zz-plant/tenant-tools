@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.3.0 - 2026-09-29
+
+### Added
+
+- Very simple English now has a follow-up and a final reminder for every issue. Before, these stages showed the first-notice text.
+
+### Changed
+
+- Stages are now "First notice", "Follow-up", and "Final reminder".
+- Next steps use plain names: "Send the first notice", "Send a follow-up", "Send a final reminder".
+- The resolved status shows as "Resolved" instead of "Verified restored". Records are not verified.
+- Issue labels no longer start with emoji. Older records show without the emoji.
+- The notice tag says "Very simple English" only when that text is used.
+
+### Fixed
+
+- Timeline dates showed one day early for residents west of UTC, such as in Chicago.
+- Dropdowns show the option name, not the stored value, after a choice.
+- Pressing Enter in a builder field no longer reloads the page and loses the draft.
+- After a record is saved, the save button stays off, so one tap cannot save a second copy.
+
 ## 1.2.0 - 2026-09-23
 
 ### Added
