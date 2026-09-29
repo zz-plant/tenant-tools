@@ -4,7 +4,7 @@
 
 ### Added
 
-- Spanish and Polish final reminders for "No repair date shared", "Building-wide message", and "Lockout / utility shutoff risk". Before, these showed the English final reminder. Hindi still uses English for them.
+- Spanish, Hindi, and Polish final reminders for "No repair date shared", "Building-wide message", and "Lockout / utility shutoff risk". Before, these showed the English final reminder.
 
 ## 1.3.1 - 2026-09-29
 

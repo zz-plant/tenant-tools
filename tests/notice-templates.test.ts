@@ -37,9 +37,9 @@ describe("notice template coverage (AGENTS.md Appendix B)", () => {
     }
   });
 
-  it("has a Spanish and Polish final reminder wherever the first notice is translated", () => {
+  it("has a translated final reminder wherever the first notice is translated", () => {
     for (const issue of allIssues) {
-      for (const language of ["es", "pl"]) {
+      for (const language of ["es", "hi", "pl"]) {
         if (issue.notices.A?.[language]) {
           assert.ok(issue.notices.C?.[language]?.trim(), `${issue.id} is missing the ${language} final reminder`);
         }
@@ -74,8 +74,8 @@ describe("Standard English final reminders", () => {
     }
   });
 
-  it("are used in Spanish and Polish, with the first message date filled in", () => {
-    const greetings = { es: "Hola,", pl: "Dzień dobry," } as const;
+  it("are used in Spanish, Hindi, and Polish, with the first message date filled in", () => {
+    const greetings = { es: "Hola,", hi: "नमस्ते,", pl: "Dzień dobry," } as const;
     for (const [language, greeting] of Object.entries(greetings)) {
       const state = {
         ...createInitialFormState(now),
