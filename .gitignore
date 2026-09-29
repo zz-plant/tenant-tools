@@ -3,3 +3,4 @@ dist/
 .astro/
 .dev.vars
 .env
+.wrangler/

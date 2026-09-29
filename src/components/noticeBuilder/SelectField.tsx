@@ -13,7 +13,13 @@ type SelectFieldProps = {
 
 /** Styled single-choice dropdown used by the notice builder. */
 const SelectField = ({ value, onValueChange, options, ariaLabel, placeholder, required }: SelectFieldProps) => (
-  <Select.Root value={value} onValueChange={(next) => onValueChange((next as string | null) ?? null)} required={required}>
+  <Select.Root
+    value={value}
+    onValueChange={(next) => onValueChange((next as string | null) ?? null)}
+    // `items` lets the trigger show the option label, not the raw value.
+    items={options.map((option) => ({ value: option.id, label: option.label }))}
+    required={required}
+  >
     <Select.Trigger className="select-trigger" aria-label={ariaLabel}>
       <Select.Value placeholder={placeholder} />
       <Select.Icon className="select-icon">
