@@ -16,6 +16,9 @@ export const lockoutIssue: IssueOption = {
       hi: `नमस्ते,\n\n[DATE/TIME] को यूटिलिटी बंद कर दी गई / सेवा बाधित हुई।\nकृपया तुरंत सेवा बहाल करें और बताएं कि यह कब बहाल होगी।\n\n`,
       pl: `Dzień dobry,\n\nMedia zostały odcięte / usługa została przerwana [DATE/TIME].\nProszę natychmiast przywrócić usługę i potwierdzić, kiedy zostanie przywrócona.\n\n`,
     },
+    C: {
+      en: `I live at [ADDRESS].\nStatement received: [LOCK ME OUT / SHUT OFF UTILITIES] on [DATE].\nFirst message date: [DATE OF FIRST MESSAGE].\nI have not received written confirmation.\nPlease confirm in writing today that you will not lock me out or shut off utilities.\nIf there is no written confirmation, the next normal step is to ask a tenant group or legal aid for help.\n\n`,
+    },
   },
   simple: {
     A: `Please confirm in writing that you will not lock me out or shut off utilities.\n\n`,
