@@ -24,6 +24,8 @@ export const pestsIssue: IssueOption = {
     },
   },
   simple: {
-    en: `I live at [ADDRESS].\nCondition: pests seen.\nDate seen: [START DATE].\nPlease schedule treatment and provide the date.\n\n`,
+    A: `I live at [ADDRESS].\nCondition: pests seen.\nDate seen: [START DATE].\nPlease schedule treatment and provide the date.\n\n`,
+    B: `I live at [ADDRESS].\nCondition: pests seen.\nIt is still happening.\nDate seen: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease schedule treatment and provide the date.\n\n`,
+    C: `I live at [ADDRESS].\nCondition: pests seen.\nIt is still happening.\nDate seen: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease provide the treatment date today.\nIf there is no treatment date, the next normal step is to call 311 for an inspection.\n\n`,
   },
 };

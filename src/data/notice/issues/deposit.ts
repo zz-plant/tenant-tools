@@ -24,6 +24,8 @@ export const depositIssue: IssueOption = {
     },
   },
   simple: {
-    en: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nPlease return the security deposit.\n\n`,
+    A: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nPlease return the security deposit.\n\n`,
+    B: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nFirst message: [DATE OF FIRST MESSAGE].\nI have not received my security deposit.\nPlease return the security deposit.\nPlease tell me the date you will send it.\n\n`,
+    C: `Move-out date: [MOVE-OUT DATE].\nAddress: [ADDRESS].\nFirst message: [DATE OF FIRST MESSAGE].\nI still have not received my security deposit.\nPlease tell me today when you will send it.\nIf there is no date, the next normal step is to ask a tenant group or legal aid.\n\n`,
   },
 };

@@ -18,6 +18,8 @@ export const noTimelineIssue: IssueOption = {
     },
   },
   simple: {
-    en: `Please provide the repair date.\nIf there is no date, provide the next step and the exact day.\n\n`,
+    A: `Please provide the repair date.\nIf there is no date, provide the next step and the exact day.\n\n`,
+    B: `I live at [ADDRESS].\nThe problem started on [START DATE].\nI asked for a repair date on [DATE OF FIRST MESSAGE].\nI still do not have a repair date.\nPlease provide the repair date.\nIf there is no date, provide the next step and the exact day.\n\n`,
+    C: `I live at [ADDRESS].\nThe problem started on [START DATE].\nI asked for a repair date on [DATE OF FIRST MESSAGE].\nI still do not have a repair date.\nPlease provide the repair date today.\nIf there is no repair date, the next normal step is to call 311 for an inspection.\n\n`,
   },
 };

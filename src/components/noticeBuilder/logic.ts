@@ -58,7 +58,7 @@ export const buildNoticeText = (state: FormState, issue: IssueOption | undefined
 
   const template =
     state.language === "en" && state.simpleEnglish
-      ? issue.simple.en
+      ? issue.simple[state.stage as keyof IssueOption["simple"]] || issue.simple.A
       : issue.notices[state.stage]?.[state.language] ||
         issue.notices[state.stage]?.en ||
         issue.notices.A.en;

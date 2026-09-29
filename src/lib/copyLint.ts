@@ -1,4 +1,5 @@
 import { issueOptions } from "../data/notice/issueOptions";
+import type { IssueOption } from "../data/notice/types";
 
 const idiomPatterns = [
   /\bcircle back\b/i,
@@ -48,8 +49,12 @@ export const lintVerySimpleEnglish = (text: string): CopyLintResult => {
   };
 };
 
+/** Lints every Very simple English template: each issue, each stage (A, B, C). */
 export const lintSimpleNoticeTemplates = () =>
-  issueOptions.map((issue) => ({
-    issueId: issue.id,
-    ...lintVerySimpleEnglish(issue.simple.en),
-  }));
+  issueOptions.flatMap((issue) =>
+    (Object.keys(issue.simple) as Array<keyof IssueOption["simple"]>).map((stage) => ({
+      issueId: issue.id,
+      stage,
+      ...lintVerySimpleEnglish(issue.simple[stage]),
+    }))
+  );

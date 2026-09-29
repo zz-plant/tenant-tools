@@ -45,6 +45,45 @@ describe("buildNoticeText", () => {
     assert.ok(buildNoticeText(state, building, now).startsWith("We are residents"));
   });
 
+  it("uses the very simple English follow-up and final reminder for stages B and C", () => {
+    const heat = issueOptions.find((option) => option.id === "heat");
+    assert.ok(heat);
+    const base = {
+      ...createInitialFormState(now),
+      building: "2400 W Wabansia",
+      startDate: "2026-09-01",
+      firstMessageDate: "2026-09-10",
+    };
+    const first = buildNoticeText({ ...base, stage: "A" }, heat, now);
+    const followUp = buildNoticeText({ ...base, stage: "B" }, heat, now);
+    const finalReminder = buildNoticeText({ ...base, stage: "C" }, heat, now);
+
+    assert.notEqual(followUp, first);
+    assert.notEqual(finalReminder, followUp);
+    assert.ok(followUp.includes("First message: 2026-09-10."));
+    assert.ok(finalReminder.includes("First message: 2026-09-10."));
+    assert.ok(finalReminder.includes("the next normal step is to call 311"));
+    assert.ok(!first.includes("next normal step"));
+  });
+
+  it("gives every issue a simple follow-up with the first message date and a calm final reminder", () => {
+    const state = { ...createInitialFormState(now), building: "2400 W Wabansia", firstMessageDate: "2026-09-10" };
+    for (const issue of issueOptions) {
+      const followUp = buildNoticeText({ ...state, stage: "B" }, issue, now);
+      const finalReminder = buildNoticeText({ ...state, stage: "C" }, issue, now);
+      assert.ok(followUp.includes("2026-09-10"), `${issue.id} follow-up is missing the first message date`);
+      assert.ok(finalReminder.includes("2026-09-10"), `${issue.id} final reminder is missing the first message date`);
+      assert.ok(finalReminder.includes("the next normal step is"), `${issue.id} final reminder is missing the next step`);
+      assert.ok(!finalReminder.includes("[DATE OF FIRST MESSAGE]"), `${issue.id} left the placeholder`);
+    }
+  });
+
+  it("does not use very simple English for other languages", () => {
+    const heat = issueOptions.find((option) => option.id === "heat");
+    const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language: "es", stage: "B" };
+    assert.ok(buildNoticeText(state, heat, now).startsWith("Hola"));
+  });
+
   it("uses Spanish template when selected", () => {
     const heat = issueOptions.find((option) => option.id === "heat");
     const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language: "es" };

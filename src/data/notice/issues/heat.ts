@@ -24,6 +24,8 @@ export const heatIssue: IssueOption = {
     },
   },
   simple: {
-    en: `I live at [ADDRESS].\nCondition: heat not working.\nStart date: [START DATE].\nPlease provide the repair date.\n\n`,
+    A: `I live at [ADDRESS].\nCondition: heat not working.\nStart date: [START DATE].\nPlease provide the repair date.\n\n`,
+    B: `I live at [ADDRESS].\nCondition: heat not working.\nIt is still not fixed.\nStart date: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease provide the repair date.\n\n`,
+    C: `I live at [ADDRESS].\nCondition: heat not working.\nIt is still not fixed.\nStart date: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease provide the repair date today.\nIf there is no repair date, the next normal step is to call 311 for an inspection.\n\n`,
   },
 };

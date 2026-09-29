@@ -484,7 +484,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     { label: "Today", value: formState.today || "Add today's date" },
     { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
   ];
-  const noticeLanguageLabel = formState.simpleEnglish
+  // Very simple English applies only to English notices (see buildNoticeText).
+  const noticeLanguageLabel = formState.simpleEnglish && formState.language === "en"
     ? "Very simple English"
     : formState.language === "en"
       ? "English"
