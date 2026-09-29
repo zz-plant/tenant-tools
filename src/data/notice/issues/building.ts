@@ -16,6 +16,9 @@ export const buildingIssue: IssueOption = {
       hi: `नमस्ते,\n\nहमने [DATE OF FIRST MESSAGE] को [ISSUE] के बारे में लिखा था।\nयह अभी भी ठीक नहीं हुआ है।\nकृपया आज मरम्मत की तारीख की पुष्टि करें।\n\nधन्यवाद,\n[ADDRESS] के निवासी`,
       pl: `Dzień dobry,\n\nPisaliśmy [DATE OF FIRST MESSAGE] w sprawie [ISSUE].\nNadal nie jest naprawione.\nProsimy dziś potwierdzić datę naprawy.\n\nDziękujemy,\nMieszkańcy [ADDRESS]`,
     },
+    C: {
+      en: `First message date: [DATE OF FIRST MESSAGE].\nIssue: [ISSUE].\nStart date: around [START DATE].\nCondition today: still not fixed. Multiple residents still report this issue.\nPlease confirm the repair plan and repair date today.\nIf there is still no repair date, the next normal step is to contact 311.\n\nResidents of [ADDRESS]`,
+    },
   },
   simple: {
     A: `We are residents at [ADDRESS].\nBuilding-wide issue: [ISSUE].\nPlease provide the repair plan and date.\n\nResidents of [ADDRESS]`,
