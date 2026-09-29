@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const entryIssue: IssueOption = {
   id: "entry",
-  label: "🚪 Entry without notice / access problems",
+  label: "Entry without notice / access problems",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nEntry without notice happened on [DATE].\nIn Chicago, 48-hour notice is required before entry unless there is an emergency.\nPlease confirm future entry will follow the 48-hour notice rule.\n\n`,
@@ -24,6 +24,8 @@ export const entryIssue: IssueOption = {
     },
   },
   simple: {
-    en: `I live at [ADDRESS].\nEntry without notice happened on [DATE].\nPlease give 48 hours’ notice going forward.\n\n`,
+    A: `I live at [ADDRESS].\nEntry without notice happened on [DATE].\nPlease give 48 hours’ notice going forward.\n\n`,
+    B: `I live at [ADDRESS].\nEntry without notice happened again on [DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease give 48 hours’ notice before each entry.\nPlease confirm this in writing.\n\n`,
+    C: `I live at [ADDRESS].\nEntry without notice happened on [DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease confirm in writing today that you will give 48 hours’ notice before each entry.\nIf it happens again, the next normal step is to call 311.\n\n`,
   },
 };

@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const lockoutIssue: IssueOption = {
   id: "lockout",
-  label: "🚫 Lockout / utility shutoff risk",
+  label: "Lockout / utility shutoff risk",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nStatement received: [LOCK ME OUT / SHUT OFF UTILITIES] on [DATE].\nThat is not allowed in Chicago without a court process.\nPlease confirm in writing that you will not lock me out or shut off utilities.\n\n`,
@@ -18,6 +18,8 @@ export const lockoutIssue: IssueOption = {
     },
   },
   simple: {
-    en: `Please confirm in writing that you will not lock me out or shut off utilities.\n\n`,
+    A: `Please confirm in writing that you will not lock me out or shut off utilities.\n\n`,
+    B: `I live at [ADDRESS].\nStatement received on [DATE]: [LOCK ME OUT / SHUT OFF UTILITIES].\nFirst message: [DATE OF FIRST MESSAGE].\nI have not received a written reply.\nPlease confirm in writing that you will not lock me out or shut off utilities.\n\n`,
+    C: `I live at [ADDRESS].\nStatement received on [DATE]: [LOCK ME OUT / SHUT OFF UTILITIES].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease confirm in writing today that you will not lock me out or shut off utilities.\nIf there is no reply, the next normal step is to ask a tenant group or legal aid.\n\n`,
   },
 };

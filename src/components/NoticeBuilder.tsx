@@ -484,7 +484,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     { label: "Today", value: formState.today || "Add today's date" },
     { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
   ];
-  const noticeLanguageLabel = formState.simpleEnglish
+  // Very simple English applies only to English notices (see buildNoticeText).
+  const noticeLanguageLabel = formState.simpleEnglish && formState.language === "en"
     ? "Very simple English"
     : formState.language === "en"
       ? "English"
@@ -599,7 +600,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
               {stepsLocked && <p className="helper">Complete step 1 to unlock steps 2 to 4.</p>}
               <p className="helper">Use Next to continue. You can go back any time.</p>
               <p className="helper mobile-step-hint">Use step buttons above on mobile.</p>
-              <form className="form-grid">
+              {/* Enter in a field must not submit this form. A submit reloads the page and loses the draft. */}
+              <form className="form-grid" onSubmit={(event) => event.preventDefault()}>
                 <Tabs.Panel value="1">
                   <div className="form-section">
                     <div className="form-section-header">
@@ -1233,7 +1235,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         className="button button-secondary"
                         type="button"
                         onClick={handleLedgerSave}
-                        disabled={!canSaveLedger || saveStatus === "saving"}
+                        disabled={!canSaveLedger || saveStatus === "saving" || saveStatus === "saved"}
                       >
                         {saveLabel}
                       </Button>

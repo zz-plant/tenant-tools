@@ -1,5 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
+import { issueOptions } from "../src/data/noticeData";
 import { lintSimpleNoticeTemplates, lintVerySimpleEnglish } from "../src/lib/copyLint";
 
 describe("lintVerySimpleEnglish", () => {
@@ -26,5 +27,14 @@ describe("simple notice templates", () => {
     const results = lintSimpleNoticeTemplates();
     const failing = results.filter((entry) => !entry.ok);
     assert.deepEqual(failing, []);
+  });
+
+  it("lint every stage of every issue", () => {
+    const results = lintSimpleNoticeTemplates();
+    assert.equal(results.length, issueOptions.length * 3);
+    for (const issue of issueOptions) {
+      const stages = results.filter((entry) => entry.issueId === issue.id).map((entry) => entry.stage);
+      assert.deepEqual(stages.sort(), ["A", "B", "C"]);
+    }
   });
 });

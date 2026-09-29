@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const leakIssue: IssueOption = {
   id: "leak",
-  label: "💧 Water leak / ceiling leak / water damage",
+  label: "Water leak / ceiling leak / water damage",
   notices: {
     A: {
       en: `I live at [ADDRESS].\nCondition: water leak / water coming in at [LOCATION].\nStart date: [START DATE].\nPlease provide the repair date and time.\nI am attaching photos/videos.\n\n`,
@@ -24,6 +24,8 @@ export const leakIssue: IssueOption = {
     },
   },
   simple: {
-    en: `I live at [ADDRESS].\nCondition: water leak at [LOCATION].\nStart date: [START DATE].\nPlease provide the repair date.\n\n`,
+    A: `I live at [ADDRESS].\nCondition: water leak at [LOCATION].\nStart date: [START DATE].\nPlease provide the repair date.\n\n`,
+    B: `I live at [ADDRESS].\nCondition: water leak at [LOCATION].\nIt is still not fixed.\nStart date: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease provide the repair date.\n\n`,
+    C: `I live at [ADDRESS].\nCondition: water leak at [LOCATION].\nIt is still not fixed.\nStart date: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease provide the repair date today.\nIf there is no repair date, the next normal step is to call 311 for an inspection.\n\n`,
   },
 };

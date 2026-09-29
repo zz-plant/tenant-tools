@@ -2,7 +2,7 @@ import type { IssueOption } from "../types";
 
 export const buildingIssue: IssueOption = {
   id: "building",
-  label: "🏢 Building-wide message",
+  label: "Building-wide message",
   notices: {
     A: {
       en: `We are residents at [ADDRESS].\nCondition: multiple residents report the same issue.\nIssue: [ISSUE].\nStart date: around [START DATE].\nPlease provide the repair plan and expected repair date.\n\nResidents of [ADDRESS]`,
@@ -18,6 +18,8 @@ export const buildingIssue: IssueOption = {
     },
   },
   simple: {
-    en: `We are residents at [ADDRESS].\nBuilding-wide issue: [ISSUE].\nPlease provide the repair plan and date.\n\nResidents of [ADDRESS]`,
+    A: `We are residents at [ADDRESS].\nBuilding-wide issue: [ISSUE].\nPlease provide the repair plan and date.\n\nResidents of [ADDRESS]`,
+    B: `We are residents at [ADDRESS].\nBuilding-wide issue: [ISSUE].\nIt is still not fixed.\nStart date: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease provide the repair plan and date.\n\nResidents of [ADDRESS]`,
+    C: `We are residents at [ADDRESS].\nBuilding-wide issue: [ISSUE].\nIt is still not fixed.\nStart date: [START DATE].\nFirst message: [DATE OF FIRST MESSAGE].\nPlease provide the repair plan and date today.\nIf there is no repair date, the next normal step is to call 311 for an inspection.\n\nResidents of [ADDRESS]`,
   },
 };
