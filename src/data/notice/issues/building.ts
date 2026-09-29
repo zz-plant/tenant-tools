@@ -18,6 +18,8 @@ export const buildingIssue: IssueOption = {
     },
     C: {
       en: `First message date: [DATE OF FIRST MESSAGE].\nIssue: [ISSUE].\nStart date: around [START DATE].\nCondition today: still not fixed. Multiple residents still report this issue.\nPlease confirm the repair plan and repair date today.\nIf there is still no repair date, the next normal step is to contact 311.\n\nResidents of [ADDRESS]`,
+      es: `Hola,\n\nLe escribimos el [DATE OF FIRST MESSAGE] sobre [ISSUE].\nEl problema comenzó alrededor de [START DATE] y aún no está arreglado.\nVarios residentes todavía informan este problema.\nPor favor confirme hoy el plan de reparación y la fecha de reparación.\nSi todavía no hay una fecha de reparación, el siguiente paso habitual es contactar al 311.\n\nGracias,\nResidentes de [ADDRESS]`,
+      pl: `Dzień dobry,\n\nPisaliśmy [DATE OF FIRST MESSAGE] w sprawie [ISSUE].\nProblem zaczął się około [START DATE] i nadal nie jest naprawiony.\nWielu mieszkańców nadal zgłasza ten problem.\nProsimy dziś potwierdzić plan naprawy i datę naprawy.\nJeśli nadal nie będzie daty naprawy, następnym standardowym krokiem jest kontakt z miastem (311).\n\nDziękujemy,\nMieszkańcy [ADDRESS]`,
     },
   },
   simple: {
