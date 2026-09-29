@@ -18,6 +18,9 @@ export const noTimelineIssue: IssueOption = {
     },
     C: {
       en: `First message date: [DATE OF FIRST MESSAGE].\nStart date: [START DATE].\nCondition today: still not fixed. I still do not have a repair date.\nPlease confirm the repair date today.\nIf there is still no repair date, the next normal step is to contact 311.\n\n`,
+      es: `Hola,\n\nLe escribí el [DATE OF FIRST MESSAGE] para pedir una fecha de reparación.\nEl problema comenzó el [START DATE] y aún no está arreglado.\nTodavía no tengo una fecha de reparación.\nPor favor confirme hoy la fecha de reparación.\nSi todavía no hay una fecha de reparación, el siguiente paso habitual es contactar al 311.\n\nGracias,\n`,
+      hi: `नमस्ते,\n\nमैंने [DATE OF FIRST MESSAGE] को मरम्मत की तारीख के लिए लिखा था।\nसमस्या [START DATE] को शुरू हुई और अब भी ठीक नहीं हुई है।\nमुझे अभी भी मरम्मत की तारीख नहीं मिली है।\nकृपया आज मरम्मत की तारीख की पुष्टि करें।\nयदि अभी भी मरम्मत की तारीख नहीं मिलती है, तो अगला सामान्य कदम 311 से संपर्क करना है।\n\nधन्यवाद,\n`,
+      pl: `Dzień dobry,\n\nPisałem/am do Państwa [DATE OF FIRST MESSAGE] z prośbą o datę naprawy.\nProblem zaczął się [START DATE] i nadal nie jest naprawiony.\nNadal nie mam daty naprawy.\nProszę dziś potwierdzić datę naprawy.\nJeśli nadal nie będzie daty naprawy, następnym standardowym krokiem jest kontakt z miastem (311).\n\nDziękuję,\n`,
     },
   },
   simple: {

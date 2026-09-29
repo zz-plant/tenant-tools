@@ -37,6 +37,16 @@ describe("notice template coverage (AGENTS.md Appendix B)", () => {
     }
   });
 
+  it("has a translated final reminder wherever the first notice is translated", () => {
+    for (const issue of allIssues) {
+      for (const language of ["es", "hi", "pl"]) {
+        if (issue.notices.A?.[language]) {
+          assert.ok(issue.notices.C?.[language]?.trim(), `${issue.id} is missing the ${language} final reminder`);
+        }
+      }
+    }
+  });
+
   it("keeps every Standard English text clear of idioms, pressure, and legal claims", () => {
     for (const issue of allIssues) {
       for (const stage of stages) {
@@ -61,6 +71,25 @@ describe("Standard English final reminders", () => {
       assert.notEqual(finalReminder, first, `${issue.id} final reminder falls back to the first notice`);
       assert.ok(finalReminder.includes("2026-09-10"), `${issue.id} final reminder is missing the first message date`);
       assert.ok(finalReminder.includes("the next normal step is"), `${issue.id} final reminder is missing the next step`);
+    }
+  });
+
+  it("are used in Spanish, Hindi, and Polish, with the first message date filled in", () => {
+    const greetings = { es: "Hola,", hi: "नमस्ते,", pl: "Dzień dobry," } as const;
+    for (const [language, greeting] of Object.entries(greetings)) {
+      const state = {
+        ...createInitialFormState(now),
+        language,
+        stage: "C",
+        building: "2400 W Wabansia",
+        firstMessageDate: "2026-09-10",
+      };
+      for (const issue of [noTimelineIssue, buildingIssue, lockoutIssue]) {
+        const text = buildNoticeText(state, issue, now);
+        assert.ok(text.startsWith(greeting), `${issue.id} ${language} final reminder is not in ${language}`);
+        assert.ok(text.includes("2026-09-10"), `${issue.id} ${language} final reminder is missing the first message date`);
+        assert.ok(!text.includes("[DATE OF FIRST MESSAGE]"), `${issue.id} ${language} left the placeholder`);
+      }
     }
   });
 });
