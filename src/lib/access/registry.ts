@@ -75,6 +75,13 @@ export const loadKeyRegistry = async (kv: KVNamespace, options: { fresh?: boolea
 export const saveKeyRegistry = async (kv: KVNamespace, registry: KeyRegistry) =>
   kv.put(KEY_REGISTRY_KV_KEY, JSON.stringify(registry));
 
+/**
+ * Short code from the stored hash. The steward page shows it next to each issued key.
+ * Two stewards can overwrite each other's change if they issue keys at the same time
+ * (one KV value, no compare-and-swap). The steward compares this code after a minute to catch that.
+ */
+export const keyCheckCode = (hash: string) => hash.slice(0, 6).toUpperCase();
+
 export type PresentedKey = { key: string; hash: string };
 
 /**

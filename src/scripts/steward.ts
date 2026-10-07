@@ -26,7 +26,7 @@ const postJson = async (url: string, method: "POST" | "DELETE", body: unknown) =
   return payload;
 };
 
-const showNewKey = (building: string, key: string) => {
+const showNewKey = (building: string, key: string, checkCode: string) => {
   if (!newKeyBox) {
     return;
   }
@@ -34,6 +34,7 @@ const showNewKey = (building: string, key: string) => {
   newKeyBox.hidden = false;
   newKeyBox.querySelector("[data-new-key-building]")!.textContent = building;
   newKeyBox.querySelector("[data-new-key-value]")!.textContent = key;
+  newKeyBox.querySelector("[data-new-key-check]")!.textContent = checkCode;
   newKeyBox.querySelector("[data-new-key-link]")!.textContent = link;
   newKeyBox.querySelector("[data-copy-new-key]")?.addEventListener("click", () => navigator.clipboard.writeText(key));
   newKeyBox.querySelector("[data-copy-new-link]")?.addEventListener("click", () => navigator.clipboard.writeText(link));
@@ -44,8 +45,8 @@ const issueKey = async (building: string) => {
   setStatus(stewardStatus, "Issuing a new key...");
   try {
     const result = await postJson("/api/steward/keys", "POST", { building });
-    setStatus(stewardStatus, `New key issued for ${result.building}. Reload the page after you copy it.`);
-    showNewKey(result.building, result.key);
+    setStatus(stewardStatus, `New key issued for ${result.building}. Copy it. Then reload the page in 1 minute and compare the check code.`);
+    showNewKey(result.building, result.key, result.checkCode);
   } catch (error) {
     setStatus(stewardStatus, error instanceof Error ? error.message : "Could not issue a key.");
   }

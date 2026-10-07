@@ -5,7 +5,7 @@ import { POST as addEvent } from "../src/pages/api/submissions/[id]/events";
 import { DELETE as removeKey, POST as issueKey } from "../src/pages/api/steward/keys";
 import { GET as exportData } from "../src/pages/api/steward/export";
 import { POST as wipe } from "../src/pages/api/steward/wipe";
-import { hashBuildingKey, KEY_REGISTRY_KV_KEY, loadKeyRegistry } from "../src/lib/access/registry";
+import { hashBuildingKey, KEY_REGISTRY_KV_KEY, keyCheckCode, loadKeyRegistry } from "../src/lib/access/registry";
 import { csvCell } from "../src/lib/buildingData";
 import { formatDate } from "../src/lib/dateUtils";
 import { asKv, createMockBucket, createMockKv } from "./helpers/mockKv";
@@ -85,6 +85,16 @@ describe("steward building keys", () => {
     assert.ok(!stored.includes(key), "the plain key must not be stored");
     const registry = await loadKeyRegistry(asKv(kv), { fresh: true });
     assert.equal(registry.buildings["2400 W Wabansia"].hash, await hashBuildingKey(key));
+  });
+
+  it("returns a check code that matches the stored hash", async () => {
+    const { kv, call, steward } = setup();
+    const result = await readJson(
+      await call(issueKey as unknown as Handler, "/api/steward/keys", { method: "POST", headers: steward, body: { building: "2400 W Wabansia" } })
+    );
+    assert.match(result.checkCode, /^[0-9A-F]{6}$/);
+    const registry = await loadKeyRegistry(asKv(kv), { fresh: true });
+    assert.equal(keyCheckCode(registry.buildings["2400 W Wabansia"].hash), result.checkCode);
   });
 
   it("rotates on a second issue and removes on delete", async () => {

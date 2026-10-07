@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
 import { isAccessKeyValid } from "../lib/access";
-import { listKnownBuildings, loadKeyRegistry, emptyKeyRegistry } from "../lib/access/registry";
+import { keyCheckCode, listKnownBuildings, loadKeyRegistry, emptyKeyRegistry } from "../lib/access/registry";
 import { STEWARD_KEY_COOKIE } from "../lib/api/requestGuard";
 import { formatTimelineDate } from "../lib/dateUtils";
 import { buildBuildingDashboardUrl } from "../lib/navigation";
@@ -95,7 +95,7 @@ const buildings = isSteward ? listKnownBuildings(settingsJson, registry) : [];
                             </th>
                             <td>
                               {issued
-                                ? `Issued here on ${formatTimelineDate(issued.issuedAt.slice(0, 10))}`
+                                ? `Issued here on ${formatTimelineDate(issued.issuedAt.slice(0, 10))}. Check code: ${keyCheckCode(issued.hash)}.`
                                 : "From deploy settings"}
                             </td>
                             <td>
@@ -130,6 +130,11 @@ const buildings = isSteward ? listKnownBuildings(settingsJson, registry) : [];
                 <p><strong>New key for <span data-new-key-building></span></strong></p>
                 <p class="new-key" data-new-key-value></p>
                 <p class="helper">This key is shown only once. Copy it now.</p>
+                <p><strong>Check code: <span data-new-key-check></span></strong></p>
+                <p class="helper">
+                  In 1 minute, reload this page. The building must show the same check code. If the code is different,
+                  another steward changed keys at the same time. Issue a new key again.
+                </p>
                 <p class="helper">Resident link (the key moves into a private cookie when opened):</p>
                 <p class="new-key-link" data-new-key-link></p>
                 <div class="report-actions">
