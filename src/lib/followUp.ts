@@ -4,6 +4,7 @@ import { formatTimelineDate } from "./dateUtils";
 import { formatIssueLabel } from "./noticeUtils";
 import { formatRecordEventLabel, winEventTypes, type RecordEvent, type RecordEventType } from "./recordEvents";
 import { formatResidentReportCount } from "./reportCount";
+import { describeCanvass, type Canvass } from "./canvass";
 import { getFirstWrittenNoticeDate } from "./submissionTimeline";
 import type { SubmissionRecord } from "./submissions";
 
@@ -123,6 +124,8 @@ export type MeetingReport = {
   replies: { requested: number; received: number; missing: number };
   upcoming: Array<{ date: string; issueLabel: string; label: string }>;
   wins: Array<{ date: string; issueLabel: string; label: string }>;
+  /** Latest canvass, described with bucketed counts. */
+  canvass: string | null;
   notes: string[];
 };
 
@@ -132,11 +135,14 @@ export const buildMeetingReport = ({
   records,
   eventsByRecord,
   today,
+  canvasses = [],
 }: {
   building: string;
   records: SubmissionRecord[];
   eventsByRecord: Map<string, RecordEvent[]>;
   today: string;
+  /** Newest first. */
+  canvasses?: Canvass[];
 }): MeetingReport => {
   const live = records.filter((record) => !record.mergedInto);
   const open = live.filter((record) => record.status === "open");
@@ -201,6 +207,7 @@ export const buildMeetingReport = ({
     replies: { requested: withRequest.length, received, missing: withRequest.length - received },
     upcoming,
     wins,
+    canvass: canvasses[0] ? describeCanvass(canvasses[0]) : null,
     notes: [
       "Resident-reported. Not verified.",
       "Counts of residents under 3 show as <3.",

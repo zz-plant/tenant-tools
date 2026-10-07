@@ -5,6 +5,7 @@ import { RESIDENT_KEY_COOKIE } from "../../../lib/api/requestGuard";
 import { loadBuildingDetail } from "../../../lib/buildingDetail";
 import { formatDate, formatTimelineDate } from "../../../lib/dateUtils";
 import { buildMeetingReport } from "../../../lib/followUp";
+import { listCanvasses } from "../../../lib/storage/canvass";
 import { buildBuildingDashboardUrl } from "../../../lib/navigation";
 import SeoHead from "../../../components/SeoHead.astro";
 import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
@@ -23,8 +24,9 @@ const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
 const today = formatDate(new Date());
 
 const detail = hasAccess && kv ? await loadBuildingDetail(kv, buildingId, { statuses: ["open", "resolved"] }) : null;
+const canvasses = detail && kv ? await listCanvasses(kv, buildingId) : [];
 const report = detail
-  ? buildMeetingReport({ building: buildingId, records: detail.records, eventsByRecord: detail.eventsByRecord, today })
+  ? buildMeetingReport({ building: buildingId, records: detail.records, eventsByRecord: detail.eventsByRecord, today, canvasses })
   : null;
 ---
 
@@ -84,6 +86,13 @@ const report = detail
                 Repair plan requests: {report.replies.requested} sent, {report.replies.received} answered, {report.replies.missing} with no reply logged
               </li>
             </ul>
+
+            {report.canvass && (
+              <>
+                <h2>Latest canvass</h2>
+                <p>{report.canvass}</p>
+              </>
+            )}
 
             <h2>Needs follow-up ({report.followUp.length})</h2>
             {report.followUp.length === 0 ? (

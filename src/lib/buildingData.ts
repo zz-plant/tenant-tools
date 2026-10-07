@@ -2,6 +2,8 @@ import { loadBuildingSubmissions } from "./buildingDashboard";
 import { formatRecordEventLabel, type RecordEvent } from "./recordEvents";
 import { deleteEvidenceRecord, listEvidenceRecords } from "./storage/evidence";
 import { listRecordEvents } from "./storage/recordEvents";
+import { listCanvasses } from "./storage/canvass";
+import type { Canvass } from "./canvass";
 import { fetchSubmissionRecord, hashBuildingId } from "./storage/submissions";
 import type { SubmissionRecord } from "./submissions";
 
@@ -18,6 +20,7 @@ export type BuildingExport = {
   exportedAt: string;
   notes: string[];
   records: BuildingExportRecord[];
+  canvasses: Canvass[];
 };
 
 const exportNotes = [
@@ -42,7 +45,13 @@ export const collectBuildingExport = async (
     }
   }
   records.sort((left, right) => left.createdAt.localeCompare(right.createdAt));
-  return { building, exportedAt: now.toISOString(), notes: exportNotes, records };
+  return {
+    building,
+    exportedAt: now.toISOString(),
+    notes: exportNotes,
+    records,
+    canvasses: await listCanvasses(kv, building),
+  };
 };
 
 const csvColumns = [

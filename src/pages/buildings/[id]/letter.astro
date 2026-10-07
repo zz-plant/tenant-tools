@@ -15,6 +15,8 @@ import { buildBuildingDashboardUrl } from "../../../lib/navigation";
 import { formatIssueLabel } from "../../../lib/noticeUtils";
 import { formatResidentReportCount } from "../../../lib/reportCount";
 import { fetchSubmissionRecord } from "../../../lib/storage/submissions";
+import { listCanvasses } from "../../../lib/storage/canvass";
+import { latestCanvassCount } from "../../../lib/canvass";
 import SeoHead from "../../../components/SeoHead.astro";
 import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
 import AppHeader from "../../../components/AppHeader.astro";
@@ -47,15 +49,23 @@ if (kv) {
   }
 }
 
+const canvasses = hasAccess && kv ? await listCanvasses(kv, buildingId) : [];
+// A canvass counts households per problem type, so it goes with the first record of that type only.
+const canvassShown = new Set<string>();
 const openIssues: LetterIssue[] = openSummaries
   .filter((record) => !isSavedBuildingLetter(buildingWideDescriptions.get(record.id)))
   .map((record) => {
     const description = buildingWideDescriptions.get(record.id);
+    const canvass = canvassShown.has(record.issue) ? null : latestCanvassCount(canvasses, record.issue);
+    if (canvass) {
+      canvassShown.add(record.issue);
+    }
     return {
       id: record.id,
       label: description ? `Building-wide: ${description}` : formatIssueLabel(record.issueLabel),
       startDate: record.startDate,
       reportCount: record.reportCount,
+      ...(canvass ? { canvass } : {}),
     };
   });
 

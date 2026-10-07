@@ -6,6 +6,8 @@ import { RESIDENT_KEY_COOKIE, STEWARD_KEY_COOKIE } from "../../lib/api/requestGu
 import { formatResidentReportCount, type BuildingSubmission } from "../../lib/buildingDashboard";
 import { loadBuildingDetail } from "../../lib/buildingDetail";
 import { buildFollowUpItems, summarizeWins } from "../../lib/followUp";
+import { describeCanvass } from "../../lib/canvass";
+import { listCanvasses } from "../../lib/storage/canvass";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
 import { buildIssuePatterns } from "../../lib/issuePatterns";
 import { formatDate } from "../../lib/dateUtils";
@@ -64,6 +66,7 @@ const detail =
 const submissions: BuildingSubmission[] = detail?.summaries ?? [];
 const followUpItems = detail ? buildFollowUpItems(detail.records, detail.eventsByRecord, today) : [];
 const wins = detail ? summarizeWins(detail.records, detail.eventsByRecord) : { total: 0, afterLetter: 0, after311: 0 };
+const latestCanvass = detail && kv ? (await listCanvasses(kv, buildingId))[0] ?? null : null;
 
 const filtered = submissions
   .filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter))
@@ -183,6 +186,9 @@ const totalFiltered = filtered.length;
                   <p class="summary-value">{wins.total}</p>
                 </div>
               </div>
+              {latestCanvass && (
+                <p class="helper"><strong>Latest canvass:</strong> {describeCanvass(latestCanvass)}</p>
+              )}
               {followUpItems.length > 0 && (
                 <details class="helper-card follow-up" open>
                   <summary>Needs follow-up ({followUpItems.length})</summary>
@@ -419,10 +425,16 @@ const totalFiltered = filtered.length;
               {isSteward && (
                 <div class="export-block">
                   <h3>Steward tools</h3>
-                  <p class="helper">Issue or rotate building keys, export data, or run an emergency wipe.</p>
+                  <p class="helper">Count problems door to door, issue or rotate building keys, export data, or run an emergency wipe.</p>
+                  <a class="button button-secondary" href={`${clearFiltersUrl}/canvass`}>Canvass tally</a>
                   <a class="button button-secondary" href="/steward">Open steward tools</a>
                 </div>
               )}
+              <div class="export-block">
+                <h3>Group 311 day</h3>
+                <p class="helper">Scripts for each open problem, and how many 311 requests are logged.</p>
+                <a class="button button-secondary" href={`${clearFiltersUrl}/311`}>Plan a group 311 day</a>
+              </div>
               <div class="export-block">
                 <h3>Meeting report</h3>
                 <p class="helper">One page for your group: what needs follow-up, deadlines, open problems, and wins.</p>

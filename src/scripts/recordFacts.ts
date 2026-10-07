@@ -161,5 +161,10 @@ if (root && form) {
     });
   });
 
+  // Links such as "Add my 311 number" open the form with the fact type already chosen.
+  const preset = new URLSearchParams(window.location.search).get("fact");
+  if (typeSelect && isRecordEventType(preset)) {
+    typeSelect.value = preset;
+  }
   updateForType();
 }

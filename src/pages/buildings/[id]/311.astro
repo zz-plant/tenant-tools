@@ -1,0 +1,121 @@
+---
+import "../../../styles/global.css";
+import { isBuildingAccessValid } from "../../../lib/access";
+import { RESIDENT_KEY_COOKIE } from "../../../lib/api/requestGuard";
+import { loadBuildingDetail } from "../../../lib/buildingDetail";
+import { formatDate, formatTimelineDate } from "../../../lib/dateUtils";
+import { buildGroup311Items, buildGroup311Message } from "../../../lib/group311";
+import { buildBuildingDashboardUrl, buildSubmissionDetailsUrl } from "../../../lib/navigation";
+import SeoHead from "../../../components/SeoHead.astro";
+import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
+import AppHeader from "../../../components/AppHeader.astro";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const env = Astro.locals.runtime?.env ?? {};
+const kv = env.SUBMISSIONS_KV;
+const buildingId = decodeURIComponent(id ?? "");
+const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? null;
+const hasAccess = Boolean(buildingId) && isBuildingAccessValid(buildingId, accessKey, env);
+const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
+const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
+const today = formatDate(new Date());
+
+const detail = hasAccess && kv ? await loadBuildingDetail(kv, buildingId, { statuses: ["open"] }) : null;
+const items = detail ? buildGroup311Items(detail.records, detail.eventsByRecord) : [];
+const groupMessage = buildGroup311Message(items, today);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Group 311 day | Building Ledger"
+      description="Private page to plan a group 311 day: scripts for each problem and requests logged."
+      canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/311`}
+      imagePath="/og/private-dashboard.svg"
+      imageAlt="Building Ledger group 311 day"
+      noindex={true}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Building Ledger"
+      subtitle={`Building: ${buildingId || "Not listed"}`}
+      backHref={dashboardUrl}
+      backLabel="Building dashboard"
+      statusBadge={hasAccess ? "Verified access" : "Access key needed"}
+    />
+    <div class="page">
+      <main class="layout" id="main">
+        {!hasAccess ? (
+          <section class="panel">
+            <AccessKeyPanel
+              title="Key required"
+              helperLines={["Residents only.", "Ask a steward for the current key."]}
+              warning="Do not share the key publicly."
+              errorMessage={hasAccessAttempt ? "Key does not match this building." : ""}
+              backLabel="Back to notice builder"
+            />
+          </section>
+        ) : (
+          <>
+            <section class="panel" data-group311>
+              <div>
+                <p class="eyebrow">Group 311 day</p>
+                <h1>Ask for inspections together</h1>
+                <p class="helper">Each resident can make their own 311 request. More requests put more reports on record with the City.</p>
+                <p class="helper">Call 311, or use 311.chicago.gov. Say what you saw and the dates. Do not guess.</p>
+              </div>
+              {items.length === 0 ? (
+                <p class="helper">No open problems here have a 311 category yet.</p>
+              ) : (
+                <ul class="rule-cards">
+                  {items.map((item) => (
+                    <li class="rule-card">
+                      <h2>{item.issueLabel}</h2>
+                      <p class="rule-meta">Started {item.startDate ? formatTimelineDate(item.startDate) : "date not listed"}. 311 requests logged: {item.requestsLogged}.</p>
+                      <p><strong>311 category:</strong> {item.category}</p>
+                      <p><strong>What to say:</strong> {item.script}</p>
+                      <div class="report-actions">
+                        <a class="button button-compact" href="tel:311">Call 311</a>
+                        <button class="button button-compact button-secondary" type="button" data-copy-text={item.script}>Copy script</button>
+                        <a class="button button-compact button-secondary" href="https://311.chicago.gov" target="_blank" rel="noreferrer">Open 311.chicago.gov</a>
+                        <a class="button button-compact button-secondary" href={`${buildSubmissionDetailsUrl({ submissionId: item.recordId })}?fact=request_311_filed#facts`}>Add my 311 number</a>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            <section class="panel">
+              <h2>Message for the group chat</h2>
+              <p class="helper">It has no address, no key, and no link. Check it before you send it.</p>
+              <pre class="output output-summary letter-output">{groupMessage}</pre>
+              <div class="report-actions">
+                <button class="button" type="button" data-copy-text={groupMessage}>Copy message</button>
+              </div>
+              <p class="helper" data-copy-status role="status" aria-live="polite"></p>
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+    <script>
+      const status = document.querySelector<HTMLElement>("[data-copy-status]");
+      document.querySelectorAll<HTMLButtonElement>("[data-copy-text]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(button.dataset.copyText || "");
+            if (status) status.textContent = "Copied.";
+            button.textContent = "Copied";
+          } catch {
+            if (status) status.textContent = "Could not copy. Select the text and copy it.";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

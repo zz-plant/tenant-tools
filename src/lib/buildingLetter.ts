@@ -12,6 +12,8 @@ export type LetterIssue = {
   label: string;
   startDate: string;
   reportCount: number;
+  /** Latest canvass count of households with this problem. */
+  canvass?: { date: string; count: number };
 };
 
 export const letterCopyRecipients = {
@@ -62,6 +64,14 @@ const issueLine = (issue: LetterIssue, simple: boolean) => {
   }
   if (!simple && issue.reportCount >= minCountShown) {
     parts.push(`${Math.floor(issue.reportCount)} residents report it.`);
+  }
+  if (issue.canvass && issue.canvass.count >= minCountShown) {
+    const count = Math.floor(issue.canvass.count);
+    parts.push(
+      simple
+        ? `A count on ${formatDay(issue.canvass.date)} found ${count} households with this problem.`
+        : `A canvass on ${formatDay(issue.canvass.date)} counted ${count} households with this problem.`
+    );
   }
   return parts.join(" ");
 };
