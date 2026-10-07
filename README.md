@@ -201,6 +201,7 @@ Use Conventional Commit style:
 - Rule data pack notes: `src/data/rules/README.md`
 - Pending legislation readiness (Chicago PRO / FAIR): `docs/pro-readiness-2026-10.md`
 - Organizing features and what was not built: `docs/organizing-features-2026-10.md`
+- Run your own copy (for unions): `docs/self-hosting.md`
 - Internal competitor battlecard: `docs/competitor-battlecard-2026-03.md`
 - External homepage copy angles: `docs/external-homepage-copy-angles.md`
 - Core agent skill: `skills/building-ledger-agent/SKILL.md`

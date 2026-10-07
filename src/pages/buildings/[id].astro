@@ -396,6 +396,13 @@ const totalFiltered = filtered.length;
                 <p class="helper">A printable summary for an inspector or legal aid. No names or evidence files.</p>
                 <a class="button button-secondary" href={`${clearFiltersUrl}/export`}>Open printable summary</a>
               </div>
+              {isSteward && (
+                <div class="export-block">
+                  <h3>Steward tools</h3>
+                  <p class="helper">Issue or rotate building keys, export data, or run an emergency wipe.</p>
+                  <a class="button button-secondary" href="/steward">Open steward tools</a>
+                </div>
+              )}
               <div class="export-block">
                 <h3>Joint letter</h3>
                 <p class="helper">One letter from many households. It lists open problems and asks for a written repair plan by a date.</p>

@@ -11,6 +11,8 @@ export type Props = {
   hiddenFields?: Array<{ name: string; value: string }>;
   steps?: string[];
   errorMessage?: string;
+  /** Query parameter the form sends. "stewardKey" for steward pages. */
+  fieldName?: "key" | "stewardKey";
 };
 
 const {
@@ -25,6 +27,7 @@ const {
   hiddenFields = [],
   steps = [],
   errorMessage = "",
+  fieldName = "key",
 } = Astro.props;
 ---
 
@@ -48,7 +51,7 @@ const {
       <span>{keyLabel}</span>
       <input
         class="input"
-        name="key"
+        name={fieldName}
         type="password"
         placeholder={keyPlaceholder}
         autocomplete="new-password"

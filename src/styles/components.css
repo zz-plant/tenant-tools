@@ -1305,3 +1305,26 @@ fieldset.facts-form {
   }
 }
 
+.new-key,
+.new-key-link {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05rem;
+  word-break: break-all;
+  user-select: all;
+}
+
+.new-key {
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+}
+
+.steward-actions {
+  margin: 0;
+}
+
+.button-danger {
+  background: #9a2b2b;
+  border-color: #9a2b2b;
+  color: #ffffff;
+}
+
