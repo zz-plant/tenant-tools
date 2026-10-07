@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.5.0 - 2026-10-07
+
+### Added
+
+- Joint repair-plan letter (`/buildings/:id/letter`). It lists open problems, shows how many households signed (not names), asks for a written plan by a date, and can list copies to the alderperson, CHA, or HUD. Counts under 3 are left out. It has a Very simple English version. Saving it adds a record with the reply date.
+- "Add a dated fact" on the record page. Choose from a list: reply requested by, management replied, repair date promised, missed repair visit, portal request marked complete but not fixed (with work order number), entry offered, city inspection, and changes after a repair request (rent increase notice, non-renewal notice, service reduced, eviction or termination notice). Facts show on the timeline. Stewards can remove a fact added by mistake.
+- Fair Notice check on the record page for rent increase and non-renewal notices (30, 60, or 120 days). It runs in the browser. Nothing is saved.
+- Patterns on the building dashboard: records started each month by issue type, last 6 months. Counts under 3 show as <3.
+- The printable building summary has a "Follow-up facts" column, such as "Marked complete, not fixed: 2; Entry offered: 1".
+- "Where to get help": tenant hotlines, legal aid, tenant unions, and City lookups (311 request status, building inspection records, ward lookup).
+- Printable short guide to Chicago tenant rules at `/rights`.
+- "Quick exit" in the header. It forgets the key on this device and leaves the site.
+
+### Changed
+
+- The retaliation rule card explains that Illinois law presumes retaliation within one year after a good-faith complaint.
+
+### Security
+
+- New write path `POST /api/submissions/:id/events`: resident key for the record's building, rate limit (8 per minute), audit log, fixed list of fact types, no free text. `DELETE` is steward-only.
+- Each fact is stored under its own key, so a "me too" tap or another fact cannot overwrite it.
+
 ## 1.4.0 - 2026-10-07
 
 ### Added
