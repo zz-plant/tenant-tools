@@ -1,0 +1,200 @@
+---
+import "../../../styles/global.css";
+import { isBuildingAccessValid } from "../../../lib/access";
+import { RESIDENT_KEY_COOKIE } from "../../../lib/api/requestGuard";
+import { loadBuildingSubmissions } from "../../../lib/buildingDashboard";
+import {
+  defaultReplyDays,
+  isSavedBuildingLetter,
+  letterCopyRecipients,
+  minCountShown,
+  type LetterIssue,
+} from "../../../lib/buildingLetter";
+import { formatDate, formatTimelineDate } from "../../../lib/dateUtils";
+import { buildBuildingDashboardUrl } from "../../../lib/navigation";
+import { formatIssueLabel } from "../../../lib/noticeUtils";
+import { formatResidentReportCount } from "../../../lib/reportCount";
+import { fetchSubmissionRecord } from "../../../lib/storage/submissions";
+import SeoHead from "../../../components/SeoHead.astro";
+import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
+import AppHeader from "../../../components/AppHeader.astro";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const env = Astro.locals.runtime?.env ?? {};
+const kv = env.SUBMISSIONS_KV;
+const buildingId = decodeURIComponent(id ?? "");
+const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? null;
+const hasAccess = Boolean(buildingId) && isBuildingAccessValid(buildingId, accessKey, env);
+const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
+const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
+
+const today = formatDate(new Date());
+const replyByDefault = formatDate(new Date(Date.now() + defaultReplyDays * 24 * 60 * 60 * 1000));
+
+const summaries = hasAccess && kv ? await loadBuildingSubmissions({ kv, buildingId }) : [];
+const openSummaries = summaries
+  .filter((record) => record.status === "open" && !record.mergedInto)
+  .sort((left, right) => (left.startDate || "").localeCompare(right.startDate || ""));
+
+// Building-wide records need their short description: it names the problem, or marks a saved letter.
+const buildingWideDescriptions = new Map<string, string>();
+if (kv) {
+  for (const summary of openSummaries.filter((record) => record.issue === "building")) {
+    const full = await fetchSubmissionRecord(kv, summary.id);
+    buildingWideDescriptions.set(summary.id, full?.issueDetails.issueDescription ?? "");
+  }
+}
+
+const openIssues: LetterIssue[] = openSummaries
+  .filter((record) => !isSavedBuildingLetter(buildingWideDescriptions.get(record.id)))
+  .map((record) => {
+    const description = buildingWideDescriptions.get(record.id);
+    return {
+      id: record.id,
+      label: description ? `Building-wide: ${description}` : formatIssueLabel(record.issueLabel),
+      startDate: record.startDate,
+      reportCount: record.reportCount,
+    };
+  });
+
+// The ledger record for the letter uses the building's portfolio. Read one full record to find it.
+const firstRecord = kv && summaries[0] ? await fetchSubmissionRecord(kv, summaries[0].id) : null;
+const portfolio = firstRecord?.portfolio ?? "other";
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Joint letter | Building Ledger"
+      description="Private tool to write a joint repair plan letter from residents."
+      canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/letter`}
+      imagePath="/og/private-dashboard.svg"
+      imageAlt="Building Ledger private joint letter preview"
+      noindex={true}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Building Ledger"
+      subtitle={`Building: ${buildingId || "Not listed"}`}
+      backHref={dashboardUrl}
+      backLabel="Building dashboard"
+      statusBadge={hasAccess ? "Verified access" : "Access key needed"}
+    />
+    <div class="page">
+      <main class="layout" id="main">
+        {!hasAccess ? (
+          <section class="panel">
+            <AccessKeyPanel
+              title="Key required"
+              helperLines={["Residents only.", "Ask a steward for the current key."]}
+              warning="Do not share the key publicly."
+              errorMessage={hasAccessAttempt ? "Key does not match this building." : ""}
+              backLabel="Back to notice builder"
+            />
+          </section>
+        ) : (
+          <>
+            <section
+              class="panel no-print"
+              data-letter-builder
+              data-building={buildingId}
+              data-today={today}
+              data-portfolio={portfolio}
+              data-issues={JSON.stringify(openIssues)}
+            >
+              <div>
+                <p class="eyebrow">Joint letter</p>
+                <h1>Ask for a written repair plan</h1>
+                <p class="helper">One letter from many households. It lists open problems and asks for a plan by a date.</p>
+                <p class="helper">Information only. Not legal advice.</p>
+              </div>
+
+              <form class="facts-form" data-letter-form>
+                <fieldset class="facts-form">
+                  <legend>Problems to include</legend>
+                  {openIssues.length === 0 ? (
+                    <p class="helper">There are no open records for this building. Add records first.</p>
+                  ) : (
+                    openIssues.map((issue) => (
+                      <label class="checkbox-label">
+                        <input type="checkbox" data-letter-issue value={issue.id} checked />
+                        {issue.label}. Started {issue.startDate ? formatTimelineDate(issue.startDate) : "date not listed"}. Reports: {formatResidentReportCount(issue.reportCount)}.
+                      </label>
+                    ))
+                  )}
+                </fieldset>
+
+                <label>
+                  Number of households that signed
+                  <input class="input" type="number" min="0" max="999" step="1" inputmode="numeric" data-letter-households />
+                </label>
+                <p class="helper">
+                  Collect signatures on paper. Keep the signature sheet with your group. The letter shows only the number.
+                  Numbers under {minCountShown} are left out to protect residents.
+                </p>
+
+                <label>
+                  Reply needed by
+                  <input class="input" type="date" min={today} value={replyByDefault} data-letter-reply-by />
+                </label>
+                <p class="helper">The RLTO counts 14 days from a written repair request for many repairs.</p>
+
+                <fieldset class="facts-form">
+                  <legend>Send copies to (optional)</legend>
+                  <label class="checkbox-label">
+                    <input type="checkbox" data-letter-copy value="alderperson" />
+                    {letterCopyRecipients.alderperson}
+                  </label>
+                  <label>
+                    Ward number (optional)
+                    <input class="input" type="number" min="1" max="50" step="1" inputmode="numeric" data-letter-ward />
+                  </label>
+                  <p class="helper">
+                    <a href="https://www.chicago.gov/city/en/about/wards.html" target="_blank" rel="noreferrer">Find your ward and alderperson</a>.
+                  </p>
+                  <label class="checkbox-label">
+                    <input type="checkbox" data-letter-copy value="cha" />
+                    {letterCopyRecipients.cha} (for CHA-assisted buildings)
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" data-letter-copy value="hud" />
+                    {letterCopyRecipients.hud} (for HUD-assisted buildings)
+                  </label>
+                </fieldset>
+
+                <label class="checkbox-label">
+                  <input type="checkbox" data-letter-simple />
+                  Very simple English
+                </label>
+              </form>
+            </section>
+
+            <section class="panel report-sheet">
+              <h2 class="no-print">Letter preview</h2>
+              <pre class="output output-summary letter-output" data-letter-output></pre>
+              <div class="no-print report-actions">
+                <button class="button" type="button" data-letter-copy-text>Copy letter</button>
+                <button class="button button-secondary" type="button" data-print>Print or save as PDF</button>
+                <button class="button button-secondary" type="button" data-letter-save>Save to building ledger</button>
+              </div>
+              <p class="helper no-print">
+                Saving adds a "Building-wide message" record with the reply date on its timeline. Then you can add the reply when it comes.
+              </p>
+              <p class="helper no-print" data-letter-status role="status" aria-live="polite"></p>
+              <p class="helper no-print">Before you send: remove names and unit numbers. Keep a copy and the date you sent it.</p>
+              <a class="button button-secondary no-print" href={dashboardUrl}>Back to building dashboard</a>
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+    <script>
+      import "../../../scripts/buildingLetter.ts";
+    </script>
+  </body>
+</html>

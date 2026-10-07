@@ -9,6 +9,8 @@ import {
   type BuildingSubmission,
 } from "../../lib/buildingDashboard";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
+import { buildIssuePatterns } from "../../lib/issuePatterns";
+import { formatDate } from "../../lib/dateUtils";
 import { buildBuildingDashboardUrl, buildSubmissionDetailsUrl } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
@@ -87,6 +89,7 @@ const mergeTargetsFor = (record: BuildingSubmission) =>
   );
 
 const totalVisible = visibleSubmissions.length;
+const patterns = buildIssuePatterns(submissions, formatDate(new Date()));
 const totalFiltered = filtered.length;
 ---
 <!DOCTYPE html>
@@ -176,6 +179,37 @@ const totalFiltered = filtered.length;
                 </div>
               </div>
 
+              {patterns.rows.length > 0 && (
+                <details class="helper-card patterns">
+                  <summary>Patterns: records started each month</summary>
+                  <div class="helper-card-body">
+                    <p class="helper">Last 6 months, by issue type. A problem that comes back shows in many months.</p>
+                    <div class="table-scroll">
+                      <table class="report-table">
+                        <thead>
+                          <tr>
+                            <th scope="col">Issue</th>
+                            {patterns.months.map((month) => <th scope="col">{month.label}</th>)}
+                            <th scope="col">Total</th>
+                            <th scope="col">Open now</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {patterns.rows.map((row) => (
+                            <tr>
+                              <th scope="row">{row.issueLabel}</th>
+                              {row.counts.map((count) => <td>{count}</td>)}
+                              <td>{row.total}</td>
+                              <td>{row.open}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p class="helper">Counts under 3 show as &lt;3 to protect residents. Merged duplicates are not counted.</p>
+                  </div>
+                </details>
+              )}
               <div>
                 <h2>Recent records</h2>
                 <p class="helper">Showing {totalVisible} of {totalFiltered} records. Use the filters on the right to change this list.</p>
@@ -361,6 +395,11 @@ const totalFiltered = filtered.length;
                 <h3>Export</h3>
                 <p class="helper">A printable summary for an inspector or legal aid. No names or evidence files.</p>
                 <a class="button button-secondary" href={`${clearFiltersUrl}/export`}>Open printable summary</a>
+              </div>
+              <div class="export-block">
+                <h3>Joint letter</h3>
+                <p class="helper">One letter from many households. It lists open problems and asks for a written repair plan by a date.</p>
+                <a class="button button-secondary" href={`${clearFiltersUrl}/letter`}>Write a joint letter</a>
               </div>
               <div class="export-block">
                 <h3>Notes</h3>

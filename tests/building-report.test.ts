@@ -66,3 +66,26 @@ describe("buildBuildingReport", () => {
     assert.ok(report.notes.includes("Resident-reported. Not verified."));
   });
 });
+
+describe("buildBuildingReport follow-up facts", () => {
+  it("summarizes follow-up facts per open record and leaves out changes after a request", () => {
+    const report = buildBuildingReport(
+      "2400 W Wabansia",
+      [record({ id: "open-1" })],
+      "2026-10-07",
+      new Map([
+        [
+          "open-1",
+          [
+            { id: "1", type: "portal_marked_complete", date: "2026-09-10" },
+            { id: "2", type: "entry_offered", date: "2026-09-11" },
+            { id: "3", type: "nonrenewal_notice", date: "2026-10-01" },
+          ],
+        ],
+      ])
+    );
+    assert.equal(report.open[0].followUpFacts, "Marked complete, not fixed: 1; Entry offered: 1");
+    assert.ok(report.notes.includes("Follow-up facts are dated entries residents added to each record."));
+  });
+});
+

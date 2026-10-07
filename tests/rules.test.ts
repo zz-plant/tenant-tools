@@ -254,3 +254,21 @@ describe("getPendingRuleChanges", () => {
     }
   });
 });
+
+describe("printable rights page cards", () => {
+  it("lists every rule in effect, never proposals", async () => {
+    const { getAllProvisionCards, getReferenceRuleCards } = await import("../src/data/rules");
+    const cards = getAllProvisionCards("2026-10-07");
+    const ids = cards.map((card) => card.id.split(".").pop());
+    assert.ok(ids.includes("fair_notice"));
+    assert.ok(ids.includes("repair_request"));
+    assert.ok(!ids.includes("rental_registry"));
+    assert.ok(!ids.includes("tenant_organizing"));
+    assert.ok(!cardText(cards).includes("internet"));
+    assert.deepEqual(
+      getReferenceRuleCards("2026-10-07").map((card) => card.title),
+      ["Chicago heat rule", "Security deposit interest rates", "Eviction enforcement", "RLTO summary (Chicago)"]
+    );
+  });
+});
+

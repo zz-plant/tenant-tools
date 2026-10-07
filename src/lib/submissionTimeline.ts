@@ -1,4 +1,5 @@
 import { getNoticeMilestone } from "../data/rules";
+import { formatRecordEventLabel, type RecordEvent } from "./recordEvents";
 
 export type SubmissionTimelineEntry = {
   label: string;
@@ -13,6 +14,8 @@ type SubmissionTimelineInput = {
   stage: "A" | "B" | "C";
   /** Issue id. Adds the RLTO date counted from the first written notice, when a rule applies. */
   issue?: string;
+  /** Dated facts added on the record page. */
+  events?: RecordEvent[];
 };
 
 const stageUsesFirstNoticeDate: Record<SubmissionTimelineInput["stage"], boolean> = {
@@ -58,6 +61,8 @@ export const getSubmissionTimelineEntries = (submission: SubmissionTimelineInput
   if (milestone) {
     pushTimelineEntry(entries, milestone.date, milestone.label);
   }
+
+  (submission.events ?? []).forEach((event) => pushTimelineEntry(entries, event.date, formatRecordEventLabel(event)));
 
   return entries.sort((a, b) => a.date.localeCompare(b.date));
 };

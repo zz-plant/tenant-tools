@@ -3,6 +3,7 @@ import { Button } from "../ui";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import type { SubmissionTimelineEntry } from "../../lib/submissionTimeline";
 import type { RuleCard } from "../../data/rules";
+import { helpResourceGroups, toTelHref } from "../../data/helpResources";
 import type { NextStep } from "./logic";
 
 type RecordPanelProps = {
@@ -205,9 +206,43 @@ const RecordPanel = ({
                     </li>
                   ))}
                 </ul>
+                <p>
+                  <a href="/rights" target="_blank" rel="noreferrer">
+                    Printable short guide to Chicago tenant rules
+                  </a>
+                </p>
               </div>
             </details>
           )}
+
+          <details className="helper-card">
+            <summary>Where to get help</summary>
+            <div className="helper-card-body help-resources">
+              <p>Building Ledger does not share your data with these groups.</p>
+              {helpResourceGroups.map((group) => (
+                <div key={group.id} className="help-group">
+                  <h4>{group.title}</h4>
+                  {group.note && <p>{group.note}</p>}
+                  <ul className="help-list">
+                    {group.items.map((item) => (
+                      <li key={item.url}>
+                        <a href={item.url} target="_blank" rel="noreferrer">
+                          {item.name}
+                        </a>
+                        {item.phone && (
+                          <>
+                            {" · "}
+                            <a href={toTelHref(item.phone)}>{item.phone}</a>
+                          </>
+                        )}
+                        <span className="help-description">{item.description}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </details>
         </div>
       </>
     )}

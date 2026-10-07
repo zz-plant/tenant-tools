@@ -1,4 +1,6 @@
 ---
+import { QUICK_EXIT_PATH } from "../lib/quickExit";
+
 export type Props = {
   title?: string;
   subtitle?: string;
@@ -65,6 +67,25 @@ const {
       <span class="app-badge app-badge-privacy" title="Safety first: no login required, no real names collected">
         Private mode
       </span>
+
+      <a
+        href={QUICK_EXIT_PATH}
+        class="app-quick-exit"
+        data-quick-exit
+        title="Leave this site now. This also forgets the key on this device."
+      >
+        Quick exit
+      </a>
     </div>
   </div>
 </header>
+
+<script>
+  // replace() keeps this page out of the Back button history.
+  document.querySelectorAll<HTMLAnchorElement>("[data-quick-exit]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.location.replace(link.href);
+    });
+  });
+</script>

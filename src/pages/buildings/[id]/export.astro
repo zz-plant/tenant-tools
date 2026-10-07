@@ -7,6 +7,8 @@ import { buildBuildingReport, type BuildingReportRow } from "../../../lib/buildi
 import { formatDate } from "../../../lib/dateUtils";
 import { buildBuildingDashboardUrl } from "../../../lib/navigation";
 import { fetchSubmissionRecord } from "../../../lib/storage/submissions";
+import { listRecordEvents } from "../../../lib/storage/recordEvents";
+import type { RecordEvent } from "../../../lib/recordEvents";
 import type { SubmissionRecord } from "../../../lib/submissions";
 import SeoHead from "../../../components/SeoHead.astro";
 import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
@@ -27,7 +29,17 @@ const summaries = hasAccess && kv ? await loadBuildingSubmissions({ kv, building
 const records = (
   kv ? await Promise.all(summaries.map((summary) => fetchSubmissionRecord(kv, summary.id))) : []
 ).filter((record): record is SubmissionRecord => Boolean(record));
-const report = buildBuildingReport(buildingId, records, formatDate(new Date()));
+// Follow-up facts are listed for open records only. Closed records do not show them.
+const eventsByRecord = new Map<string, RecordEvent[]>(
+  kv
+    ? await Promise.all(
+        records
+          .filter((record) => record.status === "open")
+          .map(async (record) => [record.id, await listRecordEvents(kv, record.id)] as const)
+      )
+    : []
+);
+const report = buildBuildingReport(buildingId, records, formatDate(new Date()), eventsByRecord);
 const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
 
 const ticketLabel = (row: BuildingReportRow) =>
@@ -94,6 +106,7 @@ const ticketLabel = (row: BuildingReportRow) =>
                     <th scope="col">Residents reporting</th>
                     <th scope="col">311 ticket</th>
                     <th scope="col">Evidence on file</th>
+                    <th scope="col">Follow-up facts</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -105,6 +118,7 @@ const ticketLabel = (row: BuildingReportRow) =>
                       <td>{row.reports}</td>
                       <td>{ticketLabel(row)}</td>
                       <td>{row.evidenceOnFile}</td>
+                      <td>{row.followUpFacts || "None"}</td>
                     </tr>
                   ))}
                 </tbody>

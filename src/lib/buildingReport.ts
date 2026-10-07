@@ -1,5 +1,6 @@
 import { formatIssueLabel } from "./noticeUtils";
 import { formatResidentReportCount } from "./reportCount";
+import { summarizeFollowUpFacts, type RecordEvent } from "./recordEvents";
 import { submissionStatusLabels, type SubmissionRecord } from "./submissions";
 
 export type BuildingReportRow = {
@@ -12,6 +13,8 @@ export type BuildingReportRow = {
   evidenceOnFile: number;
   ticketDate?: string;
   ticketNumber?: string;
+  /** Follow-up facts residents added, such as portal requests closed without a repair. */
+  followUpFacts: string;
 };
 
 export type BuildingReport = {
@@ -34,7 +37,7 @@ export const daysBetween = (start: string, end: string) => {
   return Math.max(0, Math.round((endMs - startMs) / dayMs));
 };
 
-const toRow = (record: SubmissionRecord, today: string): BuildingReportRow => ({
+const toRow = (record: SubmissionRecord, today: string, events: RecordEvent[]): BuildingReportRow => ({
   id: record.id,
   issueLabel: formatIssueLabel(record.issueLabel || record.issue),
   statusLabel: submissionStatusLabels[record.status],
@@ -45,6 +48,7 @@ const toRow = (record: SubmissionRecord, today: string): BuildingReportRow => ({
   evidenceOnFile: record.evidenceCount ?? 0,
   ticketDate: record.ticketDate,
   ticketNumber: record.ticketNumber,
+  followUpFacts: summarizeFollowUpFacts(events),
 });
 
 /**
@@ -52,10 +56,15 @@ const toRow = (record: SubmissionRecord, today: string): BuildingReportRow => ({
  * Only structured facts: issue type, dates, bucketed counts, 311 ticket, evidence count.
  * No free-text details, no zones, no evidence files, and no merged duplicates.
  */
-export const buildBuildingReport = (building: string, records: SubmissionRecord[], today: string): BuildingReport => {
+export const buildBuildingReport = (
+  building: string,
+  records: SubmissionRecord[],
+  today: string,
+  eventsByRecord: Map<string, RecordEvent[]> = new Map()
+): BuildingReport => {
   const rows = records
     .filter((record) => record.building === building && !record.mergedInto)
-    .map((record) => toRow(record, today));
+    .map((record) => toRow(record, today, eventsByRecord.get(record.id) ?? []));
   const open = rows
     .filter((row) => row.daysOpen !== null)
     .sort((left, right) => (right.daysOpen ?? 0) - (left.daysOpen ?? 0));
@@ -71,6 +80,7 @@ export const buildBuildingReport = (building: string, records: SubmissionRecord[
       "Resident-reported. Not verified.",
       "Report counts under 3 are shown as <3 to protect residents.",
       "Evidence files are stored privately. Only the number of files is shown.",
+      "Follow-up facts are dated entries residents added to each record.",
     ],
   };
 };
