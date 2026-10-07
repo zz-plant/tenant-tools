@@ -1,0 +1,328 @@
+{
+  "jurisdiction": "Chicago, IL",
+  "rule_id": "chicago.rlto_provisions",
+  "last_reviewed": "2026-10-07",
+  "sources": [
+    {
+      "id": "rlto_summary_en",
+      "title": "RLTO Summary, English (City of Chicago, revised December 2023)",
+      "url": "https://www.chicago.gov/content/dam/city/depts/doh/RLTO/RLTO%20Summary_2023_EN_FINAL.pdf"
+    },
+    {
+      "id": "rlto_page",
+      "title": "Residential Landlord and Tenant Ordinance page (City of Chicago)",
+      "url": "https://www.chicago.gov/city/en/depts/doh/provdrs/landlords/svcs/residential-landlord-and-tenant-ordinance.html"
+    },
+    {
+      "id": "rlto_code",
+      "title": "Chicago Municipal Code, Chapter 5-12 (full RLTO text)",
+      "url": "https://codelibrary.amlegal.com/codes/chicago/latest/chicago_il/0-0-0-2639041"
+    },
+    {
+      "id": "il_retaliation_act",
+      "title": "Illinois Landlord Retaliation Act (Public Act 103-0831)",
+      "url": "https://www.ilga.gov/Legislation/publicacts/view/103-0831"
+    },
+    {
+      "id": "pro_page",
+      "title": "Protecting Renters Ordinance page (City of Chicago)",
+      "url": "https://www.chicago.gov/city/en/depts/doh/provdrs/renters/svcs/protecting-renters-ordinance.html"
+    },
+    {
+      "id": "pro_text_introduced",
+      "title": "Protecting Renters Ordinance, text as introduced June 2026 (City Clerk attachment)",
+      "url": "https://occprodstoragev1.blob.core.usgovcloudapi.net/matterattachmentspublic/64229515-0ddc-4f75-b72e-39d938a33745.pdf"
+    }
+  ],
+  "provisions": [
+    {
+      "id": "notice_address",
+      "title": "Where to send a written notice",
+      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building", "deposit", "lockout"],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-090",
+          "summary": "The landlord must give tenants, in writing, the name and address of the owner or manager. Send your written notices to that person.",
+          "details": ["Keep a copy of every notice.", "Write down the date you sent it."],
+          "source_ids": ["rlto_summary_en", "rlto_code"]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-090(c)",
+          "summary": "The landlord must give tenants an address for notices. Send your written notices to that address.",
+          "details": [
+            "If the landlord did not give an address, use the way you usually contact the landlord: by hand, email, text, or mail.",
+            "Keep a copy of every notice.",
+            "Write down the date you sent it."
+          ],
+          "source_ids": ["pro_text_introduced"],
+          "app_impact": "Update the first next-step detail and the 311 guidance to mention email and text as allowed delivery when no notice address was given."
+        }
+      ]
+    },
+    {
+      "id": "repair_request",
+      "title": "Written repair request: 14 days",
+      "issues": ["heat", "leak", "pests", "common", "no-timeline", "building"],
+      "milestone_issues": ["leak", "pests", "common", "no-timeline", "building"],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-110",
+          "summary": "For repairs, the RLTO counts 14 days from your written request to the landlord. Some tenant options start only after these 14 days.",
+          "details": [
+            "Before you hold back rent or pay for a repair yourself, talk to legal aid. These options have steps you must follow.",
+            "Keep a copy of your request. Write down the date the landlord got it."
+          ],
+          "timing": { "amount": 14, "unit": "days", "label": "14 days after first written notice (RLTO 5-12-110)" },
+          "source_ids": ["rlto_summary_en", "rlto_code"]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-110(d), (e)",
+          "summary": "For repairs, the RLTO counts 14 days from your written request to the landlord. Some tenant options start only after these 14 days.",
+          "details": [
+            "Before you hold back rent or pay for a repair yourself, talk to legal aid. These options have steps you must follow.",
+            "Keep a copy of your request. Write down the date the landlord got it."
+          ],
+          "timing": { "amount": 14, "unit": "days", "label": "14 days after first written notice (RLTO 5-12-110)" },
+          "source_ids": ["pro_text_introduced"],
+          "app_impact": "No change to the 14-day period. Update the section label. The introduced text raises the repair-and-deduct limit and requires a licensed professional; the app does not show dollar limits."
+        }
+      ]
+    },
+    {
+      "id": "essential_services",
+      "title": "No heat, water, gas, or power: 24 hours",
+      "issues": ["heat", "building"],
+      "milestone_issues": ["heat"],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-110(f)",
+          "summary": "For no heat, no running water, no hot water, no electricity, no gas, or no plumbing, the RLTO uses shorter times. Some options start 24 hours after your written notice.",
+          "details": [
+            "Other options start 72 hours after your written notice.",
+            "These rules do not apply when the utility company caused the problem.",
+            "Talk to legal aid before you hold back rent or move out."
+          ],
+          "timing": { "amount": 24, "unit": "hours", "label": "24 hours after first written notice (RLTO 5-12-110(f))" },
+          "source_ids": ["rlto_summary_en", "rlto_code"]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-110(g)",
+          "summary": "For no heat, no running water, no hot water, no electricity, no gas, or no plumbing, the RLTO uses shorter times. Some options start 24 hours after your written notice.",
+          "details": [
+            "This also covers internet service when the lease says the landlord provides it.",
+            "Other options start 72 hours after your written notice.",
+            "These rules do not apply when the utility company caused the problem.",
+            "Talk to legal aid before you hold back rent or move out."
+          ],
+          "timing": { "amount": 24, "unit": "hours", "label": "24 hours after first written notice (RLTO 5-12-110(g))" },
+          "source_ids": ["pro_text_introduced"],
+          "app_impact": "Consider an 'internet' quick fact for building-wide messages. Update the section label."
+        }
+      ]
+    },
+    {
+      "id": "entry_notice",
+      "title": "Landlord entry: two days' notice",
+      "issues": ["entry"],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-050",
+          "summary": "The landlord must give at least two days' notice before entering your unit, except in an emergency.",
+          "details": [
+            "The law treats entry between 8:00 AM and 8:00 PM as reasonable.",
+            "After an emergency entry, the landlord must tell you within two days."
+          ],
+          "source_ids": ["rlto_summary_en", "rlto_code"]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-050(b)",
+          "summary": "The landlord must give at least 48 hours' notice before entering your unit, except in an emergency.",
+          "details": [
+            "The law treats entry between 8:00 AM and 8:00 PM as reasonable.",
+            "After an emergency entry, the landlord must tell you within 48 hours.",
+            "The landlord must keep a way to enter for repairs. Not being able to enter does not excuse missing basic repairs."
+          ],
+          "source_ids": ["pro_text_introduced"],
+          "app_impact": "Entry notices already say 48 hours. No template change needed."
+        }
+      ]
+    },
+    {
+      "id": "retaliation",
+      "title": "Retaliation is not allowed",
+      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building", "lockout"],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-150",
+          "summary": "A landlord may not end your lease, raise rent, cut services, refuse to renew, or start an eviction because you asked for repairs in good faith.",
+          "details": [
+            "This also covers good-faith complaints to the City, like 311, and to community groups or tenant unions.",
+            "Illinois law has similar protections."
+          ],
+          "source_ids": ["rlto_summary_en", "rlto_code", "il_retaliation_act"]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-150",
+          "summary": "A landlord may not end your lease, raise rent, cut services, refuse to renew, or start an eviction because you asked for repairs in good faith.",
+          "details": [
+            "This also covers good-faith complaints to the City, like 311, and to community groups or tenant unions.",
+            "It also covers organizing with neighbors and complaints on social media.",
+            "Illinois law has similar protections."
+          ],
+          "source_ids": ["pro_text_introduced", "il_retaliation_act"],
+          "app_impact": "Building-wide messages are protected organizing. Consider a short note on the building-wide message step."
+        }
+      ]
+    },
+    {
+      "id": "deposit_return",
+      "title": "Security deposit return: 45 days",
+      "issues": ["deposit"],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-080",
+          "summary": "The landlord must return the deposit, minus allowed deductions, within 45 days after you move out.",
+          "details": [
+            "To deduct for damage, the landlord must send an itemized list within 30 days after you move out, with costs and receipts.",
+            "The landlord must pay interest each year if it holds the deposit more than six months."
+          ],
+          "source_ids": ["rlto_summary_en", "rlto_code"]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-080",
+          "summary": "The landlord must return the deposit, minus allowed deductions, within 45 days after you move out.",
+          "details": [
+            "A deposit may not be more than one month's rent.",
+            "If you ask in writing for missing deposit information, the landlord has two business days to send it.",
+            "To deduct for damage, the landlord must send an itemized list within 30 days after you move out, with costs and receipts."
+          ],
+          "source_ids": ["pro_text_introduced", "pro_page"],
+          "app_impact": "The introduced text removes the interest-bearing account rule after the start date. Review the deposit interest card when the final text is known."
+        }
+      ]
+    },
+    {
+      "id": "lockout",
+      "title": "Lockouts are not allowed",
+      "issues": ["lockout"],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-160",
+          "summary": "A landlord may not change locks, remove doors, remove your things, or shut off heat, water, or power to make you leave.",
+          "details": ["The Chicago Police Department enforces this rule."],
+          "source_ids": ["rlto_summary_en", "rlto_code"]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-160",
+          "summary": "A landlord may not change locks, remove doors, remove your things, or shut off heat, water, power, or internet to make you leave.",
+          "details": ["The Chicago Police Department enforces this rule."],
+          "source_ids": ["pro_text_introduced"],
+          "app_impact": "Add 'internet shut off' to lockout quick facts."
+        }
+      ]
+    },
+    {
+      "id": "rental_registry",
+      "title": "Rental registry",
+      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building"],
+      "versions": [
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-175",
+          "summary": "Owners must register each rental unit with the City every year. The City keeps a public, searchable list. It includes the contact for repair requests.",
+          "details": ["The landlord must give you a copy of the registration at the start of the lease."],
+          "source_ids": ["pro_text_introduced", "pro_page"],
+          "app_impact": "Add a link to the registry search so residents can find where to send repair requests. Do not store owner names in Building Ledger."
+        }
+      ]
+    },
+    {
+      "id": "rental_housing_bureau",
+      "title": "Bureau of Rental Housing Services",
+      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building", "deposit", "lockout"],
+      "versions": [
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "Municipal Code 2-44-200",
+          "summary": "A new City bureau would receive 311 complaints about the RLTO and investigate them.",
+          "details": [],
+          "source_ids": ["pro_text_introduced", "pro_page"],
+          "app_impact": "311 stays the next normal step. Update 311 guidance once the City publishes the 311 category name for RLTO complaints."
+        }
+      ]
+    },
+    {
+      "id": "tenant_organizing",
+      "title": "Right to organize",
+      "issues": ["building"],
+      "versions": [
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-035(a)(3)",
+          "summary": "Tenants may form or join a tenant union, hand out flyers, and use common spaces to organize, as the law allows.",
+          "details": [],
+          "source_ids": ["pro_text_introduced"],
+          "app_impact": "Supports the building-wide message flow. No feature change needed."
+        }
+      ]
+    }
+  ]
+}
