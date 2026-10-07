@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.4.0 - 2026-10-07
+
+### Added
+
+- "Local rules (information only)" now shows each rule in plain words, with its code section, sources, and the date it was last checked. Before, it showed only links.
+- New cited RLTO rules: where to send a written notice, the 14-day repair request period, the 24-hour rule for no heat or water, landlord entry notice, retaliation, deposit return, and lockouts.
+- The issue timeline shows the RLTO date counted from the first written notice. Example: "14 days after first written notice (RLTO 5-12-110)". The legal aid, inspector, and personal summaries include the first notice date and this RLTO date. The management summary does not.
+- Rule data now has versions with start and end dates. Pending city bills, such as the Protecting Renters Ordinance (PRO), are tracked but never shown to residents. A passed change shows as "Starting <date>" until it starts. See `docs/pro-readiness-2026-10.md`.
+
+### Changed
+
+- The heat note uses the rule data. It says whether it is heat season on the builder date. Before, it always said the heat rule was active.
+- The heat rule card lists the City's exceptions for buildings with one heat-and-cooling system and for units with their own heater.
+- The first next step now says to send the notice to the owner or manager address the landlord gave you.
+
+### Fixed
+
+- The RLTO summary link pointed to a 2011 scan. It now points to the City's current summary (revised December 2023), in English and Spanish.
+
 ## 1.3.2 - 2026-09-29
 
 ### Added
