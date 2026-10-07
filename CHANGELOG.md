@@ -4,8 +4,8 @@
 
 ### Changed
 
-- The steward page shows a check code for each issued key. After a new key, reload the page in 1 minute and compare the code. A different code means another steward changed keys at the same time.
-- `docs/self-hosting.md`: only one steward should issue keys at a time.
+- The steward page shows a check code for each issued key. After a new key, reload the page after 5 minutes and compare the code. A different code means another steward changed keys at the same time. The check can miss a change.
+- `docs/self-hosting.md`: only one steward should issue keys at a time. This is the main protection.
 
 ## 1.6.0 - 2026-10-07
 

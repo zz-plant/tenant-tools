@@ -132,8 +132,9 @@ const buildings = isSteward ? listKnownBuildings(settingsJson, registry) : [];
                 <p class="helper">This key is shown only once. Copy it now.</p>
                 <p><strong>Check code: <span data-new-key-check></span></strong></p>
                 <p class="helper">
-                  In 1 minute, reload this page. The building must show the same check code. If the code is different,
-                  another steward changed keys at the same time. Issue a new key again.
+                  After 5 minutes, reload this page. The building should show the same check code. If the code is different,
+                  another steward changed keys at the same time. Issue a new key again. This check can miss a change, so only
+                  one steward should issue keys at a time.
                 </p>
                 <p class="helper">Resident link (the key moves into a private cookie when opened):</p>
                 <p class="new-key-link" data-new-key-link></p>

@@ -45,7 +45,7 @@ const issueKey = async (building: string) => {
   setStatus(stewardStatus, "Issuing a new key...");
   try {
     const result = await postJson("/api/steward/keys", "POST", { building });
-    setStatus(stewardStatus, `New key issued for ${result.building}. Copy it. Then reload the page in 1 minute and compare the check code.`);
+    setStatus(stewardStatus, `New key issued for ${result.building}. Copy it. After 5 minutes, reload the page and compare the check code.`);
     showNewKey(result.building, result.key, result.checkCode);
   } catch (error) {
     setStatus(stewardStatus, error instanceof Error ? error.message : "Could not issue a key.");
