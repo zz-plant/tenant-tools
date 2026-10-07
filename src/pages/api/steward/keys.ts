@@ -3,6 +3,7 @@ import { guardApiRequest } from "../../../lib/api/requestGuard";
 import {
   generateBuildingKey,
   hashBuildingKey,
+  keyCheckCode,
   loadKeyRegistry,
   saveKeyRegistry,
 } from "../../../lib/access/registry";
@@ -55,11 +56,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const key = generateBuildingKey();
   const registry = await loadKeyRegistry(kv, { fresh: true });
   const issuedAt = new Date().toISOString();
-  registry.buildings[building] = { hash: await hashBuildingKey(key), issuedAt };
+  const hash = await hashBuildingKey(key);
+  registry.buildings[building] = { hash, issuedAt };
   await saveKeyRegistry(kv, registry);
   await guarded.context.logAuditSuccess(await hashBuildingId(building));
 
-  return jsonResponse({ building, key, issuedAt }, 201, { "Cache-Control": "no-store" });
+  return jsonResponse({ building, key, issuedAt, checkCode: keyCheckCode(hash) }, 201, { "Cache-Control": "no-store" });
 };
 
 /** Stewards remove a key issued here. The building goes back to its deploy-settings key, if any. */

@@ -67,13 +67,17 @@ bun run deploy
 1. Open `https://YOUR-ADDRESS/steward?stewardKey=YOUR-STEWARD-KEY`. The key moves into a private cookie for 15 minutes.
 2. Under "Add a building", type the street address, with no unit number.
 3. Copy the new key or the resident link. It is shown only once.
-4. Share the link with residents in person or in a private group chat.
+4. Note the check code. After 5 minutes, reload `/steward`. The building should show the same check code. If it is different, issue a new key again.
+5. Share the link with residents in person or in a private group chat.
+
+**Only one steward should issue keys at a time.** Agree in your group who does it. All issued keys are saved together. If two stewards issue keys within a few minutes, one change can replace the other. The check code can show you that this happened, but it can miss it: Cloudflare can take more than a minute to show a change everywhere. The one-steward rule is the real protection.
 
 ## If a key reaches management
 
 1. Open `/steward`.
 2. Select "Issue a new key" for the building.
-3. Share the new key with residents. The old key stops working within about a minute.
+3. After 5 minutes, reload `/steward` and compare the check code. If it is different, issue a new key again. If the codes do not match, the old key may still work.
+4. Share the new key with residents. The old key stops working within about a minute.
 
 ## Keep your own copy of the data
 
