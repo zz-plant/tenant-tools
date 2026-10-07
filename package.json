@@ -9,7 +9,8 @@
     "deploy": "bun run build && wrangler deploy",
     "preview": "astro preview",
     "test": "node --test --import tsx tests/*.test.ts",
-    "typecheck": "astro check && tsc --noEmit"
+    "typecheck": "astro check && tsc --noEmit",
+    "translations": "tsx scripts/translations.ts"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",

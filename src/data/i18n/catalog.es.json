@@ -1,0 +1,473 @@
+{
+  "lang": "es",
+  "entries": {
+    "help.city.item.0.description": {
+      "text": "Busque un pedido al 311 por su número.",
+      "status": "draft",
+      "source_hash": "b816b72c",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.city.item.1.description": {
+      "text": "Inspecciones y violaciones de la Ciudad para la dirección de un edificio.",
+      "status": "draft",
+      "source_hash": "64f4cd66",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.city.item.2.description": {
+      "text": "Las oficinas de los distritos (wards) pueden ayudar con los servicios de la Ciudad.",
+      "status": "draft",
+      "source_hash": "5b2e0dbe",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.city.title": {
+      "text": "Búsquedas de la Ciudad",
+      "status": "draft",
+      "source_hash": "7f3759d1",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.help.item.0.description": {
+      "text": "Información gratis sobre los derechos de los inquilinos en Chicago.",
+      "status": "draft",
+      "source_hash": "ff45498c",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.help.item.1.description": {
+      "text": "Ayuda legal gratis para personas de bajos ingresos en el condado de Cook. En inglés y español.",
+      "status": "draft",
+      "source_hash": "72bcb0c2",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.help.item.2.description": {
+      "text": "Ayuda legal gratis para personas que enfrentan un desalojo en el condado de Cook.",
+      "status": "draft",
+      "source_hash": "6768b207",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.help.item.3.description": {
+      "text": "Información legal en lenguaje sencillo y formularios.",
+      "status": "draft",
+      "source_hash": "37b1749d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.help.title": {
+      "text": "Líneas de ayuda y asistencia legal para inquilinos",
+      "status": "draft",
+      "source_hash": "8f8fd408",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.intro": {
+      "text": "Solo información. No es asesoría legal. Building Ledger no comparte sus datos con estos grupos.",
+      "status": "draft",
+      "source_hash": "92c21601",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.last_checked": {
+      "text": "Revisado por última vez: {date}",
+      "status": "draft",
+      "source_hash": "2ef08ad2",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.title": {
+      "text": "Dónde pedir ayuda",
+      "status": "draft",
+      "source_hash": "08b155b4",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.unions.item.0.description": {
+      "text": "Sindicato voluntario de inquilinos en toda la ciudad. Ayuda a los residentes a formar sindicatos en sus edificios.",
+      "status": "draft",
+      "source_hash": "d4cda921",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.unions.item.1.description": {
+      "text": "Sindicato voluntario de inquilinos. En inglés y español.",
+      "status": "draft",
+      "source_hash": "3a8c125b",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.unions.note": {
+      "text": "Los sindicatos de inquilinos ayudan a los vecinos a actuar juntos. Hable con asistencia legal antes de cambiar cómo paga la renta.",
+      "status": "draft",
+      "source_hash": "af77f56d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "help.unions.title": {
+      "text": "Sindicatos de inquilinos",
+      "status": "draft",
+      "source_hash": "27d91e9f",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.deposit.latest": {
+      "text": "Última tasa publicada: {rate}% al año ({year}).",
+      "status": "draft",
+      "source_hash": "ba678ea7",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.deposit.rate": {
+      "text": "{year}: {rate}% al año",
+      "status": "draft",
+      "source_hash": "6f475e33",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.deposit.title": {
+      "text": "Intereses del depósito de seguridad",
+      "status": "draft",
+      "source_hash": "f3f05d32",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.deposit.unknown": {
+      "text": "La Ciudad publica cada año la tasa de interés para los depósitos de seguridad.",
+      "status": "draft",
+      "source_hash": "d0c173a8",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.eviction.fallback": {
+      "text": "Solo el alguacil puede hacer un desalojo, con una orden de la corte.",
+      "status": "draft",
+      "source_hash": "c686cc3c",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.eviction.note": {
+      "text": "Los propietarios no pueden desalojar por su cuenta (por ejemplo, cambiar las cerraduras o usar la fuerza).",
+      "status": "draft",
+      "source_hash": "d690dbb0",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.eviction.statement": {
+      "text": "En el condado de Cook, solo la Oficina del Alguacil del Condado de Cook puede sacar físicamente a un inquilino de su vivienda (con una orden de la corte).",
+      "status": "draft",
+      "source_hash": "4c01a700",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.eviction.title": {
+      "text": "Quién puede hacer un desalojo",
+      "status": "draft",
+      "source_hash": "8dc0a676",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.exception.0": {
+      "text": "Algunos edificios usan un solo sistema para calefacción y aire frío. En esos edificios, el mínimo puede ser 64°F a toda hora cerca del inicio y del final de la temporada de calefacción.",
+      "status": "draft",
+      "source_hash": "7188f40d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.exception.1": {
+      "text": "Si cada unidad tiene su propio calentador, el calentador debe poder mantener la unidad a 68°F.",
+      "status": "draft",
+      "source_hash": "3988eecc",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.in_season": {
+      "text": "Ahora es temporada de calefacción.",
+      "status": "draft",
+      "source_hash": "f5132fb7",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.minimum": {
+      "text": "Por lo menos {temp}°F de {from} a {to}.",
+      "status": "draft",
+      "source_hash": "8ab4f383",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.off_season": {
+      "text": "Ahora no es temporada de calefacción.",
+      "status": "draft",
+      "source_hash": "bbc66da4",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.season": {
+      "text": "La temporada de calefacción es del {season}.",
+      "status": "draft",
+      "source_hash": "f7ef1f13",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.season_range": {
+      "text": "{start} al {end}",
+      "status": "draft",
+      "source_hash": "b8ba004b",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.season_unknown": {
+      "text": "Las fechas de la temporada de calefacción están en la guía de la Ciudad.",
+      "status": "draft",
+      "source_hash": "cd8ef5ab",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.heat.title": {
+      "text": "Regla de calefacción de Chicago",
+      "status": "draft",
+      "source_hash": "051e7227",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.rlto_summary.since": {
+      "text": "Resumen vigente desde el {date}.",
+      "status": "draft",
+      "source_hash": "ecd0eb8f",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.rlto_summary.summary": {
+      "text": "La Ciudad publica un resumen corto de las reglas para inquilinos y propietarios. El propietario debe adjuntarlo a cada contrato de arrendamiento.",
+      "status": "draft",
+      "source_hash": "a5f5d9f2",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "ref.rlto_summary.title": {
+      "text": "Resumen de la RLTO (Chicago)",
+      "status": "draft",
+      "source_hash": "99396a39",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.back": {
+      "text": "Volver al creador de avisos",
+      "status": "draft",
+      "source_hash": "b0ca012e",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.date": {
+      "text": "Fecha: {date}",
+      "status": "draft",
+      "source_hash": "fdc8a02b",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.intro": {
+      "text": "Solo información. No es asesoría legal. Las reglas pueden cambiar. Revise las fuentes.",
+      "status": "draft",
+      "source_hash": "44a46ca1",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.print": {
+      "text": "Imprimir o guardar como PDF",
+      "status": "draft",
+      "source_hash": "80a077b4",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.section.reference": {
+      "text": "Calefacción, depósitos y desalojos",
+      "status": "draft",
+      "source_hash": "56554163",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.section.rlto": {
+      "text": "Reglas para inquilinos de Chicago (RLTO)",
+      "status": "draft",
+      "source_hash": "d84a80f0",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.starting": {
+      "text": "A partir del {date}:",
+      "status": "draft",
+      "source_hash": "ab06b9c3",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rights.title": {
+      "text": "Reglas para inquilinos de Chicago: guía corta",
+      "status": "draft",
+      "source_hash": "e9d68bfa",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.deposit_return.detail.0": {
+      "text": "Para descontar por daños, el propietario debe enviar una lista detallada dentro de 30 días después de que usted se mude, con los costos y los recibos.",
+      "status": "draft",
+      "source_hash": "261556b6",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.deposit_return.detail.1": {
+      "text": "El propietario debe pagar intereses cada año si tiene el depósito por más de seis meses.",
+      "status": "draft",
+      "source_hash": "a89c45ab",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.deposit_return.summary": {
+      "text": "El propietario debe devolver el depósito, menos los descuentos permitidos, dentro de 45 días después de que usted se mude.",
+      "status": "draft",
+      "source_hash": "83f0cc8b",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.deposit_return.title": {
+      "text": "Devolución del depósito de seguridad: 45 días",
+      "status": "draft",
+      "source_hash": "a9b6ea13",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.entry_notice.detail.0": {
+      "text": "La ley considera razonable la entrada entre las 8:00 a. m. y las 8:00 p. m.",
+      "status": "draft",
+      "source_hash": "1aa1c37d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.entry_notice.detail.1": {
+      "text": "Después de una entrada de emergencia, el propietario debe avisarle dentro de dos días.",
+      "status": "draft",
+      "source_hash": "1cc8bb59",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.entry_notice.summary": {
+      "text": "El propietario debe avisar por lo menos dos días antes de entrar a su unidad, excepto en una emergencia.",
+      "status": "draft",
+      "source_hash": "4c921c4e",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.entry_notice.title": {
+      "text": "Entrada del propietario: aviso de dos días",
+      "status": "draft",
+      "source_hash": "df116083",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.essential_services.detail.0": {
+      "text": "Otras opciones empiezan 72 horas después de su aviso por escrito.",
+      "status": "draft",
+      "source_hash": "445d0c8d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.essential_services.detail.1": {
+      "text": "Estas reglas no aplican cuando la compañía de servicios causó el problema.",
+      "status": "draft",
+      "source_hash": "05e059ca",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.essential_services.detail.2": {
+      "text": "Hable con asistencia legal antes de retener la renta o de mudarse.",
+      "status": "draft",
+      "source_hash": "6ca47598",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.essential_services.summary": {
+      "text": "Si no hay calefacción, agua corriente, agua caliente, electricidad, gas o plomería, la RLTO usa plazos más cortos. Algunas opciones empiezan 24 horas después de su aviso por escrito.",
+      "status": "draft",
+      "source_hash": "94c1369f",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.essential_services.title": {
+      "text": "Sin calefacción, agua, gas o electricidad: 24 horas",
+      "status": "draft",
+      "source_hash": "2a598bef",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.fair_notice.detail.0": {
+      "text": "Menos de 6 meses: por lo menos 30 días.",
+      "status": "draft",
+      "source_hash": "f1451cbe",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.fair_notice.detail.1": {
+      "text": "De 6 meses a 3 años: por lo menos 60 días.",
+      "status": "draft",
+      "source_hash": "d7028c85",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.fair_notice.detail.2": {
+      "text": "Más de 3 años: por lo menos 120 días.",
+      "status": "draft",
+      "source_hash": "ba695ea4",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.fair_notice.detail.3": {
+      "text": "Esta regla aplica a todas las viviendas de alquiler en Chicago, también a las que no cubre el resto de la RLTO.",
+      "status": "draft",
+      "source_hash": "d67ff58a",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.fair_notice.summary": {
+      "text": "Antes de subir la renta o de terminar un contrato, el propietario debe dar un aviso por escrito. El tiempo depende de cuánto tiempo ha vivido usted allí.",
+      "status": "draft",
+      "source_hash": "6a18568c",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.fair_notice.title": {
+      "text": "Aviso antes de un aumento de renta o de no renovar el contrato",
+      "status": "draft",
+      "source_hash": "e342d291",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.lockout.detail.0": {
+      "text": "El Departamento de Policía de Chicago hace cumplir esta regla.",
+      "status": "draft",
+      "source_hash": "4707745d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.lockout.summary": {
+      "text": "Un propietario no puede cambiar las cerraduras, quitar puertas, sacar sus cosas, ni cortar la calefacción, el agua o la electricidad para que usted se vaya.",
+      "status": "draft",
+      "source_hash": "ce11b83d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.lockout.title": {
+      "text": "No pueden dejarle fuera de su vivienda",
+      "status": "draft",
+      "source_hash": "dba856a0",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.notice_address.detail.0": {
+      "text": "Guarde una copia de cada aviso.",
+      "status": "draft",
+      "source_hash": "4b3eae5c",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.notice_address.detail.1": {
+      "text": "Anote la fecha en que lo envió.",
+      "status": "draft",
+      "source_hash": "5a372491",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.notice_address.summary": {
+      "text": "El propietario debe dar a los inquilinos, por escrito, el nombre y la dirección del dueño o del administrador. Envíe sus avisos por escrito a esa persona.",
+      "status": "draft",
+      "source_hash": "d7fa09aa",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.notice_address.title": {
+      "text": "A dónde enviar un aviso por escrito",
+      "status": "draft",
+      "source_hash": "15a779a7",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.repair_request.detail.0": {
+      "text": "Antes de retener la renta o de pagar una reparación usted mismo, hable con asistencia legal. Estas opciones tienen pasos que debe seguir.",
+      "status": "draft",
+      "source_hash": "d0ec3174",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.repair_request.detail.1": {
+      "text": "Guarde una copia de su pedido. Anote la fecha en que el propietario lo recibió.",
+      "status": "draft",
+      "source_hash": "3e4395f5",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.repair_request.summary": {
+      "text": "Para reparaciones, la RLTO cuenta 14 días desde su pedido por escrito al propietario. Algunas opciones para inquilinos empiezan solo después de esos 14 días.",
+      "status": "draft",
+      "source_hash": "136a75a8",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.repair_request.title": {
+      "text": "Pedido de reparación por escrito: 14 días",
+      "status": "draft",
+      "source_hash": "477c3902",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.retaliation.detail.0": {
+      "text": "Esto también cubre quejas de buena fe a la Ciudad, como al 311, y a grupos comunitarios o sindicatos de inquilinos.",
+      "status": "draft",
+      "source_hash": "ed30060d",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.retaliation.detail.1": {
+      "text": "Guarde las fechas. Según la ley de Illinois, si el propietario actúa dentro de un año después de una queja de buena fe, la ley primero supone que es una represalia.",
+      "status": "draft",
+      "source_hash": "f4d912a9",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.retaliation.summary": {
+      "text": "Un propietario no puede terminar su contrato, subir la renta, quitar servicios, negarse a renovar o empezar un desalojo porque usted pidió reparaciones de buena fe.",
+      "status": "draft",
+      "source_hash": "8d348a10",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    },
+    "rule.retaliation.title": {
+      "text": "Las represalias no están permitidas",
+      "status": "draft",
+      "source_hash": "7c10e816",
+      "note": "Draft. Needs review by a fluent community reviewer."
+    }
+  }
+}

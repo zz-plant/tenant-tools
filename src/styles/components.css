@@ -1462,3 +1462,14 @@ fieldset.facts-form {
   }
 }
 
+.rights-languages {
+  display: flex;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.rights-languages a[aria-current="page"] {
+  font-weight: 600;
+  text-decoration: none;
+}
+

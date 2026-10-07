@@ -5,6 +5,7 @@ import depositRatesData from "./rules/chicago/security_deposit_interest_rates.js
 import evictionRuleData from "./rules/cook/eviction_enforcement.json";
 import proposalsData from "./rules/proposals.json";
 import { formatDate, formatTimelineDate } from "../lib/dateUtils";
+import { englishTranslate, type Translate } from "../lib/i18n/translate";
 
 /*
  * Rule data for "Help and sources". Information only, not legal advice.
@@ -309,7 +310,37 @@ export const getPendingRuleChanges = (pack: RuleProvisionPack = rltoProvisionPac
       }))
   );
 
-// ---------- Heat ordinance ----------
+// ---------- Heat ordinance and reference cards ----------
+
+/** Text and date format for reference cards. English by default; the rights page passes a translator. */
+export type CardLocalizer = { t: Translate; locale: string };
+
+const englishLocalizer: CardLocalizer = { t: englishTranslate, locale: "en-US" };
+
+/** English sources for reference card text. Keys are used by the translation catalogs. */
+export const referenceStrings = {
+  "ref.heat.title": "Chicago heat rule",
+  "ref.heat.season": "Heat season is {season}.",
+  "ref.heat.season_range": "{start} to {end}",
+  "ref.heat.in_season": "It is heat season now.",
+  "ref.heat.off_season": "It is not heat season now.",
+  "ref.heat.season_unknown": "Heat season dates are listed in the city guidance.",
+  "ref.heat.minimum": "At least {temp}°F from {from} to {to}.",
+  "ref.deposit.title": "Security deposit interest rates",
+  "ref.deposit.latest": "Latest published rate: {rate}% per year ({year}).",
+  "ref.deposit.unknown": "The city publishes annual interest rates for security deposits.",
+  "ref.deposit.rate": "{year}: {rate}% per year",
+  "ref.eviction.title": "Eviction enforcement",
+  "ref.eviction.fallback": "Only the sheriff can carry out an eviction with a court order.",
+  "ref.rlto_summary.title": "RLTO summary (Chicago)",
+  "ref.rlto_summary.summary":
+    "The City publishes a short summary of tenant and landlord rules. Landlords must attach it to each lease.",
+  "ref.rlto_summary.since": "Summary in effect since {date}.",
+} as const;
+
+type ReferenceKey = keyof typeof referenceStrings;
+const ref = (localizer: CardLocalizer, key: ReferenceKey, vars?: Record<string, string | number>) =>
+  localizer.t(key, referenceStrings[key], vars);
 
 const monthNames = [
   "January",
@@ -326,19 +357,49 @@ const monthNames = [
   "December",
 ];
 
-/** "09-15" -> "September 15" */
-const formatMonthDay = (monthDay: string) => {
+// Intl output can hold narrow no-break spaces. Plain spaces print and copy the same everywhere.
+const plainSpaces = (text: string) => text.replace(/[\u00a0\u202f]/g, " ");
+
+/** "09-15" -> "September 15" in English, or the locale's form, such as "15 de septiembre". */
+const formatMonthDay = (monthDay: string, locale = "en-US") => {
   const [month, day] = monthDay.split("-").map(Number);
-  return `${monthNames[month - 1]} ${day}`;
+  if (locale === "en-US") {
+    return `${monthNames[month - 1]} ${day}`;
+  }
+  return plainSpaces(
+    new Date(Date.UTC(2001, month - 1, day)).toLocaleDateString(locale, { month: "long", day: "numeric", timeZone: "UTC" })
+  );
 };
 
-/** "22:30" -> "10:30 PM" */
-const formatClockTime = (time: string) => {
+/** "22:30" -> "10:30 PM" in English, or the locale's form. */
+const formatClockTime = (time: string, locale = "en-US") => {
   const [hours, minutes] = time.split(":").map(Number);
-  const suffix = hours >= 12 ? "PM" : "AM";
-  const hour12 = hours % 12 === 0 ? 12 : hours % 12;
-  return `${hour12}:${String(minutes).padStart(2, "0")} ${suffix}`;
+  if (locale === "en-US") {
+    const suffix = hours >= 12 ? "PM" : "AM";
+    const hour12 = hours % 12 === 0 ? 12 : hours % 12;
+    return `${hour12}:${String(minutes).padStart(2, "0")} ${suffix}`;
+  }
+  return plainSpaces(
+    new Date(Date.UTC(2001, 0, 1, hours, minutes)).toLocaleTimeString(locale, {
+      hour: "numeric",
+      minute: "2-digit",
+      timeZone: "UTC",
+    })
+  );
 };
+
+/** "2026-10-07" -> "Oct 7, 2026" in English, or the locale's short form. */
+export const formatDateForLocale = (isoDate: string, locale = "en-US") =>
+  locale === "en-US"
+    ? formatTimelineDate(isoDate)
+    : plainSpaces(
+        new Date(`${isoDate}T00:00:00Z`).toLocaleDateString(locale, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          timeZone: "UTC",
+        })
+      );
 
 const heatPeriod = heatRule.effective_periods[0];
 
@@ -352,26 +413,48 @@ export const isInHeatSeason = (onDate: string = todayIso()) => {
   return monthDay >= season.start || monthDay <= season.end;
 };
 
-export const heatSeasonLabel = heatPeriod?.heat_season
-  ? `${formatMonthDay(heatPeriod.heat_season.start)} to ${formatMonthDay(heatPeriod.heat_season.end)}`
-  : "";
+const buildHeatSeasonLabel = (localizer: CardLocalizer) =>
+  heatPeriod?.heat_season
+    ? ref(localizer, "ref.heat.season_range", {
+        start: formatMonthDay(heatPeriod.heat_season.start, localizer.locale),
+        end: formatMonthDay(heatPeriod.heat_season.end, localizer.locale),
+      })
+    : "";
+
+const buildHeatMinimumLines = (localizer: CardLocalizer) =>
+  (heatPeriod?.minimum_indoor_temperature ?? []).map((range) =>
+    ref(localizer, "ref.heat.minimum", {
+      temp: range.temp_f,
+      from: formatClockTime(range.from, localizer.locale),
+      to: formatClockTime(range.to, localizer.locale),
+    })
+  );
+
+export const heatSeasonLabel = buildHeatSeasonLabel(englishLocalizer);
 
 /** "At least 68°F from 8:30 AM to 10:30 PM." for each time range. */
-export const heatMinimumLines = (heatPeriod?.minimum_indoor_temperature ?? []).map(
-  (range) => `At least ${range.temp_f}°F from ${formatClockTime(range.from)} to ${formatClockTime(range.to)}.`
-);
+export const heatMinimumLines = buildHeatMinimumLines(englishLocalizer);
 
-const heatCard = (onDate: string): RuleCard => ({
-  id: heatRule.rule_id,
-  title: "Chicago heat rule",
-  summary: heatSeasonLabel
-    ? `Heat season is ${heatSeasonLabel}. ${isInHeatSeason(onDate) ? "It is heat season now." : "It is not heat season now."}`
-    : "Heat season dates are listed in the city guidance.",
-  details: [...heatMinimumLines, ...(heatPeriod?.exceptions ?? [])],
-  sources: heatRule.sources,
-  jurisdiction: heatRule.jurisdiction,
-  lastReviewed: heatRule.last_reviewed,
-});
+/** English heat exceptions with their translation keys. */
+export const heatExceptions = (heatPeriod?.exceptions ?? []).map((text, index) => ({ key: `ref.heat.exception.${index}`, text }));
+
+const heatCard = (onDate: string, localizer: CardLocalizer = englishLocalizer): RuleCard => {
+  const season = buildHeatSeasonLabel(localizer);
+  return {
+    id: heatRule.rule_id,
+    title: ref(localizer, "ref.heat.title"),
+    summary: season
+      ? `${ref(localizer, "ref.heat.season", { season })} ${ref(localizer, isInHeatSeason(onDate) ? "ref.heat.in_season" : "ref.heat.off_season")}`
+      : ref(localizer, "ref.heat.season_unknown"),
+    details: [
+      ...buildHeatMinimumLines(localizer),
+      ...heatExceptions.map((exception) => localizer.t(exception.key, exception.text)),
+    ],
+    sources: heatRule.sources,
+    jurisdiction: heatRule.jurisdiction,
+    lastReviewed: heatRule.last_reviewed,
+  };
+};
 
 // ---------- Other cards ----------
 
@@ -381,20 +464,20 @@ const getLatestRateYear = () =>
     .filter((year) => !Number.isNaN(year))
     .sort((a, b) => b - a)[0];
 
-const depositInterestCard = (): RuleCard => {
+const depositInterestCard = (localizer: CardLocalizer = englishLocalizer): RuleCard => {
   const latestRateYear = getLatestRateYear();
   const latestRate = latestRateYear ? depositRule.rates_by_year[String(latestRateYear)] : null;
   const rateDetails = Object.entries(depositRule.rates_by_year)
     .sort(([yearA], [yearB]) => Number(yearB) - Number(yearA))
     .slice(0, 3)
-    .map(([year, rate]) => `${year}: ${rate}% per year`);
+    .map(([year, rate]) => ref(localizer, "ref.deposit.rate", { year, rate }));
   return {
     id: depositRule.rule_id,
-    title: "Security deposit interest rates",
+    title: ref(localizer, "ref.deposit.title"),
     summary:
       latestRateYear && latestRate !== null
-        ? `Latest published rate: ${latestRate}% per year (${latestRateYear}).`
-        : "The city publishes annual interest rates for security deposits.",
+        ? ref(localizer, "ref.deposit.latest", { rate: latestRate, year: latestRateYear })
+        : ref(localizer, "ref.deposit.unknown"),
     details: rateDetails.length > 0 ? rateDetails : undefined,
     sources: depositRule.sources,
     jurisdiction: depositRule.jurisdiction,
@@ -402,26 +485,36 @@ const depositInterestCard = (): RuleCard => {
   };
 };
 
-const evictionCard = (): RuleCard => ({
+/** English eviction statement and note, with their translation keys. */
+export const evictionStrings = {
+  statement: { key: "ref.eviction.statement", text: evictionRule.statements[0]?.text ?? "" },
+  note: { key: "ref.eviction.note", text: evictionRule.statements[0]?.notes ?? "" },
+};
+
+const evictionCard = (localizer: CardLocalizer = englishLocalizer): RuleCard => ({
   id: evictionRule.rule_id,
-  title: "Eviction enforcement",
-  summary: evictionRule.statements[0]?.text ?? "Only the sheriff can carry out an eviction with a court order.",
-  details: evictionRule.statements[0]?.notes ? [evictionRule.statements[0].notes] : undefined,
+  title: ref(localizer, "ref.eviction.title"),
+  summary: evictionStrings.statement.text
+    ? localizer.t(evictionStrings.statement.key, evictionStrings.statement.text)
+    : ref(localizer, "ref.eviction.fallback"),
+  details: evictionStrings.note.text ? [localizer.t(evictionStrings.note.key, evictionStrings.note.text)] : undefined,
   sources: evictionRule.sources,
   jurisdiction: evictionRule.jurisdiction,
   lastReviewed: evictionRule.last_reviewed,
 });
 
-const rltoSummaryCard = (onDate: string): RuleCard => {
+const rltoSummaryCard = (onDate: string, localizer: CardLocalizer = englishLocalizer): RuleCard => {
   const period =
     rltoSummaryRule.effective_periods.find(
       (entry) => entry.start_date <= onDate && (entry.end_date === null || onDate < entry.end_date)
     ) ?? rltoSummaryRule.effective_periods[0];
   return {
     id: rltoSummaryRule.rule_id,
-    title: "RLTO summary (Chicago)",
-    summary: "The City publishes a short summary of tenant and landlord rules. Landlords must attach it to each lease.",
-    details: period?.start_date ? [`Summary in effect since ${formatTimelineDate(period.start_date)}.`] : undefined,
+    title: ref(localizer, "ref.rlto_summary.title"),
+    summary: ref(localizer, "ref.rlto_summary.summary"),
+    details: period?.start_date
+      ? [ref(localizer, "ref.rlto_summary.since", { date: formatDateForLocale(period.start_date, localizer.locale) })]
+      : undefined,
     sources: rltoSummaryRule.sources,
     jurisdiction: rltoSummaryRule.jurisdiction,
     lastReviewed: rltoSummaryRule.last_reviewed,
@@ -435,9 +528,9 @@ const issueSpecificCards: Record<string, (onDate: string) => RuleCard[]> = {
 };
 
 /** Heat, deposit interest, eviction, and RLTO summary cards on a date, for the printable rights page. */
-export const getReferenceRuleCards = (onDate: string = todayIso()): RuleCard[] => {
+export const getReferenceRuleCards = (onDate: string = todayIso(), localizer: CardLocalizer = englishLocalizer): RuleCard[] => {
   const date = isoDatePattern.test(onDate) ? onDate : todayIso();
-  return [heatCard(date), depositInterestCard(), evictionCard(), rltoSummaryCard(date)];
+  return [heatCard(date, localizer), depositInterestCard(localizer), evictionCard(localizer), rltoSummaryCard(date, localizer)];
 };
 
 /**

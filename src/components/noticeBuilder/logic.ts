@@ -3,6 +3,7 @@ import type { IssueOption } from "../../data/notice/types";
 import { getRuleCardsForIssue } from "../../data/rules";
 import { addDays, formatCalendarDate, formatDate, getCurrentTime } from "../../lib/dateUtils";
 import { fillTemplate } from "../../lib/noticeUtils";
+import { resolveNoticeTemplate } from "../../lib/i18n/translate";
 
 /*
  * Pure logic for the notice builder. No React here, so every function can be unit tested.
@@ -56,12 +57,18 @@ export const buildNoticeText = (state: FormState, issue: IssueOption | undefined
     return "";
   }
 
+  // A reviewed catalog translation wins over the one in the issue file (see lib/i18n/translate.ts).
+  const translated = resolveNoticeTemplate(
+    issue.id,
+    state.stage,
+    state.language,
+    issue.notices[state.stage]?.[state.language],
+    issue.notices[state.stage]?.en
+  );
   const template =
     state.language === "en" && state.simpleEnglish
       ? issue.simple[state.stage as keyof IssueOption["simple"]] || issue.simple.A
-      : issue.notices[state.stage]?.[state.language] ||
-        issue.notices[state.stage]?.en ||
-        issue.notices.A.en;
+      : translated || issue.notices[state.stage]?.en || issue.notices.A.en;
 
   const values: Record<string, string> = {
     ADDRESS: state.building || "[ADDRESS]",
