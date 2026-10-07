@@ -45,4 +45,32 @@ describe("getSubmissionTimelineEntries", () => {
 
     assert.deepEqual(entries.map((entry) => entry.date), ["2026-02-01", "2026-02-05", "2026-02-07"]);
   });
+
+  it("adds the RLTO date counted from the first written notice", () => {
+    const stageA = getSubmissionTimelineEntries({
+      stage: "A",
+      issue: "leak",
+      startDate: "2026-09-28",
+      reportDate: "2026-10-01",
+    });
+    assert.deepEqual(stageA.at(-1), {
+      label: "14 days after first written notice (RLTO 5-12-110)",
+      date: "2026-10-15",
+    });
+
+    const stageB = getSubmissionTimelineEntries({
+      stage: "B",
+      issue: "heat",
+      reportDate: "2026-10-05",
+      firstMessageDate: "2026-10-01",
+    });
+    assert.ok(stageB.some((entry) => entry.date === "2026-10-02" && entry.label.startsWith("24 hours")));
+  });
+
+  it("adds no RLTO date when no timing rule applies or the first notice date is missing", () => {
+    const entry = getSubmissionTimelineEntries({ stage: "A", issue: "entry", reportDate: "2026-10-01" });
+    const noFirstNotice = getSubmissionTimelineEntries({ stage: "B", issue: "leak", reportDate: "2026-10-05" });
+    assert.deepEqual(entry.map((item) => item.label), ["Notice sent"]);
+    assert.deepEqual(noFirstNotice.map((item) => item.label), ["Follow-up sent"]);
+  });
 });

@@ -1,7 +1,7 @@
 {
   "jurisdiction": "Chicago, IL",
   "rule_id": "chicago.heat_minimum_temperatures",
-  "last_reviewed": "2026-01-23",
+  "last_reviewed": "2026-10-07",
   "sources": [
     {
       "title": "Chicago Heat Ordinance (311 knowledge base)",
@@ -9,7 +9,7 @@
     },
     {
       "title": "Chicago Heat Ordinance (City of Chicago)",
-      "url": "https://www.chicago.gov/city/en/depts/bldgs/supp_info/chicago-heat-ordinance.html.html"
+      "url": "https://www.chicago.gov/city/en/depts/bldgs/supp_info/chicago-heat-ordinance.html"
     }
   ],
   "effective_periods": [
@@ -32,7 +32,11 @@
           "temp_f": 66
         }
       ],
-      "notes": "Applies to rental residences during heat season; see sources for details and exceptions."
+      "notes": "Applies to residential buildings during heat season. Exceptions are from the City heat ordinance page (reviewed 2026-10-07).",
+      "exceptions": [
+        "Some buildings use one system for both heat and cooling. In those buildings, the minimum can be 64°F at all hours near the start and end of heat season.",
+        "If each unit has its own heater, the heater must be able to keep the unit at 68°F."
+      ]
     }
   ]
 }
