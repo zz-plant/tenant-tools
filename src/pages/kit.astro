@@ -8,7 +8,9 @@ import HelpResources from "../components/HelpResources.astro";
 // The QR code uses this site's address, so the page is built for each request.
 export const prerender = false;
 
-const rightsUrl = `${Astro.url.origin}/rights`;
+// Printed flyers must not point at plain http. Local test hosts keep their own address.
+const isLocalHost = ["localhost", "127.0.0.1"].includes(Astro.url.hostname);
+const rightsUrl = `${isLocalHost ? Astro.url.origin : `https://${Astro.url.host}`}/rights`;
 const rightsQr = qrSvg(rightsUrl);
 ---
 

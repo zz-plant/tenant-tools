@@ -339,8 +339,9 @@ export const referenceStrings = {
 } as const;
 
 type ReferenceKey = keyof typeof referenceStrings;
+// A value that ends with a period ("8:30 a.m.") before the sentence's own period would print "..".
 const ref = (localizer: CardLocalizer, key: ReferenceKey, vars?: Record<string, string | number>) =>
-  localizer.t(key, referenceStrings[key], vars);
+  localizer.t(key, referenceStrings[key], vars).replace(/\.\.(?=\s|$)/g, ".");
 
 const monthNames = [
   "January",

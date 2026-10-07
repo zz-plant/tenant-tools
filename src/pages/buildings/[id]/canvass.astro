@@ -22,6 +22,11 @@ const hasAttempt = Boolean(stewardKey && stewardKey.trim());
 const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
 const today = formatDate(new Date());
 const canvasses = isSteward && kv && buildingId ? await listCanvasses(kv, buildingId) : [];
+const exactTallies = (tallies: (typeof canvasses)[number]["tallies"]) =>
+  canvassIssueIds
+    .filter((issue) => tallies[issue])
+    .map((issue) => `${canvassIssueLabels[issue]}: ${tallies[issue]}`)
+    .join(". ");
 ---
 
 <!DOCTYPE html>
@@ -109,12 +114,8 @@ const canvasses = isSteward && kv && buildingId ? await listCanvasses(kv, buildi
                 <ul class="fact-list">
                   {canvasses.map((canvass) => (
                     <li>
-                      <strong>{formatTimelineDate(canvass.date)}:</strong> {canvass.householdsReached} households reached.{" "}
-                      {canvassIssueIds
-                        .filter((issue) => canvass.tallies[issue])
-                        .map((issue) => `${canvassIssueLabels[issue]}: ${canvass.tallies[issue]}`)
-                        .join(". ")}
-                      .{" "}
+                      <strong>{formatTimelineDate(canvass.date)}:</strong>{" "}
+                      {`${canvass.householdsReached} households reached. ${exactTallies(canvass.tallies)}.`}{" "}
                       <button class="button button-compact button-secondary" type="button" data-canvass-remove={canvass.id}>Remove</button>
                     </li>
                   ))}
