@@ -1,0 +1,74 @@
+{
+  "last_reviewed": "2026-10-07",
+  "notes": "Referral information only. Phone numbers and links were checked on the last_reviewed date. Building Ledger does not share any data with these groups.",
+  "groups": [
+    {
+      "id": "help",
+      "title": "Tenant hotlines and legal help",
+      "items": [
+        {
+          "name": "Metropolitan Tenants Organization: Tenants' Rights Hotline",
+          "description": "Free information about tenant rights in Chicago.",
+          "phone": "773-292-4988",
+          "url": "https://www.tenants-rights.org/"
+        },
+        {
+          "name": "Legal Aid Chicago",
+          "description": "Free legal help for people with low income in Cook County. English and Spanish.",
+          "phone": "312-341-1070",
+          "url": "https://www.legalaidchicago.org/"
+        },
+        {
+          "name": "Early Resolution Program (Cook County Legal Aid for Housing and Debt)",
+          "description": "Free legal help for people facing eviction in Cook County.",
+          "phone": "855-956-5763",
+          "url": "https://www.cookcountylegalaid.org/"
+        },
+        {
+          "name": "Illinois Legal Aid Online",
+          "description": "Plain-language legal information and forms.",
+          "url": "https://www.illinoislegalaid.org/"
+        }
+      ]
+    },
+    {
+      "id": "unions",
+      "title": "Tenant unions",
+      "note": "Tenant unions help neighbors act together. Talk to legal aid before you change how you pay rent.",
+      "items": [
+        {
+          "name": "Chicago Union of Tenants",
+          "description": "Citywide volunteer tenant union. Helps residents form building unions.",
+          "url": "https://chicagounionoftenants.org/"
+        },
+        {
+          "name": "Autonomous Tenants Union",
+          "description": "Volunteer tenant union. English and Spanish.",
+          "phone": "872-216-5288",
+          "url": "https://www.autonomoustenantsunion.org/"
+        }
+      ]
+    },
+    {
+      "id": "city",
+      "title": "City lookups",
+      "items": [
+        {
+          "name": "Check a 311 request",
+          "description": "Look up a 311 request by its number.",
+          "url": "https://311.chicago.gov/s/"
+        },
+        {
+          "name": "Building permit and inspection records",
+          "description": "City inspections and violations for a building address.",
+          "url": "https://webapps1.chicago.gov/buildingrecords/"
+        },
+        {
+          "name": "Find your alderperson",
+          "description": "Ward offices can help with City services.",
+          "url": "https://www.chicago.gov/city/en/about/wards.html"
+        }
+      ]
+    }
+  ]
+}

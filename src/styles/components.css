@@ -1187,3 +1187,121 @@ ul.rule-cards {
     margin: 0;
   }
 }
+
+/* ==========================================================================
+   HELP RESOURCES & DATED FACTS
+   ========================================================================== */
+.help-resources,
+.help-group {
+  display: grid;
+  gap: 6px;
+}
+
+.help-resources h3,
+.help-resources h4 {
+  margin: 0;
+}
+
+.help-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+
+.help-list a {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.help-description {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 0.86rem;
+}
+
+.facts-form {
+  display: grid;
+  gap: 10px;
+}
+
+.facts-form label:not(.checkbox-label) {
+  display: grid;
+  gap: 4px;
+}
+
+/* The display rules above would otherwise override the hidden attribute. */
+.facts-form [hidden] {
+  display: none !important;
+}
+
+.fact-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.letter-output {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+fieldset.facts-form {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin: 0;
+}
+
+@media print {
+  .letter-output {
+    border: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: inherit !important;
+    font-size: 11pt !important;
+  }
+}
+
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.patterns .report-table th[scope="row"] {
+  font-weight: 500;
+  background: transparent;
+}
+
+.rights-sheet,
+.rights-section {
+  display: grid;
+  gap: 12px;
+}
+
+.rights-section h2 {
+  margin: 8px 0 0;
+}
+
+@media print {
+  .rights-sheet .rule-card {
+    break-inside: avoid;
+    border: 1pt solid #000000 !important;
+    background: #ffffff !important;
+  }
+
+  .rights-sheet a {
+    color: #000000 !important;
+  }
+
+  .rights-sheet .rule-sources a::after,
+  .help-list a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8pt;
+    word-break: break-all;
+  }
+}
+

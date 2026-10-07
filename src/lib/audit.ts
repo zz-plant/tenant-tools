@@ -5,6 +5,8 @@ export type AuditEventAction =
   | "submission.status.update"
   | "submission.report.increment"
   | "submission.merge"
+  | "submission.event.add"
+  | "submission.event.remove"
   | "evidence.upload"
   | "evidence.delete";
 

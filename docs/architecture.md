@@ -73,6 +73,7 @@ KV (`SUBMISSIONS_KV`):
 | `bidx-ready:{buildingHash}` | Set after older records for the building are copied into the index. |
 | `metoo:{id}:{sha256(id:sessionId)}` | One "me too" per browser session per record. No TTL. |
 | `evidence:{id}:{evidenceId}` | Evidence metadata: random object key, type, size, date. |
+| `revt:{id}:{eventId}` | One dated fact on a record (type, date, optional short number). List metadata holds the fact. |
 | `report:*`, `audit:*`, `rate:*` | Report log, audit events, and rate limits (all with TTL). |
 
 `buildingHash` is a one-way hash, so no key shows a street address.
@@ -85,6 +86,12 @@ R2 (`EVIDENCE_BUCKET`): `ev/{uuid}` holds stripped image bytes. The bucket is ne
 1. Hash the building id.
 2. If `bidx-ready:{hash}` exists, list `bidx:{hash}:` and build rows from list metadata (no per-record reads).
 3. Otherwise scan `submission:` once, write index entries for this building, and set `bidx-ready:{hash}`.
+
+### Dated facts
+
+`POST /api/submissions/{id}/events` (resident key for the record's building, rate limited, audited) adds one fact from a fixed list, such as "Portal request marked complete, but not fixed" or "Rent increase notice received". There is no free text. Two types take a short number (work order, inspection or 311 number), checked for phone numbers.
+
+Each fact has its own `revt:` key, so a fact never overwrites the record JSON and a concurrent "me too" cannot drop it. Facts show on the record timeline and, for follow-up types, in the printable building summary. `DELETE` on the same path is steward-only housekeeping. Facts are never edited.
 
 ### "Me too" counts
 

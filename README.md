@@ -25,7 +25,10 @@ Design choices prioritize:
 - Add “me too” participation without writing a long narrative
 - Upload private evidence with safety warnings
 - Generate calm notice templates (standard + very simple English)
+- Write a joint repair-plan letter with a household count, not names
+- Add dated facts to a record (replies, portal requests closed without a repair, entry offered, changes after a request)
 - Export summaries for inspection/legal-aid workflows
+- Print a short guide to Chicago tenant rules (`/rights`)
 
 ## What contributors must protect
 
@@ -197,6 +200,7 @@ Use Conventional Commit style:
 - Agent skills playbook: `docs/agent-skills-playbook.md`
 - Rule data pack notes: `src/data/rules/README.md`
 - Pending legislation readiness (Chicago PRO / FAIR): `docs/pro-readiness-2026-10.md`
+- Organizing features and what was not built: `docs/organizing-features-2026-10.md`
 - Internal competitor battlecard: `docs/competitor-battlecard-2026-03.md`
 - External homepage copy angles: `docs/external-homepage-copy-angles.md`
 - Core agent skill: `skills/building-ledger-agent/SKILL.md`

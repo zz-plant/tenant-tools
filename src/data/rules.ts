@@ -41,6 +41,8 @@ export type RuleTiming = {
   label: string;
 };
 
+export type NoticeTier = { id: string; label: string; days: number };
+
 export type RuleVersion = {
   status: RuleVersionStatus;
   /** Required when status is "proposed". Matches an id in proposals.json. */
@@ -54,6 +56,8 @@ export type RuleVersion = {
   details: string[];
   /** Time counted from the first written notice. Shown as a timeline date. */
   timing?: RuleTiming;
+  /** Notice periods that depend on how long the tenant has lived in the unit (Fair Notice). */
+  notice_tiers?: NoticeTier[];
   source_ids: string[];
   /** Maintainer note: what to change in the app when this version becomes law. */
   app_impact?: string;
@@ -190,38 +194,41 @@ const resolveSources = (pack: RuleProvisionPack, versions: Array<RuleVersion | u
   return sources;
 };
 
+/** Card for one provision on `onDate`, or null when no law version is in effect or upcoming. */
+const buildProvisionCard = (pack: RuleProvisionPack, provision: RuleProvision, onDate: string): RuleCard | null => {
+  const current = selectVersionInEffect(provision, onDate);
+  const upcoming = selectUpcomingVersion(provision, onDate);
+  const shown = current ?? upcoming;
+  if (!shown) {
+    return null;
+  }
+  return {
+    id: `${pack.rule_id}.${provision.id}`,
+    title: provision.title,
+    section: shown.section,
+    summary: current ? current.summary : `This rule starts on ${formatTimelineDate(upcoming?.start_date ?? "")}.`,
+    details: current && current.details.length > 0 ? current.details : undefined,
+    upcoming: upcoming?.start_date
+      ? {
+          startDate: upcoming.start_date,
+          summary: upcoming.summary,
+          details: upcoming.details.length > 0 ? upcoming.details : undefined,
+        }
+      : undefined,
+    sources: resolveSources(pack, [current, upcoming]),
+    jurisdiction: pack.jurisdiction,
+    lastReviewed: pack.last_reviewed,
+  };
+};
+
+const isCard = (card: RuleCard | null): card is RuleCard => Boolean(card);
+
 /** Cards for every provision that applies to the issue on `onDate`. Pure, so it can be tested with any pack. */
 export const buildProvisionCards = (pack: RuleProvisionPack, issueId: string, onDate: string): RuleCard[] =>
   pack.provisions
     .filter((provision) => provision.issues.includes(issueId))
-    .map((provision): RuleCard | null => {
-      const current = selectVersionInEffect(provision, onDate);
-      const upcoming = selectUpcomingVersion(provision, onDate);
-      const shown = current ?? upcoming;
-      if (!shown) {
-        return null;
-      }
-      return {
-        id: `${pack.rule_id}.${provision.id}`,
-        title: provision.title,
-        section: shown.section,
-        summary: current
-          ? current.summary
-          : `This rule starts on ${formatTimelineDate(upcoming?.start_date ?? "")}.`,
-        details: current && current.details.length > 0 ? current.details : undefined,
-        upcoming: upcoming?.start_date
-          ? {
-              startDate: upcoming.start_date,
-              summary: upcoming.summary,
-              details: upcoming.details.length > 0 ? upcoming.details : undefined,
-            }
-          : undefined,
-        sources: resolveSources(pack, [current, upcoming]),
-        jurisdiction: pack.jurisdiction,
-        lastReviewed: pack.last_reviewed,
-      };
-    })
-    .filter((card): card is RuleCard => Boolean(card));
+    .map((provision) => buildProvisionCard(pack, provision, onDate))
+    .filter(isCard);
 
 export type NoticeMilestone = { label: string; date: string; ruleId: string };
 
@@ -257,6 +264,24 @@ export const buildNoticeMilestone = (
 
 export const getNoticeMilestone = (issueId: string | undefined, firstNoticeDate: string | undefined) =>
   buildNoticeMilestone(rltoProvisionPack, issueId, firstNoticeDate);
+
+/** Fair Notice periods in effect on `onDate`, with the section and sources to cite. */
+export const getFairNoticeRule = (onDate: string = todayIso()) => {
+  const provision = rltoProvisionPack.provisions.find((entry) => entry.id === "fair_notice");
+  const version = provision ? selectVersionInEffect(provision, onDate) : undefined;
+  if (!version?.notice_tiers?.length) {
+    return null;
+  }
+  return {
+    section: version.section,
+    tiers: version.notice_tiers,
+    sources: resolveSources(rltoProvisionPack, [version]),
+  };
+};
+
+/** Every RLTO provision in effect or passed on `onDate`, for the printable rights page. */
+export const getAllProvisionCards = (onDate: string = todayIso()): RuleCard[] =>
+  rltoProvisionPack.provisions.map((provision) => buildProvisionCard(rltoProvisionPack, provision, onDate)).filter(isCard);
 
 export type PendingRuleChange = {
   provisionId: string;
@@ -407,6 +432,12 @@ const issueSpecificCards: Record<string, (onDate: string) => RuleCard[]> = {
   heat: (onDate) => [heatCard(onDate)],
   deposit: () => [depositInterestCard()],
   lockout: () => [evictionCard()],
+};
+
+/** Heat, deposit interest, eviction, and RLTO summary cards on a date, for the printable rights page. */
+export const getReferenceRuleCards = (onDate: string = todayIso()): RuleCard[] => {
+  const date = isoDatePattern.test(onDate) ? onDate : todayIso();
+  return [heatCard(date), depositInterestCard(), evictionCard(), rltoSummaryCard(date)];
 };
 
 /**

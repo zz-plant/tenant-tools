@@ -1,0 +1,91 @@
+---
+import "../styles/global.css";
+import { getAllProvisionCards, getReferenceRuleCards, type RuleCard } from "../data/rules";
+import { formatDate, formatTimelineDate } from "../lib/dateUtils";
+import SeoHead from "../components/SeoHead.astro";
+import AppHeader from "../components/AppHeader.astro";
+import HelpResources from "../components/HelpResources.astro";
+
+// Rules depend on the date (heat season, rules that start later), so this page is not prerendered.
+export const prerender = false;
+
+const today = formatDate(new Date());
+const sections: Array<{ title: string; cards: RuleCard[] }> = [
+  { title: "Chicago tenant rules (RLTO)", cards: getAllProvisionCards(today) },
+  { title: "Heat, deposits, and evictions", cards: getReferenceRuleCards(today) },
+];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Know your rights | Building Ledger"
+      description="Printable short guide to Chicago tenant rules, with sources and where to get help."
+      canonicalPath="/rights"
+      imagePath="/og/home.svg"
+      imageAlt="Building Ledger printable rights sheet"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader subtitle="Know your rights" backHref="/" backLabel="Notice builder" />
+    <div class="page">
+      <main class="layout print-report" id="main">
+        <section class="panel report-sheet rights-sheet">
+          <header class="report-header">
+            <p class="eyebrow">Building Ledger</p>
+            <h1>Chicago tenant rules: short guide</h1>
+            <p>Information only. Not legal advice. Rules can change. Check the sources.</p>
+            <p><strong>Date:</strong> {formatTimelineDate(today)}</p>
+          </header>
+          <div class="no-print report-actions">
+            <button class="button" type="button" data-print>Print or save as PDF</button>
+            <a class="button button-secondary" href="/">Back to notice builder</a>
+          </div>
+
+          {sections.map((section) => (
+            <section class="rights-section">
+              <h2>{section.title}</h2>
+              <ul class="rule-cards">
+                {section.cards.map((card) => (
+                  <li class="rule-card">
+                    <h3>{card.title}</h3>
+                    {card.section && <p class="rule-meta">{card.section}</p>}
+                    <p>{card.summary}</p>
+                    {card.details && (
+                      <ul class="rule-details">
+                        {card.details.map((detail) => <li>{detail}</li>)}
+                      </ul>
+                    )}
+                    {card.upcoming && (
+                      <div class="rule-upcoming">
+                        <p>
+                          <strong>Starting {formatTimelineDate(card.upcoming.startDate)}:</strong> {card.upcoming.summary}
+                        </p>
+                      </div>
+                    )}
+                    <ul class="rule-sources">
+                      {card.sources.map((source) => (
+                        <li>
+                          <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+
+          <section class="rights-section">
+            <HelpResources headingLevel="h2" />
+          </section>
+        </section>
+      </main>
+    </div>
+    <script>
+      document.querySelector("[data-print]")?.addEventListener("click", () => window.print());
+    </script>
+  </body>
+</html>

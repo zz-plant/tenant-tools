@@ -1,0 +1,35 @@
+---
+import { helpResourceGroups, helpResourcesLastReviewed, toTelHref } from "../data/helpResources";
+import { formatTimelineDate } from "../lib/dateUtils";
+
+export type Props = { headingLevel?: "h2" | "h3" };
+const { headingLevel = "h3" } = Astro.props;
+const Heading = headingLevel;
+const SubHeading = headingLevel === "h2" ? "h3" : "h4";
+---
+
+<div class="help-resources">
+  <Heading>Where to get help</Heading>
+  <p class="helper">Information only. Not legal advice. Building Ledger does not share your data with these groups.</p>
+  {helpResourceGroups.map((group) => (
+    <div class="help-group">
+      <SubHeading>{group.title}</SubHeading>
+      {group.note && <p class="helper">{group.note}</p>}
+      <ul class="help-list">
+        {group.items.map((item) => (
+          <li>
+            <a href={item.url} target="_blank" rel="noreferrer">{item.name}</a>
+            {item.phone && (
+              <>
+                {" · "}
+                <a href={toTelHref(item.phone)}>{item.phone}</a>
+              </>
+            )}
+            <span class="help-description">{item.description}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+  <p class="rule-meta">Last checked: {formatTimelineDate(helpResourcesLastReviewed)}</p>
+</div>

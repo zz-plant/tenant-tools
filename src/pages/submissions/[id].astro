@@ -7,7 +7,15 @@ import { RESIDENT_KEY_COOKIE, STEWARD_KEY_COOKIE } from "../../lib/api/requestGu
 import { isAccessKeyValid } from "../../lib/access";
 import { getEvidenceConfig } from "../../lib/storage/evidence";
 import { formatResidentReportCount } from "../../lib/buildingDashboard";
-import { formatTimelineDate } from "../../lib/dateUtils";
+import { formatDate, formatTimelineDate } from "../../lib/dateUtils";
+import { getFairNoticeRule } from "../../data/rules";
+import {
+  formatRecordEventLabel,
+  recordEventDefinitions,
+  recordEventGroups,
+  recordEventTypes,
+} from "../../lib/recordEvents";
+import { listRecordEvents } from "../../lib/storage/recordEvents";
 import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 import { reconcileReportCount } from "../../lib/domain/submissions";
 import { countReporterMarkers, fetchSubmissionRecord, saveSubmissionRecord } from "../../lib/storage/submissions";
@@ -16,6 +24,7 @@ import { formatIssueLabel } from "../../lib/noticeUtils";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 import AppHeader from "../../components/AppHeader.astro";
+import HelpResources from "../../components/HelpResources.astro";
 
 export const prerender = false;
 
@@ -73,7 +82,16 @@ const dashboardUrl =
     ? buildBuildingDashboardUrl({ buildingId: submissionRecord.building })
     : "";
 
-const timelineEntries = submissionRecord ? getSubmissionTimelineEntries(submissionRecord) : [];
+const today = formatDate(new Date());
+const recordEvents = submissionRecord && kv ? await listRecordEvents(kv, submissionRecord.id) : [];
+const timelineEntries = submissionRecord
+  ? getSubmissionTimelineEntries({ ...submissionRecord, events: recordEvents })
+  : [];
+const fairNoticeRule = getFairNoticeRule(today);
+const factTypesByGroup = recordEventGroups.map((group) => ({
+  ...group,
+  types: recordEventTypes.filter((type) => recordEventDefinitions[type].group === group.id),
+}));
 
 // Text for the resident group chat. It never includes the key, the building, or any details.
 const groupChatText = submissionRecord
@@ -210,6 +228,103 @@ const groupChatText = submissionRecord
                 )}
               </div>
 
+              {!mergedIntoUrl && (
+                <div
+                  class="export-block no-print"
+                  id="facts"
+                  data-record-facts
+                  data-submission-id={id}
+                  data-today={today}
+                  data-fair-notice-tiers={JSON.stringify(fairNoticeRule?.tiers ?? [])}
+                >
+                  <div>
+                    <h3>Add a dated fact</h3>
+                    <p class="helper">Add what happened after your notice. Choose from the list. Dates only. No names.</p>
+                    <p class="helper">Residents with the building key can see these facts.</p>
+                  </div>
+                  <form class="facts-form" data-facts-form>
+                    <label>
+                      What happened
+                      <select class="input" name="type" data-fact-type required>
+                        <option value="">Choose one</option>
+                        {factTypesByGroup.map((group) => (
+                          <optgroup label={group.label}>
+                            {group.types.map((type) => (
+                              <option value={type}>{recordEventDefinitions[type].label}</option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      <span data-fact-date-label>Date</span>
+                      <input class="input" type="date" name="date" data-fact-date required />
+                    </label>
+                    <label hidden data-fact-ref-field>
+                      <span data-fact-ref-label>Number (optional)</span>
+                      <input class="input" type="text" name="ref" maxlength="40" autocomplete="off" data-fact-ref />
+                    </label>
+                    <div class="helper" hidden data-after-request-note>
+                      <p>Keep these dates. The RLTO and Illinois law protect tenants who ask for repairs in good faith.</p>
+                      <p>
+                        <strong>Other residents with the building key can see this record.</strong>
+                        Add this only if you are comfortable with that. You can also keep the date in your own notes.
+                      </p>
+                    </div>
+                    {fairNoticeRule && (
+                      <div class="helper-card" hidden data-fair-notice-check>
+                        <p><strong>Was the notice on time?</strong> Information only. Nothing in this box is saved.</p>
+                        <label>
+                          How long have you lived here?
+                          <select class="input" data-fair-tier>
+                            <option value="">Choose one</option>
+                            {fairNoticeRule.tiers.map((tier) => (
+                              <option value={tier.id}>{tier.label}</option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          Date the rent increase or lease end starts
+                          <input class="input" type="date" data-fair-change-date />
+                        </label>
+                        <p class="helper" data-fair-result role="status" aria-live="polite"></p>
+                        <p class="rule-meta">
+                          Rule: {fairNoticeRule.section}.{" "}
+                          {fairNoticeRule.sources.map((source, index) => (
+                            <>
+                              {index > 0 && " · "}
+                              <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                            </>
+                          ))}
+                        </p>
+                      </div>
+                    )}
+                    <button class="button" type="submit" data-fact-submit>Add to timeline</button>
+                    <p class="helper" data-fact-status role="status" aria-live="polite"></p>
+                  </form>
+                  {isSteward && recordEvents.length > 0 && (
+                    <div class="steward-row">
+                      <p class="helper">Steward: remove a fact that was added by mistake.</p>
+                      <ul class="fact-list">
+                        {recordEvents.map((event) => (
+                          <li>
+                            {formatTimelineDate(event.date)}: {formatRecordEventLabel(event)}{" "}
+                            <button
+                              class="button button-compact button-secondary"
+                              type="button"
+                              data-fact-remove
+                              data-event-id={event.id}
+                            >
+                              Remove
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
 
 
               <div class="export-block share-checklist" id="share-checklist">
@@ -290,7 +405,8 @@ const groupChatText = submissionRecord
                     )}
                     {submissionRecord.ticketNumber && (
                       <li>
-                        <strong>311 ticket number:</strong> {submissionRecord.ticketNumber}
+                        <strong>311 ticket number:</strong> {submissionRecord.ticketNumber}.{" "}
+                        <a class="no-print" href="https://311.chicago.gov/s/" target="_blank" rel="noreferrer">Check a 311 request</a>
                       </li>
                     )}
                   </ul>
@@ -309,6 +425,10 @@ const groupChatText = submissionRecord
                 ) : submissionRecord.ticketDate || submissionRecord.ticketNumber ? null : (
                   <p class="helper">No details were saved.</p>
                 )}
+              </div>
+
+              <div class="export-block no-print">
+                <HelpResources />
               </div>
             </>
           ) : (
@@ -331,6 +451,7 @@ const groupChatText = submissionRecord
 
     <script>
       import "../../scripts/evidence.ts";
+      import "../../scripts/recordFacts.ts";
     </script>
     <script>
       const checks = Array.from(document.querySelectorAll('.share-check'));

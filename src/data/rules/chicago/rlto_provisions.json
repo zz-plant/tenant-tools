@@ -32,13 +32,28 @@
       "id": "pro_text_introduced",
       "title": "Protecting Renters Ordinance, text as introduced June 2026 (City Clerk attachment)",
       "url": "https://occprodstoragev1.blob.core.usgovcloudapi.net/matterattachmentspublic/64229515-0ddc-4f75-b72e-39d938a33745.pdf"
+    },
+    {
+      "id": "fair_notice_page",
+      "title": "Know Your Rights: Fair Notice Ordinance (City of Chicago)",
+      "url": "https://www.chicago.gov/city/en/depts/doh/provdrs/renters/svcs/know-your-rights--fair-notice-ordinance.html"
     }
   ],
   "provisions": [
     {
       "id": "notice_address",
       "title": "Where to send a written notice",
-      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building", "deposit", "lockout"],
+      "issues": [
+        "heat",
+        "leak",
+        "pests",
+        "entry",
+        "common",
+        "no-timeline",
+        "building",
+        "deposit",
+        "lockout"
+      ],
       "versions": [
         {
           "status": "law",
@@ -46,8 +61,14 @@
           "end_date": null,
           "section": "RLTO 5-12-090",
           "summary": "The landlord must give tenants, in writing, the name and address of the owner or manager. Send your written notices to that person.",
-          "details": ["Keep a copy of every notice.", "Write down the date you sent it."],
-          "source_ids": ["rlto_summary_en", "rlto_code"]
+          "details": [
+            "Keep a copy of every notice.",
+            "Write down the date you sent it."
+          ],
+          "source_ids": [
+            "rlto_summary_en",
+            "rlto_code"
+          ]
         },
         {
           "status": "proposed",
@@ -61,16 +82,87 @@
             "Keep a copy of every notice.",
             "Write down the date you sent it."
           ],
-          "source_ids": ["pro_text_introduced"],
+          "source_ids": [
+            "pro_text_introduced"
+          ],
           "app_impact": "Update the first next-step detail and the 311 guidance to mention email and text as allowed delivery when no notice address was given."
+        }
+      ]
+    },
+    {
+      "id": "fair_notice",
+      "title": "Notice before a rent increase or non-renewal",
+      "issues": [],
+      "versions": [
+        {
+          "status": "law",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-130(j)",
+          "summary": "Before raising rent or ending a lease, the landlord must give written notice. The time depends on how long you have lived there.",
+          "details": [
+            "Less than 6 months: at least 30 days.",
+            "6 months to 3 years: at least 60 days.",
+            "More than 3 years: at least 120 days.",
+            "This rule applies to all rental homes in Chicago, also those not covered by the rest of the RLTO."
+          ],
+          "notice_tiers": [
+            {
+              "id": "under_6_months",
+              "label": "Less than 6 months",
+              "days": 30
+            },
+            {
+              "id": "6_months_to_3_years",
+              "label": "6 months to 3 years",
+              "days": 60
+            },
+            {
+              "id": "over_3_years",
+              "label": "More than 3 years",
+              "days": 120
+            }
+          ],
+          "source_ids": [
+            "rlto_summary_en",
+            "fair_notice_page"
+          ]
+        },
+        {
+          "status": "proposed",
+          "proposal_id": "chicago.pro_2026",
+          "start_date": null,
+          "end_date": null,
+          "section": "RLTO 5-12-070(b), (c)",
+          "summary": "The introduced text would require 120 days' written notice for any rent increase, and 90 days' notice for a lease renewal offer.",
+          "details": [
+            "The September 16 substitute changes non-renewal notice for small landlords to 90 to 180 days."
+          ],
+          "source_ids": [
+            "pro_text_introduced"
+          ],
+          "app_impact": "Replace notice_tiers with the final periods. Rent increase and non-renewal may need separate tiers."
         }
       ]
     },
     {
       "id": "repair_request",
       "title": "Written repair request: 14 days",
-      "issues": ["heat", "leak", "pests", "common", "no-timeline", "building"],
-      "milestone_issues": ["leak", "pests", "common", "no-timeline", "building"],
+      "issues": [
+        "heat",
+        "leak",
+        "pests",
+        "common",
+        "no-timeline",
+        "building"
+      ],
+      "milestone_issues": [
+        "leak",
+        "pests",
+        "common",
+        "no-timeline",
+        "building"
+      ],
       "versions": [
         {
           "status": "law",
@@ -82,8 +174,15 @@
             "Before you hold back rent or pay for a repair yourself, talk to legal aid. These options have steps you must follow.",
             "Keep a copy of your request. Write down the date the landlord got it."
           ],
-          "timing": { "amount": 14, "unit": "days", "label": "14 days after first written notice (RLTO 5-12-110)" },
-          "source_ids": ["rlto_summary_en", "rlto_code"]
+          "timing": {
+            "amount": 14,
+            "unit": "days",
+            "label": "14 days after first written notice (RLTO 5-12-110)"
+          },
+          "source_ids": [
+            "rlto_summary_en",
+            "rlto_code"
+          ]
         },
         {
           "status": "proposed",
@@ -96,8 +195,14 @@
             "Before you hold back rent or pay for a repair yourself, talk to legal aid. These options have steps you must follow.",
             "Keep a copy of your request. Write down the date the landlord got it."
           ],
-          "timing": { "amount": 14, "unit": "days", "label": "14 days after first written notice (RLTO 5-12-110)" },
-          "source_ids": ["pro_text_introduced"],
+          "timing": {
+            "amount": 14,
+            "unit": "days",
+            "label": "14 days after first written notice (RLTO 5-12-110)"
+          },
+          "source_ids": [
+            "pro_text_introduced"
+          ],
           "app_impact": "No change to the 14-day period. Update the section label. The introduced text raises the repair-and-deduct limit and requires a licensed professional; the app does not show dollar limits."
         }
       ]
@@ -105,8 +210,13 @@
     {
       "id": "essential_services",
       "title": "No heat, water, gas, or power: 24 hours",
-      "issues": ["heat", "building"],
-      "milestone_issues": ["heat"],
+      "issues": [
+        "heat",
+        "building"
+      ],
+      "milestone_issues": [
+        "heat"
+      ],
       "versions": [
         {
           "status": "law",
@@ -119,8 +229,15 @@
             "These rules do not apply when the utility company caused the problem.",
             "Talk to legal aid before you hold back rent or move out."
           ],
-          "timing": { "amount": 24, "unit": "hours", "label": "24 hours after first written notice (RLTO 5-12-110(f))" },
-          "source_ids": ["rlto_summary_en", "rlto_code"]
+          "timing": {
+            "amount": 24,
+            "unit": "hours",
+            "label": "24 hours after first written notice (RLTO 5-12-110(f))"
+          },
+          "source_ids": [
+            "rlto_summary_en",
+            "rlto_code"
+          ]
         },
         {
           "status": "proposed",
@@ -135,8 +252,14 @@
             "These rules do not apply when the utility company caused the problem.",
             "Talk to legal aid before you hold back rent or move out."
           ],
-          "timing": { "amount": 24, "unit": "hours", "label": "24 hours after first written notice (RLTO 5-12-110(g))" },
-          "source_ids": ["pro_text_introduced"],
+          "timing": {
+            "amount": 24,
+            "unit": "hours",
+            "label": "24 hours after first written notice (RLTO 5-12-110(g))"
+          },
+          "source_ids": [
+            "pro_text_introduced"
+          ],
           "app_impact": "Consider an 'internet' quick fact for building-wide messages. Update the section label."
         }
       ]
@@ -144,7 +267,9 @@
     {
       "id": "entry_notice",
       "title": "Landlord entry: two days' notice",
-      "issues": ["entry"],
+      "issues": [
+        "entry"
+      ],
       "versions": [
         {
           "status": "law",
@@ -156,7 +281,10 @@
             "The law treats entry between 8:00 AM and 8:00 PM as reasonable.",
             "After an emergency entry, the landlord must tell you within two days."
           ],
-          "source_ids": ["rlto_summary_en", "rlto_code"]
+          "source_ids": [
+            "rlto_summary_en",
+            "rlto_code"
+          ]
         },
         {
           "status": "proposed",
@@ -170,7 +298,9 @@
             "After an emergency entry, the landlord must tell you within 48 hours.",
             "The landlord must keep a way to enter for repairs. Not being able to enter does not excuse missing basic repairs."
           ],
-          "source_ids": ["pro_text_introduced"],
+          "source_ids": [
+            "pro_text_introduced"
+          ],
           "app_impact": "Entry notices already say 48 hours. No template change needed."
         }
       ]
@@ -178,7 +308,16 @@
     {
       "id": "retaliation",
       "title": "Retaliation is not allowed",
-      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building", "lockout"],
+      "issues": [
+        "heat",
+        "leak",
+        "pests",
+        "entry",
+        "common",
+        "no-timeline",
+        "building",
+        "lockout"
+      ],
       "versions": [
         {
           "status": "law",
@@ -188,9 +327,13 @@
           "summary": "A landlord may not end your lease, raise rent, cut services, refuse to renew, or start an eviction because you asked for repairs in good faith.",
           "details": [
             "This also covers good-faith complaints to the City, like 311, and to community groups or tenant unions.",
-            "Illinois law has similar protections."
+            "Keep the dates. Under Illinois law, if the landlord acts within one year after a good-faith complaint, the law first assumes it is retaliation."
           ],
-          "source_ids": ["rlto_summary_en", "rlto_code", "il_retaliation_act"]
+          "source_ids": [
+            "rlto_summary_en",
+            "rlto_code",
+            "il_retaliation_act"
+          ]
         },
         {
           "status": "proposed",
@@ -202,9 +345,12 @@
           "details": [
             "This also covers good-faith complaints to the City, like 311, and to community groups or tenant unions.",
             "It also covers organizing with neighbors and complaints on social media.",
-            "Illinois law has similar protections."
+            "Keep the dates. Under Illinois law, if the landlord acts within one year after a good-faith complaint, the law first assumes it is retaliation."
           ],
-          "source_ids": ["pro_text_introduced", "il_retaliation_act"],
+          "source_ids": [
+            "pro_text_introduced",
+            "il_retaliation_act"
+          ],
           "app_impact": "Building-wide messages are protected organizing. Consider a short note on the building-wide message step."
         }
       ]
@@ -212,7 +358,9 @@
     {
       "id": "deposit_return",
       "title": "Security deposit return: 45 days",
-      "issues": ["deposit"],
+      "issues": [
+        "deposit"
+      ],
       "versions": [
         {
           "status": "law",
@@ -224,7 +372,10 @@
             "To deduct for damage, the landlord must send an itemized list within 30 days after you move out, with costs and receipts.",
             "The landlord must pay interest each year if it holds the deposit more than six months."
           ],
-          "source_ids": ["rlto_summary_en", "rlto_code"]
+          "source_ids": [
+            "rlto_summary_en",
+            "rlto_code"
+          ]
         },
         {
           "status": "proposed",
@@ -238,7 +389,10 @@
             "If you ask in writing for missing deposit information, the landlord has two business days to send it.",
             "To deduct for damage, the landlord must send an itemized list within 30 days after you move out, with costs and receipts."
           ],
-          "source_ids": ["pro_text_introduced", "pro_page"],
+          "source_ids": [
+            "pro_text_introduced",
+            "pro_page"
+          ],
           "app_impact": "The introduced text removes the interest-bearing account rule after the start date. Review the deposit interest card when the final text is known."
         }
       ]
@@ -246,7 +400,9 @@
     {
       "id": "lockout",
       "title": "Lockouts are not allowed",
-      "issues": ["lockout"],
+      "issues": [
+        "lockout"
+      ],
       "versions": [
         {
           "status": "law",
@@ -254,8 +410,13 @@
           "end_date": null,
           "section": "RLTO 5-12-160",
           "summary": "A landlord may not change locks, remove doors, remove your things, or shut off heat, water, or power to make you leave.",
-          "details": ["The Chicago Police Department enforces this rule."],
-          "source_ids": ["rlto_summary_en", "rlto_code"]
+          "details": [
+            "The Chicago Police Department enforces this rule."
+          ],
+          "source_ids": [
+            "rlto_summary_en",
+            "rlto_code"
+          ]
         },
         {
           "status": "proposed",
@@ -264,8 +425,12 @@
           "end_date": null,
           "section": "RLTO 5-12-160",
           "summary": "A landlord may not change locks, remove doors, remove your things, or shut off heat, water, power, or internet to make you leave.",
-          "details": ["The Chicago Police Department enforces this rule."],
-          "source_ids": ["pro_text_introduced"],
+          "details": [
+            "The Chicago Police Department enforces this rule."
+          ],
+          "source_ids": [
+            "pro_text_introduced"
+          ],
           "app_impact": "Add 'internet shut off' to lockout quick facts."
         }
       ]
@@ -273,7 +438,15 @@
     {
       "id": "rental_registry",
       "title": "Rental registry",
-      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building"],
+      "issues": [
+        "heat",
+        "leak",
+        "pests",
+        "entry",
+        "common",
+        "no-timeline",
+        "building"
+      ],
       "versions": [
         {
           "status": "proposed",
@@ -282,8 +455,13 @@
           "end_date": null,
           "section": "RLTO 5-12-175",
           "summary": "Owners must register each rental unit with the City every year. The City keeps a public, searchable list. It includes the contact for repair requests.",
-          "details": ["The landlord must give you a copy of the registration at the start of the lease."],
-          "source_ids": ["pro_text_introduced", "pro_page"],
+          "details": [
+            "The landlord must give you a copy of the registration at the start of the lease."
+          ],
+          "source_ids": [
+            "pro_text_introduced",
+            "pro_page"
+          ],
           "app_impact": "Add a link to the registry search so residents can find where to send repair requests. Do not store owner names in Building Ledger."
         }
       ]
@@ -291,7 +469,17 @@
     {
       "id": "rental_housing_bureau",
       "title": "Bureau of Rental Housing Services",
-      "issues": ["heat", "leak", "pests", "entry", "common", "no-timeline", "building", "deposit", "lockout"],
+      "issues": [
+        "heat",
+        "leak",
+        "pests",
+        "entry",
+        "common",
+        "no-timeline",
+        "building",
+        "deposit",
+        "lockout"
+      ],
       "versions": [
         {
           "status": "proposed",
@@ -301,7 +489,10 @@
           "section": "Municipal Code 2-44-200",
           "summary": "A new City bureau would receive 311 complaints about the RLTO and investigate them.",
           "details": [],
-          "source_ids": ["pro_text_introduced", "pro_page"],
+          "source_ids": [
+            "pro_text_introduced",
+            "pro_page"
+          ],
           "app_impact": "311 stays the next normal step. Update 311 guidance once the City publishes the 311 category name for RLTO complaints."
         }
       ]
@@ -309,7 +500,9 @@
     {
       "id": "tenant_organizing",
       "title": "Right to organize",
-      "issues": ["building"],
+      "issues": [
+        "building"
+      ],
       "versions": [
         {
           "status": "proposed",
@@ -319,7 +512,9 @@
           "section": "RLTO 5-12-035(a)(3)",
           "summary": "Tenants may form or join a tenant union, hand out flyers, and use common spaces to organize, as the law allows.",
           "details": [],
-          "source_ids": ["pro_text_introduced"],
+          "source_ids": [
+            "pro_text_introduced"
+          ],
           "app_impact": "Supports the building-wide message flow. No feature change needed."
         }
       ]
