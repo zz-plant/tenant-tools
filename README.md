@@ -29,6 +29,11 @@ Design choices prioritize:
 - Add dated facts to a record (replies, portal requests closed without a repair, entry offered, changes after a request)
 - Export summaries for inspection/legal-aid workflows
 - Print a short guide to Chicago tenant rules (`/rights`)
+- See what needs follow-up, log wins, and print a meeting report
+- Plan a group 311 day and write a meeting request to the alderperson
+- Print a starter kit for a new building group (`/kit`)
+
+Stewards can also count a door-knocking canvass (counts only), rotate building keys, export a building's data, and wipe it in an emergency (`/steward`).
 
 ## What contributors must protect
 
@@ -202,6 +207,7 @@ Use Conventional Commit style:
 - Pending legislation readiness (Chicago PRO / FAIR): `docs/pro-readiness-2026-10.md`
 - Organizing features and what was not built: `docs/organizing-features-2026-10.md`
 - Run your own copy (for unions): `docs/self-hosting.md`
+- Translation review (only reviewed text is shown): `docs/translations.md`
 - Internal competitor battlecard: `docs/competitor-battlecard-2026-03.md`
 - External homepage copy angles: `docs/external-homepage-copy-angles.md`
 - Core agent skill: `skills/building-ledger-agent/SKILL.md`

@@ -20,6 +20,22 @@ These features were inferred from public reporting. CUT did not review them.
 | 15 | Printable short guide to Chicago tenant rules | `/rights` | Rules in effect today only. Proposals are never shown. Prints source URLs. |
 | 18 | Where to get help: hotlines, legal aid, tenant unions | Builder help panel, record page, `/rights` | Referral information only. Tenant unions note says to talk to legal aid before changing how rent is paid (AGENTS.md §6.3). |
 
+## Built in 1.6.0 (second round)
+
+| # | Feature | Where | Safety notes |
+| --- | --- | --- | --- |
+| 1 | Union-run copy: self-hosting guide, building keys issued from the site | `docs/self-hosting.md`, `/steward` | Keys stored as hashes only. Shown once. |
+| 2 | Key rotation, data export, emergency wipe | `/steward` | Export has no names, keys, or evidence files. Wipe needs the building name typed to confirm. All steps audited by building hash. |
+| 3 | Needs follow-up list | Building dashboard | Facts and dates only. |
+| 4 | Meeting report | `/buildings/{id}/meeting` | Counts under 3 show as `<3`. |
+| 5 | Wins: repair completed, fixed after our letter, fixed after a 311 request | Record page facts; dashboard; meeting report | Fixed list. No free text. |
+| 6 | Canvass tally | `/buildings/{id}/canvass` (stewards) | Counts only. No names, units, or notes. |
+| 7 | Group 311 day | `/buildings/{id}/311` | Open problems that have 311 guidance. Shared message has no address or key. |
+| 8 | Starter kit with QR code | `/kit` | QR code goes to `/rights`. It never holds a key. |
+| 9 | Meeting request letter to the alderperson | `/buildings/{id}/letter` | Calm, factual. Asks for a meeting. No accusations. |
+| 10 | Translation review workflow | `bun run translations`, `docs/translations.md` | Only reviewed text is shown (AGENTS.md §14). |
+| 11 | Spanish rules guide | `/rights?lang=es` | Draft text only so far. Not shown until reviewed. |
+
 ## Not built
 
 | # | Suggestion | Reason |

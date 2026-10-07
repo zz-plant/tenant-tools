@@ -74,6 +74,8 @@ KV (`SUBMISSIONS_KV`):
 | `metoo:{id}:{sha256(id:sessionId)}` | One "me too" per browser session per record. No TTL. |
 | `evidence:{id}:{evidenceId}` | Evidence metadata: random object key, type, size, date. |
 | `revt:{id}:{eventId}` | One dated fact on a record (type, date, optional short number). List metadata holds the fact. |
+| `canvass:{buildingHash}:{canvassId}` | One canvass: date, households reached, count per issue. No free text. |
+| `config:building-keys` | Steward-issued building keys, stored as SHA-256 hashes only. |
 | `report:*`, `audit:*`, `rate:*` | Report log, audit events, and rate limits (all with TTL). |
 
 `buildingHash` is a one-way hash, so no key shows a street address.
@@ -127,6 +129,28 @@ The builder gets only the building ids the cookie unlocks, never the key.
 1. `POST /api/submissions/:id/status`
 2. Validate status enum + steward key
 3. Update `submission:{id}`
+
+### Building keys issued by a steward
+
+1. `POST /api/steward/keys` with `{ "building": "<id>" }`, steward key required. Returns a new key once, with `Cache-Control: no-store`.
+2. Only `sha256("building-key:v1:" + KEY)` is saved in `config:building-keys`.
+3. Middleware hashes each key the request presents (cookie, `?key=`, `x-building-key`) and compares it with the registry. It gives that request its own copy of env with a `BUILDING_KEYS_JSON` overlay. The shared env is never changed.
+4. A registry entry always wins over deploy settings. If no presented key matches, the building gets a random value no one can present. So an issued key also rotates out the settings key.
+5. The registry is read with a 60-second edge cache. A rotation takes effect within about a minute.
+6. `DELETE /api/steward/keys` removes an issued key. The building goes back to its deploy-settings key, if it has one.
+
+### Export and emergency wipe (steward)
+
+- `GET /api/steward/export?building=<id>&format=csv|json` returns records, dated facts, and canvass counts. No keys, "me too" markers, or evidence files. CSV cells that start with `= + - @` get a leading quote.
+- `POST /api/steward/wipe` with `{ "building": "<id>", "confirm": "<id>" }` deletes up to 5 records per call: evidence (R2 and KV), facts, "me too" markers, report log, the record, and its index entry. The steward page calls it until `remaining` is false. Canvass counts are deleted last. Audit entries keep only the building hash.
+
+### Canvass (steward)
+
+`POST /api/buildings/canvass` saves one canvass for a building: date, households reached, and a count per issue (whole numbers 0 to 999, no count above households reached). `DELETE` removes one. Both are steward-only, rate limited, and audited. Residents see counts bucketed (`<3`).
+
+### Translations
+
+Catalogs in `src/data/i18n/catalog.<lang>.json` store each string with `status` (`draft` or `reviewed`) and a hash of the English source. Residents see only `reviewed` text whose source hash still matches. `?preview=drafts` shows drafts with a banner and `noindex`. See `docs/translations.md`.
 
 ## Security and privacy controls
 
