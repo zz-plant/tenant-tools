@@ -3,11 +3,9 @@ import "../../styles/global.css";
 import { issueOptions } from "../../data/noticeData";
 import { isAccessKeyValid, isBuildingAccessValid } from "../../lib/access";
 import { RESIDENT_KEY_COOKIE, STEWARD_KEY_COOKIE } from "../../lib/api/requestGuard";
-import {
-  formatResidentReportCount,
-  loadBuildingSubmissions,
-  type BuildingSubmission,
-} from "../../lib/buildingDashboard";
+import { formatResidentReportCount, type BuildingSubmission } from "../../lib/buildingDashboard";
+import { loadBuildingDetail } from "../../lib/buildingDetail";
+import { buildFollowUpItems, summarizeWins } from "../../lib/followUp";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
 import { buildIssuePatterns } from "../../lib/issuePatterns";
 import { formatDate } from "../../lib/dateUtils";
@@ -59,10 +57,13 @@ const activeIssueLabel = issueFilter === "all"
   : (issueOptions.find((issue) => issue.id === issueFilter)?.label ?? issueFilter);
 const activeStatusLabel = statusFilter === "all" ? "" : statusLabels[statusFilter as SubmissionStatus];
 
-const submissions: BuildingSubmission[] =
-  hasAccess && kv && buildingId
-    ? await loadBuildingSubmissions({ kv, buildingId })
-    : [];
+const today = formatDate(new Date());
+// Archived records are left out of the full reads: they are not followed up, and wins are logged on open or resolved records.
+const detail =
+  hasAccess && kv && buildingId ? await loadBuildingDetail(kv, buildingId, { statuses: ["open", "resolved"] }) : null;
+const submissions: BuildingSubmission[] = detail?.summaries ?? [];
+const followUpItems = detail ? buildFollowUpItems(detail.records, detail.eventsByRecord, today) : [];
+const wins = detail ? summarizeWins(detail.records, detail.eventsByRecord) : { total: 0, afterLetter: 0, after311: 0 };
 
 const filtered = submissions
   .filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter))
@@ -89,7 +90,7 @@ const mergeTargetsFor = (record: BuildingSubmission) =>
   );
 
 const totalVisible = visibleSubmissions.length;
-const patterns = buildIssuePatterns(submissions, formatDate(new Date()));
+const patterns = buildIssuePatterns(submissions, today);
 const totalFiltered = filtered.length;
 ---
 <!DOCTYPE html>
@@ -177,7 +178,26 @@ const totalFiltered = filtered.length;
                   <p class="summary-label">Archived</p>
                   <p class="summary-value" data-summary-count="archived">{formatResidentReportCount(grouped.archived.length)}</p>
                 </div>
+                <div class="summary-card">
+                  <p class="summary-label">Wins logged</p>
+                  <p class="summary-value">{wins.total}</p>
+                </div>
               </div>
+              {followUpItems.length > 0 && (
+                <details class="helper-card follow-up" open>
+                  <summary>Needs follow-up ({followUpItems.length})</summary>
+                  <div class="helper-card-body">
+                    <ul class="fact-list">
+                      {followUpItems.map((item) => (
+                        <li>
+                          <a href={buildSubmissionDetailsUrl({ submissionId: item.recordId })}>{item.issueLabel}</a>: {item.message}
+                        </li>
+                      ))}
+                    </ul>
+                    <p class="helper">Information only. The next normal step depends on your building. Ask a tenant group or legal aid if you are not sure.</p>
+                  </div>
+                </details>
+              )}
 
               {patterns.rows.length > 0 && (
                 <details class="helper-card patterns">
@@ -403,6 +423,11 @@ const totalFiltered = filtered.length;
                   <a class="button button-secondary" href="/steward">Open steward tools</a>
                 </div>
               )}
+              <div class="export-block">
+                <h3>Meeting report</h3>
+                <p class="helper">One page for your group: what needs follow-up, deadlines, open problems, and wins.</p>
+                <a class="button button-secondary" href={`${clearFiltersUrl}/meeting`}>Open meeting report</a>
+              </div>
               <div class="export-block">
                 <h3>Joint letter</h3>
                 <p class="helper">One letter from many households. It lists open problems and asks for a written repair plan by a date.</p>

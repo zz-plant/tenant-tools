@@ -15,6 +15,10 @@ export const recordEventTypes = [
   "portal_marked_complete",
   "entry_offered",
   "inspection_done",
+  "request_311_filed",
+  "repair_completed",
+  "fixed_after_letter",
+  "fixed_after_311",
   "rent_increase_notice",
   "nonrenewal_notice",
   "service_reduced",
@@ -23,7 +27,7 @@ export const recordEventTypes = [
 
 export type RecordEventType = (typeof recordEventTypes)[number];
 
-export type RecordEventGroup = "follow_up" | "access" | "city" | "after_request";
+export type RecordEventGroup = "follow_up" | "access" | "city" | "result" | "after_request";
 
 type RecordEventDefinition = {
   label: string;
@@ -76,6 +80,20 @@ export const recordEventDefinitions: Record<RecordEventType, RecordEventDefiniti
     refLabel: "Inspection or 311 number (optional)",
     refPrefix: "number",
   },
+  request_311_filed: {
+    label: "311 request filed",
+    group: "city",
+    dateLabel: "Date of the 311 request",
+    refLabel: "311 request number (optional)",
+    refPrefix: "number",
+  },
+  repair_completed: { label: "Repair completed", group: "result", dateLabel: "Date it was fixed" },
+  fixed_after_letter: { label: "Fixed after the joint letter", group: "result", dateLabel: "Date it was fixed" },
+  fixed_after_311: {
+    label: "Fixed after a 311 request or inspection",
+    group: "result",
+    dateLabel: "Date it was fixed",
+  },
   rent_increase_notice: {
     label: "Rent increase notice received",
     group: "after_request",
@@ -102,8 +120,12 @@ export const recordEventGroups: Array<{ id: RecordEventGroup; label: string }> =
   { id: "follow_up", label: "Management follow-up" },
   { id: "access", label: "Entry for repairs" },
   { id: "city", label: "City" },
+  { id: "result", label: "Result" },
   { id: "after_request", label: "Changes after a repair request" },
 ];
+
+/** Facts that record a win: the problem was fixed. */
+export const winEventTypes = recordEventTypes.filter((type) => recordEventDefinitions[type].group === "result");
 
 /** Fact types that are not shown in summaries meant for management. */
 export const afterRequestEventTypes = recordEventTypes.filter(
@@ -216,6 +238,10 @@ const followUpSummaryLabels: Partial<Record<RecordEventType, string>> = {
   entry_offered: "Entry offered",
   management_replied: "Management replies",
   inspection_done: "City inspections",
+  request_311_filed: "311 requests",
+  repair_completed: "Repair completed",
+  fixed_after_letter: "Fixed after joint letter",
+  fixed_after_311: "Fixed after 311",
 };
 
 /**
