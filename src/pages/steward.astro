@@ -1,0 +1,190 @@
+---
+import "../styles/global.css";
+import { isAccessKeyValid } from "../lib/access";
+import { listKnownBuildings, loadKeyRegistry, emptyKeyRegistry } from "../lib/access/registry";
+import { STEWARD_KEY_COOKIE } from "../lib/api/requestGuard";
+import { formatTimelineDate } from "../lib/dateUtils";
+import { buildBuildingDashboardUrl } from "../lib/navigation";
+import SeoHead from "../components/SeoHead.astro";
+import AccessKeyPanel from "../components/AccessKeyPanel.astro";
+import AppHeader from "../components/AppHeader.astro";
+
+export const prerender = false;
+
+const env = Astro.locals.runtime?.env ?? {};
+const kv = env.SUBMISSIONS_KV;
+const stewardKey = Astro.cookies.get(STEWARD_KEY_COOKIE)?.value ?? null;
+const isSteward = isAccessKeyValid(stewardKey, env.STEWARD_KEY);
+const hasAttempt = Boolean(stewardKey && stewardKey.trim());
+
+// The settings list is read from the deploy setting, not the per-request overlay, so the source is accurate.
+const settingsJson = typeof env.BUILDING_KEYS_JSON === "string" ? env.BUILDING_KEYS_JSON : undefined;
+const registry = isSteward && kv ? await loadKeyRegistry(kv, { fresh: true }) : emptyKeyRegistry();
+// Middleware replaced BUILDING_KEYS_JSON with an overlay. Registry buildings are in both, so the
+// list is right either way. The source column uses the registry.
+const buildings = isSteward ? listKnownBuildings(settingsJson, registry) : [];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Steward tools | Building Ledger"
+      description="Private steward tools for building keys and data."
+      canonicalPath="/steward"
+      imagePath="/og/private-dashboard.svg"
+      imageAlt="Building Ledger steward tools"
+      noindex={true}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader subtitle="Steward tools" backHref="/" backLabel="Notice builder" isSteward={isSteward} />
+    <div class="page">
+      <main class="layout" id="main">
+        {!isSteward ? (
+          <section class="panel">
+            <AccessKeyPanel
+              title="Steward key required"
+              helperLines={[
+                "These tools change building keys and data.",
+                "Only stewards have this key. It works for 15 minutes on this device.",
+              ]}
+              warning="Do not share the steward key."
+              errorMessage={hasAttempt ? "Steward key does not match." : ""}
+              backLabel="Back to notice builder"
+              keyLabel="Steward key"
+              keyPlaceholder="Paste steward key"
+              fieldName="stewardKey"
+            />
+          </section>
+        ) : !kv ? (
+          <section class="panel">
+            <h1>Ledger storage is not configured.</h1>
+            <p class="helper">Connect SUBMISSIONS_KV first. See docs/self-hosting.md.</p>
+          </section>
+        ) : (
+          <>
+            <section class="panel" data-steward-tools>
+              <div>
+                <p class="eyebrow">Steward tools</p>
+                <h1>Building keys</h1>
+                <p class="helper">Residents need the building key to see records. Issue a new key if the old one reached management or someone outside the building.</p>
+                <p class="helper">The old key stops working within about a minute. Residents with the old key must use the new one.</p>
+              </div>
+
+              <div class="table-scroll">
+                <table class="report-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Building</th>
+                      <th scope="col">Key</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {buildings.length === 0 ? (
+                      <tr><td colspan="3">No buildings yet. Add one below.</td></tr>
+                    ) : (
+                      buildings.map((building) => {
+                        const issued = registry.buildings[building];
+                        return (
+                          <tr>
+                            <th scope="row">
+                              <a href={buildBuildingDashboardUrl({ buildingId: building })}>{building}</a>
+                            </th>
+                            <td>
+                              {issued
+                                ? `Issued here on ${formatTimelineDate(issued.issuedAt.slice(0, 10))}`
+                                : "From deploy settings"}
+                            </td>
+                            <td>
+                              <div class="report-actions steward-actions">
+                                <button class="button button-compact" type="button" data-issue-key={building}>
+                                  {issued ? "Issue a new key" : "Replace with a new key"}
+                                </button>
+                                {issued && (
+                                  <button class="button button-compact button-secondary" type="button" data-remove-key={building}>
+                                    Remove issued key
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <form class="facts-form" data-add-building>
+                <label>
+                  Add a building (street address, no unit number)
+                  <input class="input" type="text" name="building" maxlength="120" autocomplete="off" required />
+                </label>
+                <button class="button button-secondary" type="submit">Add building and issue a key</button>
+              </form>
+
+              <div class="helper-card" hidden data-new-key>
+                <p><strong>New key for <span data-new-key-building></span></strong></p>
+                <p class="new-key" data-new-key-value></p>
+                <p class="helper">This key is shown only once. Copy it now.</p>
+                <p class="helper">Resident link (the key moves into a private cookie when opened):</p>
+                <p class="new-key-link" data-new-key-link></p>
+                <div class="report-actions">
+                  <button class="button button-compact" type="button" data-copy-new-key>Copy key</button>
+                  <button class="button button-compact button-secondary" type="button" data-copy-new-link>Copy resident link</button>
+                </div>
+                <p class="helper">Share it in person or in the private group chat. Never post it in public.</p>
+              </div>
+              <p class="helper" data-steward-status role="status" aria-live="polite"></p>
+            </section>
+
+            <section class="panel">
+              <h2>Export data</h2>
+              <p class="helper">Download all records and dated facts for a building. Use it for your own records or a lawyer. No names, keys, or photos are included.</p>
+              <ul class="help-list">
+                {buildings.map((building) => {
+                  const query = `building=${encodeURIComponent(building)}`;
+                  return (
+                    <li>
+                      {building}:{" "}
+                      <a href={`/api/steward/export?${query}&format=csv`}>Spreadsheet (CSV)</a>
+                      {" · "}
+                      <a href={`/api/steward/export?${query}&format=json`}>Full data (JSON)</a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+
+            <section class="panel" data-wipe>
+              <h2>Emergency wipe</h2>
+              <p class="helper">Use this only if the building's records are no longer safe. It deletes every record, dated fact, "me too" count, canvass, and photo for the building. This cannot be undone.</p>
+              <p class="helper">Export the data first if you want to keep a copy. Then issue a new key.</p>
+              <form class="facts-form" data-wipe-form>
+                <label>
+                  Building
+                  <select class="input" name="building" required>
+                    <option value="">Choose a building</option>
+                    {buildings.map((building) => <option value={building}>{building}</option>)}
+                  </select>
+                </label>
+                <label>
+                  Type the building name exactly to confirm
+                  <input class="input" type="text" name="confirm" autocomplete="off" required />
+                </label>
+                <button class="button button-danger" type="submit">Delete all data for this building</button>
+              </form>
+              <p class="helper" data-wipe-status role="status" aria-live="polite"></p>
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+    <script>
+      import "../scripts/steward.ts";
+    </script>
+  </body>
+</html>

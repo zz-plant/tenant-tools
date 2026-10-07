@@ -949,6 +949,7 @@ ul.rule-cards {
   gap: 8px;
 }
 
+.rule-card h2,
 .rule-card h3,
 .rule-card h4 {
   margin: 0;
@@ -1233,7 +1234,8 @@ ul.rule-cards {
 }
 
 /* The display rules above would otherwise override the hidden attribute. */
-.facts-form [hidden] {
+.facts-form [hidden],
+fieldset.facts-form[hidden] {
   display: none !important;
 }
 
@@ -1303,5 +1305,171 @@ fieldset.facts-form {
     font-size: 8pt;
     word-break: break-all;
   }
+}
+
+.new-key,
+.new-key-link {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05rem;
+  word-break: break-all;
+  user-select: all;
+}
+
+.new-key {
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+}
+
+.steward-actions {
+  margin: 0;
+}
+
+.button-danger {
+  background: #9a2b2b;
+  border-color: #9a2b2b;
+  color: #ffffff;
+}
+
+.tally-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tally-label {
+  font-weight: 500;
+}
+
+.tally-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tally-button {
+  min-width: 48px;
+  min-height: 48px;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.tally-count {
+  min-width: 3ch;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.kit-sheet {
+  display: grid;
+  gap: 20px;
+}
+
+.kit-flyer {
+  border: 2px solid var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.kit-flyer-title {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.kit-flyer-lead {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.kit-flyer-list {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+  font-size: 1.05rem;
+}
+
+.kit-flyer-meeting p {
+  margin: 4px 0;
+  font-size: 1.05rem;
+}
+
+.kit-flyer-qr {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.kit-flyer-qr p {
+  margin: 2px 0;
+}
+
+.kit-qr {
+  width: 140px;
+  height: 140px;
+  background: #ffffff;
+  flex: none;
+}
+
+.kit-qr svg {
+  width: 100%;
+  height: 100%;
+}
+
+.kit-url {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  word-break: break-all;
+}
+
+.kit-checklist ol,
+.kit-steps ol {
+  display: grid;
+  gap: 6px;
+  padding-left: 22px;
+}
+
+@media print {
+  .kit-flyer {
+    border: 2pt solid #000000 !important;
+    break-after: page;
+    min-height: 23cm;
+  }
+
+  .kit-flyer-title {
+    font-size: 30pt !important;
+  }
+
+  .kit-flyer-lead {
+    font-size: 18pt !important;
+  }
+
+  .kit-flyer-list,
+  .kit-flyer-meeting p {
+    font-size: 14pt !important;
+  }
+
+  .kit-qr {
+    width: 4.5cm;
+    height: 4.5cm;
+  }
+}
+
+.rights-languages {
+  display: flex;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.rights-languages a[aria-current="page"] {
+  font-weight: 600;
+  text-decoration: none;
 }
 

@@ -7,6 +7,11 @@ export type AuditEventAction =
   | "submission.merge"
   | "submission.event.add"
   | "submission.event.remove"
+  | "building.key.issue"
+  | "building.key.remove"
+  | "building.export"
+  | "building.wipe"
+  | "building.canvass.save"
   | "evidence.upload"
   | "evidence.delete";
 

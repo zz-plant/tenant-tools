@@ -1,0 +1,134 @@
+---
+import "../../../styles/global.css";
+import { isAccessKeyValid } from "../../../lib/access";
+import { STEWARD_KEY_COOKIE } from "../../../lib/api/requestGuard";
+import { canvassIssueIds, canvassIssueLabels } from "../../../lib/canvass";
+import { formatDate, formatTimelineDate } from "../../../lib/dateUtils";
+import { buildBuildingDashboardUrl } from "../../../lib/navigation";
+import { listCanvasses } from "../../../lib/storage/canvass";
+import SeoHead from "../../../components/SeoHead.astro";
+import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
+import AppHeader from "../../../components/AppHeader.astro";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const env = Astro.locals.runtime?.env ?? {};
+const kv = env.SUBMISSIONS_KV;
+const buildingId = decodeURIComponent(id ?? "");
+const stewardKey = Astro.cookies.get(STEWARD_KEY_COOKIE)?.value ?? null;
+const isSteward = isAccessKeyValid(stewardKey, env.STEWARD_KEY);
+const hasAttempt = Boolean(stewardKey && stewardKey.trim());
+const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
+const today = formatDate(new Date());
+const canvasses = isSteward && kv && buildingId ? await listCanvasses(kv, buildingId) : [];
+const exactTallies = (tallies: (typeof canvasses)[number]["tallies"]) =>
+  canvassIssueIds
+    .filter((issue) => tallies[issue])
+    .map((issue) => `${canvassIssueLabels[issue]}: ${tallies[issue]}`)
+    .join(". ");
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Canvass tally | Building Ledger"
+      description="Private steward tool to count households with each problem during door-knocking."
+      canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/canvass`}
+      imagePath="/og/private-dashboard.svg"
+      imageAlt="Building Ledger canvass tally"
+      noindex={true}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Building Ledger"
+      subtitle={`Canvass: ${buildingId || "Not listed"}`}
+      backHref={dashboardUrl}
+      backLabel="Building dashboard"
+      isSteward={isSteward}
+    />
+    <div class="page">
+      <main class="layout" id="main">
+        {!isSteward ? (
+          <section class="panel">
+            <AccessKeyPanel
+              title="Steward key required"
+              helperLines={["Canvass counts are saved by stewards, so counts cannot be added twice by mistake."]}
+              warning="Do not share the steward key."
+              errorMessage={hasAttempt ? "Steward key does not match." : ""}
+              backLabel="Back to notice builder"
+              keyLabel="Steward key"
+              keyPlaceholder="Paste steward key"
+              fieldName="stewardKey"
+            />
+          </section>
+        ) : (
+          <>
+            <section class="panel" data-canvass data-building={buildingId}>
+              <div>
+                <p class="eyebrow">Canvass tally</p>
+                <h1>Count problems door to door</h1>
+                <p class="helper">Tap + for each household that has the problem. Count households, not people.</p>
+                <p class="helper">Do not write unit numbers or names anywhere. Only the counts are saved.</p>
+                <p class="helper">Counts stay on this phone until you save, even if the page reloads.</p>
+              </div>
+              <form class="facts-form" data-canvass-form>
+                <label>
+                  Canvass date
+                  <input class="input" type="date" name="date" value={today} max={today} required />
+                </label>
+                <div class="tally-row">
+                  <span class="tally-label">Households reached</span>
+                  <div class="tally-controls">
+                    <button class="button button-secondary tally-button" type="button" data-step="-1" data-field="householdsReached" aria-label="One fewer household reached">−</button>
+                    <output class="tally-count" data-count="householdsReached">0</output>
+                    <button class="button tally-button" type="button" data-step="1" data-field="householdsReached" aria-label="One more household reached">+</button>
+                  </div>
+                </div>
+                {canvassIssueIds.map((issue) => (
+                  <div class="tally-row">
+                    <span class="tally-label">{canvassIssueLabels[issue]}</span>
+                    <div class="tally-controls">
+                      <button class="button button-secondary tally-button" type="button" data-step="-1" data-field={issue} aria-label={`One fewer household with ${canvassIssueLabels[issue]}`}>−</button>
+                      <output class="tally-count" data-count={issue}>0</output>
+                      <button class="button tally-button" type="button" data-step="1" data-field={issue} aria-label={`One more household with ${canvassIssueLabels[issue]}`}>+</button>
+                    </div>
+                  </div>
+                ))}
+                <div class="report-actions">
+                  <button class="button" type="submit">Save canvass</button>
+                  <button class="button button-secondary" type="button" data-canvass-reset>Start over</button>
+                </div>
+                <p class="helper" data-canvass-status role="status" aria-live="polite"></p>
+              </form>
+            </section>
+
+            <section class="panel">
+              <h2>Saved canvasses</h2>
+              {canvasses.length === 0 ? (
+                <p class="helper">None yet.</p>
+              ) : (
+                <ul class="fact-list">
+                  {canvasses.map((canvass) => (
+                    <li>
+                      <strong>{formatTimelineDate(canvass.date)}:</strong>{" "}
+                      {`${canvass.householdsReached} households reached. ${exactTallies(canvass.tallies)}.`}{" "}
+                      <button class="button button-compact button-secondary" type="button" data-canvass-remove={canvass.id}>Remove</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p class="helper">Residents see these counts on the dashboard and in letters. Counts under 3 show as &lt;3.</p>
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+    <script>
+      import "../../../scripts/canvass.ts";
+    </script>
+  </body>
+</html>

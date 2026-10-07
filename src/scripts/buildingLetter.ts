@@ -3,6 +3,7 @@ import {
   describeBuildingLetter,
   type LetterCopyRecipient,
   type LetterIssue,
+  type LetterKind,
 } from "../lib/buildingLetter";
 
 /*
@@ -34,6 +35,14 @@ if (root && output) {
   const wardInput = root.querySelector<HTMLInputElement>("[data-letter-ward]");
   const simpleInput = root.querySelector<HTMLInputElement>("[data-letter-simple]");
   const saveButton = document.querySelector<HTMLButtonElement>("[data-letter-save]");
+  const alderpersonFields = root.querySelector<HTMLElement>("[data-alderperson-fields]");
+  const copyFields = root.querySelector<HTMLElement>("[data-copy-fields]");
+  const managementDateInput = root.querySelector<HTMLInputElement>("[data-letter-management-date]");
+  const noPlanInput = root.querySelector<HTMLInputElement>("[data-letter-no-plan]");
+  const attachSummaryInput = root.querySelector<HTMLInputElement>("[data-letter-attach-summary]");
+
+  const readKind = (): LetterKind =>
+    root.querySelector<HTMLInputElement>("[data-letter-kind]:checked")?.value === "alderperson" ? "alderperson" : "management";
 
   const setStatus = (message: string) => {
     if (status) {
@@ -53,6 +62,10 @@ if (root && output) {
   const readLetter = () => {
     const ward = Number(wardInput?.value);
     return buildBuildingLetter({
+      kind: readKind(),
+      managementLetterDate: managementDateInput?.value || undefined,
+      noPlanReceived: Boolean(noPlanInput?.checked),
+      attachSummary: Boolean(attachSummaryInput?.checked),
       building,
       today,
       issues: selectedIssues(),
@@ -67,6 +80,17 @@ if (root && output) {
   };
 
   const render = () => {
+    const alderperson = readKind() === "alderperson";
+    if (alderpersonFields) {
+      alderpersonFields.hidden = !alderperson;
+    }
+    // The alderperson letter asks for a meeting, not a reply date, so the date is not shown or saved.
+    root.querySelectorAll<HTMLElement>("[data-reply-field]").forEach((field) => {
+      field.hidden = alderperson;
+    });
+    if (copyFields) {
+      copyFields.hidden = alderperson;
+    }
     output.textContent = readLetter();
   };
 
@@ -87,7 +111,7 @@ if (root && output) {
 
   saveButton?.addEventListener("click", async () => {
     const issues = selectedIssues();
-    const replyBy = replyByInput?.value || "";
+    const replyBy = readKind() === "management" ? replyByInput?.value || "" : "";
     if (issues.length === 0) {
       setStatus("Choose at least one problem.");
       return;
@@ -110,7 +134,7 @@ if (root && output) {
           reportCount: 1,
           simpleEnglish: Boolean(simpleInput?.checked),
           zone: "",
-          issueDetails: { issueDescription: describeBuildingLetter(issues.length) },
+          issueDetails: { issueDescription: describeBuildingLetter(issues.length, readKind()) },
         }),
       });
       const createdPayload = await created.json().catch(() => ({}));

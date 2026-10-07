@@ -1,22 +1,24 @@
 ---
 import { helpResourceGroups, helpResourcesLastReviewed, toTelHref } from "../data/helpResources";
-import { formatTimelineDate } from "../lib/dateUtils";
+import { rightsStrings } from "../data/i18n/strings";
+import { formatDateForLocale } from "../data/rules";
+import { englishTranslate, type Translate } from "../lib/i18n/translate";
 
-export type Props = { headingLevel?: "h2" | "h3" };
-const { headingLevel = "h3" } = Astro.props;
+export type Props = { headingLevel?: "h2" | "h3"; t?: Translate; locale?: string };
+const { headingLevel = "h3", t = englishTranslate, locale = "en-US" } = Astro.props;
 const Heading = headingLevel;
 const SubHeading = headingLevel === "h2" ? "h3" : "h4";
 ---
 
 <div class="help-resources">
-  <Heading>Where to get help</Heading>
-  <p class="helper">Information only. Not legal advice. Building Ledger does not share your data with these groups.</p>
+  <Heading>{t("help.title", rightsStrings["help.title"])}</Heading>
+  <p class="helper">{t("help.intro", rightsStrings["help.intro"])}</p>
   {helpResourceGroups.map((group) => (
     <div class="help-group">
-      <SubHeading>{group.title}</SubHeading>
-      {group.note && <p class="helper">{group.note}</p>}
+      <SubHeading>{t(`help.${group.id}.title`, group.title)}</SubHeading>
+      {group.note && <p class="helper">{t(`help.${group.id}.note`, group.note)}</p>}
       <ul class="help-list">
-        {group.items.map((item) => (
+        {group.items.map((item, index) => (
           <li>
             <a href={item.url} target="_blank" rel="noreferrer">{item.name}</a>
             {item.phone && (
@@ -25,11 +27,13 @@ const SubHeading = headingLevel === "h2" ? "h3" : "h4";
                 <a href={toTelHref(item.phone)}>{item.phone}</a>
               </>
             )}
-            <span class="help-description">{item.description}</span>
+            <span class="help-description">{t(`help.${group.id}.item.${index}.description`, item.description)}</span>
           </li>
         ))}
       </ul>
     </div>
   ))}
-  <p class="rule-meta">Last checked: {formatTimelineDate(helpResourcesLastReviewed)}</p>
+  <p class="rule-meta">
+    {t("help.last_checked", rightsStrings["help.last_checked"], { date: formatDateForLocale(helpResourcesLastReviewed, locale) })}
+  </p>
 </div>

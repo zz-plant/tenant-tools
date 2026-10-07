@@ -1,0 +1,172 @@
+---
+import "../../../styles/global.css";
+import { isBuildingAccessValid } from "../../../lib/access";
+import { RESIDENT_KEY_COOKIE } from "../../../lib/api/requestGuard";
+import { loadBuildingDetail } from "../../../lib/buildingDetail";
+import { formatDate, formatTimelineDate } from "../../../lib/dateUtils";
+import { buildMeetingReport } from "../../../lib/followUp";
+import { listCanvasses } from "../../../lib/storage/canvass";
+import { buildBuildingDashboardUrl } from "../../../lib/navigation";
+import SeoHead from "../../../components/SeoHead.astro";
+import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
+import AppHeader from "../../../components/AppHeader.astro";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const env = Astro.locals.runtime?.env ?? {};
+const kv = env.SUBMISSIONS_KV;
+const buildingId = decodeURIComponent(id ?? "");
+const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? null;
+const hasAccess = Boolean(buildingId) && isBuildingAccessValid(buildingId, accessKey, env);
+const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
+const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
+const today = formatDate(new Date());
+
+const detail = hasAccess && kv ? await loadBuildingDetail(kv, buildingId, { statuses: ["open", "resolved"] }) : null;
+const canvasses = detail && kv ? await listCanvasses(kv, buildingId) : [];
+const report = detail
+  ? buildMeetingReport({ building: buildingId, records: detail.records, eventsByRecord: detail.eventsByRecord, today, canvasses })
+  : null;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Meeting report | Building Ledger"
+      description="Private one-page building report for a tenant meeting."
+      canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/meeting`}
+      imagePath="/og/private-dashboard.svg"
+      imageAlt="Building Ledger private meeting report"
+      noindex={true}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Building Ledger"
+      subtitle={`Building: ${buildingId || "Not listed"}`}
+      backHref={dashboardUrl}
+      backLabel="Building dashboard"
+      statusBadge={hasAccess ? "Verified access" : "Access key needed"}
+    />
+    <div class="page">
+      <main class="layout print-report" id="main">
+        {!hasAccess || !report ? (
+          <section class="panel">
+            <AccessKeyPanel
+              title="Key required"
+              helperLines={["Residents only.", "Ask a steward for the current key."]}
+              warning="Do not share the key publicly."
+              errorMessage={hasAccessAttempt ? "Key does not match this building." : ""}
+              backLabel="Back to notice builder"
+            />
+          </section>
+        ) : (
+          <section class="panel report-sheet">
+            <header class="report-header">
+              <p class="eyebrow">Building ledger</p>
+              <h1>Meeting report</h1>
+              <p><strong>Building:</strong> {report.building}</p>
+              <p><strong>Date:</strong> {formatTimelineDate(report.today)}</p>
+            </header>
+            <div class="no-print report-actions">
+              <button class="button" type="button" data-print>Print or save as PDF</button>
+              <a class="button button-secondary" href={dashboardUrl}>Back to building dashboard</a>
+              <p class="helper">For your group only. It has no names or unit numbers. Do not give it to management.</p>
+            </div>
+
+            <h2>Overview</h2>
+            <ul>
+              <li>Open problems: {report.overview.open}</li>
+              <li>New in the last 30 days: {report.overview.newLast30Days}</li>
+              <li>Wins in the last 90 days: {report.overview.winsLast90Days}</li>
+              <li>
+                Repair plan requests: {report.replies.requested} sent, {report.replies.received} answered, {report.replies.missing} with no reply logged
+              </li>
+            </ul>
+
+            {report.canvass && (
+              <>
+                <h2>Latest canvass</h2>
+                <p>{report.canvass}</p>
+              </>
+            )}
+
+            <h2>Needs follow-up ({report.followUp.length})</h2>
+            {report.followUp.length === 0 ? (
+              <p>Nothing is overdue.</p>
+            ) : (
+              <ul>
+                {report.followUp.map((item) => (
+                  <li><strong>{item.issueLabel}:</strong> {item.message}</li>
+                ))}
+              </ul>
+            )}
+
+            <h2>Coming up in the next 14 days</h2>
+            {report.upcoming.length === 0 ? (
+              <p>No deadlines logged.</p>
+            ) : (
+              <ul>
+                {report.upcoming.map((entry) => (
+                  <li>{formatTimelineDate(entry.date)}: {entry.issueLabel}. {entry.label}.</li>
+                ))}
+              </ul>
+            )}
+
+            <h2>Open problems, longest first</h2>
+            {report.topProblems.length === 0 ? (
+              <p>No open problems.</p>
+            ) : (
+              <div class="table-scroll">
+                <table class="report-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Problem</th>
+                      <th scope="col">Started</th>
+                      <th scope="col">Days open</th>
+                      <th scope="col">Residents reporting</th>
+                      <th scope="col">Latest fact</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.topProblems.map((row) => (
+                      <tr>
+                        <td>{row.issueLabel}</td>
+                        <td>{row.startDate ? formatTimelineDate(row.startDate) : "Not listed"}</td>
+                        <td>{row.daysOpen}</td>
+                        <td>{row.reports}</td>
+                        <td>{row.lastFact}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <h2>Wins in the last 90 days</h2>
+            {report.wins.length === 0 ? (
+              <p>No wins logged yet. Add "Repair completed" or "Fixed after the joint letter" on a record when a problem is fixed.</p>
+            ) : (
+              <ul>
+                {report.wins.map((win) => (
+                  <li>{formatTimelineDate(win.date)}: {win.issueLabel}. {win.label}.</li>
+                ))}
+              </ul>
+            )}
+
+            <h2>Notes</h2>
+            <ul>
+              {report.notes.map((note) => <li>{note}</li>)}
+            </ul>
+          </section>
+        )}
+      </main>
+    </div>
+    <script>
+      document.querySelector("[data-print]")?.addEventListener("click", () => window.print());
+    </script>
+  </body>
+</html>

@@ -1,7 +1,9 @@
 ---
 import "../styles/global.css";
-import { getAllProvisionCards, getReferenceRuleCards, type RuleCard } from "../data/rules";
-import { formatDate, formatTimelineDate } from "../lib/dateUtils";
+import { formatDateForLocale, getAllProvisionCards, getReferenceRuleCards, type RuleCard } from "../data/rules";
+import { rightsLanguages, rightsStrings } from "../data/i18n/strings";
+import { formatDate } from "../lib/dateUtils";
+import { createTranslator, getCatalog, lookupTranslation } from "../lib/i18n/translate";
 import SeoHead from "../components/SeoHead.astro";
 import AppHeader from "../components/AppHeader.astro";
 import HelpResources from "../components/HelpResources.astro";
@@ -10,14 +12,40 @@ import HelpResources from "../components/HelpResources.astro";
 export const prerender = false;
 
 const today = formatDate(new Date());
+const requested = Astro.url.searchParams.get("lang") ?? "en";
+const lang = rightsLanguages.some((entry) => entry.id === requested) ? requested : "en";
+// Reviewer preview shows draft translations. Residents never get it from a normal link.
+const preview = lang !== "en" && Astro.url.searchParams.get("preview") === "drafts";
+const translator = createTranslator(lang, { preview });
+const { t } = translator;
+// Dates and the page language follow the page text: Spanish only when the guide's text is translated.
+const titleTranslated =
+  lang !== "en" &&
+  Boolean(lookupTranslation(getCatalog(lang), "rights.title", rightsStrings["rights.title"], { includeDrafts: preview }));
+const textLang = titleTranslated ? lang : "en";
+const locale = textLang === "es" ? "es-US" : "en-US";
+const s = (key: keyof typeof rightsStrings, vars?: Record<string, string | number>) => t(key, rightsStrings[key], vars);
+
+const localizeProvision = (card: RuleCard): RuleCard => {
+  const provisionId = card.id.split(".").pop() ?? card.id;
+  return {
+    ...card,
+    title: t(`rule.${provisionId}.title`, card.title),
+    summary: t(`rule.${provisionId}.summary`, card.summary),
+    details: card.details?.map((detail, index) => t(`rule.${provisionId}.detail.${index}`, detail)),
+  };
+};
+
 const sections: Array<{ title: string; cards: RuleCard[] }> = [
-  { title: "Chicago tenant rules (RLTO)", cards: getAllProvisionCards(today) },
-  { title: "Heat, deposits, and evictions", cards: getReferenceRuleCards(today) },
+  { title: s("rights.section.rlto"), cards: getAllProvisionCards(today).map(localizeProvision) },
+  { title: s("rights.section.reference"), cards: getReferenceRuleCards(today, { t, locale }) },
 ];
+const stats = translator.stats();
+const showUnreviewedNotice = lang !== "en" && !preview && stats.shown === 0;
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang={textLang}>
   <head>
     <SeoHead
       title="Know your rights | Building Ledger"
@@ -25,6 +53,7 @@ const sections: Array<{ title: string; cards: RuleCard[] }> = [
       canonicalPath="/rights"
       imagePath="/og/home.svg"
       imageAlt="Building Ledger printable rights sheet"
+      noindex={preview}
     />
   </head>
   <body>
@@ -33,15 +62,43 @@ const sections: Array<{ title: string; cards: RuleCard[] }> = [
     <div class="page">
       <main class="layout print-report" id="main">
         <section class="panel report-sheet rights-sheet">
+          <nav class="no-print rights-languages" aria-label="Language">
+            {rightsLanguages.map((entry) => (
+              <a href={entry.id === "en" ? "/rights" : `/rights?lang=${entry.id}`} lang={entry.id} aria-current={entry.id === lang ? "page" : undefined}>
+                {entry.label}
+              </a>
+            ))}
+          </nav>
+
+          {preview && (
+            <div class="evidence-warning no-print" role="note" lang="en">
+              <p class="evidence-warning-title">Draft translation for review</p>
+              <p>{stats.drafts} draft lines are shown. They are not checked yet. Do not share this page with residents.</p>
+              <p>Send corrections in the translation spreadsheet. See docs/translations.md. <a href={`/rights?lang=${lang}`}>Leave preview</a>.</p>
+            </div>
+          )}
+
+          {showUnreviewedNotice && (
+            <div class="helper-card no-print" role="note">
+              <p lang="en">This guide is not reviewed in this language yet, so it is shown in English.</p>
+              {lang === "es" && (
+                <p lang="en">
+                  The City of Chicago has an official Spanish summary:{" "}
+                  <a href="https://www.chicago.gov/content/dam/city/depts/doh/RLTO/RLTO%20Summary_2023_ES-US.pdf" target="_blank" rel="noreferrer" hreflang="es">RLTO Summary, Spanish (PDF)</a>.
+                </p>
+              )}
+            </div>
+          )}
+
           <header class="report-header">
             <p class="eyebrow">Building Ledger</p>
-            <h1>Chicago tenant rules: short guide</h1>
-            <p>Information only. Not legal advice. Rules can change. Check the sources.</p>
-            <p><strong>Date:</strong> {formatTimelineDate(today)}</p>
+            <h1>{s("rights.title")}</h1>
+            <p>{s("rights.intro")}</p>
+            <p>{s("rights.date", { date: formatDateForLocale(today, locale) })}</p>
           </header>
           <div class="no-print report-actions">
-            <button class="button" type="button" data-print>Print or save as PDF</button>
-            <a class="button button-secondary" href="/">Back to notice builder</a>
+            <button class="button" type="button" data-print>{s("rights.print")}</button>
+            <a class="button button-secondary" href="/">{s("rights.back")}</a>
           </div>
 
           {sections.map((section) => (
@@ -61,7 +118,7 @@ const sections: Array<{ title: string; cards: RuleCard[] }> = [
                     {card.upcoming && (
                       <div class="rule-upcoming">
                         <p>
-                          <strong>Starting {formatTimelineDate(card.upcoming.startDate)}:</strong> {card.upcoming.summary}
+                          <strong>{s("rights.starting", { date: formatDateForLocale(card.upcoming.startDate, locale) })}</strong> {card.upcoming.summary}
                         </p>
                       </div>
                     )}
@@ -79,7 +136,7 @@ const sections: Array<{ title: string; cards: RuleCard[] }> = [
           ))}
 
           <section class="rights-section">
-            <HelpResources headingLevel="h2" />
+            <HelpResources headingLevel="h2" t={t} locale={locale} />
           </section>
         </section>
       </main>

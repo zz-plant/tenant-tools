@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.6.0 - 2026-10-07
+
+### Added
+
+- A union can run its own copy. `docs/self-hosting.md` gives the Cloudflare steps. The steward page (`/steward`) lists buildings, issues a new resident key, and adds a building without editing deploy settings.
+- Key rotation. "Issue new key" on `/steward` replaces the building key. The old key stops working within about a minute. The new key is shown once.
+- Building data export from `/steward` as CSV or JSON. It has records and dated facts. It has no names, keys, "me too" markers, or evidence files.
+- Emergency wipe on `/steward`. It deletes a building's records, facts, evidence files, and canvass counts. The steward must type the building name to confirm.
+- "Needs follow-up" on the building dashboard: no reply by the requested date, a promised repair date passed, the RLTO period passed, or the problem qualifies for a 311 request.
+- "Wins logged" on the dashboard. New dated facts: "Repair completed", "Fixed after our letter", "Fixed after a 311 request", and "311 request filed" (with an optional 311 number).
+- Meeting report (`/buildings/:id/meeting`): open problems, follow-ups, wins, and the latest canvass, ready to print.
+- Canvass tally for stewards (`/buildings/:id/canvass`): households reached and how many have each problem. Only counts are saved. The joint letter can use the count when it is 3 or more.
+- Group 311 day (`/buildings/:id/311`): the problems that qualify for a 311 request, what to say, and a message to share with neighbors. The message has no address and no key.
+- Meeting request letter to the alderperson, on the joint letter page.
+- Starter kit (`/kit`): a flyer with a QR code to `/rights`, a first-meeting checklist, and where to get help. The QR code never holds a building key.
+- Translation review workflow: `bun run translations export|import|check`. See `docs/translations.md`. Only reviewed translations are shown to residents.
+- `/rights?lang=es`. Spanish text is a draft and is not shown until a reviewer marks it reviewed. Until then, the page links to the City's Spanish RLTO summary.
+
+### Changed
+
+- The building dashboard reads open and resolved records, so it can show wins.
+- Rule dates and times can print in other languages. English output is the same.
+
+### Security
+
+- Steward-issued keys are stored only as a SHA-256 hash in KV (`config:building-keys`). A key issued here always replaces the deploy-settings key for that building. Requests are checked against a per-request copy of the settings. The shared settings are never changed. If the key list cannot be read, no resident key works for that request, so a replaced key cannot come back.
+- New steward-only paths, all rate limited and audited: `POST` and `DELETE /api/steward/keys`, `GET /api/steward/export`, `POST /api/steward/wipe`, `POST` and `DELETE /api/buildings/canvass`.
+- Export CSV cells that start with `=`, `+`, `-`, or `@` get a leading quote, so spreadsheets do not run them.
+- Canvass counts are whole numbers from 0 to 999. A count cannot be higher than households reached. There is no free text.
+- New dependency: `qrcode-generator` (MIT, no dependencies). QR codes are made on the server. The QR helper refuses any URL with a key.
+
 ## 1.5.0 - 2026-10-07
 
 ### Added

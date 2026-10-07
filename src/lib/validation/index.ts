@@ -117,3 +117,17 @@ export const isValidDateString = (value: string) => {
     parsed.getUTCDate() === day
   );
 };
+
+/** Building ids are street addresses such as "2400 W Wabansia". No unit numbers, phones, or emails. */
+export const validateBuildingId = (value: unknown): { ok: true; building: string } | { ok: false; message: string } => {
+  const building = typeof value === "string" ? sanitizeLimitedText(value, 120) : "";
+  if (!building) {
+    return { ok: false, message: "Building is required." };
+  }
+  const sensitive = getSensitiveContentMessages(building);
+  if (sensitive.length > 0) {
+    return { ok: false, message: sensitive[0] };
+  }
+  return { ok: true, building };
+};
+
