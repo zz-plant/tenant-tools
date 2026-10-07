@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import {
   buildAccessOverlay,
+  closedAccessEnv,
   generateBuildingKey,
   hashBuildingKey,
   listKnownBuildings,
@@ -94,5 +95,18 @@ describe("buildAccessOverlay", () => {
       "2353 W Wabansia",
       "2400 W Wabansia",
     ]);
+  });
+});
+
+describe("closedAccessEnv", () => {
+  it("lets no resident key in when the registry cannot be read", () => {
+    const deployEnv = { BUILDING_KEYS_JSON: settingsJson, BUILDING_ACCESS_KEY: "shared" };
+    const env = { ...deployEnv, ...closedAccessEnv };
+    for (const key of ["old-2400", "key-2353", "shared"]) {
+      assert.equal(isBuildingAccessValid("2400 W Wabansia", key, env), false);
+      assert.equal(isBuildingAccessValid("2353 W Wabansia", key, env), false);
+      assert.equal(isResidentKeyRecognized(key, env), false);
+      assert.deepEqual(getBuildingIdsForKey(key, env), []);
+    }
   });
 });

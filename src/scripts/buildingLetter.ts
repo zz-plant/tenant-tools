@@ -84,6 +84,10 @@ if (root && output) {
     if (alderpersonFields) {
       alderpersonFields.hidden = !alderperson;
     }
+    // The alderperson letter asks for a meeting, not a reply date, so the date is not shown or saved.
+    root.querySelectorAll<HTMLElement>("[data-reply-field]").forEach((field) => {
+      field.hidden = alderperson;
+    });
     if (copyFields) {
       copyFields.hidden = alderperson;
     }
@@ -107,7 +111,7 @@ if (root && output) {
 
   saveButton?.addEventListener("click", async () => {
     const issues = selectedIssues();
-    const replyBy = replyByInput?.value || "";
+    const replyBy = readKind() === "management" ? replyByInput?.value || "" : "";
     if (issues.length === 0) {
       setStatus("Choose at least one problem.");
       return;

@@ -102,6 +102,12 @@ export const buildAccessOverlay = ({
   return overlay;
 };
 
+/**
+ * Access settings for a request when the registry cannot be read. No building key and no
+ * shared fallback key, so no resident key works. Failing open could bring back a replaced key.
+ */
+export const closedAccessEnv = { BUILDING_KEYS_JSON: "{}", BUILDING_ACCESS_KEY: "" } as const;
+
 /** Every building id the site knows: deploy settings plus steward-issued keys. */
 export const listKnownBuildings = (settingsJson: string | undefined, registry: KeyRegistry) =>
   [...new Set([...Object.keys(parseBuildingKeys(settingsJson)), ...Object.keys(registry.buildings)])].sort((a, b) =>

@@ -63,8 +63,14 @@ export const validateCanvassInput = (
     if (count === null) {
       return { ok: false, message: "Counts must be whole numbers from 0 to 999." };
     }
-    if (householdsReached > 0 && count > householdsReached) {
-      return { ok: false, message: "A count is larger than the number of households reached." };
+    if (count > householdsReached) {
+      return {
+        ok: false,
+        message:
+          householdsReached === 0
+            ? "Add how many households you reached."
+            : "A count is larger than the number of households reached.",
+      };
     }
     if (count > 0) {
       tallies[issue as CanvassIssueId] = count;

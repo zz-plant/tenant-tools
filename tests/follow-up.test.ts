@@ -40,6 +40,30 @@ describe("buildFollowUpItems", () => {
     assert.deepEqual(buildFollowUpItems(records, replied, today), []);
   });
 
+  it("counts only a reply after the earlier due date for a new reply date", () => {
+    const records = [record({ id: "a", startDate: "2026-09-01", reportDate: "2026-09-01" })];
+    const oldReplyOnly = new Map([
+      [
+        "a",
+        [
+          event("1", "reply_due", "2026-09-15"),
+          event("2", "management_replied", "2026-09-10"),
+          event("3", "reply_due", "2026-10-19"),
+        ],
+      ],
+    ]);
+    const replyItems = (events: Map<string, RecordEvent[]>) =>
+      buildFollowUpItems(records, events, today)
+        .filter((item) => item.kind === "reply_overdue")
+        .map((item) => item.date);
+    assert.deepEqual(replyItems(oldReplyOnly), ["2026-10-19"]);
+
+    const newReply = new Map([
+      ["a", [...(oldReplyOnly.get("a") ?? []), event("4", "management_replied", "2026-10-02")]],
+    ]);
+    assert.deepEqual(replyItems(newReply), []);
+  });
+
   it("flags a missed promised repair date unless a fix is logged", () => {
     const records = [record({ id: "a" })];
     const promised = new Map([["a", [event("1", "repair_date_promised", "2026-10-19")]]]);

@@ -160,11 +160,11 @@ const portfolio = firstRecord?.portfolio ?? "other";
                   Numbers under {minCountShown} are left out to protect residents.
                 </p>
 
-                <label>
+                <label data-reply-field>
                   Reply needed by
                   <input class="input" type="date" min={today} value={replyByDefault} data-letter-reply-by />
                 </label>
-                <p class="helper">The RLTO counts 14 days from a written repair request for many repairs.</p>
+                <p class="helper" data-reply-field>The RLTO counts 14 days from a written repair request for many repairs.</p>
 
                 <label>
                   Ward number (optional)

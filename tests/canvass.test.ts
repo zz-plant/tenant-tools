@@ -32,6 +32,11 @@ describe("validateCanvassInput", () => {
     const extra = validateCanvassInput(bad[6], today);
     assert.ok(extra.ok && !("note" in extra.data));
   });
+
+  it("rejects counts when no households were reached", () => {
+    const result = validateCanvassInput({ date: today, householdsReached: 0, tallies: { pests: 5 } }, today);
+    assert.deepEqual(result, { ok: false, message: "Add how many households you reached." });
+  });
 });
 
 describe("canvass helpers", () => {

@@ -1,7 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { RESIDENT_KEY_COOKIE, SESSION_ID_COOKIE, STEWARD_KEY_COOKIE } from "./lib/api/requestGuard";
 import { resolveForgetRedirect } from "./lib/quickExit";
-import { buildAccessOverlay, hashBuildingKey, loadKeyRegistry } from "./lib/access/registry";
+import { buildAccessOverlay, closedAccessEnv, hashBuildingKey, loadKeyRegistry } from "./lib/access/registry";
 
 // Residents return from group chat links many times. A short TTL forces key re-entry too often.
 // "Forget key on this device" (`?forget=1`) clears it on shared phones.
@@ -46,7 +46,9 @@ const applyKeyRegistry = async (context: MiddlewareContext, url: URL) => {
     // `runtime` is created for each request. The shared env object is copied, never changed.
     context.locals.runtime = { ...runtime, env: { ...env, BUILDING_KEYS_JSON: JSON.stringify(overlay) } };
   } catch {
-    // If the registry cannot be read, keys from deploy settings still work.
+    // Fail closed. Without the registry, a settings key that a steward replaced would work again.
+    // No resident key works for this request. The steward key does not use these settings.
+    context.locals.runtime = { ...runtime, env: { ...env, ...closedAccessEnv } };
   }
 };
 

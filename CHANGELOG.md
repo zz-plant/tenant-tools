@@ -25,7 +25,7 @@
 
 ### Security
 
-- Steward-issued keys are stored only as a SHA-256 hash in KV (`config:building-keys`). A key issued here always replaces the deploy-settings key for that building. Requests are checked against a per-request copy of the settings. The shared settings are never changed.
+- Steward-issued keys are stored only as a SHA-256 hash in KV (`config:building-keys`). A key issued here always replaces the deploy-settings key for that building. Requests are checked against a per-request copy of the settings. The shared settings are never changed. If the key list cannot be read, no resident key works for that request, so a replaced key cannot come back.
 - New steward-only paths, all rate limited and audited: `POST` and `DELETE /api/steward/keys`, `GET /api/steward/export`, `POST /api/steward/wipe`, `POST` and `DELETE /api/buildings/canvass`.
 - Export CSV cells that start with `=`, `+`, `-`, or `@` get a leading quote, so spreadsheets do not run them.
 - Canvass counts are whole numbers from 0 to 999. A count cannot be higher than households reached. There is no free text.

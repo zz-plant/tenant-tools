@@ -137,6 +137,7 @@ The builder gets only the building ids the cookie unlocks, never the key.
 3. Middleware hashes each key the request presents (cookie, `?key=`, `x-building-key`) and compares it with the registry. It gives that request its own copy of env with a `BUILDING_KEYS_JSON` overlay. The shared env is never changed.
 4. A registry entry always wins over deploy settings. If no presented key matches, the building gets a random value no one can present. So an issued key also rotates out the settings key.
 5. The registry is read with a 60-second edge cache. A rotation takes effect within about a minute.
+   If the registry cannot be read, no resident key works for that request (fail closed), so a replaced key cannot come back.
 6. `DELETE /api/steward/keys` removes an issued key. The building goes back to its deploy-settings key, if it has one.
 
 ### Export and emergency wipe (steward)

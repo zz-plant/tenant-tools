@@ -53,7 +53,16 @@ export const buildFollowUpItems = (
 
       const replyDue = latestOfType(events, "reply_due");
       const sentOn = record.reportDate || record.startDate;
-      const replied = events.some((event) => event.type === "management_replied" && event.date >= sentOn);
+      // A new "reply requested by" date starts a new cycle. Only a reply after the earlier due date counts for it.
+      const previousDue = replyDue
+        ? events
+            .filter((event) => event.type === "reply_due" && event.date < replyDue.date)
+            .sort((a, b) => b.date.localeCompare(a.date))[0]
+        : undefined;
+      const replied = events.some(
+        (event) =>
+          event.type === "management_replied" && event.date >= sentOn && (!previousDue || event.date > previousDue.date)
+      );
       if (replyDue && replyDue.date < today && !replied) {
         push("reply_overdue", replyDue.date, `Reply was due ${formatTimelineDate(replyDue.date)}. No reply is logged.`);
       }
