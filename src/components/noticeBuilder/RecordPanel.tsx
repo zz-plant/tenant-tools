@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "../ui";
 import { formatTimelineDate } from "../../lib/dateUtils";
 import type { SubmissionTimelineEntry } from "../../lib/submissionTimeline";
+import type { RuleCard } from "../../data/rules";
 import type { NextStep } from "./logic";
 
 type RecordPanelProps = {
@@ -13,7 +14,7 @@ type RecordPanelProps = {
   impactCount: number;
   issueGuidance: { category: string; nextStep: string } | null;
   guidanceScript: string;
-  ruleSources: Array<{ url: string; title: string }>;
+  ruleCards: RuleCard[];
 };
 
 /** "Record and next steps": timeline, unlockable next steps, report count, and public info links. */
@@ -26,7 +27,7 @@ const RecordPanel = ({
   impactCount,
   issueGuidance,
   guidanceScript,
-  ruleSources,
+  ruleCards,
 }: RecordPanelProps) => {
   const [scriptCopyLabel, setScriptCopyLabel] = useState("Copy 311 script");
 
@@ -159,16 +160,48 @@ const RecordPanel = ({
             </details>
           )}
 
-          {ruleSources.length > 0 && (
+          {ruleCards.length > 0 && (
             <details className="helper-card">
               <summary>Local rules (information only)</summary>
               <div className="helper-card-body">
-                <ul className="rule-sources">
-                  {ruleSources.map((source) => (
-                    <li key={source.url}>
-                      <a href={source.url} target="_blank" rel="noreferrer">
-                        {source.title}
-                      </a>
+                <ul className="rule-cards">
+                  {ruleCards.map((card) => (
+                    <li key={card.id} className="rule-card">
+                      <h4>{card.title}</h4>
+                      {card.section && <p className="rule-meta">{card.section}</p>}
+                      <p>{card.summary}</p>
+                      {card.details && (
+                        <ul className="rule-details">
+                          {card.details.map((detail) => (
+                            <li key={detail}>{detail}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {card.upcoming && (
+                        <div className="rule-upcoming">
+                          <p>
+                            <strong>Starting {formatTimelineDate(card.upcoming.startDate)}:</strong>{" "}
+                            {card.upcoming.summary}
+                          </p>
+                          {card.upcoming.details && (
+                            <ul className="rule-details">
+                              {card.upcoming.details.map((detail) => (
+                                <li key={detail}>{detail}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      )}
+                      <ul className="rule-sources">
+                        {card.sources.map((source) => (
+                          <li key={source.url}>
+                            <a href={source.url} target="_blank" rel="noreferrer">
+                              {source.title}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="rule-meta">Last checked: {formatTimelineDate(card.lastReviewed)}</p>
                     </li>
                   ))}
                 </ul>

@@ -8,6 +8,8 @@ const exportAudienceConfigs: Record<
     includeReportCount: boolean;
     includeEvidence: boolean;
     includeTicket: boolean;
+    /** First written notice date and the RLTO date counted from it. */
+    includeNoticeDates: boolean;
     notes: string[];
   }
 > = {
@@ -17,6 +19,7 @@ const exportAudienceConfigs: Record<
     includeReportCount: true,
     includeEvidence: true,
     includeTicket: true,
+    includeNoticeDates: true,
     notes: ["Resident-reported. Not verified.", "Evidence files are stored privately."],
   },
   legal: {
@@ -25,6 +28,7 @@ const exportAudienceConfigs: Record<
     includeReportCount: true,
     includeEvidence: true,
     includeTicket: true,
+    includeNoticeDates: true,
     notes: ["Resident-reported. Dates are recorded below.", "Evidence files are stored privately."],
   },
   management: {
@@ -33,6 +37,7 @@ const exportAudienceConfigs: Record<
     includeReportCount: false,
     includeEvidence: false,
     includeTicket: false,
+    includeNoticeDates: false,
     notes: ["Request: Please share a repair plan and timeline."],
   },
   personal: {
@@ -41,6 +46,7 @@ const exportAudienceConfigs: Record<
     includeReportCount: true,
     includeEvidence: true,
     includeTicket: true,
+    includeNoticeDates: true,
     notes: ["Saved for personal records. No names are included."],
   },
 };
@@ -62,6 +68,9 @@ export type ExportSummaryInput = {
   evidence: string;
   ticketDate?: string;
   ticketNumber?: string;
+  firstNoticeDate?: string;
+  /** RLTO date counted from the first written notice, from getNoticeMilestone. */
+  noticeMilestone?: { label: string; date: string } | null;
 };
 
 export const buildExportSummary = ({
@@ -81,6 +90,8 @@ export const buildExportSummary = ({
   evidence,
   ticketDate,
   ticketNumber,
+  firstNoticeDate,
+  noticeMilestone,
 }: ExportSummaryInput) => {
   const config = exportAudienceConfigs[exportAudience];
   const detailLines = issueDetails
@@ -103,6 +114,8 @@ export const buildExportSummary = ({
     `Start date: ${startDate}`,
     `Report date: ${reportDate}`,
     `Days open: ${daysOpen}`,
+    config.includeNoticeDates && firstNoticeDate ? `First written notice: ${firstNoticeDate}` : null,
+    config.includeNoticeDates && noticeMilestone ? `${noticeMilestone.label}: ${noticeMilestone.date}` : null,
     config.includeReportCount ? `Residents reporting: ${impactCount}` : null,
     config.includeEvidence ? `Evidence noted: ${evidence}` : null,
     config.includeTicket && ticketDate ? `311 ticket date: ${ticketDate}` : null,

@@ -18,6 +18,7 @@ import {
 } from "../data/noticeData";
 import { defaultBuildingOptions, type BuildingOption } from "../data/buildings";
 import { portfolioOptions } from "../data/portfolioOptions";
+import { getNoticeMilestone, heatMinimumLines, heatSeasonLabel, isInHeatSeason } from "../data/rules";
 import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
 import useTimedCallbacks from "../hooks/useTimedCallbacks";
 import { formatDate, getCurrentTime } from "../lib/dateUtils";
@@ -40,14 +41,14 @@ import {
   buildNextSteps,
   buildNoticeText,
   collectIssueDetails,
-  collectRuleSources,
+  collectRuleCards,
   computeDaysOpen,
   createInitialFormState,
   getIssueGuidance,
   type FormState,
   type IssueFieldKey,
 } from "./noticeBuilder/logic";
-import { getSubmissionTimelineEntries } from "../lib/submissionTimeline";
+import { getFirstWrittenNoticeDate, getSubmissionTimelineEntries } from "../lib/submissionTimeline";
 import type { Stage } from "./noticeBuilder/types";
 
 
@@ -271,6 +272,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     const statusLabel = selectedExportStatus.label;
 
     const issueDetails = collectIssueDetails(formState, issueFields);
+    const firstNoticeDate = getFirstWrittenNoticeDate({
+      stage: formState.stage as Stage,
+      reportDate: formState.today,
+      firstMessageDate: formState.firstMessageDate,
+    });
 
     return buildExportSummary({
       exportAudience,
@@ -289,6 +295,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       evidence: formState.attachment ? formState.attachment : "None listed",
       ticketDate: formState.ticketDate || undefined,
       ticketNumber: formState.ticketNumber || undefined,
+      firstNoticeDate: firstNoticeDate || undefined,
+      noticeMilestone: getNoticeMilestone(formState.issue, firstNoticeDate),
     });
   }, [
     formState,
@@ -538,13 +546,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
         firstMessageDate: formState.firstMessageDate,
         ticketDate: formState.ticketDate,
         stage: formState.stage as Stage,
+        issue: formState.issue,
       }),
-    [formState.firstMessageDate, formState.startDate, formState.stage, formState.ticketDate, formState.today]
+    [
+      formState.firstMessageDate,
+      formState.issue,
+      formState.startDate,
+      formState.stage,
+      formState.ticketDate,
+      formState.today,
+    ]
   );
 
   const issueGuidance = getIssueGuidance(formState.issue);
   const guidanceScript = issueGuidance ? buildGuidanceScript(issueGuidance.script, formState) : "";
-  const ruleSources = useMemo(() => collectRuleSources(formState.issue), [formState.issue]);
+  const ruleCards = useMemo(
+    () => collectRuleCards(formState.issue, formState.today),
+    [formState.issue, formState.today]
+  );
 
   return (
     <div className="notice-builder-container">
@@ -660,7 +679,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     {formState.issue === "heat" && (
                       <div className="helper-card" role="note" style={{ marginTop: "12px" }}>
                         <p className="helper">
-                          <strong>Chicago Heat Ordinance active (Sept 15 – June 1):</strong> Required minimum indoor temperature is 68°F day (8:30 AM–10:30 PM) and 66°F night (10:30 PM–8:30 AM). Landlords must restore heat promptly when temperatures fall below these levels.
+                          <strong>Chicago heat rule ({heatSeasonLabel}):</strong>{" "}
+                          {isInHeatSeason(formState.today || undefined)
+                            ? "It is heat season now."
+                            : "It is not heat season now."}{" "}
+                          {heatMinimumLines.join(" ")}
                         </p>
                       </div>
                     )}
@@ -1352,7 +1375,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
           impactCount={impactCount}
           issueGuidance={issueGuidance}
           guidanceScript={guidanceScript}
-          ruleSources={ruleSources}
+          ruleCards={ruleCards}
         />
 
       <footer className="site-footer">

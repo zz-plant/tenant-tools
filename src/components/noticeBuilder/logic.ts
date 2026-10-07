@@ -123,7 +123,8 @@ const nextStepDefinitions = [
     label: "Send the first notice",
     unlockDay: 0,
     calendarLabel: "Send first notice",
-    detail: "Send a short written notice. Keep a copy. Write down the date you sent it.",
+    detail:
+      "Send a short written notice to the owner or manager address the landlord gave you. Keep a copy. Write down the date you sent it.",
   },
   {
     label: "Send a follow-up",
@@ -199,15 +200,6 @@ export const buildGuidanceScript = (script: string, state: FormState) =>
     .replace("[LOCATION]", state.location || "[LOCATION]")
     .replace("[DATE]", state.eventDate || "[DATE]");
 
-/** Unique source links from the rule cards for an issue. */
-export const collectRuleSources = (issueId: string) => {
-  const sourceMap = new Map<string, string>();
-  getRuleCardsForIssue(issueId).forEach((card) => {
-    card.sources.forEach((source) => {
-      if (!sourceMap.has(source.url)) {
-        sourceMap.set(source.url, source.title);
-      }
-    });
-  });
-  return Array.from(sourceMap, ([url, title]) => ({ url, title }));
-};
+/** Rule cards for "Help and sources", using the rules in effect on `onDate` (`YYYY-MM-DD`). */
+export const collectRuleCards = (issueId: string, onDate?: string) =>
+  getRuleCardsForIssue(issueId || undefined, onDate || undefined);

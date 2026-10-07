@@ -1,3 +1,5 @@
+import { getNoticeMilestone } from "../data/rules";
+
 export type SubmissionTimelineEntry = {
   label: string;
   date: string;
@@ -9,6 +11,8 @@ type SubmissionTimelineInput = {
   firstMessageDate?: string;
   ticketDate?: string;
   stage: "A" | "B" | "C";
+  /** Issue id. Adds the RLTO date counted from the first written notice, when a rule applies. */
+  issue?: string;
 };
 
 const stageUsesFirstNoticeDate: Record<SubmissionTimelineInput["stage"], boolean> = {
@@ -34,6 +38,10 @@ const pushTimelineEntry = (
   entries.push({ label, date });
 };
 
+/** The first notice is the report itself at stage A. Later stages record it separately. */
+export const getFirstWrittenNoticeDate = (submission: SubmissionTimelineInput) =>
+  stageUsesFirstNoticeDate[submission.stage] ? submission.firstMessageDate : submission.reportDate;
+
 export const getSubmissionTimelineEntries = (submission: SubmissionTimelineInput): SubmissionTimelineEntry[] => {
   const entries: SubmissionTimelineEntry[] = [];
 
@@ -45,6 +53,11 @@ export const getSubmissionTimelineEntries = (submission: SubmissionTimelineInput
 
   pushTimelineEntry(entries, submission.reportDate, reportDateLabelByStage[submission.stage]);
   pushTimelineEntry(entries, submission.ticketDate, "311 ticket logged");
+
+  const milestone = getNoticeMilestone(submission.issue, getFirstWrittenNoticeDate(submission));
+  if (milestone) {
+    pushTimelineEntry(entries, milestone.date, milestone.label);
+  }
 
   return entries.sort((a, b) => a.date.localeCompare(b.date));
 };

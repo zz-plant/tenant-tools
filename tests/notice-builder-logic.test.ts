@@ -6,7 +6,7 @@ import {
   buildNextSteps,
   buildNoticeText,
   collectIssueDetails,
-  collectRuleSources,
+  collectRuleCards,
   computeDaysOpen,
   createInitialFormState,
   getIssueGuidance,
@@ -147,8 +147,17 @@ describe("guidance and sources", () => {
     assert.equal(getIssueGuidance("building"), null);
   });
 
-  it("returns unique rule sources", () => {
-    const sources = collectRuleSources("heat");
-    assert.equal(new Set(sources.map((source) => source.url)).size, sources.length);
+  it("lists each source once per rule card", () => {
+    for (const card of collectRuleCards("heat", "2026-10-07")) {
+      const urls = card.sources.map((source) => source.url);
+      assert.equal(new Set(urls).size, urls.length, card.title);
+    }
+  });
+
+  it("returns rule cards for the issue on the builder date", () => {
+    const cards = collectRuleCards("lockout", "2026-10-07");
+    assert.ok(cards.some((card) => card.title === "Lockouts are not allowed"));
+    assert.ok(cards.some((card) => card.title === "Eviction enforcement"));
+    assert.equal(cards.at(-1)?.title, "RLTO summary (Chicago)");
   });
 });

@@ -78,4 +78,33 @@ describe("buildExportSummary", () => {
     assert.ok(!summary.includes("Evidence noted:"));
     assert.ok(!summary.includes("Evidence note (optional):"));
   });
+
+  it("adds the first written notice and RLTO date for legal aid, not for management", () => {
+    const base = {
+      building: "2400 W Wabansia",
+      portfolioLabel: "Main management company",
+      issueLabel: "Water leak",
+      zoneLabel: "Inside unit",
+      statusLabel: "Open",
+      stageLabel: "Follow-up",
+      startDate: "2026-09-28",
+      reportDate: "2026-10-05",
+      daysOpen: 7,
+      impactCount: 1,
+      language: "en",
+      issueDetails: [],
+      evidence: "None listed",
+      firstNoticeDate: "2026-10-01",
+      noticeMilestone: { label: "14 days after first written notice (RLTO 5-12-110)", date: "2026-10-15" },
+    };
+
+    const legal = buildExportSummary({ ...base, exportAudience: "legal" });
+    assert.ok(legal.includes("First written notice: 2026-10-01"));
+    assert.ok(legal.includes("14 days after first written notice (RLTO 5-12-110): 2026-10-15"));
+
+    const management = buildExportSummary({ ...base, exportAudience: "management" });
+    assert.ok(!management.includes("First written notice"));
+    assert.ok(!management.includes("RLTO"));
+  });
 });
+

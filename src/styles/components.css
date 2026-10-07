@@ -934,6 +934,12 @@
   gap: 10px;
 }
 
+ul.rule-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
 .rule-card {
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
@@ -943,11 +949,26 @@
   gap: 8px;
 }
 
-.rule-card h3 {
+.rule-card h3,
+.rule-card h4 {
   margin: 0;
   font-size: 0.94rem;
   font-weight: 600;
   color: var(--color-text-primary);
+}
+
+.rule-card p {
+  margin: 0;
+}
+
+.rule-meta {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.rule-upcoming {
+  border-left: 3px solid var(--color-border);
+  padding-left: 10px;
 }
 
 .rule-details,
