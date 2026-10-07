@@ -119,12 +119,24 @@ const portfolio = firstRecord?.portfolio ?? "other";
             >
               <div>
                 <p class="eyebrow">Joint letter</p>
-                <h1>Ask for a written repair plan</h1>
-                <p class="helper">One letter from many households. It lists open problems and asks for a plan by a date.</p>
+                <h1>Write a joint letter</h1>
+                <p class="helper">One letter from many households. It lists open problems. No names.</p>
                 <p class="helper">Information only. Not legal advice.</p>
               </div>
 
               <form class="facts-form" data-letter-form>
+                <fieldset class="facts-form">
+                  <legend>Letter type</legend>
+                  <label class="checkbox-label">
+                    <input type="radio" name="kind" value="management" data-letter-kind checked />
+                    Ask management for a written repair plan
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="radio" name="kind" value="alderperson" data-letter-kind />
+                    Ask the alderperson's office for a meeting
+                  </label>
+                </fieldset>
+
                 <fieldset class="facts-form">
                   <legend>Problems to include</legend>
                   {openIssues.length === 0 ? (
@@ -154,19 +166,37 @@ const portfolio = firstRecord?.portfolio ?? "other";
                 </label>
                 <p class="helper">The RLTO counts 14 days from a written repair request for many repairs.</p>
 
-                <fieldset class="facts-form">
+                <label>
+                  Ward number (optional)
+                  <input class="input" type="number" min="1" max="50" step="1" inputmode="numeric" data-letter-ward />
+                </label>
+                <p class="helper">
+                  <a href="https://www.chicago.gov/city/en/about/wards.html" target="_blank" rel="noreferrer">Find your ward and alderperson</a>.
+                </p>
+
+                <fieldset class="facts-form" hidden data-alderperson-fields>
+                  <legend>About your request to management</legend>
+                  <label>
+                    Date you asked management for a repair plan (optional)
+                    <input class="input" type="date" max={today} data-letter-management-date />
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" data-letter-no-plan />
+                    No plan has come from management yet
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" data-letter-attach-summary />
+                    A printed building summary is attached
+                  </label>
+                  <p class="helper"><a href={`${dashboardUrl}/export`}>Open the printable building summary</a> to print it with the letter.</p>
+                </fieldset>
+
+                <fieldset class="facts-form" data-copy-fields>
                   <legend>Send copies to (optional)</legend>
                   <label class="checkbox-label">
                     <input type="checkbox" data-letter-copy value="alderperson" />
                     {letterCopyRecipients.alderperson}
                   </label>
-                  <label>
-                    Ward number (optional)
-                    <input class="input" type="number" min="1" max="50" step="1" inputmode="numeric" data-letter-ward />
-                  </label>
-                  <p class="helper">
-                    <a href="https://www.chicago.gov/city/en/about/wards.html" target="_blank" rel="noreferrer">Find your ward and alderperson</a>.
-                  </p>
                   <label class="checkbox-label">
                     <input type="checkbox" data-letter-copy value="cha" />
                     {letterCopyRecipients.cha} (for CHA-assisted buildings)

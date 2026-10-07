@@ -1,0 +1,103 @@
+---
+import "../styles/global.css";
+import { qrSvg } from "../lib/qr";
+import SeoHead from "../components/SeoHead.astro";
+import AppHeader from "../components/AppHeader.astro";
+import HelpResources from "../components/HelpResources.astro";
+
+// The QR code uses this site's address, so the page is built for each request.
+export const prerender = false;
+
+const rightsUrl = `${Astro.url.origin}/rights`;
+const rightsQr = qrSvg(rightsUrl);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Start a building group | Building Ledger"
+      description="Printable flyer and first-meeting checklist for residents who want to work on building problems together."
+      canonicalPath="/kit"
+      imagePath="/og/home.svg"
+      imageAlt="Building Ledger starter kit for a building group"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader subtitle="Start a building group" backHref="/" backLabel="Notice builder" />
+    <div class="page">
+      <main class="layout print-report" id="main">
+        <section class="panel report-sheet kit-sheet">
+          <div class="no-print">
+            <p class="eyebrow">Starter kit</p>
+            <h1>Start a building group</h1>
+            <p class="helper">A flyer to print, a checklist for the first meeting, and the steps that follow. Information only. Not legal advice.</p>
+            <div class="report-actions">
+              <button class="button" type="button" data-print>Print the flyer and checklist</button>
+              <a class="button button-secondary" href="/rights">Short guide to tenant rules</a>
+            </div>
+            <p class="helper">Before you post flyers, talk with neighbors you trust about safety. You can hand flyers to neighbors instead of posting them.</p>
+          </div>
+
+          <article class="kit-flyer">
+            <h2 class="kit-flyer-title">Problems in our building?</h2>
+            <p class="kit-flyer-lead">Neighbors can work on them together.</p>
+            <ul class="kit-flyer-list">
+              <li>Many of us have the same problems: heat, leaks, pests, repairs.</li>
+              <li>One letter from many households is harder to ignore than one call.</li>
+              <li>We keep a shared record with dates. No names are needed.</li>
+            </ul>
+            <div class="kit-flyer-meeting">
+              <p><strong>Meeting</strong></p>
+              <p>Date: ______________________</p>
+              <p>Time: ______________________</p>
+              <p>Place: _____________________</p>
+            </div>
+            <div class="kit-flyer-qr">
+              <div class="kit-qr" role="img" aria-label={`QR code for ${rightsUrl}`} set:html={rightsQr} />
+              <div>
+                <p><strong>Chicago tenant rules, in short</strong></p>
+                <p>Scan the code, or go to:</p>
+                <p class="kit-url">{rightsUrl}</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="kit-checklist">
+            <h2>First meeting checklist</h2>
+            <ol>
+              <li>Meet in a place that feels safe. Not the management office.</li>
+              <li>Use a paper sign-in sheet only if people agree. Keep it with the group. Do not put it in the app.</li>
+              <li>Go around the room. Each person names the problems they have. Write the problem, not the unit.</li>
+              <li>Add each problem to the building ledger. Neighbors with the same problem tap "Me too".</li>
+              <li>Choose one to three problems to start with.</li>
+              <li>Write the joint letter together. Count the households that sign. The letter shows only the number.</li>
+              <li>Choose a reply date. Plan the next meeting for soon after that date.</li>
+              <li>Choose one or two stewards. They keep the building key and can issue a new key if it leaks.</li>
+              <li>Talk about safety: no names or unit numbers in the group chat, and what to say if management asks about the group.</li>
+            </ol>
+          </article>
+
+          <article class="kit-steps no-print">
+            <h2>After the first meeting</h2>
+            <ol>
+              <li><strong>Record:</strong> add problems and dates to the building ledger. Add dated facts as things happen.</li>
+              <li><strong>Ask together:</strong> send the joint letter from the building dashboard.</li>
+              <li><strong>Follow up:</strong> check "Needs follow-up" on the dashboard. Add replies and missed dates.</li>
+              <li><strong>Inspections:</strong> plan a group 311 day for problems that qualify.</li>
+              <li><strong>Meet again:</strong> print the meeting report. Log wins when problems are fixed.</li>
+            </ol>
+          </article>
+
+          <section class="no-print">
+            <HelpResources />
+          </section>
+        </section>
+      </main>
+    </div>
+    <script>
+      document.querySelector("[data-print]")?.addEventListener("click", () => window.print());
+    </script>
+  </body>
+</html>
