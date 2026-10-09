@@ -1,10 +1,12 @@
-const CACHE_NAME = "building-ledger-v1";
+const CACHE_NAME = "building-ledger-v2";
 const STATIC_ASSETS = [
   "/",
   "/manifest.webmanifest",
-  "/og/home.svg",
-  "/og/private-dashboard.svg",
-  "/og/private-record.svg"
+  "/favicon.svg",
+  "/icon-192.png",
+  "/og/home.png",
+  "/og/private-dashboard.png",
+  "/og/private-record.png"
 ];
 
 self.addEventListener("install", (event) => {
