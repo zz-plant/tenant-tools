@@ -14,7 +14,8 @@
 
 ### Fixed
 
-- Two quick write requests from one person (for example, two photos) could fail. KV allows one write per second to the same key, and the rate limit counter wrote to the same key each time. Now a counter that cannot be saved does not fail the request.
+- Two quick write requests from one person could fail with an error. KV allows one write per second to the same key, and the rate limit counter wrote to the same key each time. Rate limits with a binding no longer write to KV. The evidence upload limit still uses KV: a refused counter write now returns "try again" (429) instead of an error.
+- `keep_vars` is on, so a deploy no longer deletes variables set in the Cloudflare dashboard, such as `BUILDING_KEYS_JSON`.
 
 ### Security
 

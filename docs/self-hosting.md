@@ -45,6 +45,7 @@ Never turn on public access for the R2 bucket.
 
 Leave these settings as they are:
 
+- `"keep_vars": true`: a deploy keeps variables you set in the Cloudflare dashboard. Without it, each deploy deletes them.
 - `"preview_urls": false`: old versions are not served at public preview addresses.
 - `"invocation_logs": false`: Cloudflare does not save request URLs. A first visit URL can hold a building key or the steward key. The app logs only failed routes and error names.
 

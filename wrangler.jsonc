@@ -7,6 +7,9 @@
     "nodejs_compat"
   ],
   "minify": true,
+  // Keep variables set in the Cloudflare dashboard (such as BUILDING_KEYS_JSON) when deploying.
+  // Without this, every deploy deletes them and residents of those buildings are locked out.
+  "keep_vars": true,
   "assets": {
     "binding": "ASSETS",
     "directory": "./dist"

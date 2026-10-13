@@ -76,8 +76,10 @@ export const enforceRateLimit = async ({
       expirationTtl: getSeconds(windowMs),
     });
   } catch {
-    // KV allows one write per second to the same key. Two quick requests from one person
-    // must not fail because their counter could not be saved.
+    // KV allows one write per second to the same key. A refused write means another request
+    // on this counter just ran, so treat it as a burst: answer 429 ("try again"), not a 500.
+    // Letting it through would let a burst skip the limit, because the count never goes up.
+    return { ok: false, retryAfter: 1 };
   }
 
   return { ok: true };

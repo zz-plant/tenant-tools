@@ -98,14 +98,22 @@ describe("rate limiting on Cloudflare", () => {
     assert.equal((await submit(env)).status, 201);
   });
 
-  it("does not fail a request when KV refuses a second write to the same counter", async () => {
+  it("answers 429, not an error, when KV refuses a second write to the same counter", async () => {
     const kv = {
       get: async () => ({ count: 1, resetAt: Date.now() + 60_000 }),
       put: async () => {
         throw new Error("KV PUT failed: 429 Too Many Requests");
       },
     };
-    assert.deepEqual(await enforceRateLimit({ kv, key: "rate:x", limit: 5, windowMs: 60_000 }), { ok: true });
+    assert.deepEqual(await enforceRateLimit({ kv, key: "rate:x", limit: 5, windowMs: 60_000 }), {
+      ok: false,
+      retryAfter: 1,
+    });
+  });
+
+  it("keeps dashboard variables when deploying", () => {
+    const config = JSON.parse(readFileSync("wrangler.jsonc", "utf8").replace(/^\s*\/\/.*$/gm, "")) as { keep_vars?: boolean };
+    assert.equal(config.keep_vars, true);
   });
 
   it("has a wrangler binding for every per-minute limit a route uses", () => {
