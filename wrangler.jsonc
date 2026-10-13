@@ -1,4 +1,5 @@
 {
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "tenant-notice-builder",
   "main": "./dist/_worker.js/index.js",
   "compatibility_date": "2026-01-23",
@@ -16,6 +17,18 @@
       "custom_domain": true
     }
   ],
+  // Serve the site only at the custom domain above. No *.workers.dev address and no public
+  // preview addresses for old versions. Without a custom domain, set "workers_dev" to true.
+  "workers_dev": false,
+  "preview_urls": false,
+  // Keep error lines from the app (route pattern, status, error name). Turn off request logs:
+  // a first visit URL can hold a building key (?key=) or the steward key (?stewardKey=).
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "invocation_logs": false
+    }
+  },
   // Private evidence photos.
   // Never enable public access on this bucket. Photos are served only through signed, key-gated links.
   "r2_buckets": [
@@ -29,5 +42,17 @@
       "binding": "SUBMISSIONS_KV",
       "id": "d2a59d442141478dae1fc35a3344e952"
     }
+  ],
+  // Rate limits for write requests, counted per IP and per browser session at each Cloudflare
+  // location. One binding per limit (see src/lib/rateLimit.ts). They use no KV writes.
+  // A limit with no binding here falls back to a KV counter.
+  "ratelimits": [
+    { "name": "RATE_LIMIT_4_PER_MINUTE", "namespace_id": "47104", "simple": { "limit": 4, "period": 60 } },
+    { "name": "RATE_LIMIT_5_PER_MINUTE", "namespace_id": "47105", "simple": { "limit": 5, "period": 60 } },
+    { "name": "RATE_LIMIT_6_PER_MINUTE", "namespace_id": "47106", "simple": { "limit": 6, "period": 60 } },
+    { "name": "RATE_LIMIT_8_PER_MINUTE", "namespace_id": "47108", "simple": { "limit": 8, "period": 60 } },
+    { "name": "RATE_LIMIT_10_PER_MINUTE", "namespace_id": "47110", "simple": { "limit": 10, "period": 60 } },
+    { "name": "RATE_LIMIT_20_PER_MINUTE", "namespace_id": "47120", "simple": { "limit": 20, "period": 60 } },
+    { "name": "RATE_LIMIT_60_PER_MINUTE", "namespace_id": "47160", "simple": { "limit": 60, "period": 60 } }
   ]
 }

@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -23,3 +24,44 @@ jobs:
       - run: bun run typecheck
       - run: bun run test
       - run: bun run build
+
+  # Deploys main to Cloudflare after the checks pass. See docs/self-hosting.md, "Deploy from GitHub".
+  # Without the two Cloudflare secrets, this job skips the deploy and says so in the run summary.
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SITE_URL: ${{ vars.SITE_URL }}
+    steps:
+      - name: Check Cloudflare secrets
+        id: secrets
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "Deploy skipped: add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID as repository secrets. See docs/self-hosting.md." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - if: steps.secrets.outputs.ready == 'true'
+        uses: actions/checkout@v4
+      - if: steps.secrets.outputs.ready == 'true'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.14
+      - if: steps.secrets.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - if: steps.secrets.outputs.ready == 'true'
+        run: bun install --frozen-lockfile
+      - if: steps.secrets.outputs.ready == 'true'
+        run: bun run build
+      - if: steps.secrets.outputs.ready == 'true'
+        name: Deploy to Cloudflare
+        run: bunx wrangler deploy

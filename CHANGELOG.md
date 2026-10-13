@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.7.0 - 2026-10-13
+
+### Added
+
+- Automatic deploys. The `deploy` job in `.github/workflows/ci.yml` deploys `main` to Cloudflare after the checks pass. It needs two repository secrets (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`) and the `SITE_URL` variable. Without the secrets, it skips and says so. `docs/self-hosting.md` has the steps.
+
+### Changed
+
+- Rate limits use Cloudflare's Rate Limiting binding, one binding per limit in `wrangler.jsonc`. Limits are the same. They no longer use KV writes, which saves free-plan KV writes. The 10-minute evidence upload limit still uses KV.
+- Workers Logs: request logs are off. The app writes one line for a failed request with the route pattern, status, and a short error. No URLs, addresses, or keys.
+- `docs/self-hosting.md`: `SITE_URL` is set at build time, not in the Cloudflare dashboard. Added free-plan KV write limits, the no-domain setup, and the GitHub deploy steps.
+
+### Fixed
+
+- Two quick write requests from one person (for example, two photos) could fail. KV allows one write per second to the same key, and the rate limit counter wrote to the same key each time. Now a counter that cannot be saved does not fail the request.
+
+### Security
+
+- Every page and API response has security headers: HSTS, `nosniff`, no framing by other sites (protects the steward key and wipe buttons from clickjacking), `Referrer-Policy: same-origin`, and no camera, microphone, or location access.
+- The Worker is served only at its custom domain. `workers_dev` and `preview_urls` are off, so there is no second public address and old versions are not served.
+- Request URLs, which can hold a building key or the steward key, are no longer kept in Cloudflare logs.
+
 ## 1.6.1 - 2026-10-07
 
 ### Changed

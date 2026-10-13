@@ -1,7 +1,7 @@
 import { getBuildingIdsForKey, isAccessKeyValid, isBuildingAccessValid, isResidentKeyRecognized } from "../access";
 import { createAuditEvent, type AuditEventAction } from "../audit";
 import { getRequestKey, jsonError, parseJsonBody } from "../http";
-import { enforceRateLimit, getClientIp } from "../rateLimit";
+import { enforceBindingRateLimit, enforceRateLimit, findRateLimitBinding, getClientIp } from "../rateLimit";
 import { saveAuditEvent } from "../storage/audit";
 
 export type GuardAuthMode = "none" | "resident" | "steward";
@@ -175,13 +175,12 @@ export const guardApiRequest = async <TPayload = Record<string, unknown>, TValid
       sessionId ? `session:${sessionId}` : null,
     ].filter((entry): entry is string => Boolean(entry));
 
+    const binding = findRateLimitBinding(env, definition.limit, definition.windowMs);
     for (const dimensionKey of dimensionKeys) {
-      const rateLimit = await enforceRateLimit({
-        kv: definition.kv,
-        key: `${definition.keyPrefix}:${dimensionKey}`,
-        limit: definition.limit,
-        windowMs: definition.windowMs,
-      });
+      const key = `${definition.keyPrefix}:${dimensionKey}`;
+      const rateLimit = binding
+        ? await enforceBindingRateLimit(binding, key, definition.windowMs)
+        : await enforceRateLimit({ kv: definition.kv, key, limit: definition.limit, windowMs: definition.windowMs });
       if (!rateLimit.ok) {
         return rejectWithAudit(config.audit, payload, url, definition.message, 429, {}, {
           "Retry-After": String(rateLimit.retryAfter),

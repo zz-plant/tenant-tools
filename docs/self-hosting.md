@@ -4,6 +4,8 @@ This guide is for a tenant union or building group that wants to run Building Le
 
 Cost: the Cloudflare free plan is enough for a few buildings. Check current Cloudflare limits before you start.
 
+The free plan allows 1,000 KV writes a day. Each resident action (a new record, a "me too", a dated fact) uses a few writes. That is enough for a few hundred actions a day. If your union runs many buildings, or a large 311 day, consider the Workers Paid plan. When the free limit is reached, saving fails until 00:00 UTC.
+
 ## What you need
 
 - A Cloudflare account (free).
@@ -36,8 +38,15 @@ Never turn on public access for the R2 bucket.
 ## 3. Edit `wrangler.jsonc`
 
 - `name`: a name for your Worker, such as `our-union-ledger`.
-- `routes`: remove the `galina.kanav.net` route, or replace it with your own domain. Without a route, Cloudflare gives you a `*.workers.dev` address.
+- `routes`: replace `galina.kanav.net` with your own domain. Your domain must be on Cloudflare.
+- No domain? Remove `routes` and set `"workers_dev": true`. Cloudflare then gives you a `*.workers.dev` address.
 - `kv_namespaces[0].id`: the id from step 2.
+- `ratelimits`: each `namespace_id` must be unique in your Cloudflare account. If another Worker in your account already uses 47104 to 47160, change these numbers.
+
+Leave these settings as they are:
+
+- `"preview_urls": false`: old versions are not served at public preview addresses.
+- `"invocation_logs": false`: Cloudflare does not save request URLs. A first visit URL can hold a building key or the steward key. The app logs only failed routes and error names.
 
 ## 4. Set secrets
 
@@ -53,14 +62,30 @@ npx wrangler secret put EVIDENCE_SIGNING_KEY
 
 You do not need to set building keys here. Stewards issue them on the site (step 6). If you already use `BUILDING_KEYS_JSON`, it keeps working. A key issued on the site replaces the settings key for that building.
 
-Optional: set `SITE_URL` (your full address, such as `https://ledger.example.org`) as a variable in the Cloudflare dashboard, for links and the sitemap.
+`SITE_URL` is your full address, such as `https://ledger.example.org`. It is used for page links, link previews, and the sitemap. It is read when the site is built, not in the Cloudflare dashboard. Set it every time you build (step 5). Without it, links point to `galina.kanav.net`.
 
 ## 5. Deploy
 
+### From your computer
+
 ```bash
 bun run test
-bun run deploy
+SITE_URL=https://ledger.example.org bun run deploy
 ```
+
+### From GitHub (recommended)
+
+The `deploy` job in `.github/workflows/ci.yml` deploys `main` after the checks pass. Then no one has to remember to deploy. Set it up once:
+
+1. In Cloudflare, go to **My Profile → API Tokens → Create Token**. Use the **Edit Cloudflare Workers** template. Under resources, choose only your account and only your domain's zone.
+2. Copy your **Account ID** from **Workers & Pages → Overview**.
+3. In GitHub, open your copy of the repository. Go to **Settings → Secrets and variables → Actions**.
+4. Add two **secrets**: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
+5. Add one **variable**: `SITE_URL`.
+
+After this, every merge to `main` deploys. To deploy by hand, open **Actions → CI → Run workflow** on `main`. Without the secrets, the deploy job is skipped and the run summary says so.
+
+Never put the API token in the code or in a chat. If it leaks, delete it in Cloudflare and make a new one.
 
 ## 6. Add buildings and keys
 
@@ -89,11 +114,15 @@ If a building's records are no longer safe, use "Emergency wipe" on `/steward`. 
 
 ## Updates
 
+If you deploy from GitHub, merge the update into `main`. The checks run, then it deploys.
+
+From your computer:
+
 ```bash
 git pull
 bun install
 bun run test
-bun run deploy
+SITE_URL=https://ledger.example.org bun run deploy
 ```
 
 Read `CHANGELOG.md` before you update. Keep `AGENTS.md` rules if you change the code: no names, no public evidence, no comments.
