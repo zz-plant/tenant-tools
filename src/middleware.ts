@@ -2,6 +2,8 @@ import { defineMiddleware } from "astro:middleware";
 import { RESIDENT_KEY_COOKIE, SESSION_ID_COOKIE, STEWARD_KEY_COOKIE } from "./lib/api/requestGuard";
 import { resolveForgetRedirect } from "./lib/quickExit";
 import { buildAccessOverlay, closedAccessEnv, hashBuildingKey, loadKeyRegistry } from "./lib/access/registry";
+import { failureLogLine } from "./lib/requestLog";
+import { withSecurityHeaders } from "./lib/securityHeaders";
 
 // Residents return from group chat links many times. A short TTL forces key re-entry too often.
 // "Forget key on this device" (`?forget=1`) clears it on shared phones.
@@ -12,6 +14,7 @@ const SESSION_COOKIE_TTL_SECONDS = 60 * 60 * 24 * 30;
 const randomSessionId = () => crypto.randomUUID().replace(/-/g, "");
 
 type MiddlewareContext = Parameters<Parameters<typeof defineMiddleware>[0]>[0];
+type MiddlewareNext = Parameters<Parameters<typeof defineMiddleware>[0]>[1];
 
 /**
  * Applies steward-issued building keys for this request only (see lib/access/registry.ts).
@@ -52,7 +55,7 @@ const applyKeyRegistry = async (context: MiddlewareContext, url: URL) => {
   }
 };
 
-export const onRequest = defineMiddleware(async (context, next) => {
+const handleRequest = async (context: MiddlewareContext, next: MiddlewareNext) => {
   const url = new URL(context.request.url);
   const residentKey = url.searchParams.get("key")?.trim() ?? "";
   const stewardKey = url.searchParams.get("stewardKey")?.trim() ?? "";
@@ -108,4 +111,20 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   return next();
+};
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  // Workers Logs keep only these lines. Request logs are off in wrangler.jsonc because URLs can hold keys.
+  const logFailure = (status: number, error?: unknown) =>
+    console.error(failureLogLine({ route: context.routePattern, method: context.request.method, status, error }));
+  try {
+    const response = await handleRequest(context, next);
+    if (response.status >= 500) {
+      logFailure(response.status);
+    }
+    return withSecurityHeaders(response);
+  } catch (error) {
+    logFailure(500, error);
+    throw error;
+  }
 });
