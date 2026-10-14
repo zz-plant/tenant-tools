@@ -18,7 +18,7 @@ const setReportStatus = (id: string, message: string, isError = false) => {
   const statusEl = document.querySelector(`[data-report-status="${id}"]`) as HTMLElement | null;
   if (!statusEl) return;
   statusEl.textContent = message;
-  statusEl.style.color = isError ? "#9a2b2b" : "#1d3b2a";
+  statusEl.style.color = isError ? "var(--color-danger)" : "var(--color-success)";
 };
 
 const updateStatusCounts = () => {
@@ -90,9 +90,10 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
           ? "You already added your report on this device."
           : "Your report was added. No personal details were saved."
       );
+      button.textContent = "✓ Reported";
+      button.setAttribute("disabled", "true");
     } catch (error) {
       setReportStatus(id, error instanceof Error ? error.message : "We could not add your report.", true);
-    } finally {
       button.removeAttribute("disabled");
       button.textContent = defaultLabel;
     }

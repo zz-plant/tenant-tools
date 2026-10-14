@@ -242,7 +242,37 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     }));
   }, [formState.autoDates]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const urlBuilding = params.get("building");
+    const urlIssue = params.get("issue");
+    if (urlBuilding || urlIssue) {
+      setFormState((prev) => ({
+        ...prev,
+        building: urlBuilding && buildingOptions.some((b) => b.id === urlBuilding) ? urlBuilding : prev.building,
+        issue: urlIssue && issueOptions.some((opt) => opt.id === urlIssue) ? urlIssue : prev.issue,
+      }));
+    }
+  }, [buildingOptions]);
+
   const noticeText = useMemo(() => buildNoticeText(formState, selectedIssue), [formState, selectedIssue]);
+
+  const noticeSubject = useMemo(() => {
+    const issueName = formatIssueLabel(selectedIssue?.label || "Maintenance Issue");
+    const bldg = formState.building || "Apartment";
+    return `Maintenance Notice: ${issueName} - ${bldg}`;
+  }, [selectedIssue?.label, formState.building]);
+
+  const noticeEmailHref = useMemo(() => {
+    if (!noticeText) return "#";
+    return `mailto:?subject=${encodeURIComponent(noticeSubject)}&body=${encodeURIComponent(noticeText)}`;
+  }, [noticeSubject, noticeText]);
+
+  const noticeSmsHref = useMemo(() => {
+    if (!noticeText) return "#";
+    return `sms:?&body=${encodeURIComponent(noticeText)}`;
+  }, [noticeText]);
 
   const meaningItems = meaningMap[formState.stage as Stage] || meaningMap.A;
 
@@ -689,24 +719,124 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     )}
 
                     {isNoticeReady && (
-                      <div className="quick-notice-banner" role="region" aria-label="Quick notice actions">
-                        <div className="quick-notice-info">
-                          <span className="quick-notice-title">Notice ready to send</span>
-                          <span className="quick-notice-subtitle">
-                            {formState.building} • {formatIssueLabel(selectedIssue?.label || "")}
-                          </span>
-                        </div>
-                        <div className="quick-notice-actions">
-                          <Button className="button button-compact" type="button" onClick={handleCopy}>
-                            {copyLabel}
-                          </Button>
-                          <Button
-                            className="button button-secondary button-compact"
+                      <div className="quick-start-date" role="region" aria-label="When problem started">
+                        <label style={{ fontSize: "0.85rem", fontWeight: 600 }}>
+                          When did this problem start?
+                        </label>
+                        <div className="fact-tag-row">
+                          <button
                             type="button"
-                            onClick={() => setCurrentStep(4)}
+                            className={`fact-tag ${formState.startDate === formatDate(new Date()) ? "fact-tag-included" : ""}`}
+                            onClick={() => handleQuickStartDate(0)}
                           >
-                            Review & Save →
-                          </Button>
+                            Today
+                          </button>
+                          <button
+                            type="button"
+                            className={`fact-tag ${(() => {
+                              const d = new Date();
+                              d.setDate(d.getDate() - 1);
+                              return formState.startDate === formatDate(d) ? "fact-tag-included" : "";
+                            })()}`}
+                            onClick={() => handleQuickStartDate(1)}
+                          >
+                            Yesterday
+                          </button>
+                          <button
+                            type="button"
+                            className={`fact-tag ${(() => {
+                              const d = new Date();
+                              d.setDate(d.getDate() - 3);
+                              return formState.startDate === formatDate(d) ? "fact-tag-included" : "";
+                            })()}`}
+                            onClick={() => handleQuickStartDate(3)}
+                          >
+                            3 days ago
+                          </button>
+                          <button
+                            type="button"
+                            className={`fact-tag ${(() => {
+                              const d = new Date();
+                              d.setDate(d.getDate() - 7);
+                              return formState.startDate === formatDate(d) ? "fact-tag-included" : "";
+                            })()}`}
+                            onClick={() => handleQuickStartDate(7)}
+                          >
+                            1 week ago
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {isNoticeReady && (
+                      <div className="quick-notice-banner" role="region" aria-label="Quick notice actions">
+                        <div className="quick-notice-top-row">
+                          <div className="quick-notice-info">
+                            <span className="quick-notice-title">Notice ready to send</span>
+                            <span className="quick-notice-subtitle">
+                              {formState.building} • {formatIssueLabel(selectedIssue?.label || "")} • Started {formState.startDate || "today"}
+                            </span>
+                          </div>
+                          <div className="quick-notice-actions">
+                            <Button className="button button-compact" type="button" onClick={handleCopy}>
+                              {copyLabel}
+                            </Button>
+                            <a
+                              className="button button-secondary button-compact"
+                              href={noticeEmailHref}
+                              title="Open in your email app with notice pre-filled"
+                            >
+                              ✉️ Email
+                            </a>
+                            <a
+                              className="button button-secondary button-compact"
+                              href={noticeSmsHref}
+                              title="Open in your text messaging app with notice pre-filled"
+                            >
+                              💬 Text
+                            </a>
+                            <Button
+                              className="button button-secondary button-compact"
+                              type="button"
+                              onClick={() => setCurrentStep(4)}
+                            >
+                              Review & Save →
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="fact-tags">
+                          <div className="fact-tag-row">
+                            <span className="helper" style={{ alignSelf: "center", marginRight: "4px" }}>Style:</span>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "en" && formState.simpleEnglish ? "fact-tag-included" : ""}`}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "en", simpleEnglish: true }))}
+                            >
+                              Simple English
+                            </button>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "en" && !formState.simpleEnglish ? "fact-tag-included" : ""}`}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "en", simpleEnglish: false }))}
+                            >
+                              Standard English
+                            </button>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "es" ? "fact-tag-included" : ""}`}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "es", simpleEnglish: false }))}
+                            >
+                              Español
+                            </button>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "pl" ? "fact-tag-included" : ""}`}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "pl", simpleEnglish: false }))}
+                            >
+                              Polski
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -998,6 +1128,22 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         >
                           {copyLabel}
                         </Button>
+                        <a
+                          className="button button-secondary"
+                          href={noticeEmailHref}
+                          aria-disabled={!isNoticeReady}
+                          onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                        >
+                          ✉️ Email notice
+                        </a>
+                        <a
+                          className="button button-secondary"
+                          href={noticeSmsHref}
+                          aria-disabled={!isNoticeReady}
+                          onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                        >
+                          💬 Text notice
+                        </a>
                         <Button
                           className="button button-secondary"
                           type="button"
@@ -1072,6 +1218,24 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                   <Button className="button" type="button" onClick={handleCopy} disabled={!isNoticeReady}>
                     {copyLabel}
                   </Button>
+                  <a
+                    className="button button-secondary"
+                    href={noticeEmailHref}
+                    aria-disabled={!isNoticeReady}
+                    onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                    title="Open in your email app with notice pre-filled"
+                  >
+                    ✉️ Email
+                  </a>
+                  <a
+                    className="button button-secondary"
+                    href={noticeSmsHref}
+                    aria-disabled={!isNoticeReady}
+                    onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                    title="Open in your text messaging app with notice pre-filled"
+                  >
+                    💬 Text
+                  </a>
                   <Button className="button button-secondary" type="button" onClick={handleRepeatNotice} disabled={!isNoticeReady}>
                     {repeatLabel}
                   </Button>

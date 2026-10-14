@@ -194,6 +194,12 @@ const groupChatText = submissionRecord
                 <>
                   <div class="issue-actions">
                     <button class="button" type="button" data-me-too data-submission-id={id}>Me too</button>
+                    <a
+                      class="button button-secondary"
+                      href={`/?building=${encodeURIComponent(submissionRecord.building)}&issue=${encodeURIComponent(submissionRecord.issue)}#builder`}
+                    >
+                      Draft notice for this issue
+                    </a>
                   </div>
                   <p class="helper" data-me-too-status role="status" aria-live="polite">
                     Tap “Me too” if you have this problem. No personal details are saved.

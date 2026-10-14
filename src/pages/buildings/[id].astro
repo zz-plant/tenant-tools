@@ -236,27 +236,54 @@ const totalFiltered = filtered.length;
                   </div>
                 </details>
               )}
-              <div>
-                <h2>Recent records</h2>
-                <p class="helper">Showing {totalVisible} of {totalFiltered} records. Use the filters on the right to change this list.</p>
-                <p class="helper">Small report counts are hidden to protect resident privacy.</p>
-                {hasFilters && (
-                  <div class="tag-row">
-                    {issueFilter !== "all" && (
-                      <span>
-                        Filtered by issue: {activeIssueLabel}.{" "}
-                        <a href={clearIssueUrl}>Clear issue filter</a>
-                      </span>
-                    )}
-                    {statusFilter !== "all" && (
-                      <span>
-                        Filtered by status: {activeStatusLabel}.{" "}
-                        <a href={clearStatusUrl}>Clear status filter</a>
-                      </span>
-                    )}
-                  </div>
-                )}
+
+              <div class="ledger-action-bar">
+                <div>
+                  <h2 style="margin: 0; font-size: 1.15rem;">Recent records</h2>
+                  <p class="helper" style="margin: 0;">Showing {totalVisible} of {totalFiltered} records. Small counts are hidden for privacy.</p>
+                </div>
+                <a class="button" href={`/?building=${encodeURIComponent(buildingId)}#builder`}>
+                  ＋ Draft notice for this building
+                </a>
               </div>
+
+              <nav class="quick-filter-bar" aria-label="Filter issues by category">
+                <a
+                  href={buildFilterUrl("all", statusFilter)}
+                  class={`fact-tag ${issueFilter === "all" ? "fact-tag-included" : ""}`}
+                >
+                  All issues ({submissions.length})
+                </a>
+                {issueOptions.map((opt) => {
+                  const count = submissions.filter((s) => s.issue === opt.id).length;
+                  if (count === 0 && issueFilter !== opt.id) return null;
+                  return (
+                    <a
+                      href={buildFilterUrl(opt.id, statusFilter)}
+                      class={`fact-tag ${issueFilter === opt.id ? "fact-tag-included" : ""}`}
+                    >
+                      {opt.label} ({count})
+                    </a>
+                  );
+                })}
+              </nav>
+
+              {hasFilters && (
+                <div class="tag-row" style="margin-bottom: 12px;">
+                  {issueFilter !== "all" && (
+                    <span>
+                      Filtered by issue: {activeIssueLabel}.{" "}
+                      <a href={clearIssueUrl}>Clear issue filter</a>
+                    </span>
+                  )}
+                  {statusFilter !== "all" && (
+                    <span>
+                      Filtered by status: {activeStatusLabel}.{" "}
+                      <a href={clearStatusUrl}>Clear status filter</a>
+                    </span>
+                  )}
+                </div>
+              )}
 
               {totalFiltered === 0 ? (
                 <p class="helper">No records match these filters.</p>
