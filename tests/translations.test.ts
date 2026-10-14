@@ -11,12 +11,34 @@ import {
 } from "../src/lib/i18n/translate";
 import { collectSourceStrings } from "../src/lib/i18n/sources";
 import { checkCatalog, exportTranslationCsv, importTranslationCsv, parseCsv, placeholdersOf } from "../src/lib/i18n/workflow";
-import { buildNoticeText, createInitialFormState } from "../src/components/noticeBuilder/logic";
+import {
+  buildNoticeText,
+  chooseNoticeTemplate,
+  createInitialFormState,
+  getWithheldNoticeNote,
+} from "../src/components/noticeBuilder/logic";
+import { noticeBuilderStrings } from "../src/data/i18n/strings";
+import { issueOptions } from "../src/data/noticeData";
+import { depositIssue } from "../src/data/notice/issues/deposit";
 import { heatIssue } from "../src/data/notice/issues/heat";
+import { lockoutIssue } from "../src/data/notice/issues/lockout";
 
 const onDate = "2026-10-07";
 const sources = collectSourceStrings(onDate);
 const catalog = (entries: Catalog["entries"]): Catalog => ({ lang: "es", entries });
+
+/** Puts entries in a saved catalog for one test, then restores it. */
+const withSavedEntries = (lang: string, entries: Catalog["entries"], run: () => void) => {
+  const saved = getCatalog(lang);
+  assert.ok(saved, lang);
+  const before = { ...saved.entries };
+  Object.assign(saved.entries, entries);
+  try {
+    run();
+  } finally {
+    saved.entries = before;
+  }
+};
 
 describe("translation lookup", () => {
   it("shows reviewed text, hides drafts unless previewing, and hides stale text", () => {
@@ -56,20 +78,77 @@ describe("saved catalogs", () => {
   it("have a Spanish draft for every rules guide string", () => {
     const es = getCatalog("es");
     assert.ok(es);
-    const guideKeys = sources.filter((source) => !source.key.startsWith("notice.")).map((source) => source.key);
+    const guideKeys = sources
+      .filter((source) => !source.key.startsWith("notice.") && !source.key.startsWith("builder."))
+      .map((source) => source.key);
     assert.deepEqual(guideKeys.filter((key) => !es.entries[key]), []);
     assert.ok(Object.values(es.entries).every((entry) => entry.status === "draft"));
   });
 });
 
-describe("notice templates", () => {
-  it("use a reviewed catalog translation when one matches the current English", () => {
-    const english = heatIssue.notices.A.en;
-    assert.equal(resolveNoticeTemplate("heat", "A", "es", "old", english), "old");
-    assert.equal(resolveNoticeTemplate("heat", "A", "en", undefined, english), undefined);
-    const state = { ...createInitialFormState(new Date("2026-10-07T12:00:00")), language: "es", simpleEnglish: false, building: "2400 W Wabansia" };
-    // No reviewed Spanish notice is in the catalog yet, so the issue file's Spanish text is used.
-    assert.ok(buildNoticeText(state, heatIssue).startsWith("Hola"));
+describe("notice templates (AGENTS.md §14)", () => {
+  const now = new Date("2026-10-07T12:00:00");
+  const base = { ...createInitialFormState(now), building: "2400 W Wabansia", firstMessageDate: "2026-10-01" };
+  const allIssues = [...issueOptions, depositIssue, lockoutIssue];
+  const english = heatIssue.notices.A.en;
+  const reviewedHeat = { text: "Hola. Vivo en [ADDRESS]. Revisado.", status: "reviewed" as const, source_hash: sourceHash(english) };
+
+  it("show the English notice instead of an unreviewed Spanish, Hindi, or Polish draft", () => {
+    for (const language of ["es", "hi", "pl"]) {
+      assert.ok(heatIssue.notices.A[language], `${language} draft is still in the issue file`);
+      assert.equal(resolveNoticeTemplate("heat", "A", language, english), null);
+      const state = { ...base, language, simpleEnglish: false };
+      assert.equal(buildNoticeText(state, heatIssue, now), buildNoticeText({ ...state, language: "en" }, heatIssue, now));
+      assert.deepEqual(chooseNoticeTemplate(state, heatIssue), { template: english, language: "en", simpleEnglish: false, withheld: true });
+    }
+  });
+
+  it("show a reviewed translation in its language while it matches the current English", () => {
+    withSavedEntries("es", { "notice.heat.A": reviewedHeat }, () => {
+      const state = { ...base, language: "es", simpleEnglish: true };
+      assert.equal(buildNoticeText(state, heatIssue, now), "Hola. Vivo en 2400 W Wabansia. Revisado.");
+      assert.equal(chooseNoticeTemplate(state, heatIssue).withheld, false);
+      // Other stages and languages are still not reviewed.
+      assert.equal(chooseNoticeTemplate({ ...state, stage: "B" }, heatIssue).withheld, true);
+      assert.equal(chooseNoticeTemplate({ ...state, language: "pl" }, heatIssue).withheld, true);
+    });
+    withSavedEntries("es", { "notice.heat.A": { ...reviewedHeat, source_hash: sourceHash("Old English") } }, () => {
+      assert.equal(chooseNoticeTemplate({ ...base, language: "es" }, heatIssue).withheld, true);
+    });
+    withSavedEntries("es", { "notice.heat.A": { ...reviewedHeat, status: "draft" } }, () => {
+      assert.equal(chooseNoticeTemplate({ ...base, language: "es" }, heatIssue).withheld, true);
+    });
+  });
+
+  it("never return draft text for any issue, stage, language, or style", () => {
+    for (const issue of allIssues) {
+      for (const stage of ["A", "B", "C"]) {
+        for (const language of ["es", "hi", "pl"]) {
+          for (const simpleEnglish of [true, false]) {
+            const state = { ...base, stage, language, simpleEnglish };
+            const label = `${issue.id} ${stage} ${language} simple=${simpleEnglish}`;
+            assert.equal(resolveNoticeTemplate(issue.id, stage, language, issue.notices[stage]?.en), null, label);
+            const choice = chooseNoticeTemplate(state, issue);
+            assert.equal(choice.withheld, true, label);
+            assert.equal(choice.template, simpleEnglish ? issue.simple[stage as "A"] : issue.notices[stage].en, label);
+            assert.equal(buildNoticeText(state, issue, now), buildNoticeText({ ...state, language: "en" }, issue, now), label);
+          }
+        }
+      }
+    }
+  });
+
+  it("explain in English until the note itself is reviewed", () => {
+    const englishNote = noticeBuilderStrings["builder.notice_not_reviewed"];
+    assert.deepEqual(getWithheldNoticeNote("es"), { text: englishNote, lang: "en" });
+    const draftNote = { text: "Nota", status: "draft" as const, source_hash: sourceHash(englishNote) };
+    withSavedEntries("es", { "builder.notice_not_reviewed": draftNote }, () => {
+      assert.deepEqual(getWithheldNoticeNote("es"), { text: englishNote, lang: "en" });
+    });
+    withSavedEntries("es", { "builder.notice_not_reviewed": { ...draftNote, status: "reviewed" } }, () => {
+      assert.deepEqual(getWithheldNoticeNote("es"), { text: "Nota", lang: "es" });
+      assert.deepEqual(getWithheldNoticeNote("pl"), { text: englishNote, lang: "en" });
+    });
   });
 });
 

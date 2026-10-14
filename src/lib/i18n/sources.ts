@@ -3,7 +3,8 @@ import { helpResourceGroups } from "../../data/helpResources";
 import { issueOptions } from "../../data/noticeData";
 import { depositIssue } from "../../data/notice/issues/deposit";
 import { lockoutIssue } from "../../data/notice/issues/lockout";
-import { rightsStrings } from "../../data/i18n/strings";
+import { noticeBuilderStrings, rightsStrings } from "../../data/i18n/strings";
+import { noticeTemplateKey } from "./translate";
 
 /*
  * Every string the translation workflow knows about, with its English source.
@@ -15,7 +16,7 @@ export type SourceString = {
   english: string;
   /** Where the text appears, for reviewers. */
   context: string;
-  /** Translation already in the code (notice templates), used when the catalog has none. */
+  /** Unreviewed draft in the issue files (notice templates). Exported for review, never shown. */
   existing?: Record<string, string>;
 };
 
@@ -52,7 +53,7 @@ const noticeSources = (): SourceString[] =>
       .map((stage) => {
         const { en, ...existing } = issue.notices[stage];
         return {
-          key: `notice.${issue.id}.${stage}`,
+          key: noticeTemplateKey(issue.id, stage),
           english: en,
           context: `Notice: ${issue.label}, stage ${stage}`,
           existing,
@@ -64,6 +65,7 @@ export const collectSourceStrings = (onDate: string): SourceString[] => {
   const seen = new Set<string>();
   return [
     ...Object.entries(rightsStrings).map(([key, english]) => ({ key, english, context: "Rules guide: page text" })),
+    ...Object.entries(noticeBuilderStrings).map(([key, english]) => ({ key, english, context: "Notice builder: page text" })),
     ...Object.entries(referenceStrings).map(([key, english]) => ({ key, english, context: "Rules guide: reference card" })),
     ...heatExceptions.map((exception) => ({ key: exception.key, english: exception.text, context: "Rules guide: heat rule" })),
     ...Object.values(evictionStrings)

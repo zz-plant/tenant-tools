@@ -78,24 +78,15 @@ describe("buildNoticeText", () => {
     }
   });
 
-  it("does not use very simple English for other languages", () => {
+  it("uses the English notice, in the chosen English style, for Spanish and Polish until reviewed", () => {
     const heat = issueOptions.find((option) => option.id === "heat");
-    const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language: "es", stage: "B" };
-    assert.ok(buildNoticeText(state, heat, now).startsWith("Hola"));
-  });
-
-  it("uses Spanish template when selected", () => {
-    const heat = issueOptions.find((option) => option.id === "heat");
-    const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language: "es" };
-    const text = buildNoticeText(state, heat, now);
-    assert.ok(text.includes("Vivo en 2400 W Wabansia"));
-  });
-
-  it("uses Polish template when selected", () => {
-    const heat = issueOptions.find((option) => option.id === "heat");
-    const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language: "pl" };
-    const text = buildNoticeText(state, heat, now);
-    assert.ok(text.includes("Mieszkam pod adresem 2400 W Wabansia"));
+    for (const simpleEnglish of [true, false]) {
+      const english = buildNoticeText({ ...createInitialFormState(now), building: "2400 W Wabansia", simpleEnglish }, heat, now);
+      for (const language of ["es", "pl"]) {
+        const state = { ...createInitialFormState(now), building: "2400 W Wabansia", language, simpleEnglish };
+        assert.equal(buildNoticeText(state, heat, now), english, `${language} simple=${simpleEnglish}`);
+      }
+    }
   });
 
   it("falls back to English when a language has no template", () => {

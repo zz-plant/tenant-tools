@@ -40,11 +40,13 @@ import {
   buildGuidanceScript,
   buildNextSteps,
   buildNoticeText,
+  chooseNoticeTemplate,
   collectIssueDetails,
   collectRuleCards,
   computeDaysOpen,
   createInitialFormState,
   getIssueGuidance,
+  getWithheldNoticeNote,
   type FormState,
   type IssueFieldKey,
 } from "./noticeBuilder/logic";
@@ -66,6 +68,14 @@ const ResidentSessionNote = () => (
     Your resident key is saved on this device. <a href="/?forget=1">Forget key on this device</a>
   </p>
 );
+
+/** Shown when the chosen language has no reviewed translation of this notice (AGENTS.md §14). */
+const WithheldNoticeNote = ({ note }: { note: { text: string; lang: string } | null }) =>
+  note ? (
+    <p className="helper helper-warning" role="status" lang={note.lang}>
+      {note.text}
+    </p>
+  ) : null;
 
 const RadioGroup = {
   Root: BaseRadioGroup,
@@ -257,6 +267,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   }, [buildingOptions]);
 
   const noticeText = useMemo(() => buildNoticeText(formState, selectedIssue), [formState, selectedIssue]);
+  const noticeChoice = useMemo(
+    () => (selectedIssue ? chooseNoticeTemplate(formState, selectedIssue) : null),
+    [formState, selectedIssue]
+  );
+  const withheldNote = noticeChoice?.withheld ? getWithheldNoticeNote(formState.language) : null;
 
   const noticeSubject = useMemo(() => {
     const issueName = formatIssueLabel(selectedIssue?.label || "Maintenance Issue");
@@ -522,12 +537,13 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     { label: "Today", value: formState.today || "Add today's date" },
     { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
   ];
-  // Very simple English applies only to English notices (see buildNoticeText).
-  const noticeLanguageLabel = formState.simpleEnglish && formState.language === "en"
-    ? "Very simple English"
-    : formState.language === "en"
-      ? "English"
-      : formState.language.toUpperCase();
+  // The language the notice is in, which is English when the chosen language is not reviewed.
+  const noticeLanguageLabel =
+    noticeChoice && noticeChoice.language !== "en"
+      ? noticeChoice.language.toUpperCase()
+      : noticeChoice?.simpleEnglish
+        ? "Very simple English"
+        : "English";
 
   const detailSummaryItems = useMemo(
     () =>
@@ -838,6 +854,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             </button>
                           </div>
                         </div>
+                        <WithheldNoticeNote note={withheldNote} />
                       </div>
                     )}
 
@@ -935,6 +952,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         required
                       />
                     </label>
+                    <WithheldNoticeNote note={withheldNote} />
 
                     <div className="checkbox-row">
                       <label className="checkbox-label">
@@ -1160,6 +1178,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         </p>
                       )}
 
+                      <WithheldNoticeNote note={withheldNote} />
                       <label>
                         Notice text
                         <pre className="output-notice">{noticeText}</pre>

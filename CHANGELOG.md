@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.1 - 2026-10-14
+
+### Fixed
+
+- The notice builder no longer shows the Spanish, Hindi, or Polish notice text. A fluent reviewer has not checked it (AGENTS.md §14). A resident who chooses one of these languages gets the English notice, in Very simple English when that option is on. A note says that a reviewed translation is not available yet. The note is in English until its own translation is reviewed.
+- The draft translations stay in the issue files and in the translation export, so reviewers can check them. See `docs/translations.md`.
+
 ## 1.7.0 - 2026-10-13
 
 ### Added

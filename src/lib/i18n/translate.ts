@@ -94,20 +94,16 @@ export const createTranslator = (lang: string, options: { preview?: boolean } = 
   };
 };
 
+export const noticeTemplateKey = (issueId: string, stage: string) => `notice.${issueId}.${stage}`;
+
 /**
- * Notice template for a language: a reviewed catalog translation of the current English if one
- * exists, otherwise the translation already in the issue file.
+ * Notice template for a language: a reviewed catalog translation of the current English, or null
+ * when the English notice must be shown. The Spanish, Hindi, and Polish text in the issue files is
+ * an unreviewed draft. It is exported for reviewers (see docs/translations.md) and never shown.
  */
-export const resolveNoticeTemplate = (
-  issueId: string,
-  stage: string,
-  lang: string,
-  existing: string | undefined,
-  english: string | undefined
-) => {
+export const resolveNoticeTemplate = (issueId: string, stage: string, lang: string, english: string | undefined) => {
   if (lang === "en" || !english) {
-    return existing;
+    return null;
   }
-  const entry = lookupTranslation(getCatalog(lang), `notice.${issueId}.${stage}`, english);
-  return entry ? entry.text : existing;
+  return lookupTranslation(getCatalog(lang), noticeTemplateKey(issueId, stage), english)?.text ?? null;
 };
