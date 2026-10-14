@@ -3,7 +3,8 @@ import type { IssueOption } from "../../data/notice/types";
 import { getRuleCardsForIssue } from "../../data/rules";
 import { addDays, formatCalendarDate, formatDate, getCurrentTime } from "../../lib/dateUtils";
 import { fillTemplate } from "../../lib/noticeUtils";
-import { resolveNoticeTemplate } from "../../lib/i18n/translate";
+import { noticeBuilderStrings } from "../../data/i18n/strings";
+import { createTranslator, resolveNoticeTemplate } from "../../lib/i18n/translate";
 
 /*
  * Pure logic for the notice builder. No React here, so every function can be unit tested.
@@ -52,23 +53,47 @@ export const createInitialFormState = (now: Date = new Date(), initialBuilding: 
   };
 };
 
+export type NoticeTemplateChoice = {
+  template: string;
+  /** Language of `template`: the chosen language, or "en" when the English notice is shown. */
+  language: string;
+  simpleEnglish: boolean;
+  /** The resident chose another language, but it has no reviewed translation of this notice. */
+  withheld: boolean;
+};
+
+/**
+ * Template for the chosen issue, stage, and language. Another language is used only with a
+ * reviewed translation (AGENTS.md §14, lib/i18n/translate.ts). Otherwise the English notice is
+ * used, in Very simple English when that option is on.
+ */
+export const chooseNoticeTemplate = (state: FormState, issue: IssueOption): NoticeTemplateChoice => {
+  const translated = resolveNoticeTemplate(issue.id, state.stage, state.language, issue.notices[state.stage]?.en);
+  if (translated) {
+    return { template: translated, language: state.language, simpleEnglish: false, withheld: false };
+  }
+  const withheld = state.language !== "en";
+  if (state.simpleEnglish) {
+    const template = issue.simple[state.stage as keyof IssueOption["simple"]] || issue.simple.A;
+    return { template, language: "en", simpleEnglish: true, withheld };
+  }
+  return { template: issue.notices[state.stage]?.en || issue.notices.A.en, language: "en", simpleEnglish: false, withheld };
+};
+
+/** Note shown when `withheld` is true. In the chosen language only when the note itself is reviewed. */
+export const getWithheldNoticeNote = (language: string) => {
+  const translator = createTranslator(language);
+  const key = "builder.notice_not_reviewed";
+  const text = translator.t(key, noticeBuilderStrings[key]);
+  return { text, lang: translator.stats().shown > 0 ? language : "en" };
+};
+
 export const buildNoticeText = (state: FormState, issue: IssueOption | undefined, now: Date = new Date()) => {
   if (!issue) {
     return "";
   }
 
-  // A reviewed catalog translation wins over the one in the issue file (see lib/i18n/translate.ts).
-  const translated = resolveNoticeTemplate(
-    issue.id,
-    state.stage,
-    state.language,
-    issue.notices[state.stage]?.[state.language],
-    issue.notices[state.stage]?.en
-  );
-  const template =
-    state.language === "en" && state.simpleEnglish
-      ? issue.simple[state.stage as keyof IssueOption["simple"]] || issue.simple.A
-      : translated || issue.notices[state.stage]?.en || issue.notices.A.en;
+  const { template } = chooseNoticeTemplate(state, issue);
 
   const values: Record<string, string> = {
     ADDRESS: state.building || "[ADDRESS]",

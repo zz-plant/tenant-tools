@@ -5,7 +5,8 @@ Building Ledger shows a translation to residents only after a fluent community r
 ## What can be translated
 
 - The rules guide (`/rights`): page text, rule cards, heat, deposit, and eviction cards, and "Where to get help".
-- Notice templates in Spanish, Hindi, and Polish. Reviewed text replaces the text in the issue files.
+- Notice templates in Spanish, Hindi, and Polish (`notice.<issue>.<stage>`).
+- The notice builder note that says a notice is shown in English (`builder.notice_not_reviewed`).
 
 Each string has a key, its English source, and a status:
 
@@ -47,4 +48,5 @@ The import checks every row. If any row has a problem, nothing is changed and th
 ## Current state (October 2026)
 
 - Spanish rules guide: 78 lines drafted, 0 reviewed. Residents who open `/rights?lang=es` see English and a link to the City's official Spanish RLTO summary.
-- Notice templates: the Spanish, Hindi, and Polish text in the issue files is still used. It can be exported for review the same way.
+- Notice templates: 0 reviewed. The Spanish, Hindi, and Polish text in `src/data/notice/issues/*.ts` is an unreviewed draft. Part of it was drafted by AI in PR #158. It is not shown to residents. A resident who chooses Spanish, Hindi, or Polish gets the English notice and a note that says so. The note is in English until its own translation is reviewed.
+- The drafts stay in the issue files so reviewers can start from them. The export puts each one in the `translation` column with status `draft`. When a reviewer marks a notice `reviewed`, residents see the catalog text, not the issue-file text.

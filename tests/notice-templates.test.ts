@@ -74,21 +74,24 @@ describe("Standard English final reminders", () => {
     }
   });
 
-  it("are used in Spanish, Hindi, and Polish, with the first message date filled in", () => {
+  it("are used in English for Spanish, Hindi, and Polish until reviewed, and the drafts stay for reviewers", () => {
     const greetings = { es: "Hola,", hi: "नमस्ते,", pl: "Dzień dobry," } as const;
     for (const [language, greeting] of Object.entries(greetings)) {
       const state = {
         ...createInitialFormState(now),
         language,
+        simpleEnglish: false,
         stage: "C",
         building: "2400 W Wabansia",
         firstMessageDate: "2026-09-10",
       };
       for (const issue of [noTimelineIssue, buildingIssue, lockoutIssue]) {
+        const draft = issue.notices.C[language];
+        assert.ok(draft.startsWith(greeting), `${issue.id} ${language} draft is missing`);
+        assert.ok(draft.includes("[DATE OF FIRST MESSAGE]"), `${issue.id} ${language} draft is missing the first message date`);
         const text = buildNoticeText(state, issue, now);
-        assert.ok(text.startsWith(greeting), `${issue.id} ${language} final reminder is not in ${language}`);
+        assert.equal(text, buildNoticeText({ ...state, language: "en" }, issue, now), `${issue.id} ${language} showed the draft`);
         assert.ok(text.includes("2026-09-10"), `${issue.id} ${language} final reminder is missing the first message date`);
-        assert.ok(!text.includes("[DATE OF FIRST MESSAGE]"), `${issue.id} ${language} left the placeholder`);
       }
     }
   });

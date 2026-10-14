@@ -15,6 +15,11 @@ export const rightsStrings = {
 
 export type RightsStringKey = keyof typeof rightsStrings;
 
+/** English sources for notice builder text that can be translated. */
+export const noticeBuilderStrings = {
+  "builder.notice_not_reviewed": "A reviewed translation of this notice is not available yet. This notice is in English.",
+} as const;
+
 /** Languages the rights page can show once translations are reviewed. */
 export const rightsLanguages = [
   { id: "en", label: "English" },
