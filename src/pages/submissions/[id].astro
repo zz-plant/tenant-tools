@@ -20,6 +20,7 @@ import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 import { reconcileReportCount } from "../../lib/domain/submissions";
 import { countReporterMarkers, fetchSubmissionRecord, saveSubmissionRecord } from "../../lib/storage/submissions";
 import { buildBuildingDashboardUrl } from "../../lib/navigation";
+import { buildRecordNoticeUrl, nextNoticeStage, noticeStageActionLabels } from "../../lib/followUp";
 import { formatIssueLabel } from "../../lib/noticeUtils";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
@@ -88,6 +89,16 @@ const timelineEntries = submissionRecord
   ? getSubmissionTimelineEntries({ ...submissionRecord, events: recordEvents })
   : [];
 const fairNoticeRule = getFairNoticeRule(today);
+// "Send a follow-up" opens the builder filled in from this record. Saving there adds a dated fact here.
+const nextNotice = submissionRecord ? nextNoticeStage(submissionRecord, recordEvents, today) : null;
+const nextNoticeUrl = submissionRecord && nextNotice ? buildRecordNoticeUrl(submissionRecord.id, nextNotice.stage) : "";
+const nextNoticeLockNote = nextNotice?.unlockDate
+  ? nextNotice.stage === "A"
+    ? `A follow-up unlocks on ${formatTimelineDate(nextNotice.unlockDate)}.`
+    : `The final reminder unlocks on ${formatTimelineDate(nextNotice.unlockDate)}.`
+  : "";
+// One-tap choices for the facts residents add most. The full list stays in the menu.
+const quickFactTypes = ["management_replied", "repair_date_promised", "repair_completed", "request_311_filed"] as const;
 const factTypesByGroup = recordEventGroups.map((group) => ({
   ...group,
   types: recordEventTypes.filter((type) => recordEventDefinitions[type].group === group.id),
@@ -194,13 +205,11 @@ const groupChatText = submissionRecord
                 <>
                   <div class="issue-actions">
                     <button class="button" type="button" data-me-too data-submission-id={id}>Me too</button>
-                    <a
-                      class="button button-secondary"
-                      href={`/?building=${encodeURIComponent(submissionRecord.building)}&issue=${encodeURIComponent(submissionRecord.issue)}#builder`}
-                    >
-                      Draft notice for this issue
+                    <a class="button button-secondary" href={nextNoticeUrl} data-next-notice>
+                      {nextNotice ? noticeStageActionLabels[nextNotice.stage] : "Send a follow-up"}
                     </a>
                   </div>
+                  {nextNoticeLockNote && <p class="helper">{nextNoticeLockNote}</p>}
                   <p class="helper" data-me-too-status role="status" aria-live="polite">
                     Tap “Me too” if you have this problem. No personal details are saved.
                   </p>
@@ -248,6 +257,13 @@ const groupChatText = submissionRecord
                     <p class="helper">Add what happened after your notice. Choose from the list. Dates only. No names.</p>
                     <p class="helper">Residents with the building key can see these facts.</p>
                   </div>
+                  <div class="fact-tag-row quick-facts" role="group" aria-label="Common facts">
+                    {quickFactTypes.map((type) => (
+                      <button class="fact-tag" type="button" data-fact-chip={type}>
+                        {recordEventDefinitions[type].label}
+                      </button>
+                    ))}
+                  </div>
                   <form class="facts-form" data-facts-form>
                     <label>
                       What happened
@@ -264,7 +280,7 @@ const groupChatText = submissionRecord
                     </label>
                     <label>
                       <span data-fact-date-label>Date</span>
-                      <input class="input" type="date" name="date" data-fact-date required />
+                      <input class="input" type="date" name="date" value={today} data-fact-date required />
                     </label>
                     <label hidden data-fact-ref-field>
                       <span data-fact-ref-label>Number (optional)</span>

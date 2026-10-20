@@ -93,6 +93,8 @@ R2 (`EVIDENCE_BUCKET`): `ev/{uuid}` holds stripped image bytes. The bucket is ne
 
 `POST /api/submissions/{id}/events` (resident key for the record's building, rate limited, audited) adds one fact from a fixed list, such as "Portal request marked complete, but not fixed" or "Rent increase notice received". There is no free text. Two types take a short number (work order, inspection or 311 number), checked for phone numbers.
 
+The notice builder adds `follow_up_sent` or `final_notice_sent` when a resident sends a follow-up from a saved record (`/?record={id}&stage=B|C`). The builder reads the record with `GET /api/submissions/{id}` and posts the fact to the same record, so a follow-up never makes a second record. `nextNoticeStage` in `src/lib/followUp.ts` picks the stage with the builder's unlock days.
+
 Each fact has its own `revt:` key, so a fact never overwrites the record JSON and a concurrent "me too" cannot drop it. Facts show on the record timeline and, for follow-up types, in the printable building summary. `DELETE` on the same path is steward-only housekeeping. Facts are never edited.
 
 ### "Me too" counts

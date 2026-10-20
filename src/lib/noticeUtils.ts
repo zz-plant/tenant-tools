@@ -8,6 +8,9 @@ export const fillTemplate = (template: string, values: Record<string, string>) =
   return text;
 };
 
+/** Days after the start date when each notice step unlocks (AGENTS.md §6.1). */
+export const noticeUnlockDays = { followUp: 3, finalReminder: 6 } as const;
+
 export const getVisibleUnlockableSteps = <T extends { unlocked: boolean }>(steps: T[]): T[] => {
   const firstLockedIndex = steps.findIndex((step) => !step.unlocked);
   if (firstLockedIndex < 0) {

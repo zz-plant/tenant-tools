@@ -21,7 +21,7 @@ import { portfolioOptions } from "../data/portfolioOptions";
 import { getNoticeMilestone, heatMinimumLines, heatSeasonLabel, isInHeatSeason } from "../data/rules";
 import { buildExportSummary, type ExportAudience } from "../lib/exportSummary";
 import useTimedCallbacks from "../hooks/useTimedCallbacks";
-import { formatDate, getCurrentTime } from "../lib/dateUtils";
+import { formatDate, formatTimelineDate, getCurrentTime } from "../lib/dateUtils";
 import { formatIssueLabel, getVisibleUnlockableSteps } from "../lib/noticeUtils";
 import { detectSensitiveContent } from "../lib/validation";
 import {
@@ -122,6 +122,25 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
   const [shareChecks, setShareChecks] = useState({ names: false, units: false, contact: false });
   const [showOptionalSetup, setShowOptionalSetup] = useState(false);
+  // Copy, Email, and Text also save the notice, so residents do not need a separate save step.
+  const [addToLedger, setAddToLedger] = useState(true);
+  // Set when the builder was opened from a saved record ("Send a follow-up"). Saving then adds a
+  // dated fact to that record instead of creating a second record for the same problem.
+  const [recordContext, setRecordContext] = useState<{ id: string; url: string; startDate: string } | null>(null);
+  const [recordNote, setRecordNote] = useState("");
+  // After a choice, bring the next question into view so residents do not hunt for it on a phone.
+  const [scrollTarget, setScrollTarget] = useState("");
+  useEffect(() => {
+    if (!scrollTarget || typeof window === "undefined") {
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => {
+      const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+      document.querySelector(scrollTarget)?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      setScrollTarget("");
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [scrollTarget]);
   const { scheduleTimeout } = useTimedCallbacks();
   const stepProgress = Math.round((currentStep / steps.length) * 100);
   const currentStepInfo = steps[currentStep - 1];
@@ -158,7 +177,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     formState.building && (residentBuildings.includes("*") || residentBuildings.includes(formState.building))
   );
   const hasSaveAccess = Boolean(normalizedBuildingKey) || hasResidentSession;
-  const canSaveLedger = Boolean(formState.building && formState.issue && hasSaveAccess);
+  // In record mode a follow-up or final reminder is added to the saved record as a dated fact.
+  const recordFactType =
+    recordContext && (formState.stage === "B" || formState.stage === "C")
+      ? formState.stage === "C"
+        ? "final_notice_sent"
+        : "follow_up_sent"
+      : null;
+  const recordFactLabel = recordFactType === "final_notice_sent" ? "Final reminder sent" : "Follow-up notice sent";
+  const canSaveLedger = Boolean(
+    formState.building && formState.issue && hasSaveAccess && (!recordContext || recordFactType)
+  );
   const saveDisabledMessage = !formState.building || !formState.issue
     ? "Choose a building and issue to enable saving."
     : !hasSaveAccess
@@ -255,6 +284,48 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+    const recordId = params.get("record") ?? "";
+    const urlStage = params.get("stage");
+    if (/^[A-Za-z0-9-]{8,80}$/.test(recordId)) {
+      const stage: Stage = urlStage === "A" || urlStage === "C" ? urlStage : "B";
+      fetch(`/api/submissions/${encodeURIComponent(recordId)}`, { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
+        .then((record) => {
+          if (!record || typeof record !== "object" || typeof record.building !== "string") {
+            throw new Error("invalid record");
+          }
+          const details: Record<string, string> = {};
+          const formFields = createInitialFormState(new Date());
+          Object.entries((record.issueDetails ?? {}) as Record<string, unknown>).forEach(([key, value]) => {
+            if (typeof value === "string" && key in formFields) {
+              details[key] = value;
+            }
+          });
+          setFormState((prev) => ({
+            ...prev,
+            ...details,
+            building: buildingOptions.some((b) => b.id === record.building) ? record.building : prev.building,
+            issue: issueOptions.some((opt) => opt.id === record.issue) ? record.issue : prev.issue,
+            startDate: typeof record.startDate === "string" && record.startDate ? record.startDate : prev.startDate,
+            zone: typeof record.zone === "string" ? record.zone : prev.zone,
+            ticketDate: typeof record.ticketDate === "string" ? record.ticketDate : prev.ticketDate,
+            ticketNumber: typeof record.ticketNumber === "string" ? record.ticketNumber : prev.ticketNumber,
+            firstMessageDate: getFirstWrittenNoticeDate(record) || prev.firstMessageDate,
+            stage,
+          }));
+          setRecordContext({
+            id: recordId,
+            url: `/submissions/${encodeURIComponent(recordId)}`,
+            startDate: typeof record.startDate === "string" ? record.startDate : "",
+          });
+          setSaveLabel("Add to the record");
+          setScrollTarget(".quick-notice-banner");
+        })
+        .catch(() => {
+          setRecordNote("We could not open the saved record. Saving here makes a new record.");
+        });
+      return;
+    }
     const urlBuilding = params.get("building");
     const urlIssue = params.get("issue");
     if (urlBuilding || urlIssue) {
@@ -361,6 +432,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       return;
     }
     await navigator.clipboard.writeText(noticeText);
+    saveOnSend();
     setCopyLabel("Copied!");
     setNoticeStatusMessage("Notice copied.");
     scheduleTimeout("copy-label", () => setCopyLabel("Copy notice text"), 1500);
@@ -403,6 +475,42 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       return;
     }
 
+    if (recordContext) {
+      if (!recordFactType) {
+        setSaveStatus("error");
+        setSaveError("Choose the follow-up or the final reminder to add it to the record.");
+        return;
+      }
+      setSaveStatus("saving");
+      setSaveError("");
+      setSaveLabel("Saving...");
+      try {
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (normalizedBuildingKey) {
+          headers["x-building-key"] = normalizedBuildingKey;
+        }
+        const response = await fetch(`/api/submissions/${encodeURIComponent(recordContext.id)}/events`, {
+          method: "POST",
+          headers,
+          // The Email and Text buttons switch to another app. keepalive lets the save finish.
+          keepalive: true,
+          body: JSON.stringify({ type: recordFactType, date: formState.today }),
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload?.error || "We could not add this to the record.");
+        }
+        setSubmissionUrl(recordContext.url);
+        setSaveStatus("saved");
+        setSaveLabel("Added to the record");
+      } catch (error) {
+        setSaveStatus("error");
+        setSaveLabel("Add to the record");
+        setSaveError(error instanceof Error ? error.message : "We could not add this to the record.");
+      }
+      return;
+    }
+
     setSaveStatus("saving");
     setSaveError("");
     setSaveWarnings([]);
@@ -420,6 +528,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       const response = await fetch("/api/submissions", {
         method: "POST",
         headers,
+        // The Email and Text buttons switch to another app. keepalive lets the save finish.
+        keepalive: true,
         body: JSON.stringify({
           building: formState.building,
           issue: formState.issue,
@@ -459,6 +569,22 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     }
   };
 
+  // Copy, Email, and Text also save, unless the resident turned that off. One save per notice.
+  const saveOnSend = () => {
+    if (!addToLedger || !canSaveLedger || saveStatus === "saving" || saveStatus === "saved") {
+      return;
+    }
+    void handleLedgerSave();
+  };
+
+  const handleSendLink = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isNoticeReady) {
+      event.preventDefault();
+      return;
+    }
+    saveOnSend();
+  };
+
   const handleCopyLink = async () => {
     if (!submissionUrl) {
       return;
@@ -496,6 +622,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     setShareChecks({ names: false, units: false, contact: false });
     setRepeatLabel("Repeat with today's date");
     setExportAudience("inspector");
+    setAddToLedger(true);
+    setRecordContext(null);
+    setRecordNote("");
+    if (window.location.search.includes("record=")) {
+      window.history.replaceState(null, "", `${window.location.pathname}#builder`);
+    }
   };
 
   const handleRepeatNotice = async () => {
@@ -704,6 +836,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             return;
                           }
                           setFormState((prev) => ({ ...prev, issue: value }));
+                          setScrollTarget(".quick-start-date");
                         }}
                         required
                       >
@@ -788,9 +921,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                       <div className="quick-notice-banner" role="region" aria-label="Quick notice actions">
                         <div className="quick-notice-top-row">
                           <div className="quick-notice-info">
-                            <span className="quick-notice-title">Notice ready to send</span>
+                            <span className="quick-notice-title">
+                              {recordContext
+                                ? formState.stage === "C"
+                                  ? "Final reminder ready to send"
+                                  : formState.stage === "B"
+                                    ? "Follow-up ready to send"
+                                    : "Notice ready to send"
+                                : "Notice ready to send"}
+                            </span>
                             <span className="quick-notice-subtitle">
-                              {formState.building} • {formatIssueLabel(selectedIssue?.label || "")} • Started {formState.startDate || "today"}
+                              {formState.building} • {formatIssueLabel(selectedIssue?.label || "")} • Started {formState.startDate ? formatTimelineDate(formState.startDate) : "today"}
                             </span>
                           </div>
                           <div className="quick-notice-actions">
@@ -800,6 +941,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             <a
                               className="button button-secondary button-compact"
                               href={noticeEmailHref}
+                              onClick={handleSendLink}
                               title="Open in your email app with notice pre-filled"
                             >
                               ✉️ Email
@@ -807,6 +949,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             <a
                               className="button button-secondary button-compact"
                               href={noticeSmsHref}
+                              onClick={handleSendLink}
                               title="Open in your text messaging app with notice pre-filled"
                             >
                               💬 Text
@@ -816,10 +959,41 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                               type="button"
                               onClick={() => setCurrentStep(4)}
                             >
-                              Review & Save →
+                              {saveStatus === "saved" ? "Review →" : "Review & Save →"}
                             </Button>
                           </div>
                         </div>
+
+                        {recordNote && <p className="helper" role="status">{recordNote}</p>}
+                        {recordContext && (
+                          <p className="helper">
+                            For the <a href={recordContext.url}>saved record</a>
+                            {recordContext.startDate ? ` that started ${formatTimelineDate(recordContext.startDate)}` : ""}. It
+                            uses the dates saved there.
+                          </p>
+                        )}
+                        {hasSaveAccess && (!recordContext || recordFactType) && saveStatus !== "saved" && (
+                          <label className="checkbox-label quick-save-option">
+                            <input
+                              type="checkbox"
+                              checked={addToLedger}
+                              onChange={(event) => setAddToLedger(event.currentTarget.checked)}
+                            />
+                            {recordContext
+                              ? `When you send, add “${recordFactLabel}” to the record.`
+                              : "When you send, also save it to the building ledger. No names are saved."}
+                          </label>
+                        )}
+                        {saveStatus === "saving" && <p className="helper" role="status">Saving…</p>}
+                        {saveStatus === "saved" && submissionUrl && (
+                          <p className="helper" role="status">
+                            {recordContext ? `Added “${recordFactLabel}” to the record.` : "Saved to the building ledger."}{" "}
+                            <a href={submissionUrl}>Open the record</a>
+                          </p>
+                        )}
+                        {saveStatus === "error" && saveError && (
+                          <p className="submission-error" role="alert">{saveError}</p>
+                        )}
 
                         <div className="fact-tags">
                           <div className="fact-tag-row">
@@ -1150,7 +1324,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                           className="button button-secondary"
                           href={noticeEmailHref}
                           aria-disabled={!isNoticeReady}
-                          onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                          onClick={handleSendLink}
                         >
                           ✉️ Email notice
                         </a>
@@ -1158,7 +1332,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                           className="button button-secondary"
                           href={noticeSmsHref}
                           aria-disabled={!isNoticeReady}
-                          onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                          onClick={handleSendLink}
                         >
                           💬 Text notice
                         </a>
@@ -1225,7 +1399,13 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
             </div>
             {isStep1Complete && (
               <p className="helper" role="status" aria-live="polite">
-                Save status: {saveReadinessLabel}. Saving is in step 4.
+                {saveStatus === "saved"
+                  ? recordContext
+                    ? "Added to the record."
+                    : "Saved to the building ledger."
+                  : addToLedger && canSaveLedger
+                    ? "Copy, Email, or Text also saves it."
+                    : `Save status: ${saveReadinessLabel}. You can save in step 4.`}
               </p>
             )}
           </section>
@@ -1241,7 +1421,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     className="button button-secondary"
                     href={noticeEmailHref}
                     aria-disabled={!isNoticeReady}
-                    onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                    onClick={handleSendLink}
                     title="Open in your email app with notice pre-filled"
                   >
                     ✉️ Email
@@ -1250,7 +1430,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     className="button button-secondary"
                     href={noticeSmsHref}
                     aria-disabled={!isNoticeReady}
-                    onClick={(e) => { if (!isNoticeReady) e.preventDefault(); }}
+                    onClick={handleSendLink}
                     title="Open in your text messaging app with notice pre-filled"
                   >
                     💬 Text

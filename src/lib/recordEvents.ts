@@ -8,6 +8,8 @@ import { getSensitiveContentMessages, isValidDateString, sanitizeLimitedText } f
  */
 
 export const recordEventTypes = [
+  "follow_up_sent",
+  "final_notice_sent",
   "reply_due",
   "management_replied",
   "repair_date_promised",
@@ -43,6 +45,8 @@ type RecordEventDefinition = {
 };
 
 export const recordEventDefinitions: Record<RecordEventType, RecordEventDefinition> = {
+  follow_up_sent: { label: "Follow-up notice sent", group: "follow_up", dateLabel: "Date sent" },
+  final_notice_sent: { label: "Final reminder sent", group: "follow_up", dateLabel: "Date sent" },
   reply_due: {
     label: "Reply requested by",
     group: "follow_up",
@@ -233,6 +237,8 @@ export const sortRecordEvents = (events: RecordEvent[]) =>
 
 /** Short names for the follow-up facts counted in the printable building summary. */
 const followUpSummaryLabels: Partial<Record<RecordEventType, string>> = {
+  follow_up_sent: "Follow-ups sent",
+  final_notice_sent: "Final reminders sent",
   portal_marked_complete: "Marked complete, not fixed",
   repair_visit_missed: "Missed repair visits",
   entry_offered: "Entry offered",

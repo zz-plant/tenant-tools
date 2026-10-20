@@ -2,7 +2,7 @@ import { fieldDefinitions, issue311Guidance } from "../../data/noticeData";
 import type { IssueOption } from "../../data/notice/types";
 import { getRuleCardsForIssue } from "../../data/rules";
 import { addDays, formatCalendarDate, formatDate, getCurrentTime } from "../../lib/dateUtils";
-import { fillTemplate } from "../../lib/noticeUtils";
+import { fillTemplate, noticeUnlockDays } from "../../lib/noticeUtils";
 import { noticeBuilderStrings } from "../../data/i18n/strings";
 import { createTranslator, resolveNoticeTemplate } from "../../lib/i18n/translate";
 
@@ -160,13 +160,13 @@ const nextStepDefinitions = [
   },
   {
     label: "Send a follow-up",
-    unlockDay: 3,
+    unlockDay: noticeUnlockDays.followUp,
     calendarLabel: "Send follow-up notice",
     detail: "If there is no repair date yet, send a follow-up. Include the date of your first message.",
   },
   {
     label: "Send a final reminder",
-    unlockDay: 6,
+    unlockDay: noticeUnlockDays.finalReminder,
     calendarLabel: "Send final reminder",
     detail:
       "If there is still no repair date, send a final calm reminder. The next normal step after this is a 311 inspection request.",
