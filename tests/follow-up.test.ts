@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   buildFollowUpItems,
   buildMeetingReport,
+  countedNotices,
   followUpActionHref,
   nextNoticeStage,
   summarizeWins,
@@ -161,7 +162,8 @@ describe("nextNoticeStage", () => {
     const sent = [event("1", "follow_up_sent", "2026-10-13")];
     assert.deepEqual(nextNoticeStage(base, sent, "2026-10-14"), { stage: "B", unlockDate: "2026-10-16" });
     assert.deepEqual(nextNoticeStage(base, sent, "2026-10-16"), { stage: "C" });
-    assert.deepEqual(nextNoticeStage({ ...base, stage: "B" }, [], "2026-10-20"), { stage: "C" });
+    // A record saved as a follow-up on day 4 counts as that follow-up.
+    assert.deepEqual(nextNoticeStage({ ...base, stage: "B", reportDate: "2026-10-14" }, [], "2026-10-20"), { stage: "C" });
   });
 
   it("waits 3 days after a follow-up before the final reminder", () => {
@@ -170,9 +172,27 @@ describe("nextNoticeStage", () => {
     assert.deepEqual(nextNoticeStage(base, late, "2026-10-23"), { stage: "C" });
   });
 
-  it("stays at the final reminder once one was sent", () => {
-    assert.deepEqual(nextNoticeStage(base, [event("1", "final_notice_sent", "2026-10-17")], "2026-10-20"), { stage: "C" });
-    assert.deepEqual(nextNoticeStage({ ...base, stage: "C" }, [], "2026-10-11"), { stage: "C" });
+  it("stays at the final reminder once one was sent on time", () => {
+    const onTime = [event("1", "follow_up_sent", "2026-10-13"), event("2", "final_notice_sent", "2026-10-17")];
+    assert.deepEqual(nextNoticeStage(base, onTime, "2026-10-20"), { stage: "C" });
+    assert.deepEqual(nextNoticeStage({ ...base, stage: "C", reportDate: "2026-10-17" }, [], "2026-10-20"), { stage: "C" });
+  });
+
+  it("ignores notices dated before their step unlocked", () => {
+    // A final reminder on day 1, with no follow-up, unlocks nothing.
+    const earlyFinal = [event("1", "final_notice_sent", "2026-10-11")];
+    assert.deepEqual(nextNoticeStage(base, earlyFinal, "2026-10-11"), { stage: "A", unlockDate: "2026-10-13" });
+    assert.deepEqual(nextNoticeStage(base, earlyFinal, "2026-10-20"), { stage: "B" });
+    // A follow-up on day 1 does not start the wait for the final reminder.
+    const earlyFollowUp = [event("1", "follow_up_sent", "2026-10-11")];
+    assert.deepEqual(nextNoticeStage(base, earlyFollowUp, "2026-10-14"), { stage: "B" });
+    // A final reminder the day after a follow-up does not count.
+    assert.deepEqual(
+      countedNotices(base, [event("1", "follow_up_sent", "2026-10-16"), event("2", "final_notice_sent", "2026-10-17")]),
+      { followUpDates: ["2026-10-16"], finalDate: undefined }
+    );
+    // A record saved as a final reminder on day 1 does not count either.
+    assert.deepEqual(nextNoticeStage({ ...base, stage: "C" }, [], "2026-10-11"), { stage: "A", unlockDate: "2026-10-13" });
   });
 });
 
@@ -189,7 +209,7 @@ describe("follow-up actions", () => {
     assert.deepEqual(byKind.qualifies_311.action, { kind: "fact", fact: "request_311_filed", label: "Add my 311 number" });
     assert.equal(followUpActionHref(byKind.qualifies_311), "/submissions/a?fact=request_311_filed#facts");
     assert.deepEqual(byKind.rlto_period_passed.action, { kind: "notice", stage: "B", label: "Send a follow-up" });
-    assert.equal(followUpActionHref(byKind.rlto_period_passed), "/?record=a&stage=B#builder");
+    assert.equal(followUpActionHref(byKind.rlto_period_passed), "/?record=a#builder");
     items.forEach((item) => assert.ok(lintVerySimpleEnglish(item.action.label).ok, item.action.label));
   });
 });

@@ -39,9 +39,45 @@ export const noticeStageActionLabels: Record<NoticeStage, string> = {
 };
 
 /**
+ * Notices sent on time, from a record and its dated facts. Only these move the next step, so a
+ * fact dated too early (by mistake, or added straight to the API) is kept on the timeline as the
+ * resident reported it, but it unlocks nothing. This is why the API does not need its own unlock check.
+ * - A follow-up counts from day 3 after the start date.
+ * - A final reminder counts from day 6, and at least 3 days after a follow-up that counts.
+ * A record saved at stage B or C in the notice builder counts as that notice on its report date.
+ */
+export const countedNotices = (
+  record: Pick<SubmissionRecord, "stage" | "startDate" | "reportDate">,
+  events: RecordEvent[]
+): { followUpDates: string[]; finalDate?: string } => {
+  const start = record.startDate || record.reportDate;
+  if (!start) {
+    return { followUpDates: [] };
+  }
+  const followUpOpens = addDaysIso(start, noticeUnlockDays.followUp);
+  const finalOpens = addDaysIso(start, noticeUnlockDays.finalReminder);
+  const followUpDates = [
+    ...events.filter((event) => event.type === "follow_up_sent").map((event) => event.date),
+    ...(record.stage === "B" && record.reportDate ? [record.reportDate] : []),
+  ]
+    .filter((date) => date >= followUpOpens)
+    .sort();
+  const firstFollowUp = followUpDates[0];
+  const finalDates = events
+    .filter((event) => event.type === "final_notice_sent")
+    .map((event) => event.date)
+    .filter((date) => date >= finalOpens && Boolean(firstFollowUp) && date >= addDaysIso(firstFollowUp, noticeUnlockDays.followUp));
+  // A record saved as a final reminder means the earlier notices went out before it was saved.
+  if (record.stage === "C" && record.reportDate && record.reportDate >= finalOpens) {
+    finalDates.push(record.reportDate);
+  }
+  return { followUpDates, finalDate: finalDates.sort()[0] };
+};
+
+/**
  * The next notice for a saved record. Steps unlock by days open, as in the notice builder
  * (AGENTS.md §6.1): a follow-up from day 3, a final reminder from day 6. The final reminder also
- * waits 3 days after the follow-up, so two notices never go out back to back.
+ * waits 3 days after the latest follow-up, so two notices never go out back to back.
  * `unlockDate` is set when the next step is still locked.
  */
 export const nextNoticeStage = (
@@ -51,14 +87,12 @@ export const nextNoticeStage = (
 ): { stage: NoticeStage; unlockDate?: string } => {
   const start = record.startDate || record.reportDate || today;
   const open = Math.max(0, daysBetween(start, today));
-  const sentFinal = record.stage === "C" || events.some((event) => event.type === "final_notice_sent");
-  const sentFollowUp = record.stage === "B" || events.some((event) => event.type === "follow_up_sent");
-  if (sentFinal) {
+  const counted = countedNotices({ ...record, startDate: start }, events);
+  if (counted.finalDate) {
     return { stage: "C" };
   }
-  if (sentFollowUp) {
-    const followUpDates = events.filter((event) => event.type === "follow_up_sent").map((event) => event.date);
-    const lastFollowUp = followUpDates.sort().at(-1) ?? record.reportDate ?? start;
+  const lastFollowUp = counted.followUpDates.at(-1);
+  if (lastFollowUp) {
     const unlockDate = [
       addDaysIso(start, noticeUnlockDays.finalReminder),
       addDaysIso(lastFollowUp, noticeUnlockDays.followUp),
@@ -70,9 +104,11 @@ export const nextNoticeStage = (
     : { stage: "A", unlockDate: addDaysIso(start, noticeUnlockDays.followUp) };
 };
 
-/** Builder link that prefills a notice from a saved record. Saving adds a dated fact to that record. */
-export const buildRecordNoticeUrl = (recordId: string, stage: NoticeStage) =>
-  `/?record=${encodeURIComponent(recordId)}&stage=${stage}#builder`;
+/**
+ * Builder link that prefills a notice from a saved record. The builder asks the server for the
+ * next step (GET /api/submissions/{id} returns `nextNotice`), so the link carries no stage.
+ */
+export const buildRecordNoticeUrl = (recordId: string) => `/?record=${encodeURIComponent(recordId)}#builder`;
 
 /** Record page link that opens "Add a dated fact" with the type already chosen. */
 export const buildRecordFactUrl = (recordId: string, fact: RecordEventType) =>
@@ -81,7 +117,7 @@ export const buildRecordFactUrl = (recordId: string, fact: RecordEventType) =>
 export const followUpActionHref = (item: FollowUpItem) =>
   item.action.kind === "fact"
     ? buildRecordFactUrl(item.recordId, item.action.fact)
-    : buildRecordNoticeUrl(item.recordId, item.action.stage);
+    : buildRecordNoticeUrl(item.recordId);
 
 /** Same day the notice builder unlocks the final reminder; after it, a 311 inspection is the next normal step. */
 export const inspectionQualifyingDays = 6;

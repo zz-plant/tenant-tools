@@ -126,7 +126,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const [addToLedger, setAddToLedger] = useState(true);
   // Set when the builder was opened from a saved record ("Send a follow-up"). Saving then adds a
   // dated fact to that record instead of creating a second record for the same problem.
-  const [recordContext, setRecordContext] = useState<{ id: string; url: string; startDate: string } | null>(null);
+  const [recordContext, setRecordContext] = useState<{
+    id: string;
+    url: string;
+    startDate: string;
+    /** Highest notice step unlocked for this record, from the server. */
+    allowedStage: Stage;
+    unlockDate: string;
+  } | null>(null);
   const [recordNote, setRecordNote] = useState("");
   // What a new record saved. There is no edit path for records, so later changes are not saved:
   // the builder says so instead of showing "Saved" for details the ledger does not have.
@@ -180,13 +187,22 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     formState.building && (residentBuildings.includes("*") || residentBuildings.includes(formState.building))
   );
   const hasSaveAccess = Boolean(normalizedBuildingKey) || hasResidentSession;
-  // In record mode a follow-up or final reminder is added to the saved record as a dated fact.
+  // In record mode a follow-up or final reminder is added to the saved record as a dated fact, but
+  // only for a step that is unlocked for that record. A later step shows when it unlocks instead.
+  const stageRank: Record<string, number> = { A: 0, B: 1, C: 2 };
+  const stageIsUnlocked = Boolean(
+    recordContext && stageRank[formState.stage] <= stageRank[recordContext.allowedStage]
+  );
   const recordFactType =
-    recordContext && (formState.stage === "B" || formState.stage === "C")
+    recordContext && stageIsUnlocked && (formState.stage === "B" || formState.stage === "C")
       ? formState.stage === "C"
         ? "final_notice_sent"
         : "follow_up_sent"
       : null;
+  const recordLockNote =
+    recordContext && !recordFactType && recordContext.unlockDate
+      ? `${recordContext.allowedStage === "A" ? "A follow-up" : "The final reminder"} unlocks on ${formatTimelineDate(recordContext.unlockDate)}.`
+      : "";
   const recordFactLabel = recordFactType === "final_notice_sent" ? "Final reminder sent" : "Follow-up notice sent";
   const canSaveLedger = Boolean(
     formState.building && formState.issue && hasSaveAccess && (!recordContext || recordFactType)
@@ -301,15 +317,17 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const recordId = params.get("record") ?? "";
-    const urlStage = params.get("stage");
     if (/^[A-Za-z0-9-]{8,80}$/.test(recordId)) {
-      const stage: Stage = urlStage === "A" || urlStage === "C" ? urlStage : "B";
       fetch(`/api/submissions/${encodeURIComponent(recordId)}`, { cache: "no-store" })
         .then((response) => (response.ok ? response.json() : Promise.reject(new Error(String(response.status)))))
         .then((record) => {
           if (!record || typeof record !== "object" || typeof record.building !== "string") {
             throw new Error("invalid record");
           }
+          // The server works out the next step from the record's dates and on-time notices.
+          const next = record.nextNotice as { stage?: unknown; unlockDate?: unknown } | undefined;
+          const stage: Stage = next?.stage === "B" || next?.stage === "C" ? next.stage : "A";
+          const unlockDate = typeof next?.unlockDate === "string" ? next.unlockDate : "";
           const details: Record<string, string> = {};
           const formFields = createInitialFormState(new Date());
           Object.entries((record.issueDetails ?? {}) as Record<string, unknown>).forEach(([key, value]) => {
@@ -333,6 +351,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
             id: recordId,
             url: `/submissions/${encodeURIComponent(recordId)}`,
             startDate: typeof record.startDate === "string" ? record.startDate : "",
+            allowedStage: stage,
+            unlockDate,
           });
           setSaveLabel("Add to the record");
           setScrollTarget(".quick-notice-banner");
@@ -1002,6 +1022,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             When you send, also save it to the building ledger. No names are saved.
                           </label>
                         )}
+                        {recordLockNote && saveStatus !== "saved" && <p className="helper">{recordLockNote}</p>}
                         {hasSaveAccess && recordContext && recordFactType && saveStatus !== "saved" && (
                           <div className="quick-save-option">
                             <p className="helper">After you send it, tap the button below.</p>
@@ -1441,7 +1462,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                       ? "Saved before your changes. The ledger keeps the first version."
                       : "Saved to the building ledger."
                   : recordContext
-                    ? "After you send it, tap “I sent it” to add it to the record."
+                    ? recordFactType
+                      ? "After you send it, tap “I sent it” to add it to the record."
+                      : recordLockNote || "Nothing is added to the record for this notice."
                     : addToLedger && canSaveLedger
                       ? "Copy, Email, or Text also saves it."
                       : `Save status: ${saveReadinessLabel}. You can save in step 4.`}

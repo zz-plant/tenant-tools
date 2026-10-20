@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { POST as createSubmission } from "../src/pages/api/submissions/index";
 import { DELETE as removeEvent, POST as addEvent } from "../src/pages/api/submissions/[id]/events";
 import { POST as addReport } from "../src/pages/api/submissions/[id]/report";
+import { GET as getRecord } from "../src/pages/api/submissions/[id]";
+import { addDays } from "../src/lib/dateUtils";
 import { formatDate } from "../src/lib/dateUtils";
 import { maxRecordEvents } from "../src/lib/recordEvents";
 import { listRecordEvents } from "../src/lib/storage/recordEvents";
@@ -95,6 +97,26 @@ describe("POST /api/submissions/:id/events", () => {
     assert.equal((await add({ type: "final_notice_sent", date: today })).status, 201);
     const stored = await listRecordEvents(asKv(kv), id);
     assert.deepEqual(stored.map((event) => event.type).sort(), ["final_notice_sent", "follow_up_sent"]);
+  });
+
+  it("returns the next notice step with the record, ignoring notices sent too early", async () => {
+    const { id, add, locals } = await setup();
+    const read = async () =>
+      readJson(
+        await getRecord({
+          params: { id },
+          request: new Request(`http://localhost/api/submissions/${id}`, { headers: { "x-building-key": "key-2400" } }),
+          locals,
+        } as unknown as Parameters<typeof getRecord>[0])
+      );
+    // Started 2026-09-01: the follow-up is unlocked.
+    assert.deepEqual((await read()).nextNotice, { stage: "B" });
+    // A final reminder with no follow-up before it does not unlock anything.
+    assert.equal((await add({ type: "final_notice_sent", date: today })).status, 201);
+    assert.deepEqual((await read()).nextNotice, { stage: "B" });
+    // After a follow-up today, the final reminder waits 3 days.
+    assert.equal((await add({ type: "follow_up_sent", date: today })).status, 201);
+    assert.deepEqual((await read()).nextNotice, { stage: "B", unlockDate: formatDate(addDays(new Date(`${today}T12:00:00`), 3)) });
   });
 
   it("requires a resident key for the record's building", async () => {
