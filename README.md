@@ -89,9 +89,15 @@ bun run preview
 
 ### Deploy
 
+Production (`galina.kanav.net`) deploys from Cloudflare Workers Builds. Each push to `main` runs typecheck, tests, and the build, then `wrangler deploy`. A failed check stops the deploy. Build logs are in the Cloudflare dashboard under the Worker's **Deployments** tab, and the result shows as a check on the commit in GitHub.
+
+To deploy by hand, for example when Workers Builds is down:
+
 ```bash
 bun run deploy
 ```
+
+Running your own copy? See [docs/self-hosting.md](docs/self-hosting.md).
 
 ---
 
