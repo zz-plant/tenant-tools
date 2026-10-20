@@ -1462,7 +1462,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                       ? "Saved before your changes. The ledger keeps the first version."
                       : "Saved to the building ledger."
                   : recordContext
-                    ? "After you send it, tap “I sent it” to add it to the record."
+                    ? recordFactType
+                      ? "After you send it, tap “I sent it” to add it to the record."
+                      : recordLockNote || "Nothing is added to the record for this notice."
                     : addToLedger && canSaveLedger
                       ? "Copy, Email, or Text also saves it."
                       : `Save status: ${saveReadinessLabel}. You can save in step 4.`}
