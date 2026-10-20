@@ -91,7 +91,7 @@ const timelineEntries = submissionRecord
 const fairNoticeRule = getFairNoticeRule(today);
 // "Send a follow-up" opens the builder filled in from this record. Saving there adds a dated fact here.
 const nextNotice = submissionRecord ? nextNoticeStage(submissionRecord, recordEvents, today) : null;
-const nextNoticeUrl = submissionRecord && nextNotice ? buildRecordNoticeUrl(submissionRecord.id, nextNotice.stage) : "";
+const nextNoticeUrl = submissionRecord ? buildRecordNoticeUrl(submissionRecord.id) : "";
 const nextNoticeLockNote = nextNotice?.unlockDate
   ? nextNotice.stage === "A"
     ? `A follow-up unlocks on ${formatTimelineDate(nextNotice.unlockDate)}.`

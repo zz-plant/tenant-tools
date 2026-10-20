@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.8.1 - 2026-10-20
+
+### Changed
+
+- The next notice step for a saved record counts only notices sent on time: a follow-up from day 3, and a final reminder from day 6 and at least 3 days after a follow-up. A fact dated earlier stays on the timeline, but it does not unlock the next step.
+- The server works out the next step and sends it with the record. The "Send a follow-up" link no longer has the step in it, so an old or edited link cannot open a step that is still locked.
+- In a follow-up, "I sent it" shows only for a step that is unlocked. Otherwise the builder shows the unlock date.
+
 ## 1.8.0 - 2026-10-20
 
 ### Added
