@@ -1509,3 +1509,53 @@ fieldset.facts-form {
   text-decoration: none;
 }
 
+/* Fewer taps: actions on the first screen of the dashboard, one-tap facts, send-and-save. */
+.hero-single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.dashboard-tools {
+  margin: 4px 0 8px;
+}
+
+a.fact-tag {
+  text-decoration: none;
+}
+
+.dashboard-tools .fact-tag,
+.quick-facts .fact-tag,
+.follow-up-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.follow-up-list li {
+  margin-bottom: 10px;
+}
+
+.follow-up-action {
+  margin-top: 4px;
+}
+
+.dashboard-overview-title {
+  font-size: 1.05rem;
+  margin: 24px 0 0;
+}
+
+.quick-facts {
+  margin-bottom: 10px;
+}
+
+.quick-save-option {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+/* Room for the sticky header when the builder scrolls to the next question. */
+.quick-start-date,
+.quick-notice-banner {
+  scroll-margin-top: 120px;
+}

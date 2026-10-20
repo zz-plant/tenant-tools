@@ -1,5 +1,5 @@
 import { checkFairNotice } from "../lib/fairNotice";
-import { formatTimelineDate } from "../lib/dateUtils";
+import { addDays, formatDate, formatTimelineDate } from "../lib/dateUtils";
 import { isRecordEventType, recordEventDefinitions } from "../lib/recordEvents";
 import type { NoticeTier } from "../data/rules";
 
@@ -39,6 +39,21 @@ if (root && form) {
   const submitButton = form.querySelector<HTMLButtonElement>("[data-fact-submit]");
   const status = form.querySelector<HTMLElement>("[data-fact-status]");
   const tiers = readTiers();
+  const chips = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-fact-chip]"));
+
+  // Most facts are logged the day they happen, so the date starts as today. A reply deadline starts
+  // 14 days out (the usual RLTO repair period). Once someone edits the date, it is left alone.
+  const localToday = formatDate(new Date());
+  const defaultToday = today && localToday > today ? today : localToday;
+  let dateIsDefault = true;
+  const defaultDateFor = (type: string) =>
+    type === "reply_due" ? formatDate(addDays(new Date(`${defaultToday}T12:00:00`), 14)) : defaultToday;
+  if (dateInput) {
+    dateInput.value = defaultToday;
+    dateInput.addEventListener("input", () => {
+      dateIsDefault = false;
+    });
+  }
 
   const setStatus = (message: string) => {
     if (status) {
@@ -70,6 +85,10 @@ if (root && form) {
   const updateForType = () => {
     const type = typeSelect?.value ?? "";
     const definition = isRecordEventType(type) ? recordEventDefinitions[type] : null;
+    chips.forEach((chip) => chip.classList.toggle("fact-tag-included", chip.dataset.factChip === type));
+    if (dateInput && dateIsDefault) {
+      dateInput.value = defaultDateFor(type);
+    }
     if (dateLabel) {
       dateLabel.textContent = definition?.dateLabel ?? "Date";
     }
@@ -100,6 +119,18 @@ if (root && form) {
   };
 
   typeSelect?.addEventListener("change", updateForType);
+  chips.forEach((chip) =>
+    chip.addEventListener("click", () => {
+      const type = chip.dataset.factChip ?? "";
+      if (!typeSelect || !isRecordEventType(type)) {
+        return;
+      }
+      typeSelect.value = type;
+      updateForType();
+      // Next tap: the number for a 311 request, otherwise "Add to timeline".
+      (recordEventDefinitions[type].refLabel ? refInput : submitButton)?.focus();
+    })
+  );
   [dateInput, fairChangeDate].forEach((input) => input?.addEventListener("input", updateFairNotice));
   fairTier?.addEventListener("change", updateFairNotice);
 

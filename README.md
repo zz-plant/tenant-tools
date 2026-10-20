@@ -27,6 +27,7 @@ Design choices prioritize:
 - Generate calm notice templates (standard + very simple English)
 - Write a joint repair-plan letter with a household count, not names
 - Add dated facts to a record (replies, portal requests closed without a repair, entry offered, changes after a request)
+- Send a follow-up or final reminder for a saved problem, with its dates filled in
 - Export summaries for inspection/legal-aid workflows
 - Print a short guide to Chicago tenant rules (`/rights`)
 - See what needs follow-up, log wins, and print a meeting report

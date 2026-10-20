@@ -89,6 +89,14 @@ describe("POST /api/submissions/:id/events", () => {
     assert.deepEqual(stored, [body.event]);
   });
 
+  it("records a follow-up or final reminder sent from the notice builder", async () => {
+    const { kv, id, add } = await setup();
+    assert.equal((await add({ type: "follow_up_sent", date: today })).status, 201);
+    assert.equal((await add({ type: "final_notice_sent", date: today })).status, 201);
+    const stored = await listRecordEvents(asKv(kv), id);
+    assert.deepEqual(stored.map((event) => event.type).sort(), ["final_notice_sent", "follow_up_sent"]);
+  });
+
   it("requires a resident key for the record's building", async () => {
     const { add } = await setup();
     assert.equal((await add({ type: "entry_offered", date: today }, null)).status, 403);

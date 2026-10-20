@@ -1,6 +1,12 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { buildFollowUpItems, buildMeetingReport, summarizeWins } from "../src/lib/followUp";
+import {
+  buildFollowUpItems,
+  buildMeetingReport,
+  followUpActionHref,
+  nextNoticeStage,
+  summarizeWins,
+} from "../src/lib/followUp";
 import type { RecordEvent } from "../src/lib/recordEvents";
 import type { SubmissionRecord } from "../src/lib/submissions";
 import { lintVerySimpleEnglish } from "../src/lib/copyLint";
@@ -138,5 +144,52 @@ describe("buildMeetingReport", () => {
     assert.equal(report.topProblems[0].reports, "5");
     assert.equal(report.topProblems[0].lastFact, "Oct 25, 2026: Reply requested by");
     assert.equal(report.wins[0].label, "Fixed after the joint letter");
+  });
+});
+
+describe("nextNoticeStage", () => {
+  const base = { stage: "A" as const, startDate: "2026-10-10", reportDate: "2026-10-10" };
+
+  it("keeps the follow-up locked until day 3, then offers it", () => {
+    assert.deepEqual(nextNoticeStage(base, [], "2026-10-11"), { stage: "A", unlockDate: "2026-10-13" });
+    assert.deepEqual(nextNoticeStage(base, [], "2026-10-13"), { stage: "B" });
+    // A final reminder comes only after a follow-up, even when the problem is old.
+    assert.deepEqual(nextNoticeStage(base, [], "2026-11-30"), { stage: "B" });
+  });
+
+  it("offers the final reminder from day 6 after a follow-up", () => {
+    const sent = [event("1", "follow_up_sent", "2026-10-13")];
+    assert.deepEqual(nextNoticeStage(base, sent, "2026-10-14"), { stage: "B", unlockDate: "2026-10-16" });
+    assert.deepEqual(nextNoticeStage(base, sent, "2026-10-16"), { stage: "C" });
+    assert.deepEqual(nextNoticeStage({ ...base, stage: "B" }, [], "2026-10-20"), { stage: "C" });
+  });
+
+  it("waits 3 days after a follow-up before the final reminder", () => {
+    const late = [event("1", "follow_up_sent", "2026-10-20")];
+    assert.deepEqual(nextNoticeStage(base, late, "2026-10-20"), { stage: "B", unlockDate: "2026-10-23" });
+    assert.deepEqual(nextNoticeStage(base, late, "2026-10-23"), { stage: "C" });
+  });
+
+  it("stays at the final reminder once one was sent", () => {
+    assert.deepEqual(nextNoticeStage(base, [event("1", "final_notice_sent", "2026-10-17")], "2026-10-20"), { stage: "C" });
+    assert.deepEqual(nextNoticeStage({ ...base, stage: "C" }, [], "2026-10-11"), { stage: "C" });
+  });
+});
+
+describe("follow-up actions", () => {
+  it("gives each follow-up item one tap to the right place", () => {
+    const records = [record({ id: "a", startDate: "2026-09-01", reportDate: "2026-09-01" })];
+    const events = new Map([["a", [event("1", "reply_due", "2026-10-01"), event("2", "repair_date_promised", "2026-10-05")]]]);
+    const items = buildFollowUpItems(records, events, today);
+    const byKind = Object.fromEntries(items.map((item) => [item.kind, item]));
+
+    assert.deepEqual(byKind.reply_overdue.action, { kind: "fact", fact: "management_replied", label: "Log a reply" });
+    assert.equal(followUpActionHref(byKind.reply_overdue), "/submissions/a?fact=management_replied#facts");
+    assert.deepEqual(byKind.promise_missed.action, { kind: "fact", fact: "repair_completed", label: "Log the repair" });
+    assert.deepEqual(byKind.qualifies_311.action, { kind: "fact", fact: "request_311_filed", label: "Add my 311 number" });
+    assert.equal(followUpActionHref(byKind.qualifies_311), "/submissions/a?fact=request_311_filed#facts");
+    assert.deepEqual(byKind.rlto_period_passed.action, { kind: "notice", stage: "B", label: "Send a follow-up" });
+    assert.equal(followUpActionHref(byKind.rlto_period_passed), "/?record=a&stage=B#builder");
+    items.forEach((item) => assert.ok(lintVerySimpleEnglish(item.action.label).ok, item.action.label));
   });
 });

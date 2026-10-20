@@ -393,6 +393,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  min-width: 0;
 }
 
 .panel-highlight {
@@ -462,7 +463,9 @@
 
 @media (max-width: 900px) {
   .layout {
-    grid-template-columns: 1fr;
+    /* minmax(0, …) lets the column shrink to the screen. A plain 1fr grows to fit wide content
+       such as the notice step bar, and the whole page then scrolls sideways on phones. */
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .preview-panel {

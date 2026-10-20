@@ -1,7 +1,7 @@
 import { getNoticeMilestone } from "../data/rules";
 import { issue311Guidance } from "../data/notice/guidance";
 import { formatTimelineDate } from "./dateUtils";
-import { formatIssueLabel } from "./noticeUtils";
+import { formatIssueLabel, noticeUnlockDays } from "./noticeUtils";
 import { formatRecordEventLabel, winEventTypes, type RecordEvent, type RecordEventType } from "./recordEvents";
 import { formatResidentReportCount } from "./reportCount";
 import { describeCanvass, type Canvass } from "./canvass";
@@ -15,13 +15,73 @@ import type { SubmissionRecord } from "./submissions";
 
 export type FollowUpKind = "reply_overdue" | "promise_missed" | "rlto_period_passed" | "qualifies_311";
 
+/** Notice stages, as in the notice builder: A first notice, B follow-up, C final reminder. */
+export type NoticeStage = "A" | "B" | "C";
+
+/** One tap from a follow-up item: add a dated fact on the record, or send the next notice. */
+export type FollowUpAction =
+  | { kind: "fact"; fact: RecordEventType; label: string }
+  | { kind: "notice"; stage: NoticeStage; label: string };
+
 export type FollowUpItem = {
   recordId: string;
   issueLabel: string;
   kind: FollowUpKind;
   date: string;
   message: string;
+  action: FollowUpAction;
 };
+
+export const noticeStageActionLabels: Record<NoticeStage, string> = {
+  A: "Send the notice again",
+  B: "Send a follow-up",
+  C: "Send the final reminder",
+};
+
+/**
+ * The next notice for a saved record. Steps unlock by days open, as in the notice builder
+ * (AGENTS.md §6.1): a follow-up from day 3, a final reminder from day 6. The final reminder also
+ * waits 3 days after the follow-up, so two notices never go out back to back.
+ * `unlockDate` is set when the next step is still locked.
+ */
+export const nextNoticeStage = (
+  record: Pick<SubmissionRecord, "stage" | "startDate" | "reportDate">,
+  events: RecordEvent[],
+  today: string
+): { stage: NoticeStage; unlockDate?: string } => {
+  const start = record.startDate || record.reportDate || today;
+  const open = Math.max(0, daysBetween(start, today));
+  const sentFinal = record.stage === "C" || events.some((event) => event.type === "final_notice_sent");
+  const sentFollowUp = record.stage === "B" || events.some((event) => event.type === "follow_up_sent");
+  if (sentFinal) {
+    return { stage: "C" };
+  }
+  if (sentFollowUp) {
+    const followUpDates = events.filter((event) => event.type === "follow_up_sent").map((event) => event.date);
+    const lastFollowUp = followUpDates.sort().at(-1) ?? record.reportDate ?? start;
+    const unlockDate = [
+      addDaysIso(start, noticeUnlockDays.finalReminder),
+      addDaysIso(lastFollowUp, noticeUnlockDays.followUp),
+    ].sort()[1];
+    return today >= unlockDate ? { stage: "C" } : { stage: "B", unlockDate };
+  }
+  return open >= noticeUnlockDays.followUp
+    ? { stage: "B" }
+    : { stage: "A", unlockDate: addDaysIso(start, noticeUnlockDays.followUp) };
+};
+
+/** Builder link that prefills a notice from a saved record. Saving adds a dated fact to that record. */
+export const buildRecordNoticeUrl = (recordId: string, stage: NoticeStage) =>
+  `/?record=${encodeURIComponent(recordId)}&stage=${stage}#builder`;
+
+/** Record page link that opens "Add a dated fact" with the type already chosen. */
+export const buildRecordFactUrl = (recordId: string, fact: RecordEventType) =>
+  `/submissions/${encodeURIComponent(recordId)}?fact=${fact}#facts`;
+
+export const followUpActionHref = (item: FollowUpItem) =>
+  item.action.kind === "fact"
+    ? buildRecordFactUrl(item.recordId, item.action.fact)
+    : buildRecordNoticeUrl(item.recordId, item.action.stage);
 
 /** Same day the notice builder unlocks the final reminder; after it, a 311 inspection is the next normal step. */
 export const inspectionQualifyingDays = 6;
@@ -48,8 +108,8 @@ export const buildFollowUpItems = (
     .forEach((record) => {
       const events = eventsByRecord.get(record.id) ?? [];
       const issueLabel = labelOf(record);
-      const push = (kind: FollowUpKind, date: string, message: string) =>
-        items.push({ recordId: record.id, issueLabel, kind, date, message });
+      const push = (kind: FollowUpKind, date: string, message: string, action: FollowUpAction) =>
+        items.push({ recordId: record.id, issueLabel, kind, date, message, action });
 
       const replyDue = latestOfType(events, "reply_due");
       const sentOn = record.reportDate || record.startDate;
@@ -64,17 +124,30 @@ export const buildFollowUpItems = (
           event.type === "management_replied" && event.date >= sentOn && (!previousDue || event.date > previousDue.date)
       );
       if (replyDue && replyDue.date < today && !replied) {
-        push("reply_overdue", replyDue.date, `Reply was due ${formatTimelineDate(replyDue.date)}. No reply is logged.`);
+        push("reply_overdue", replyDue.date, `Reply was due ${formatTimelineDate(replyDue.date)}. No reply is logged.`, {
+          kind: "fact",
+          fact: "management_replied",
+          label: "Log a reply",
+        });
       }
 
       const promise = latestOfType(events, "repair_date_promised");
       if (promise && promise.date < today && !hasType(events, winEventTypes)) {
-        push("promise_missed", promise.date, `Promised repair date ${formatTimelineDate(promise.date)} has passed.`);
+        push("promise_missed", promise.date, `Promised repair date ${formatTimelineDate(promise.date)} has passed.`, {
+          kind: "fact",
+          fact: "repair_completed",
+          label: "Log the repair",
+        });
       }
 
       const milestone = getNoticeMilestone(record.issue, getFirstWrittenNoticeDate(record));
       if (milestone && milestone.date < today) {
-        push("rlto_period_passed", milestone.date, `${milestone.label}: ${formatTimelineDate(milestone.date)}. Talk to legal aid about next steps.`);
+        const next = nextNoticeStage(record, events, today);
+        push("rlto_period_passed", milestone.date, `${milestone.label}: ${formatTimelineDate(milestone.date)}. Talk to legal aid about next steps.`, {
+          kind: "notice",
+          stage: next.stage,
+          label: noticeStageActionLabels[next.stage],
+        });
       }
 
       const has311 =
@@ -85,7 +158,11 @@ export const buildFollowUpItems = (
         daysBetween(record.startDate, today) >= inspectionQualifyingDays &&
         !has311
       ) {
-        push("qualifies_311", record.startDate, "This issue qualifies for a 311 inspection. No 311 request is logged.");
+        push("qualifies_311", record.startDate, "This issue qualifies for a 311 inspection. No 311 request is logged.", {
+          kind: "fact",
+          fact: "request_311_filed",
+          label: "Add my 311 number",
+        });
       }
     });
   return items.sort((a, b) => a.date.localeCompare(b.date) || a.issueLabel.localeCompare(b.issueLabel));
