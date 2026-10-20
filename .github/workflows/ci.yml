@@ -25,8 +25,10 @@ jobs:
       - run: bun run test
       - run: bun run build
 
-  # Deploys main to Cloudflare after the checks pass. See docs/self-hosting.md, "Deploy from GitHub".
+  # Deploys main to Cloudflare after the checks pass. See docs/self-hosting.md, "From GitHub".
   # Without the two Cloudflare secrets, this job skips the deploy and says so in the run summary.
+  # This repository deploys with Cloudflare Workers Builds instead, so it has no such secrets.
+  # Adding them here would deploy every merge twice.
   deploy:
     needs: check
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'

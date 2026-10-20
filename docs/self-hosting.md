@@ -74,7 +74,22 @@ bun run test
 SITE_URL=https://ledger.example.org bun run deploy
 ```
 
-### From GitHub (recommended)
+### From Cloudflare Workers Builds (recommended)
+
+Cloudflare builds and deploys `main` itself. You do not make or store an API token. Deploy once from your computer first, so the Worker exists.
+
+1. In Cloudflare, open **Workers & Pages**, then your Worker. Go to **Settings → Builds → Connect**.
+2. Choose GitHub, then your copy of the repository. Set the branch to `main`.
+3. Build command: `bun install --frozen-lockfile && bun run typecheck && bun run test && bun run build`
+4. Deploy command: `bunx wrangler deploy`
+5. Under **Build variables**, add `SITE_URL` (your full address), `BUN_VERSION` = `1.2.14`, and `SKIP_DEPENDENCY_INSTALL` = `1`. The build command installs with Bun itself.
+6. Leave builds for other branches off. A branch build would use the same KV namespace and photo bucket as your live site.
+
+After this, every merge to `main` deploys. If a check fails, nothing is deployed. Build logs are under the Worker's **Deployments** tab.
+
+### From GitHub
+
+Use this instead of Workers Builds, not as well. With both, each merge deploys twice.
 
 The `deploy` job in `.github/workflows/ci.yml` deploys `main` after the checks pass. Then no one has to remember to deploy. Set it up once:
 
@@ -115,7 +130,7 @@ If a building's records are no longer safe, use "Emergency wipe" on `/steward`. 
 
 ## Updates
 
-If you deploy from GitHub, merge the update into `main`. The checks run, then it deploys.
+If you deploy from Workers Builds or GitHub, merge the update into `main`. The checks run, then it deploys.
 
 From your computer:
 
