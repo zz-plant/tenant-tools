@@ -128,6 +128,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   // dated fact to that record instead of creating a second record for the same problem.
   const [recordContext, setRecordContext] = useState<{ id: string; url: string; startDate: string } | null>(null);
   const [recordNote, setRecordNote] = useState("");
+  // What a new record saved. There is no edit path for records, so later changes are not saved:
+  // the builder says so instead of showing "Saved" for details the ledger does not have.
+  const [savedFingerprint, setSavedFingerprint] = useState("");
   // After a choice, bring the next question into view so residents do not hunt for it on a phone.
   const [scrollTarget, setScrollTarget] = useState("");
   useEffect(() => {
@@ -257,6 +260,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const selectedIssue = issueOptions.find((option) => option.id === formState.issue);
   const issueFields: readonly IssueFieldKey[] =
     issueFieldMap[formState.issue as keyof typeof issueFieldMap] || [];
+  const ledgerFingerprint = JSON.stringify([
+    formState.building,
+    formState.issue,
+    formState.stage,
+    formState.startDate,
+    formState.zone,
+    formState.firstMessageDate,
+    formState.ticketDate,
+    formState.ticketNumber,
+    collectIssueDetails(formState, issueFields),
+  ]);
+  const changedSinceSave =
+    saveStatus === "saved" && !recordContext && Boolean(savedFingerprint) && savedFingerprint !== ledgerFingerprint;
   const stageLabel = stages[formState.stage as Stage] || stages.A;
 
   const selectedZone = zoneOptions.find((option) => option.id === formState.zone);
@@ -558,6 +574,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       }
 
       setSubmissionUrl(payload.url || "");
+      setSavedFingerprint(ledgerFingerprint);
       setShareChecks({ names: false, units: false, contact: false });
       setSaveWarnings(Array.isArray(payload?.warnings) ? payload.warnings.filter((item: unknown): item is string => typeof item === "string") : []);
       setSaveStatus("saved");
@@ -571,7 +588,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
 
   // Copy, Email, and Text also save, unless the resident turned that off. One save per notice.
   const saveOnSend = () => {
-    if (!addToLedger || !canSaveLedger || saveStatus === "saving" || saveStatus === "saved") {
+    // A follow-up fact says the notice was sent. Copying it or opening the email or text app does
+    // not send it, so in record mode the resident taps "I sent it" instead (see the quick banner).
+    if (recordContext || !addToLedger || !canSaveLedger || saveStatus === "saving" || saveStatus === "saved") {
       return;
     }
     void handleLedgerSave();
@@ -623,6 +642,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     setRepeatLabel("Repeat with today's date");
     setExportAudience("inspector");
     setAddToLedger(true);
+    setSavedFingerprint("");
     setRecordContext(null);
     setRecordNote("");
     if (window.location.search.includes("record=")) {
@@ -972,22 +992,37 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             uses the dates saved there.
                           </p>
                         )}
-                        {hasSaveAccess && (!recordContext || recordFactType) && saveStatus !== "saved" && (
+                        {hasSaveAccess && !recordContext && saveStatus !== "saved" && (
                           <label className="checkbox-label quick-save-option">
                             <input
                               type="checkbox"
                               checked={addToLedger}
                               onChange={(event) => setAddToLedger(event.currentTarget.checked)}
                             />
-                            {recordContext
-                              ? `When you send, add “${recordFactLabel}” to the record.`
-                              : "When you send, also save it to the building ledger. No names are saved."}
+                            When you send, also save it to the building ledger. No names are saved.
                           </label>
+                        )}
+                        {hasSaveAccess && recordContext && recordFactType && saveStatus !== "saved" && (
+                          <div className="quick-save-option">
+                            <p className="helper">After you send it, tap the button below.</p>
+                            <Button
+                              className="button button-compact"
+                              type="button"
+                              onClick={handleLedgerSave}
+                              disabled={saveStatus === "saving"}
+                            >
+                              I sent it. Add “{recordFactLabel}” to the record
+                            </Button>
+                          </div>
                         )}
                         {saveStatus === "saving" && <p className="helper" role="status">Saving…</p>}
                         {saveStatus === "saved" && submissionUrl && (
                           <p className="helper" role="status">
-                            {recordContext ? `Added “${recordFactLabel}” to the record.` : "Saved to the building ledger."}{" "}
+                            {recordContext
+                              ? `Added “${recordFactLabel}” to the record.`
+                              : changedSinceSave
+                                ? "You changed the notice after it was saved. The ledger keeps the first version."
+                                : "Saved to the building ledger."}{" "}
                             <a href={submissionUrl}>Open the record</a>
                           </p>
                         )}
@@ -1402,10 +1437,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                 {saveStatus === "saved"
                   ? recordContext
                     ? "Added to the record."
-                    : "Saved to the building ledger."
-                  : addToLedger && canSaveLedger
-                    ? "Copy, Email, or Text also saves it."
-                    : `Save status: ${saveReadinessLabel}. You can save in step 4.`}
+                    : changedSinceSave
+                      ? "Saved before your changes. The ledger keeps the first version."
+                      : "Saved to the building ledger."
+                  : recordContext
+                    ? "After you send it, tap “I sent it” to add it to the record."
+                    : addToLedger && canSaveLedger
+                      ? "Copy, Email, or Text also saves it."
+                      : `Save status: ${saveReadinessLabel}. You can save in step 4.`}
               </p>
             )}
           </section>

@@ -4,14 +4,14 @@
 
 ### Added
 
-- "Send a follow-up" on the record page. It opens the notice with the record's start date and first notice date filled in, and the next step chosen. Sending adds "Follow-up notice sent" or "Final reminder sent" to the same record. Before, the start date reset to today and saving made a second record for the same problem.
+- "Send a follow-up" on the record page. It opens the notice with the record's start date and first notice date filled in, and the next step chosen. After you send it, one tap ("I sent it") adds "Follow-up notice sent" or "Final reminder sent" to the same record. Copying the notice or opening the email or text app does not add it. Before, the start date reset to today and saving made a second record for the same problem.
 - The next step follows the unlock rules: a follow-up from day 3, a final reminder from day 6 and at least 3 days after the follow-up. The record page shows the unlock date when the step is still locked.
 - One-tap buttons for common facts on the record page: "Management replied", "Repair date promised", "Repair completed", and "311 request filed".
 - Each "Needs follow-up" item on the dashboard has one action: "Log a reply", "Log the repair", "Send a follow-up", or "Add my 311 number".
 
 ### Changed
 
-- Copy, Email, and Text also save the notice to the building ledger. A checkbox right under the buttons turns this off. Before, residents had to go to step 4 and select "Save record".
+- For a new problem, Copy, Email, and Text also save the notice to the building ledger. A checkbox right under the buttons turns this off. Before, residents had to go to step 4 and select "Save record". If you change the notice after it was saved, the builder says the ledger keeps the first version.
 - The dashboard's first screen has "Report a problem", "Me too on a problem", and the group tools (311 day, meeting report, joint letter, printable summary; for stewards, canvass and steward tools). Records come before the counts. The follow-up list shows 5 items and links to the meeting report for the rest.
 - The date for a new fact starts as today. "Reply requested by" starts 14 days out.
 - After you choose a problem, the notice builder moves to the start date. A follow-up opens at the notice that is ready to send.
