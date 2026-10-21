@@ -330,3 +330,37 @@ describe("after the final reminder", () => {
     assert.ok(!items.some((item) => item.action.label === "Send the final reminder"));
   });
 });
+
+describe("city work", () => {
+  const city = record({ id: "c", issue: "city-work", issueLabel: "City work blocks part of the building", startDate: "2026-09-28", reportDate: "2026-09-28" });
+
+  it("asks the ward office first, from the start", () => {
+    const items = buildFollowUpItems([city], new Map([["c", []]]), today);
+    const ward = items.find((item) => item.kind === "ward_office");
+    assert.ok(ward);
+    assert.equal(ward.action.label, "Ask the ward office for help");
+    assert.equal(followUpActionHref(ward), "/buildings/2400%20W%20Wabansia/letter?kind=alderperson");
+    assert.deepEqual(lintVerySimpleEnglish(ward.message).warnings, []);
+  });
+
+  it("stops asking once the ward office was asked, and draws the ward as a stop", () => {
+    const events = [event("1", "ward_office_asked", "2026-09-29")];
+    const items = buildFollowUpItems([city], new Map([["c", events]]), today);
+    assert.ok(!items.some((item) => item.kind === "ward_office"));
+    const stops = buildRecordLine(city, events, today);
+    assert.deepEqual(stops.map((stop) => stop.id), ["start", "notice", "follow-up", "final", "ward", "fixed"]);
+    assert.equal(stops[4].state, "done");
+  });
+
+  it("does not suggest the ward office again after 311 when it was already asked", () => {
+    const heat = record({ id: "w", issue: "heat", startDate: "2026-09-20", reportDate: "2026-09-20" });
+    const events = [
+      event("1", "follow_up_sent", "2026-09-24"),
+      event("2", "final_notice_sent", "2026-09-28"),
+      event("3", "request_311_filed", "2026-10-01"),
+      event("4", "ward_office_asked", "2026-10-02"),
+    ];
+    const items = buildFollowUpItems([heat], new Map([["w", events]]), today);
+    assert.ok(!items.some((item) => item.kind === "ward_office"));
+  });
+});

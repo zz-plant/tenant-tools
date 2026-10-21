@@ -274,13 +274,25 @@ export const buildFollowUpItems = (
         });
       }
 
-      // The ward office comes last: after the final reminder, after 311, and only while nothing is fixed.
+      // City work is the ward office's project, so for it the ward office is the first step, not the last.
+      const wardAsked = events.filter((event) => event.type === "ward_office_asked").map((event) => event.date).sort().at(-1);
+      if (record.issue === "city-work" && !wardAsked && !hasType(events, winEventTypes)) {
+        push(
+          "ward_office",
+          record.startDate || record.reportDate,
+          "City work is the ward office's project. You can ask the ward office for help.",
+          { kind: "letter", letter: "alderperson", label: "Ask the ward office for help" }
+        );
+      }
+
+      // For other problems the ward office comes last: after the final reminder, after 311, and only while nothing is fixed.
       const dates311 = [
         record.ticketDate,
         ...events.filter((event) => event.type === "request_311_filed" || event.type === "inspection_done").map((event) => event.date),
       ].filter((date): date is string => Boolean(date));
       const latest311 = dates311.sort().at(-1);
-      if (finalSent && latest311 && !hasType(events, winEventTypes)) {
+      const askedSince311 = Boolean(wardAsked && latest311 && wardAsked >= latest311);
+      if (record.issue !== "city-work" && finalSent && latest311 && !askedSince311 && !hasType(events, winEventTypes)) {
         const unlocks = addDaysIso(latest311, wardOfficeWaitDays);
         if (today >= unlocks) {
           push(
@@ -464,18 +476,26 @@ export const buildRecordLine = (record: SubmissionRecord, events: RecordEvent[],
     return unlocksThis ? { state: "locked", date: next.unlockDate } : { state: "later" };
   };
   const qualifies311 = record.issue in issue311Guidance && daysOpen(start, today) >= inspectionQualifyingDays;
+  // City work goes to the ward office instead of 311, so that stop is the ward office.
+  const wardAsked = events.find((event) => event.type === "ward_office_asked");
+  const cityStop: LineStop =
+    record.issue === "city-work"
+      ? wardAsked
+        ? { id: "ward", label: "Ward", state: "done", date: wardAsked.date }
+        : { id: "ward", label: "Ward", state: fixed ? "later" : "open" }
+      : {
+          id: "311",
+          label: "311",
+          ...(has311
+            ? { state: "done" as const, date: record.ticketDate || ticket?.date }
+            : { state: (qualifies311 && !fixed ? "open" : "later") as LineStopState }),
+        };
   return [
     { id: "start", label: "Started", state: "done", date: start },
     { id: "notice", label: "Notice", ...(firstNotice ? { state: "done" as const, date: firstNotice } : { state: "open" as const }) },
     { id: "follow-up", label: "Follow-up", ...noticeStop("B", counted.followUpDates[0]) },
     { id: "final", label: "Final", ...noticeStop("C", counted.finalDate) },
-    {
-      id: "311",
-      label: "311",
-      ...(has311
-        ? { state: "done" as const, date: record.ticketDate || ticket?.date }
-        : { state: (qualifies311 && !fixed ? "open" : "later") as LineStopState }),
-    },
+    cityStop,
     { id: "fixed", label: "Fixed", ...(fixed ? { state: "done" as const, date: win?.date } : { state: "later" as const }) },
   ];
 };

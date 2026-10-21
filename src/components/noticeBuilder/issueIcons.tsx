@@ -56,6 +56,38 @@ export const issueIcons: Record<string, React.ReactNode> = {
       <path d="M16 14l-1.5-1.5M16 14l1.5-1.5M16 14v-4" />
     </Glyph>
   ),
+  access: (
+    <Glyph>
+      <circle cx="8" cy="12" r="4" />
+      <path d="M12 12h9M18 12v3M21 12v2" />
+    </Glyph>
+  ),
+  trash: (
+    <Glyph>
+      <path d="M4 7h16M9 7V4h6v3" />
+      <path d="M6 7l1 14h10l1-14" />
+      <path d="M10 11v6M14 11v6" />
+    </Glyph>
+  ),
+  parking: (
+    <Glyph>
+      <rect x="4" y="3" width="16" height="18" rx="1" />
+      <path d="M9.5 17V7.5h3.5a3 3 0 0 1 0 6H9.5" />
+    </Glyph>
+  ),
+  "city-work": (
+    <Glyph>
+      <path d="M3 20h18" />
+      <path d="M12 3l6 17H6z" />
+      <path d="M8.2 14h7.6M10 9h4" />
+    </Glyph>
+  ),
+  damage: (
+    <Glyph>
+      <rect x="3" y="4" width="18" height="16" rx="1" />
+      <path d="M12 4l-2 5 4 3-3 4 1 4" />
+    </Glyph>
+  ),
   "no-timeline": (
     <Glyph>
       <rect x="3.5" y="5" width="17" height="15" rx="1" />

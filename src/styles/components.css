@@ -2334,5 +2334,10 @@ a.fact-tag {
 [data-issue="common"] { --issue: var(--issue-common); }
 [data-issue="no-timeline"] { --issue: var(--issue-no-timeline); }
 [data-issue="building"] { --issue: var(--issue-building); }
+[data-issue="access"] { --issue: var(--issue-access); }
+[data-issue="trash"] { --issue: var(--issue-trash); }
+[data-issue="parking"] { --issue: var(--issue-parking); }
+[data-issue="city-work"] { --issue: var(--issue-city-work); }
+[data-issue="damage"] { --issue: var(--issue-damage); }
 [data-issue="deposit"] { --issue: var(--issue-deposit); }
 [data-issue="lockout"] { --issue: var(--issue-lockout); }

@@ -133,6 +133,11 @@ export const factualTagOptions: Partial<Record<keyof typeof fieldDefinitions, st
     "front entry callbox",
   ],
   lockoutAction: ["locked out", "water shut off", "heat shut off", "power shut off"],
+  cannotUse: ["garage parking", "alley entrance", "trash area", "bike room"],
+  reason: ["garage entrance blocked", "City work in the alley", "garage door broken"],
+  trashChange: ["trash room locked", "bins moved outside", "trash chute closed", "recycling removed"],
+  accessItem: ["front door fob", "garage fob", "unit lock", "garage door", "callbox"],
+  damagedItem: ["car in garage spot", "bike", "items in storage", "unit floor"],
   issueDescription: [
     "no heat / radiators cold",
     "water leak from above",

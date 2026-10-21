@@ -34,6 +34,11 @@ export const initialFormState = {
   lockoutAction: "",
   location: "",
   issueDescription: "",
+  cannotUse: "",
+  reason: "",
+  trashChange: "",
+  accessItem: "",
+  damagedItem: "",
   attachment: "",
   ticketDate: "",
   ticketNumber: "",
@@ -113,6 +118,11 @@ export const buildNoticeText = (state: FormState, issue: IssueOption | undefined
     "ELEVATOR / GARAGE DOOR / HALL LIGHTS / TRASH ROOM":
       state.commonArea || "[ELEVATOR / GARAGE DOOR / HALL LIGHTS / TRASH ROOM]",
     "LOCK ME OUT / SHUT OFF UTILITIES": state.lockoutAction || "[LOCK ME OUT / SHUT OFF UTILITIES]",
+    "WHAT I CANNOT USE": state.cannotUse || "[WHAT I CANNOT USE]",
+    REASON: state.reason || "[REASON]",
+    "TRASH CHANGE": state.trashChange || "[TRASH CHANGE]",
+    "DOOR / FOB / LOCK": state.accessItem || "[DOOR / FOB / LOCK]",
+    "WHAT WAS DAMAGED": state.damagedItem || "[WHAT WAS DAMAGED]",
   };
 
   if (state.autoDates) {
