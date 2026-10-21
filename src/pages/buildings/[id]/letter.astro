@@ -32,6 +32,8 @@ const hasAccess = Boolean(buildingId) && isBuildingAccessValid(buildingId, acces
 const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
 const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
 
+// "Ask the ward office for a meeting" from a record's next step opens this page on that letter.
+const startsOnAlderperson = Astro.url.searchParams.get("kind") === "alderperson";
 const today = formatDate(new Date());
 const replyByDefault = formatDate(new Date(Date.now() + defaultReplyDays * 24 * 60 * 60 * 1000));
 
@@ -127,11 +129,11 @@ const portfolio = firstRecord?.portfolio ?? "other";
                 <fieldset class="facts-form">
                   <legend>Letter type</legend>
                   <label class="checkbox-label">
-                    <input type="radio" name="kind" value="management" data-letter-kind checked />
+                    <input type="radio" name="kind" value="management" data-letter-kind checked={!startsOnAlderperson} />
                     Ask management for a written repair plan
                   </label>
                   <label class="checkbox-label">
-                    <input type="radio" name="kind" value="alderperson" data-letter-kind />
+                    <input type="radio" name="kind" value="alderperson" data-letter-kind checked={startsOnAlderperson} />
                     Ask the alderperson's office for a meeting
                   </label>
                 </fieldset>
