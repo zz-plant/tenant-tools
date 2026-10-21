@@ -7,6 +7,9 @@ colors:
   street-green: "#0b6b3f"
   street-ink: "#ffffff"
   enamel-black: "#151515"
+  ink-deep: "#000000"
+  bar-ink-muted: "#b9bcb4"
+  bar-ok: "#4cc27f"
   wall: "#f3f4f1"
   board-white: "#ffffff"
   wall-shade: "#e9ebe6"
@@ -65,6 +68,40 @@ typography:
     fontSize: "16px"
     fontWeight: 400
     lineHeight: 1.6
+  hero:
+    fontFamily: "Big Shoulders, Arial Narrow, Roboto Condensed, sans-serif"
+    fontSize: "clamp(2.8rem, 8vw, 5.5rem)"
+    fontWeight: 900
+    lineHeight: 0.86
+  subhead:
+    fontFamily: "Big Shoulders, Arial Narrow, Roboto Condensed, sans-serif"
+    fontSize: "clamp(1.6rem, 3.6vw, 2.2rem)"
+    fontWeight: 800
+    lineHeight: 0.95
+  numeral-large:
+    fontFamily: "Big Shoulders, Arial Narrow, Roboto Condensed, sans-serif"
+    fontSize: "clamp(3.2rem, 10vw, 5rem)"
+    fontWeight: 900
+    lineHeight: 0.85
+  text-xs:
+    fontSize: "0.8rem"
+  text-sm:
+    fontSize: "0.9rem"
+  text-base:
+    fontSize: "1rem"
+  text-md:
+    fontSize: "1.12rem"
+  text-lg:
+    fontSize: "1.3rem"
+  text-xl:
+    fontSize: "1.6rem"
+  text-2xl:
+    fontSize: "2rem"
+  text-3xl:
+    fontSize: "3rem"
+  code:
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
+    fontSize: "1rem"
 rounded:
   xs: "2px"
   sm: "3px"
@@ -192,6 +229,8 @@ Each issue type owns one enamel hue, applied through `data-issue` on the element
 
 ### Neutral
 - **Enamel Black** (`enamel-black`): all text, primary buttons, the top bar, and every 2px rule.
+- **Deep Ink** (`ink-deep`, `--color-ink-deep`): pure black for pressed primary buttons, the sign button's hover, the night top bar, and print.
+- **Bar Muted Ink / Bar OK** (`bar-ink-muted`, `bar-ok`): the top bar's secondary text and its "verified access" dot. The bar is black in both modes, so these do not change at night.
 - **White Wall** (`wall`): the page canvas.
 - **Board White** (`board-white`): panels, inputs, secondary buttons, unselected tags.
 - **Wall Shade** (`wall-shade`) and **Wall Shadow** (`wall-shadow`): hover and pressed fills; the warning board.
@@ -227,7 +266,17 @@ Each issue type owns one enamel hue, applied through `data-issue` on the element
 - **Label** (800, 1.12rem, 0.04em tracking, caps): buttons, tag labels, timeline dates (1.15rem), summary toggles, top-bar items. Stop-line names are 800 at 1rem and never wrap (0.86rem below 480px); the compact "N of 6 steps" count is 700 at 0.95rem with 0.04em tracking.
 - **Body** (400, 16px, line-height 1.55 to 1.6, max 68ch): every sentence, meta line, and helper note. Form labels are 600 at 0.95rem.
 
+### Scale
+Every font size is a token in `base.css`:
+- **Steps:** `--text-xs` 0.8rem, `--text-sm` 0.9rem, `--text-base` 1rem, `--text-md` 1.12rem, `--text-lg` 1.3rem, `--text-xl` 1.6rem, `--text-2xl` 2rem, `--text-3xl` 3rem.
+- **Fluid sizes:** `--text-title`, `--text-subhead`, `--text-headline`, `--text-numeral`, `--text-display`, `--text-display-sm` (long page titles, such as a problem name on its record page), `--text-numeral-lg`, and `--text-hero` (the home headline).
+- **Not tokens:** parts inside a street sign are sized in em of the sign, and print styles use points.
+
+Building keys shown to stewards are the one monospace use (`code`), so each character can be read and copied.
+
 ### Named Rules
+**The One Scale Rule.** Use a scale token for every font size. A size between two steps snaps to the nearer step.
+
 **The Two Voices Rule.** Big Shoulders sets h1 to h4, labels, buttons, and numerals, always in caps. It never sets a sentence. Anything a resident reads as a sentence, in any language, is the system font.
 
 **The Lined-Up Numbers Rule.** Dates, counts, and table cells use tabular figures so they line up in columns.
