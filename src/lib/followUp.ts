@@ -267,7 +267,7 @@ export const buildFollowUpItems = (
         daysBetween(record.startDate, today) >= inspectionQualifyingDays &&
         !has311
       ) {
-        push("qualifies_311", record.startDate, "This issue qualifies for a 311 inspection. No 311 request is logged.", {
+        push("qualifies_311", record.startDate, "This issue qualifies for a 311 inspection. Call 311 or use 311.chicago.gov, then add the 311 number here.", {
           kind: "fact",
           fact: "request_311_filed",
           label: "Add my 311 number",

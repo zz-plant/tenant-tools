@@ -2,7 +2,7 @@ import type { IssueId } from "./issueOptions";
 
 export const fieldDefinitions = {
   temp: { label: "Temperature (°F)", type: "number", placeholder: "68" },
-  time: { label: "Time", type: "time" },
+  time: { label: "Time you checked the temperature", type: "time" },
   location: { label: "Location (for leaks)", placeholder: "kitchen ceiling" },
   attachment: { label: "Evidence note (optional, private)", placeholder: "photo of ceiling leak" },
   eventDate: { label: "Event date", type: "date" },

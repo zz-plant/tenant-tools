@@ -71,7 +71,7 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
     const defaultLabel = button.getAttribute("data-default-label") || "Me too";
     button.setAttribute("disabled", "true");
     button.textContent = "Saving...";
-    setReportStatus(id, "Saving your report...");
+    setReportStatus(id, "Counting you...");
     try {
       const response = await fetch(`/api/submissions/${id}/report`, {
         method: "POST",
@@ -82,19 +82,19 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(payload?.error || "We could not update the report count.");
+        throw new Error(payload?.error || "You were not counted. Check your connection and try again.");
       }
       updateReportCount(id, payload.reportCount ?? 0);
       setReportStatus(
         id,
         payload.alreadyReported
-          ? "You already added your report on this device."
-          : "Your report was added. No personal details were saved."
+          ? "You are already counted on this phone."
+          : "You are counted. No one can see who tapped."
       );
-      button.textContent = "Report added";
+      button.textContent = "You are counted";
       button.setAttribute("disabled", "true");
     } catch (error) {
-      setReportStatus(id, error instanceof Error ? error.message : "We could not add your report.", true);
+      setReportStatus(id, error instanceof Error ? error.message : "You were not counted. Check your connection and try again.", true);
       button.removeAttribute("disabled");
       button.textContent = defaultLabel;
     }

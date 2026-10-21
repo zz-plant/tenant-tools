@@ -115,10 +115,16 @@ describe("computeDaysOpen and buildNextSteps", () => {
     assert.ok(later[0].calendarLink.startsWith("https://calendar.google.com/"));
   });
 
+  it("opens each step on the right local day, not the day before", () => {
+    const steps = buildNextSteps({ startDate: "2026-10-21", today: "2026-10-21", building: "", now });
+    assert.deepEqual(steps.map((step) => step.reminderDate), ["2026-10-21", "2026-10-24", "2026-10-27"]);
+    assert.ok(steps[1].calendarLink.includes("dates=20261024/20261024"));
+  });
+
   it("has no calendar link without a start date", () => {
     const steps = buildNextSteps({ startDate: "", today: "2026-09-23", building: "", now });
     assert.ok(steps.every((step) => step.calendarLink === ""));
-    assert.equal(steps[0].reminderDateLabel, "Add a start date");
+    assert.equal(steps[0].reminderDate, "");
   });
 });
 

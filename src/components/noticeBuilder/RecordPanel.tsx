@@ -8,10 +8,11 @@ import type { NextStep } from "./logic";
 
 type RecordPanelProps = {
   canShowAfterBasics: boolean;
+  /** Phones show this panel only on the last step, so the steps above stay short. */
+  hideOnPhone?: boolean;
   onGoToStep1: () => void;
   timelineEntries: SubmissionTimelineEntry[];
   visibleNextSteps: NextStep[];
-  daysOpen: number;
   impactCount: number;
   issueGuidance: { category: string; nextStep: string } | null;
   guidanceScript: string;
@@ -21,10 +22,10 @@ type RecordPanelProps = {
 /** "Record and next steps": timeline, unlockable next steps, report count, and public info links. */
 const RecordPanel = ({
   canShowAfterBasics,
+  hideOnPhone = false,
   onGoToStep1,
   timelineEntries,
   visibleNextSteps,
-  daysOpen,
   impactCount,
   issueGuidance,
   guidanceScript,
@@ -33,10 +34,10 @@ const RecordPanel = ({
   const [scriptCopyLabel, setScriptCopyLabel] = useState("Copy 311 script");
 
   return (
-    <section className={`panel panel-highlight record-panel${!canShowAfterBasics ? " record-panel-mobile-hidden" : ""}`} id="record">
+    <section className={`panel panel-highlight record-panel${!canShowAfterBasics || hideOnPhone ? " record-panel-mobile-hidden" : ""}`} id="record">
     <div>
       <h2>Record and next steps</h2>
-      <p className="helper">Use this after you send the notice.</p>
+      <p className="helper">What comes after you send the notice. Nothing here is sent or saved by itself.</p>
     </div>
     {!canShowAfterBasics ? (
       <div className="record-locked">
@@ -70,32 +71,20 @@ const RecordPanel = ({
               <li key={step.label} className={step.unlocked ? "" : "locked"}>
                 <div className="next-step-row">
                   <div>
-                    <p className="next-step-title">
-                      {step.unlocked
-                        ? step.label
-                        : `${step.label} (next normal step unlocks in ${Math.abs(step.remaining)} days)`}
-                    </p>
-                    <p className="helper">Reminder date: {step.reminderDateLabel}</p>
+                    <p className="next-step-title">{step.label}</p>
                     <p className="helper">
-                      {step.unlocked
-                        ? `Unlocked at ${daysOpen} days open.`
-                        : `Unlocks after ${step.unlockDay} days open.`}
+                      {!step.reminderDate
+                        ? "Add the date the problem started to see when this opens."
+                        : step.unlocked
+                          ? "You can do this now."
+                          : `Opens on ${formatTimelineDate(step.reminderDate)}, in ${step.remaining} day${step.remaining === 1 ? "" : "s"}. If the problem is fixed by then, you do not need it.`}
                     </p>
                   </div>
-                  <a
-                    className={`button button-secondary calendar-link ${step.calendarLink ? "" : "disabled"}`}
-                    href={step.calendarLink || "#"}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-disabled={!step.calendarLink}
-                    onClick={(event) => {
-                      if (!step.calendarLink) {
-                        event.preventDefault();
-                      }
-                    }}
-                  >
-                    Add Google Calendar reminder
-                  </a>
+                  {!step.unlocked && step.calendarLink && (
+                    <a className="button button-secondary calendar-link" href={step.calendarLink} target="_blank" rel="noreferrer">
+                      Remind me in Google Calendar
+                    </a>
+                  )}
                 </div>
               </li>
             ))}
@@ -108,8 +97,8 @@ const RecordPanel = ({
             <div className="impact-summary">
               <p className="impact-count">{impactCount}</p>
               <div>
-                <p className="impact-label">Total reports</p>
-                <p className="impact-hint">Reports start at 1. Use “Me too” to add yours.</p>
+                <p className="impact-label">{impactCount === 1 ? "Household reporting" : "Households reporting"}</p>
+                <p className="impact-hint">This counts you. After you save, neighbors with the same problem can tap “Me too” on the record.</p>
               </div>
             </div>
           </div>

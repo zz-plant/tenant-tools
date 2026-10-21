@@ -17,7 +17,21 @@
 
 ### Changed
 
+- Notice builder on phones: the preview, save, and record panels show on step 4 only. Step 1 went from about 8,000 to 3,400 pixels tall. Step 1 can show the notice text ("See the notice"), and step 4 shows it once, not twice.
+- The builder says that Tenant Tools sends nothing. Email and Text open your own app, and nothing goes out until you press send there.
+- Before you save, the timeline says "Notice sent, if you send it today", not "Notice sent".
+- Saving is called "Save to your building's record (optional)". It says who can see the record, that management is not contacted, and that you can send the notice without a key. "Resident key" is now "Building key".
+- The notice summary shows building, problem, notice, and start date only. Portfolio, zone, export status, and the other internal fields are gone. Sharing a summary with an inspector or legal aid is folded away as an optional step.
+- Next steps say "You can do this now" or "Opens on Oct 24, 2026, in 3 days". Calendar reminders are offered only for steps that open later.
+- "Me too" says "You are counted. No one can see who tapped." On the record page, the count at the top changes when you tap.
+- The footer says nothing is public. It used to mention "public views", which do not exist.
+- The 311 step on records says how to file: call 311 or use 311.chicago.gov, then add the number.
+- Starter kit: a "Before you start" card (your building needs to be on Tenant Tools, and how to get it added), an "Organizing is protected" card from RLTO 5-12-150, and a flyer with a "Tenant meeting" band, write-in lines, and what to expect ("You do not have to speak or sign anything"). The checklist gives words to use if management asks about the group.
 - The site moved to tenants.kanav.net. The old address, galina.kanav.net, sends every page and link there, including resident links with a key. The old address named a person, which this tool should never do.
+
+### Fixed
+
+- Next-step dates in the notice builder showed the day before (a start date of Oct 21 showed a reminder on Oct 20), and Google Calendar reminders were set a day early.
 
 ## 1.11.0 - 2026-10-21
 

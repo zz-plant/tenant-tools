@@ -174,7 +174,7 @@ const groupChatText = submissionRecord
                 <h1 class="painted">{issueLabel}</h1>
                 <StreetSign address={submissionRecord.building} size="small" />
                 <p class="record-meta">
-                  Started {startDateLabel}. Me too: {reportCountLabel}.
+                  Started {startDateLabel}. Me too: <span data-me-too-count>{reportCountLabel}</span>.
                   {submissionRecord.status !== "open" && ` ${submissionRecord.status === "resolved" ? "Resolved" : "Archived"}.`}
                 </p>
               </div>
@@ -218,7 +218,7 @@ const groupChatText = submissionRecord
                   <a class="button button-secondary" href="#facts">Add a dated fact</a>
                 </div>
                 <p class="helper" data-me-too-status role="status" aria-live="polite">
-                  Tap “Me too” if you have this problem. No personal details are saved.
+                  Tap “Me too” if you have this problem too. Only the count goes up. No one can see who tapped.
                 </p>
               </section>
             )}
@@ -394,7 +394,7 @@ const groupChatText = submissionRecord
                   <p class="helper">Only residents with the key can see them. Photos on file: <span data-evidence-count>{evidenceCount}</span></p>
                 </div>
                 {!evidenceEnabled ? (
-                  <p class="helper">Photo upload is not set up for this site yet.</p>
+                  <p class="helper">Photo upload is not turned on for this building. Keep your photos on your phone, with the date they were taken.</p>
                 ) : (
                   <>
                     <div class="evidence-grid no-print" data-evidence-grid></div>
@@ -439,10 +439,10 @@ const groupChatText = submissionRecord
                   I removed phone numbers and email addresses.
                 </label>
                 <div class="share-actions">
-                  <button class="button" type="button" data-share-chat data-share-text={groupChatText} disabled title="Complete all checks to share">Share in group chat</button>
-                  <button class="button button-secondary" type="button" data-copy-link disabled title="Complete all checks to copy the link">Copy this record link</button>
+                  <button class="button" type="button" data-share-chat data-share-text={groupChatText} disabled title="Check all three boxes to share">Share in group chat</button>
+                  <button class="button button-secondary" type="button" data-copy-link disabled title="Check all three boxes to copy the link">Copy this record link</button>
                 </div>
-                <p class="helper" data-share-status role="status" aria-live="polite">Complete all checks to copy the link.</p>
+                <p class="helper" data-share-status role="status" aria-live="polite">Check all three boxes to copy the link.</p>
                 <p class="helper">Share only with residents who have the key.</p>
               </section>
 
@@ -454,7 +454,7 @@ const groupChatText = submissionRecord
                   <div><dt>Management</dt><dd>{portfolioLabel}</dd></div>
                   <div><dt>Notice saved</dt><dd>{stageLabel}</dd></div>
                   <div><dt>Start date</dt><dd>{startDateLabel}</dd></div>
-                  <div><dt>Report date</dt><dd>{reportDateLabel}</dd></div>
+                  <div><dt>Saved on</dt><dd>{reportDateLabel}</dd></div>
                   {submissionRecord.ticketDate && <div><dt>311 ticket date</dt><dd>{formatTimelineDate(submissionRecord.ticketDate)}</dd></div>}
                   {submissionRecord.ticketNumber && (
                     <div>
@@ -506,6 +506,7 @@ const groupChatText = submissionRecord
       import "../../scripts/recordFacts.ts";
     </script>
     <script>
+      import { formatResidentReportCount } from "../../lib/reportCount";
       const checks = Array.from(document.querySelectorAll('.share-check'));
       const status = document.querySelector('[data-share-status]');
       const copyButton = document.querySelector('[data-copy-link]');
@@ -520,14 +521,14 @@ const groupChatText = submissionRecord
         if (copyButton instanceof HTMLButtonElement) {
           copyButton.disabled = !done;
           copyButton.setAttribute('aria-disabled', String(!done));
-          copyButton.title = done ? 'Copy this record link' : 'Complete all checks to copy the link';
+          copyButton.title = done ? 'Copy this record link' : 'Check all three boxes to copy the link';
         }
         if (shareButton instanceof HTMLButtonElement) {
           shareButton.disabled = !done;
           shareButton.setAttribute('aria-disabled', String(!done));
-          shareButton.title = done ? 'Share in group chat' : 'Complete all checks to share';
+          shareButton.title = done ? 'Share in group chat' : 'Check all three boxes to share';
         }
-        status.textContent = done ? 'Checklist complete. You can copy the link.' : 'Complete all checks to copy the link.';
+        status.textContent = done ? 'All checked. You can share the link.' : 'Check all three boxes to copy the link.';
       };
 
       const copyRecordLink = async () => {
@@ -605,17 +606,21 @@ const groupChatText = submissionRecord
           });
           const payload = await response.json().catch(() => ({}));
           if (!response.ok) {
-            throw new Error(payload?.error || 'We could not add your report.');
+            throw new Error(payload?.error || 'You were not counted. Check your connection and try again.');
           }
           if (meTooStatus) {
             meTooStatus.textContent = payload.alreadyReported
-              ? 'You already added your report on this device.'
-              : 'Your report was added. No personal details were saved.';
+              ? 'You are already counted on this phone.'
+              : 'You are counted. No one can see who tapped.';
           }
-          meTooButton.textContent = 'Report added';
+          const countLabel = document.querySelector('[data-me-too-count]');
+          if (countLabel && typeof payload.reportCount === 'number') {
+            countLabel.textContent = formatResidentReportCount(payload.reportCount);
+          }
+          meTooButton.textContent = 'You are counted';
         } catch (error) {
           if (meTooStatus) {
-            meTooStatus.textContent = error instanceof Error ? error.message : 'We could not add your report.';
+            meTooStatus.textContent = error instanceof Error ? error.message : 'You were not counted. Check your connection and try again.';
           }
           meTooButton.disabled = false;
           meTooButton.textContent = 'Me too';

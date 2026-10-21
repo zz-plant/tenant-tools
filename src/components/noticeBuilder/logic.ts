@@ -178,7 +178,8 @@ export type NextStep = {
   unlocked: boolean;
   remaining: number;
   calendarLink: string;
-  reminderDateLabel: string;
+  /** `YYYY-MM-DD` the step opens, or "" without a start date. */
+  reminderDate: string;
 };
 
 const nextStepDefinitions = [
@@ -218,7 +219,8 @@ export const buildNextSteps = ({
   issueLabel?: string;
   now?: Date;
 }): NextStep[] => {
-  const start = startDate ? new Date(startDate) : null;
+  // Noon local time: "2026-10-21" alone parses as UTC midnight, which is the day before in Chicago.
+  const start = startDate ? new Date(`${startDate}T12:00:00`) : null;
   const daysOpen = rawDaysOpen(startDate, today, now);
   const label = issueLabel || "maintenance issue";
   const buildingLabel = building || "your building";
@@ -237,7 +239,7 @@ export const buildNextSteps = ({
       unlocked: daysOpen >= step.unlockDay,
       remaining: step.unlockDay - daysOpen,
       calendarLink,
-      reminderDateLabel: reminderDate ? formatDate(reminderDate) : "Add a start date",
+      reminderDate: reminderDate ? formatDate(reminderDate) : "",
     };
   });
 };
