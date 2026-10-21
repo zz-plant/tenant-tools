@@ -3,6 +3,8 @@ import "../styles/global.css";
 import NoticeBuilder from "../components/NoticeBuilder";
 import SeoHead from "../components/SeoHead.astro";
 import AppHeader from "../components/AppHeader.astro";
+import BlockSkyline from "../components/BlockSkyline.astro";
+import StreetSign from "../components/StreetSign.astro";
 import { getBuildingOptions } from "../data/buildings";
 import { getBuildingIdsForKey, parseBuildingKeys } from "../lib/access";
 import { RESIDENT_KEY_COOKIE } from "../lib/api/requestGuard";
@@ -31,18 +33,23 @@ const ledgerLinks = (ledgerBuildings.length > 0 ? ledgerBuildings : ["2400 W Wab
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
-    <AppHeader subtitle="Repair records for tenants" statusBadge={hasResidentKey ? "Device key active" : undefined} />
+    <AppHeader subtitle="Notices and records for tenants" statusBadge={hasResidentKey ? "Device key active" : undefined} />
     <main class="page" id="main">
       <section class="home-intro-panel" aria-labelledby="home-title">
         <div class="home-intro-copy">
-          <h1 id="home-title">Put it in writing. Act together.</h1>
+          <h1 id="home-title" class="painted">Put it in writing. Act together.</h1>
           <p class="home-intro-lead">
             Write a calm notice to management. Save the dates. Neighbors with the same problem tap “Me too”. No legal words needed.
           </p>
           <div class="hero-actions">
             <a class="button intro-primary-cta" href="#builder">Write a notice</a>
             {ledgerLinks.map((building) => (
-              <a class="button button-secondary" href={`/buildings/${encodeURIComponent(building)}`}>Open {building}</a>
+              <a class="street-sign-link" href={`/buildings/${encodeURIComponent(building)}`} aria-label={`Open ${building}`}>
+                <StreetSign address={building} size="small" />
+                <svg class="tool-arrow" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                  <path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="square" />
+                </svg>
+              </a>
             ))}
           </div>
           <ul class="home-intro-list">
@@ -55,6 +62,7 @@ const ledgerLinks = (ledgerBuildings.length > 0 ? ledgerBuildings : ["2400 W Wab
             <a href="/kit">Start a building group: flyer and first-meeting checklist</a>
           </p>
         </div>
+        <BlockSkyline />
       </section>
 
       <NoticeBuilder

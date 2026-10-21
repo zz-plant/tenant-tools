@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.10.0 - 2026-10-21
+
+### Changed
+
+- Building addresses look like Chicago street signs: a green blade with the street name, and the block number ("2400 W") on its own plate.
+- Each problem's steps are drawn as a train line with stops: started, notice, follow-up, final reminder, 311, fixed. Stops you reached are filled in the problem's colour. Stops you can do now have a heavy ring. The record page names every stop; each row on the building page shows the dots and "N of 6 steps".
+- A line drawing of a Chicago block (two-flat, greystone, courtyard building, worker's cottage, corner store) at the foot of the home and building pages.
+- The big heading on the home and record pages has a painted drop shade, like a sign painter's lettering.
+- No City of Chicago or CTA marks are used.
+
 ## 1.9.0 - 2026-10-21
 
 ### Changed

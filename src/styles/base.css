@@ -77,6 +77,10 @@
   --color-primary-border: #151515;
   --color-primary-contrast: #ffffff;
 
+  /* Chicago street-sign green: building addresses only. */
+  --color-street: #0b6b3f;
+  --color-street-ink: #ffffff;
+
   /* The next-step sign. Never decoration. */
   --color-sign: #f2c200;
   --color-sign-ink: #151515;
@@ -313,6 +317,15 @@ input[type="radio"] {
   width: 20px;
   height: 20px;
   flex: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Counts and dates line up in columns. */

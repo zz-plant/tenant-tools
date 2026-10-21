@@ -1,0 +1,46 @@
+---
+import type { LineStop } from "../lib/followUp";
+
+/*
+ * A record's steps drawn as a train line with stops, in the problem's colour (set by data-issue
+ * on a parent). "compact" draws dots only, for dashboard rows; the full line names every stop.
+ */
+export type Props = { stops: LineStop[]; compact?: boolean };
+
+const { stops, compact = false } = Astro.props;
+const done = stops.filter((stop) => stop.state === "done").length;
+// Short dates fit six stops across a phone. The record's timeline below has the full dates.
+const shortDate = (value: string) =>
+  new Date(`${value}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+const stateText = (stop: LineStop) =>
+  stop.state === "done"
+    ? stop.date
+      ? shortDate(stop.date)
+      : "Done"
+    : stop.state === "open"
+      ? "Open now"
+      : stop.state === "locked" && stop.date
+        ? `From ${shortDate(stop.date)}`
+        : "Later";
+---
+
+{compact ? (
+  <div class="stop-line-row">
+    <ol class="stop-line stop-line-compact" aria-hidden="true">
+      {stops.map((stop) => (
+        <li class={`stop is-${stop.state}`}><span class="stop-dot"></span></li>
+      ))}
+    </ol>
+    <span class="stop-summary">{done} of {stops.length} steps</span>
+  </div>
+) : (
+  <ol class="stop-line" aria-label="Steps for this problem">
+    {stops.map((stop) => (
+      <li class={`stop is-${stop.state}`}>
+        <span class="stop-dot" aria-hidden="true"></span>
+        <span class="stop-label">{stop.label}</span>
+        <span class="stop-state">{stateText(stop)}</span>
+      </li>
+    ))}
+  </ol>
+)}

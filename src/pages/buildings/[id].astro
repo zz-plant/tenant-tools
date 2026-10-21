@@ -7,6 +7,7 @@ import { formatResidentReportCount, type BuildingSubmission } from "../../lib/bu
 import { loadBuildingDetail } from "../../lib/buildingDetail";
 import {
   buildFollowUpItems,
+  buildRecordLine,
   daysOpen,
   nextStepButtonLabel,
   nextStepForRecord,
@@ -23,6 +24,9 @@ import { buildBuildingDashboardUrl, buildSubmissionDetailsUrl } from "../../lib/
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 import AppHeader from "../../components/AppHeader.astro";
+import BlockSkyline from "../../components/BlockSkyline.astro";
+import StopLine from "../../components/StopLine.astro";
+import StreetSign from "../../components/StreetSign.astro";
 
 export const prerender = false;
 
@@ -94,6 +98,12 @@ const nextStepFor = (summary: BuildingSubmission): RecordNextStep | null => {
   }
   return nextStepForRecord(record, detail?.eventsByRecord.get(record.id) ?? [], today, followUpItems);
 };
+const lineFor = (summary: BuildingSubmission) => {
+  const record = recordById.get(summary.id);
+  return record && summary.status === "open" && !summary.mergedInto
+    ? buildRecordLine(record, detail?.eventsByRecord.get(record.id) ?? [], today)
+    : null;
+};
 grouped.open.sort((left, right) => daysOpen(right.startDate, today) - daysOpen(left.startDate, today));
 
 // The sign shows one step a resident can take now: the oldest open problem with a step that is ready.
@@ -139,7 +149,7 @@ const groupTools = [
     <div class="page">
       <header class="hero hero-single">
         <div class="hero-main">
-          <h1>{buildingId || "Building ledger"}</h1>
+          {buildingId ? <StreetSign address={buildingId} as="h1" /> : <h1>Building page</h1>}
           {!hasAccess && <p class="tagline">Residents only. Open the link from your building group, or enter the key.</p>}
         </div>
       </header>
@@ -251,6 +261,7 @@ const groupTools = [
                             Started {record.startDate ? formatTimelineDate(record.startDate) : "date not listed"}.{" "}
                             Me too: <span data-report-count={record.id} title="Small counts are hidden for privacy">{formatResidentReportCount(record.reportCount)}</span>
                           </p>
+                          {lineFor(record) && <StopLine stops={lineFor(record) ?? []} compact />}
                           {step && step.state !== "ready" && <p class="problem-next">{step.label}</p>}
                           {record.mergedInto && <p class="problem-next">Merged into another record.</p>}
                         </div>
@@ -415,6 +426,7 @@ const groupTools = [
         </aside>
       </main>
 
+      <BlockSkyline />
       <footer class="site-footer">
         <p>This page does not show names, unit numbers, or photos.</p>
         {hasAccess && (

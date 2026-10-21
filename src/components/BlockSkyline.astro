@@ -1,0 +1,93 @@
+---
+/*
+ * A Chicago residential block in outline: two-flat, greystone three-flat, courtyard building, then a
+ * worker's cottage and a corner store with flats above. Drawn in one 2px line in the text colour. Decorative only.
+ * Phones get a viewBox that ends after the courtyard building, so no building is cut in half.
+ */
+---
+
+<div class="block-skyline" aria-hidden="true">
+  <svg class="sky-defs" width="0" height="0" focusable="false">
+    <defs>
+      <g id="chicago-block" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="square">
+    <!-- two-flat: flat roof with cornice, one bay per flat stacked on the left, stoop and door on the right -->
+    <g>
+      <path d="M16 118V34h112v84" />
+      <path d="M12 34h120M12 28h120v6" />
+      <path d="M16 78h112" />
+      <path d="M24 74V48l10-6h28l10 6v26" />
+      <path d="M24 118V88l10-6h28l10 6v30" />
+      <path d="M34 54h28v14H34zM34 94h28v14H34z" />
+      <path d="M88 52h28v18H88zM88 82h28v18H88z" />
+      <path d="M96 118v-12h14v12" />
+      <path d="M86 118h-8v-6h6" />
+    </g>
+    <!-- worker's cottage: gable roof -->
+    <g transform="translate(442 0)">
+      <path d="M148 118V70h80v48" />
+      <path d="M142 72l46-34 46 34" />
+      <path d="M160 82h18v16h-18zM198 82h18v16h-18z" />
+      <path d="M182 118v-14h14v14" />
+    </g>
+    <!-- greystone three-flat: tall, rusticated base, deep bay, cornice with brackets -->
+    <g transform="translate(-96 0)">
+      <path d="M246 118V14h124v104" />
+      <path d="M240 14h136M240 8h136v6" />
+      <path d="M256 14v6M276 14v6M296 14v6M316 14v6M336 14v6M356 14v6" />
+      <path d="M246 104h124M246 96h124" />
+      <path d="M256 96V30l10-6h36l10 6v66" />
+      <path d="M266 40h36M266 62h36" />
+      <path d="M268 46v12M300 46v12M268 68v12M300 68v12" />
+      <path d="M326 34h32v18h-32zM326 62h32v18h-32z" />
+      <path d="M334 118v-14h18v14" />
+    </g>
+    <!-- courtyard building: two wings, a lower centre, an arched gate -->
+    <g transform="translate(-90 0)">
+      <path d="M392 118V30h70v88M592 118V30h70v88" />
+      <path d="M386 30h82M586 30h82" />
+      <path d="M462 118V50h130v68" />
+      <path d="M512 118V92a15 15 0 0 1 30 0v26" />
+      <path d="M404 44h18v14h-18zM432 44h18v14h-18zM404 72h18v14h-18zM432 72h18v14h-18z" />
+      <path d="M604 44h18v14h-18zM632 44h18v14h-18zM604 72h18v14h-18zM632 72h18v14h-18z" />
+      <path d="M476 62h16v14h-16zM562 62h16v14h-16z" />
+    </g>
+    <!-- corner store with flats above: big shop window, an awning, a blank sign board -->
+    <g>
+      <path d="M684 118V22h150v96" />
+      <path d="M678 22h162" />
+      <path d="M698 34h26v16h-26zM738 34h26v16h-26zM778 34h26v16h-26z" />
+      <path d="M692 58h134v12H692z" />
+      <path d="M690 78h138l-8 10H698z" />
+      <path d="M698 118V92h78v26M790 118V92h20v26" />
+    </g>
+    <!-- two-flat with a bay -->
+    <g>
+      <path d="M852 118V38h108v80" />
+      <path d="M846 38h120M846 32h120v6" />
+      <path d="M908 118V52l10-6h26l10 6v66" />
+      <path d="M916 62h30M916 90h30" />
+      <path d="M866 54h26v16h-26zM866 84h26v16h-26z" />
+      <path d="M872 118v-10h14v10" />
+    </g>
+    <!-- greystone three-flat -->
+    <g>
+      <path d="M978 118V18h116v100" />
+      <path d="M972 18h128M972 12h128v6" />
+      <path d="M978 104h116M978 96h116" />
+      <path d="M988 30h30v18h-30zM1054 30h30v18h-30zM988 60h30v18h-30zM1054 60h30v18h-30z" />
+      <path d="M1026 118v-14h20v14" />
+    </g>
+    <!-- worker's cottage -->
+    <g>
+      <path d="M1110 118V74h64v44" />
+      <path d="M1104 76l38-28 38 28" />
+      <path d="M1120 86h16v14h-16z" />
+      <path d="M1148 118v-14h12v14" />
+    </g>
+        <path d="M0 118h1180" />
+      </g>
+    </defs>
+  </svg>
+  <svg class="sky-wide" viewBox="0 0 1180 120" preserveAspectRatio="xMinYMax slice"><use href="#chicago-block" /></svg>
+  <svg class="sky-narrow" viewBox="0 0 581 120"><use href="#chicago-block" /></svg>
+</div>

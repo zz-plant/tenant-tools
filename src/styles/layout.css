@@ -466,7 +466,8 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .hero-actions .button:only-child {
+  .hero-actions .button:only-child,
+  .hero-actions .street-sign-link {
     grid-column: 1 / -1;
   }
 

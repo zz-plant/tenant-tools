@@ -389,3 +389,54 @@ export const buildMeetingReport = ({
     ],
   };
 };
+
+/**
+ * A record's steps as stops on a line, like an 'L' line map: problem started, notice, follow-up,
+ * final reminder, 311 request, fixed. Each stop is done, open now, locked until a date, or later.
+ * More than one stop can be open at once (the final reminder and 311 often are); the record's
+ * single next step is still `nextStepForRecord`.
+ */
+export type LineStopState = "done" | "open" | "locked" | "later";
+export type LineStop = { id: string; label: string; state: LineStopState; date?: string };
+
+export const buildRecordLine = (record: SubmissionRecord, events: RecordEvent[], today: string): LineStop[] => {
+  const start = record.startDate || record.reportDate || today;
+  const counted = countedNotices({ ...record, startDate: start }, events);
+  const next = nextNoticeStage({ ...record, startDate: start }, events, today);
+  const firstNotice = getFirstWrittenNoticeDate(record) || record.reportDate;
+  const ticket = events.find((event) => event.type === "request_311_filed" || event.type === "inspection_done");
+  const has311 = Boolean(record.ticketNumber || record.ticketDate || ticket);
+  const win = events
+    .filter((event) => winEventTypes.includes(event.type))
+    .sort((a, b) => a.date.localeCompare(b.date))[0];
+  const fixed = Boolean(win) || record.status === "resolved";
+  const noticeStop = (stage: "B" | "C", doneDate?: string): Pick<LineStop, "state" | "date"> => {
+    if (doneDate) {
+      return { state: "done", date: doneDate };
+    }
+    if (fixed) {
+      return { state: "later" };
+    }
+    if (next.stage === stage && !next.unlockDate) {
+      return { state: "open" };
+    }
+    // nextNoticeStage reports the follow-up's unlock date as stage A, and the final reminder's as stage B.
+    const unlocksThis = next.unlockDate && ((stage === "B" && next.stage === "A") || (stage === "C" && next.stage === "B"));
+    return unlocksThis ? { state: "locked", date: next.unlockDate } : { state: "later" };
+  };
+  const qualifies311 = record.issue in issue311Guidance && daysOpen(start, today) >= inspectionQualifyingDays;
+  return [
+    { id: "start", label: "Started", state: "done", date: start },
+    { id: "notice", label: "Notice", ...(firstNotice ? { state: "done" as const, date: firstNotice } : { state: "open" as const }) },
+    { id: "follow-up", label: "Follow-up", ...noticeStop("B", counted.followUpDates[0]) },
+    { id: "final", label: "Final", ...noticeStop("C", counted.finalDate) },
+    {
+      id: "311",
+      label: "311",
+      ...(has311
+        ? { state: "done" as const, date: record.ticketDate || ticket?.date }
+        : { state: (qualifies311 && !fixed ? "open" : "later") as LineStopState }),
+    },
+    { id: "fixed", label: "Fixed", ...(fixed ? { state: "done" as const, date: win?.date } : { state: "later" as const }) },
+  ];
+};
