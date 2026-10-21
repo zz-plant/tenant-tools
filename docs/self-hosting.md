@@ -74,7 +74,7 @@ bun run test
 SITE_URL=https://ledger.example.org bun run deploy
 ```
 
-### From Cloudflare Workers Builds (recommended)
+### From Cloudflare Workers Builds
 
 Cloudflare builds and deploys `main` itself. You do not make or store an API token. Deploy once from your computer first, so the Worker exists.
 
@@ -86,22 +86,6 @@ Cloudflare builds and deploys `main` itself. You do not make or store an API tok
 6. Leave builds for other branches off. A branch build would use the same KV namespace and photo bucket as your live site.
 
 After this, every merge to `main` deploys. If a check fails, nothing is deployed. Build logs are under the Worker's **Deployments** tab.
-
-### From GitHub
-
-Use this instead of Workers Builds, not as well. With both, each merge deploys twice.
-
-The `deploy` job in `.github/workflows/ci.yml` deploys `main` after the checks pass. Then no one has to remember to deploy. Set it up once:
-
-1. In Cloudflare, go to **My Profile → API Tokens → Create Token**. Use the **Edit Cloudflare Workers** template. Under resources, choose only your account and only your domain's zone.
-2. Copy your **Account ID** from **Workers & Pages → Overview**.
-3. In GitHub, open your copy of the repository. Go to **Settings → Secrets and variables → Actions**.
-4. Add two **secrets**: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`.
-5. Add one **variable**: `SITE_URL`.
-
-After this, every merge to `main` deploys. To deploy by hand, open **Actions → CI → Run workflow** on `main`. Without the secrets, the deploy job is skipped and the run summary says so.
-
-Never put the API token in the code or in a chat. If it leaks, delete it in Cloudflare and make a new one.
 
 ## 6. Add buildings and keys
 
@@ -130,7 +114,7 @@ If a building's records are no longer safe, use "Emergency wipe" on `/steward`. 
 
 ## Updates
 
-If you deploy from Workers Builds or GitHub, merge the update into `main`. The checks run, then it deploys.
+If you deploy from Workers Builds, merge the update into `main`. The checks run, then it deploys.
 
 From your computer:
 
