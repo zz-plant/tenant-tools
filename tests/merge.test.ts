@@ -25,7 +25,7 @@ const payloadFor = (building: string) => ({
 
 const setup = () => {
   const kv = createMockKv();
-  const locals = { runtime: { env: { SUBMISSIONS_KV: kv, BUILDING_KEYS_JSON, STEWARD_KEY } } };
+  const locals = { env: { SUBMISSIONS_KV: kv, BUILDING_KEYS_JSON, STEWARD_KEY } };
   let ip = 0;
   const create = async (building: string, key: string) => {
     const response = await createSubmission({

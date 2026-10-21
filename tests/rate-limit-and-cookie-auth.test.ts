@@ -51,11 +51,9 @@ const createMockKv = () => {
 };
 
 const localsFor = (kv: MockKv) => ({
-  runtime: {
-    env: {
-      SUBMISSIONS_KV: kv,
-      BUILDING_KEYS_JSON,
-    },
+  env: {
+    SUBMISSIONS_KV: kv,
+    BUILDING_KEYS_JSON,
   },
 });
 

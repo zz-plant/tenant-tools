@@ -17,7 +17,7 @@ const setup = () => {
   const kv = createMockKv();
   const bucket = createMockBucket();
   const env: Record<string, unknown> = { SUBMISSIONS_KV: kv, BUILDING_KEYS_JSON, STEWARD_KEY: "steward", EVIDENCE_BUCKET: bucket };
-  const locals = { runtime: { env } };
+  const locals = { env };
   let ip = 0;
   const call = (handler: Handler, url: string, init: { method?: string; body?: unknown; headers?: Record<string, string> } = {}) =>
     handler({

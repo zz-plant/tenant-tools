@@ -13,11 +13,11 @@
     "translations": "tsx scripts/translations.ts"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.13",
-    "@astrojs/react": "^4.4.2",
+    "@astrojs/cloudflare": "^14.4.1",
+    "@astrojs/react": "^7.1.0",
     "@astrojs/sitemap": "^3.7.4",
     "@base-ui/react": "^1.9.0",
-    "astro": "^5.18.2",
+    "astro": "^7.4.1",
     "qrcode-generator": "2.0.4",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

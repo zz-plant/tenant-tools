@@ -10,7 +10,7 @@ The free plan allows 1,000 KV writes a day. Each resident action (a new record, 
 
 - A Cloudflare account (free).
 - A GitHub account, to copy the code.
-- A computer with [Bun](https://bun.sh) 1.2+ and Node 20+.
+- A computer with [Bun](https://bun.sh) 1.2+ and Node 22.22+.
 - About one hour.
 
 ## 1. Copy the code

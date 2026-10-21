@@ -8,7 +8,7 @@ import { getSubmissionsKv, saveSubmissionRecord } from "../../../lib/storage/sub
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }

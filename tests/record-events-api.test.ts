@@ -17,7 +17,7 @@ const today = formatDate(new Date());
 const setup = async () => {
   const kv = createMockKv();
   const env: Record<string, unknown> = { SUBMISSIONS_KV: kv, BUILDING_KEYS_JSON, STEWARD_KEY: "steward" };
-  const locals = { runtime: { env } };
+  const locals = { env };
   let ip = 0;
   // A new IP for each call keeps the per-IP rate limit out of tests that are not about it.
   const nextIp = () => `9.9.${Math.floor(ip / 250)}.${ip++ % 250}`;

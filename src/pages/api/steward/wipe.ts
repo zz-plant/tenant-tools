@@ -15,7 +15,7 @@ type WipePayload = { building: string };
  * The steward must type the building name exactly. Runs in batches: call until `remaining` is false.
  */
 export const POST: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime?.env ?? {};
+  const env = locals.env ?? {};
   const kv = getSubmissionsKv(env);
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);

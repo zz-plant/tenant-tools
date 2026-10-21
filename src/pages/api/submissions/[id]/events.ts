@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Submission id is required.", 400);
   }
 
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
@@ -92,7 +92,7 @@ export const DELETE: APIRoute = async ({ params, request, locals }) => {
     return jsonError("Submission id is required.", 400);
   }
 
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }

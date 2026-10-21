@@ -110,11 +110,11 @@ const rejectWithAudit = async <TValidated>(
 
 export const guardApiRequest = async <TPayload = Record<string, unknown>, TValidated = TPayload>(
   request: Request,
-  locals: { runtime?: { env?: Record<string, unknown> } } | undefined,
+  locals: { env?: Record<string, unknown> } | undefined,
   kv: KVNamespace,
   config: GuardConfig<TPayload, TValidated>
 ): Promise<{ ok: true; context: GuardSuccess<TValidated> } | { ok: false; response: Response }> => {
-  const env = (locals?.runtime?.env ?? {}) as Record<string, unknown>;
+  const env = (locals?.env ?? {}) as Record<string, unknown>;
   const url = new URL(request.url);
 
   let payload: TValidated | null = null;

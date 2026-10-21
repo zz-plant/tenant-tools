@@ -30,10 +30,10 @@ import HelpResources from "../../components/HelpResources.astro";
 export const prerender = false;
 
 const { id } = Astro.params;
-const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
+const kv = Astro.locals.env?.SUBMISSIONS_KV;
 const url = new URL(Astro.request.url);
 const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? url.searchParams.get("key");
-const env = Astro.locals.runtime?.env ?? {};
+const env = Astro.locals.env ?? {};
 const hasAccess = isResidentKeyRecognized(accessKey, env);
 const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
 const rawSubmissionRecord = id && kv && hasAccess ? await fetchSubmissionRecord(kv, id) : null;

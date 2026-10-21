@@ -61,11 +61,9 @@ describe("submission status route", () => {
       params: { id: record.id },
       request,
       locals: {
-        runtime: {
-          env: {
-            SUBMISSIONS_KV: kv,
-            STEWARD_KEY: "steward-secret",
-          },
+        env: {
+          SUBMISSIONS_KV: kv,
+          STEWARD_KEY: "steward-secret",
         },
       },
     } as unknown as Parameters<typeof updateStatus>[0]);

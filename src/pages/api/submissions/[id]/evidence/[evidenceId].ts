@@ -19,7 +19,7 @@ export const prerender = false;
  */
 export const GET: APIRoute = async ({ params, request, locals }) => {
   const { id, evidenceId } = params;
-  const env = locals.runtime?.env ?? {};
+  const env = locals.env ?? {};
   const kv = getSubmissionsKv(env);
   const evidence = getEvidenceConfig(env);
   if (!id || !evidenceId || !kv || !evidence) {
@@ -68,7 +68,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 /** Steward housekeeping: remove a photo that shows faces, names, or other unsafe content. */
 export const DELETE: APIRoute = async ({ params, request, locals }) => {
   const { id, evidenceId } = params;
-  const env = locals.runtime?.env ?? {};
+  const env = locals.env ?? {};
   const kv = getSubmissionsKv(env);
   const evidence = getEvidenceConfig(env);
   if (!id || !evidenceId || !kv || !evidence) {

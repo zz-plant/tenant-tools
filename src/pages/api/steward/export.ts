@@ -13,7 +13,7 @@ const fileSlug = (building: string) =>
 
 /** Stewards download all of a building's records and dated facts, as JSON or CSV. */
 export const GET: APIRoute = async ({ request, locals }) => {
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }

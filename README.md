@@ -52,7 +52,7 @@ See [`AGENTS.md`](AGENTS.md) for full required policy.
 
 ### Requirements
 
-- Node 20+
+- Node 22.22+
 - bun 1.2+
 
 ### Install and run
@@ -151,12 +151,7 @@ Photo upload is off until both of these are set. Without them, the record page s
   wrangler secret put EVIDENCE_SIGNING_KEY
   ```
 
-Local run with KV and R2 simulated (bindings come from `wrangler.jsonc`):
-
-```bash
-bun run build
-npx wrangler dev
-```
+`bun run dev` and `bun run preview` run the app in Cloudflare's workerd runtime, with KV and R2 simulated. Bindings come from `wrangler.jsonc`. Settings and secrets come from `.dev.vars`.
 
 ### SEO and sitemap
 

@@ -14,7 +14,7 @@ export const GET: APIRoute = async ({ params, locals, request }) => {
     return jsonError("Submission id is required.", 400);
   }
 
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }

@@ -29,18 +29,28 @@ type R2Bucket = {
   delete: (key: string) => Promise<void>;
 };
 
+/** Cloudflare bindings and settings this app reads. */
+type BuildingLedgerEnv = {
+  SUBMISSIONS_KV?: KVNamespace;
+  BUILDING_ACCESS_KEY?: string;
+  BUILDING_KEYS_JSON?: string;
+  STEWARD_KEY?: string;
+  EVIDENCE_BUCKET?: R2Bucket;
+  EVIDENCE_SIGNING_KEY?: string;
+};
+
+/** Only the middleware imports this. It copies the env onto `locals.env` for each request. */
+declare module "cloudflare:workers" {
+  export const env: BuildingLedgerEnv;
+}
+
 declare namespace App {
   interface Locals {
-    runtime?: {
-      env?: {
-        SUBMISSIONS_KV?: KVNamespace;
-        BUILDING_ACCESS_KEY?: string;
-        BUILDING_KEYS_JSON?: string;
-        STEWARD_KEY?: string;
-        EVIDENCE_BUCKET?: R2Bucket;
-        EVIDENCE_SIGNING_KEY?: string;
-      };
-    };
+    /**
+     * Set by middleware for each request: the Worker env, with steward-issued building keys applied
+     * to BUILDING_KEYS_JSON. Pages and API routes read bindings from here, not from `cloudflare:workers`.
+     */
+    env?: BuildingLedgerEnv;
   }
 }
 

@@ -1,4 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
+import { env as workerEnv } from "cloudflare:workers";
 import { RESIDENT_KEY_COOKIE, SESSION_ID_COOKIE, STEWARD_KEY_COOKIE } from "./lib/api/requestGuard";
 import { resolveForgetRedirect } from "./lib/quickExit";
 import { buildAccessOverlay, closedAccessEnv, hashBuildingKey, loadKeyRegistry } from "./lib/access/registry";
@@ -17,14 +18,15 @@ type MiddlewareContext = Parameters<Parameters<typeof defineMiddleware>[0]>[0];
 type MiddlewareNext = Parameters<Parameters<typeof defineMiddleware>[0]>[1];
 
 /**
- * Applies steward-issued building keys for this request only (see lib/access/registry.ts).
- * Pages and API routes keep reading BUILDING_KEYS_JSON from `locals.runtime.env`.
+ * Puts the Worker env on `locals.env`, with steward-issued building keys applied for this request
+ * only (see lib/access/registry.ts). Pages and API routes read bindings from `locals.env`.
  */
 const applyKeyRegistry = async (context: MiddlewareContext, url: URL) => {
-  const runtime = context.locals.runtime;
-  const env = runtime?.env;
-  const kv = env?.SUBMISSIONS_KV;
-  if (!runtime || !env || !kv || context.isPrerendered) {
+  const env = workerEnv;
+  // The shared env object is copied for each request, never changed.
+  context.locals.env = { ...env };
+  const kv = env.SUBMISSIONS_KV;
+  if (!kv || context.isPrerendered) {
     return;
   }
   try {
@@ -46,12 +48,11 @@ const applyKeyRegistry = async (context: MiddlewareContext, url: URL) => {
       presented,
       sentinel: `unset-${crypto.randomUUID()}`,
     });
-    // `runtime` is created for each request. The shared env object is copied, never changed.
-    context.locals.runtime = { ...runtime, env: { ...env, BUILDING_KEYS_JSON: JSON.stringify(overlay) } };
+    context.locals.env = { ...env, BUILDING_KEYS_JSON: JSON.stringify(overlay) };
   } catch {
     // Fail closed. Without the registry, a settings key that a steward replaced would work again.
     // No resident key works for this request. The steward key does not use these settings.
-    context.locals.runtime = { ...runtime, env: { ...env, ...closedAccessEnv } };
+    context.locals.env = { ...env, ...closedAccessEnv };
   }
 };
 

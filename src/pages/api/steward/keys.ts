@@ -27,7 +27,7 @@ const validateBuilding = (payload: { building?: unknown } | null) => {
  * Issuing a key again rotates it: the old key stops working.
  */
 export const POST: APIRoute = async ({ request, locals }) => {
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 /** Stewards remove a key issued here. The building goes back to its deploy-settings key, if any. */
 export const DELETE: APIRoute = async ({ request, locals }) => {
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }

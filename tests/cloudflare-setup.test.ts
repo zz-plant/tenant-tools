@@ -56,7 +56,7 @@ const submit = (env: Record<string, unknown>) =>
       },
       body: JSON.stringify(basePayload),
     }),
-    locals: { runtime: { env } },
+    locals: { env },
   } as unknown as Parameters<typeof createSubmission>[0]);
 
 describe("rate limiting on Cloudflare", () => {

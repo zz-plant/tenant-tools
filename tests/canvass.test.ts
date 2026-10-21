@@ -79,7 +79,7 @@ describe("canvass helpers", () => {
 describe("canvass API", () => {
   const setup = () => {
     const kv = createMockKv();
-    const locals = { runtime: { env: { SUBMISSIONS_KV: kv, STEWARD_KEY: "steward", BUILDING_KEYS_JSON: JSON.stringify({ "2400 W Wabansia": "key-2400" }) } } };
+    const locals = { env: { SUBMISSIONS_KV: kv, STEWARD_KEY: "steward", BUILDING_KEYS_JSON: JSON.stringify({ "2400 W Wabansia": "key-2400" }) } };
     let ip = 0;
     const call = (handler: (context: never) => Promise<Response>, method: string, body: unknown, headers: Record<string, string>, url = "/api/buildings/canvass") =>
       handler({

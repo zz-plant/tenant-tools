@@ -26,7 +26,7 @@ const privateHeaders = { "Cache-Control": "private, no-store" };
 /** Lists evidence for residents of the building, with short-lived signed links. */
 export const GET: APIRoute = async ({ params, request, locals }) => {
   const id = params.id;
-  const env = locals.runtime?.env ?? {};
+  const env = locals.env ?? {};
   const kv = getSubmissionsKv(env);
   if (!id || !kv) {
     return jsonError("Submission not found.", 404);
@@ -58,7 +58,7 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
 /** Uploads one photo. The request body is the raw image bytes. */
 export const POST: APIRoute = async ({ params, request, locals }) => {
   const id = params.id;
-  const env = locals.runtime?.env ?? {};
+  const env = locals.env ?? {};
   const kv = getSubmissionsKv(env);
   if (!id || !kv) {
     return jsonError("Submission not found.", 404);

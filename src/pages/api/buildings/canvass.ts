@@ -13,7 +13,7 @@ type SavePayload = CanvassInput & { building: string };
 
 /** Stewards save a canvass tally for a building. Counts only. */
 export const POST: APIRoute = async ({ request, locals }) => {
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
@@ -56,7 +56,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
 /** Stewards remove a canvass saved by mistake. */
 export const DELETE: APIRoute = async ({ request, locals }) => {
-  const kv = getSubmissionsKv(locals.runtime?.env ?? {});
+  const kv = getSubmissionsKv(locals.env ?? {});
   if (!kv) {
     return jsonError("Ledger storage is not configured.", 500);
   }
