@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+
+- Five problem types: "City work blocks part of the building", "Paid parking I cannot use", "Trash or recycling changed or not working", "Doors, fobs, or locks not working", and "Damage from building work". Each has a first notice, a follow-up, and a final reminder, in Standard and Very simple English. The notices ask for a written answer or a credit; they never say rent will be held back.
+- City work goes to the ward office first. The ward office runs or tracks these projects, so a City-work record's first next step is "Ask the ward office for help", and its stop line has a "Ward" stop in place of 311.
+- A dated fact, "Ward office asked for help". Once it is logged, the ward office is not suggested again.
+
 ### Changed
 
 - The site moved to tenants.kanav.net. The old address, galina.kanav.net, sends every page and link there, including resident links with a key. The old address named a person, which this tool should never do.

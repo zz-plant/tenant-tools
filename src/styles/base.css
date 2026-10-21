@@ -122,6 +122,11 @@
   --issue-common: #0f7c83;
   --issue-no-timeline: #55595f;
   --issue-building: #151515;
+  --issue-access: #a3336e;
+  --issue-trash: #5f6b1d;
+  --issue-parking: #2b4c7e;
+  --issue-city-work: #b35400;
+  --issue-damage: #6b4a2b;
   --issue-deposit: #55595f;
   --issue-lockout: #8a1c4a;
   --issue-ink: #ffffff;
@@ -229,6 +234,11 @@
     --issue-common: #3cc2c9;
     --issue-no-timeline: #aab0b8;
     --issue-building: #f3f4f1;
+    --issue-access: #f07ab3;
+    --issue-trash: #b5c24a;
+    --issue-parking: #86a8e0;
+    --issue-city-work: #ff9a3d;
+    --issue-damage: #d1a27a;
     --issue-deposit: #aab0b8;
     --issue-lockout: #f0709f;
     --issue-ink: #121311;

@@ -13,6 +13,11 @@ export const fieldDefinitions = {
   commonArea: { label: "Common area item", placeholder: "ELEVATOR" },
   lockoutAction: { label: "Lockout or shutoff action", placeholder: "LOCK ME OUT" },
   issueDescription: { label: "Issue description (building-wide)", placeholder: "broken elevator" },
+  cannotUse: { label: "What I cannot use", placeholder: "garage parking" },
+  reason: { label: "Why I cannot use it", placeholder: "garage entrance blocked" },
+  trashChange: { label: "What changed", placeholder: "trash room locked" },
+  accessItem: { label: "Door, fob, or lock", placeholder: "front door fob" },
+  damagedItem: { label: "What was damaged", placeholder: "car in garage spot" },
 } as const;
 
 export type FieldDefinitionKey = keyof typeof fieldDefinitions;
@@ -25,6 +30,11 @@ export const issueFieldMap = {
   pests: ["pestType", "attachment"],
   entry: ["eventDate", "eventDates", "attachment"],
   common: ["commonArea", "attachment"],
+  access: ["accessItem", "attachment"],
+  trash: ["trashChange", "attachment"],
+  parking: ["reason", "attachment"],
+  "city-work": ["cannotUse", "attachment"],
+  damage: ["damagedItem", "attachment"],
   "no-timeline": [],
   deposit: ["moveOutDate"],
   lockout: ["lockoutAction", "eventDate", "eventDateTime", "attachment"],

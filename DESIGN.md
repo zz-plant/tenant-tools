@@ -27,6 +27,11 @@ colors:
   issue-common: "#0f7c83"
   issue-slate: "#55595f"
   issue-lockout: "#8a1c4a"
+  issue-access: "#a3336e"
+  issue-trash: "#5f6b1d"
+  issue-parking: "#2b4c7e"
+  issue-city-work: "#b35400"
+  issue-damage: "#6b4a2b"
   danger: "#c21f18"
   success: "#1e7a44"
   night-board: "#121311"
@@ -221,10 +226,15 @@ Each issue type owns one enamel hue, applied through `data-issue` on the element
 - **Heat Red** (`issue-heat`): heat and hot water.
 - **Ultramarine** (`issue-leak`): water leaks.
 - **Pest Green** (`issue-pests`): pests.
-- **Entry Violet** (`issue-entry`): entry without notice and access.
+- **Entry Violet** (`issue-entry`): entry without notice.
 - **Common Teal** (`issue-common`): elevators and common areas.
 - **Slate** (`issue-slate`): no-timeline and deposit issues.
 - **Lockout Plum** (`issue-lockout`): lockouts.
+- **Fob Raspberry** (`issue-access`): doors, fobs, and locks that do not work.
+- **Olive** (`issue-trash`): trash and recycling changes.
+- **Garage Navy** (`issue-parking`): paid parking a resident cannot use.
+- **Barricade Orange** (`issue-city-work`): City work blocking part of the building. A darker orange than any warning or sign colour, used only as this issue's enamel.
+- **Umber** (`issue-damage`): damage from building work.
 - Building-wide issues use Enamel Black.
 
 ### Neutral

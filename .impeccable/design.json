@@ -436,6 +436,26 @@
           "#eeefec"
         ]
       },
+      "issue-access": {
+        "value": "#a3336e",
+        "role": "Doors, fobs, and locks"
+      },
+      "issue-trash": {
+        "value": "#5f6b1d",
+        "role": "Trash and recycling"
+      },
+      "issue-parking": {
+        "value": "#2b4c7e",
+        "role": "Paid parking"
+      },
+      "issue-city-work": {
+        "value": "#b35400",
+        "role": "City work blocking the building"
+      },
+      "issue-damage": {
+        "value": "#6b4a2b",
+        "role": "Damage from building work"
+      },
       "ink-deep": {
         "value": "#000000",
         "role": "Pure black for pressed primary buttons, the sign button hover, the night top bar, and print."
