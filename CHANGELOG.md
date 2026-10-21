@@ -4,6 +4,7 @@
 
 ### Added
 
+- "Who to send notices to": a steward notes the owner, the property manager, the rent or repair portal, and the address for written notices (RLTO 5-12-090). Residents with the building key see it on the dashboard and on the joint letter page. Business names and mailing addresses only: email addresses and phone numbers are rejected. It is in the steward export and is removed by the emergency wipe.
 - Dated facts for notices from management: "Notice of entry from management received" and "Notice from management received". Each can say how the notice came (email, rent portal, mail, a note on the door, and so on).
 - "Did the notice give 2 days?" on the record page, for entry notices. Add when the notice arrived and when they plan to enter, and it compares them with RLTO 5-12-050 (48 hours, entry between 8 AM and 8 PM). It runs in the browser only. Nothing in it is saved.
 - "Follow-up notice sent" and "Final reminder sent" can say how you sent them, for example "Follow-up notice sent (by certified mail)".

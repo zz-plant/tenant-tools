@@ -280,15 +280,18 @@ export const getFairNoticeRule = (onDate: string = todayIso()) => {
   };
 };
 
-/** The landlord entry rule in effect on `onDate`, with the section and sources to cite. */
-export const getEntryNoticeRule = (onDate: string = todayIso()) => {
-  const provision = rltoProvisionPack.provisions.find((entry) => entry.id === "entry_notice");
+/** One RLTO provision in effect on `onDate`, with its summary, section, and sources to cite. */
+export const getProvisionInEffect = (provisionId: string, onDate: string = todayIso()) => {
+  const provision = rltoProvisionPack.provisions.find((entry) => entry.id === provisionId);
   const version = provision ? selectVersionInEffect(provision, onDate) : undefined;
   if (!version) {
     return null;
   }
-  return { section: version.section, sources: resolveSources(rltoProvisionPack, [version]) };
+  return { section: version.section, summary: version.summary, sources: resolveSources(rltoProvisionPack, [version]) };
 };
+
+/** The landlord entry rule in effect on `onDate`. */
+export const getEntryNoticeRule = (onDate: string = todayIso()) => getProvisionInEffect("entry_notice", onDate);
 
 /** Every RLTO provision in effect or passed on `onDate`, for the printable rights page. */
 export const getAllProvisionCards = (onDate: string = todayIso()): RuleCard[] =>

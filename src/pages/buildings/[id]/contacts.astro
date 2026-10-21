@@ -1,0 +1,135 @@
+---
+import "../../../styles/global.css";
+import { getProvisionInEffect } from "../../../data/rules";
+import { isAccessKeyValid } from "../../../lib/access";
+import { STEWARD_KEY_COOKIE } from "../../../lib/api/requestGuard";
+import { formatDate, formatTimelineDate } from "../../../lib/dateUtils";
+import { buildBuildingDashboardUrl } from "../../../lib/navigation";
+import { noticeContactFields, noticeContactLimit, noticeContactSources } from "../../../lib/noticeContacts";
+import { getNoticeContacts } from "../../../lib/storage/noticeContacts";
+import SeoHead from "../../../components/SeoHead.astro";
+import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
+import AppHeader from "../../../components/AppHeader.astro";
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const env = Astro.locals.env ?? {};
+const kv = env.SUBMISSIONS_KV;
+const buildingId = decodeURIComponent(id ?? "");
+const stewardKey = Astro.cookies.get(STEWARD_KEY_COOKIE)?.value ?? null;
+const isSteward = isAccessKeyValid(stewardKey, env.STEWARD_KEY);
+const hasAttempt = Boolean(stewardKey && stewardKey.trim());
+const dashboardUrl = buildBuildingDashboardUrl({ buildingId });
+const contacts = isSteward && kv && buildingId ? await getNoticeContacts(kv, buildingId) : null;
+const noticeAddressRule = getProvisionInEffect("notice_address", formatDate(new Date()));
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <SeoHead
+      title="Who to send notices to | Tenant Tools"
+      description="Private steward tool to note the owner, manager, and address for written notices."
+      canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/contacts`}
+      imagePath="/og/private-dashboard.png"
+      imageAlt="Tenant Tools notice contacts"
+      noindex={true}
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <AppHeader
+      title="Tenant Tools"
+      subtitle={`Notices: ${buildingId || "Not listed"}`}
+      backHref={dashboardUrl}
+      backLabel="Building dashboard"
+      isSteward={isSteward}
+    />
+    <div class="page">
+      <main class="layout" id="main">
+        {!isSteward ? (
+          <section class="panel">
+            <AccessKeyPanel
+              title="Steward key required"
+              helperLines={["Stewards keep this card, so every resident sends notices to the same place."]}
+              warning="Do not share the steward key."
+              errorMessage={hasAttempt ? "Steward key does not match." : ""}
+              backLabel="Back to notice builder"
+              keyLabel="Steward key"
+              keyPlaceholder="Paste steward key"
+              fieldName="stewardKey"
+            />
+          </section>
+        ) : (
+          <>
+            <section class="panel" data-contacts data-building={buildingId}>
+              <div>
+                <h1>Who to send notices to</h1>
+                <p class="helper">Residents with the building key see this on the dashboard and the joint letter page.</p>
+                <p class="helper">Business names and mailing addresses only. No staff names, emails, or phone numbers.</p>
+              </div>
+              <form class="facts-form" data-contacts-form>
+                {noticeContactFields.map((field) => (
+                  <label>
+                    {field.label}
+                    <input
+                      class="input"
+                      type="text"
+                      name={field.key}
+                      maxlength={noticeContactLimit}
+                      autocomplete="off"
+                      placeholder={field.placeholder}
+                      value={contacts?.[field.key] ?? ""}
+                    />
+                  </label>
+                ))}
+                <label>
+                  Where this came from (optional)
+                  <select class="input" name="source">
+                    <option value="">Choose one</option>
+                    {Object.entries(noticeContactSources).map(([value, label]) => (
+                      <option value={value} selected={contacts?.source === value}>{label}</option>
+                    ))}
+                  </select>
+                </label>
+                <div class="report-actions">
+                  <button class="button" type="submit">Save</button>
+                  {contacts && (
+                    <button class="button button-secondary" type="button" data-contacts-clear>Clear the card</button>
+                  )}
+                </div>
+                <p class="helper" data-contacts-status role="status" aria-live="polite">
+                  {contacts ? `Last saved ${formatTimelineDate(contacts.updatedAt)}.` : ""}
+                </p>
+              </form>
+            </section>
+
+            {noticeAddressRule && (
+              <section class="panel">
+                <h2>Where to find it</h2>
+                <ul class="submission-detail-list">
+                  <li>{noticeAddressRule.summary} ({noticeAddressRule.section})</li>
+                  <li>Check the lease first. It usually names the owner or the manager.</li>
+                  <li>The owner is often a company (an LLC). Cook County property tax records show who gets the tax bill for the address.</li>
+                  <li>When the building changes hands or managers, update this card.</li>
+                </ul>
+                <p class="rule-meta">
+                  {noticeAddressRule.sources.map((source, index) => (
+                    <>
+                      {index > 0 && " · "}
+                      <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                    </>
+                  ))}
+                </p>
+              </section>
+            )}
+          </>
+        )}
+      </main>
+    </div>
+    <script>
+      import "../../../scripts/noticeContacts.ts";
+    </script>
+  </body>
+</html>
