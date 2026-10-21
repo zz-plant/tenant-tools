@@ -15,7 +15,11 @@ export default defineConfig({
   site,
   compressHTML: true,
   output: "server",
-  adapter: cloudflare(),
+  // The app does not use Astro sessions. Without a driver, the Cloudflare adapter expects a
+  // `SESSION` KV binding that does not exist.
+  session: { driver: "null" },
+  // No page uses astro:assets, so no image service runs (and no sharp warning at build time).
+  adapter: cloudflare({ imageService: "passthrough" }),
   integrations: [
     react(),
     sitemap({
