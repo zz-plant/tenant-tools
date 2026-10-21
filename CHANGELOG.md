@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- The site moved to tenants.kanav.net. The old address, galina.kanav.net, sends every page and link there, including resident links with a key. The old address named a person, which this tool should never do.
+
 ## 1.11.0 - 2026-10-21
 
 ### Added

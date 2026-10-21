@@ -15,6 +15,11 @@
   },
   "routes": [
     {
+      "pattern": "tenants.kanav.net",
+      "custom_domain": true
+    },
+    // The first address. It stays attached so old links work; middleware redirects it to tenants.kanav.net.
+    {
       "pattern": "galina.kanav.net",
       "custom_domain": true
     }

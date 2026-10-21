@@ -3,6 +3,7 @@ import { env as workerEnv } from "cloudflare:workers";
 import { RESIDENT_KEY_COOKIE, SESSION_ID_COOKIE, STEWARD_KEY_COOKIE } from "./lib/api/requestGuard";
 import { resolveForgetRedirect } from "./lib/quickExit";
 import { buildAccessOverlay, closedAccessEnv, hashBuildingKey, loadKeyRegistry } from "./lib/access/registry";
+import { canonicalRedirect } from "./lib/canonicalHost";
 import { failureLogLine } from "./lib/requestLog";
 import { withSecurityHeaders } from "./lib/securityHeaders";
 
@@ -58,6 +59,11 @@ const applyKeyRegistry = async (context: MiddlewareContext, url: URL) => {
 
 const handleRequest = async (context: MiddlewareContext, next: MiddlewareNext) => {
   const url = new URL(context.request.url);
+  // An old address goes to the site's own address before anything else runs.
+  const moved = canonicalRedirect(url, context.request.method, import.meta.env.SITE);
+  if (moved) {
+    return new Response(null, { status: moved.status, headers: { Location: moved.location } });
+  }
   const residentKey = url.searchParams.get("key")?.trim() ?? "";
   const stewardKey = url.searchParams.get("stewardKey")?.trim() ?? "";
 
