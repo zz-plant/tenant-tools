@@ -8,8 +8,9 @@ import { isAccessKeyValid } from "../../lib/access";
 import { getEvidenceConfig } from "../../lib/storage/evidence";
 import { formatResidentReportCount } from "../../lib/buildingDashboard";
 import { formatDate, formatTimelineDate } from "../../lib/dateUtils";
-import { getFairNoticeRule } from "../../data/rules";
+import { getEntryNoticeRule, getFairNoticeRule } from "../../data/rules";
 import {
+  deliveryMethodSuggestions,
   formatRecordEventLabel,
   recordEventDefinitions,
   recordEventGroups,
@@ -91,6 +92,7 @@ const timelineEntries = submissionRecord
   ? getSubmissionTimelineEntries({ ...submissionRecord, events: recordEvents })
   : [];
 const fairNoticeRule = getFairNoticeRule(today);
+const entryNoticeRule = getEntryNoticeRule(today);
 // The same next step as this record's row on the building page: a follow-up item first, then the next notice.
 // A notice step opens the builder filled in from this record. Saving there adds a dated fact here.
 const nextStep =
@@ -285,6 +287,11 @@ const groupChatText = submissionRecord
                       <span data-fact-ref-label>Number (optional)</span>
                       <input class="input" type="text" name="ref" maxlength="40" autocomplete="off" data-fact-ref />
                     </label>
+                    <datalist id="fact-delivery-options">
+                      {deliveryMethodSuggestions.map((method) => (
+                        <option value={method} />
+                      ))}
+                    </datalist>
                     <div class="helper" hidden data-after-request-note>
                       <p>Keep these dates. The RLTO and Illinois law protect tenants who ask for repairs in good faith.</p>
                       <p>
@@ -312,6 +319,34 @@ const groupChatText = submissionRecord
                         <p class="rule-meta">
                           Rule: {fairNoticeRule.section}.{" "}
                           {fairNoticeRule.sources.map((source, index) => (
+                            <>
+                              {index > 0 && " · "}
+                              <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                            </>
+                          ))}
+                        </p>
+                      </div>
+                    )}
+                    {entryNoticeRule && (
+                      <div class="helper-card" hidden data-entry-notice-check>
+                        <p><strong>Did the notice give 2 days?</strong> Information only. Nothing in this box is saved.</p>
+                        <label>
+                          Time the notice arrived (optional)
+                          <input class="input" type="time" data-entry-notice-time />
+                        </label>
+                        <label>
+                          Date they plan to enter
+                          <input class="input" type="date" data-entry-date />
+                        </label>
+                        <label>
+                          Time they plan to enter (optional)
+                          <input class="input" type="time" data-entry-time />
+                        </label>
+                        <p class="helper" data-entry-result role="status" aria-live="polite"></p>
+                        <p class="helper">In an emergency, the landlord can enter without notice. Then they must tell you within 2 days.</p>
+                        <p class="rule-meta">
+                          Rule: {entryNoticeRule.section}.{" "}
+                          {entryNoticeRule.sources.map((source, index) => (
                             <>
                               {index > 0 && " · "}
                               <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>

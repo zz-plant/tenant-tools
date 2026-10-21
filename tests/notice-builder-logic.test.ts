@@ -10,7 +10,9 @@ import {
   computeDaysOpen,
   createInitialFormState,
   getIssueGuidance,
+  withLeaseQuote,
 } from "../src/components/noticeBuilder/logic";
+import { lintVerySimpleEnglish } from "../src/lib/copyLint";
 
 const now = new Date("2026-09-23T15:00:00");
 const leak = issueOptions.find((option) => option.id === "leak");
@@ -150,5 +152,25 @@ describe("guidance and sources", () => {
     assert.ok(cards.some((card) => card.title === "Lockouts are not allowed"));
     assert.ok(cards.some((card) => card.title === "Eviction enforcement"));
     assert.equal(cards.at(-1)?.title, "RLTO summary (Chicago)");
+  });
+});
+
+describe("lease quote", () => {
+  const base = { leaseSection: "Section 7", leaseQuote: '  "Landlord shall deliver possession   of the Premises."  ', leaseChecked: true };
+
+  it("adds the section and the exact words before the end of the notice", () => {
+    const text = withLeaseQuote("I live at 1 Main St.\nPlease reply.\n\n", base);
+    assert.equal(text, 'I live at 1 Main St.\nPlease reply.\nMy lease, section 7, says: "Landlord shall deliver possession of the Premises."\n\n');
+  });
+
+  it("leaves the notice alone until both parts are filled and checked", () => {
+    assert.equal(withLeaseQuote("A\n\n", { ...base, leaseChecked: false }), "A\n\n");
+    assert.equal(withLeaseQuote("A\n\n", { ...base, leaseSection: " " }), "A\n\n");
+    assert.equal(withLeaseQuote("A\n\n", { ...base, leaseQuote: "" }), "A\n\n");
+  });
+
+  it("is plain enough for Very simple English", () => {
+    const line = withLeaseQuote("", { ...base, leaseQuote: "Rent is due on the first day of the month." }).trim();
+    assert.deepEqual(lintVerySimpleEnglish(line).warnings, []);
   });
 });

@@ -4,6 +4,7 @@ import {
   type LetterCopyRecipient,
   type LetterIssue,
   type LetterKind,
+  type LetterSigning,
 } from "../lib/buildingLetter";
 
 /*
@@ -41,6 +42,11 @@ if (root && output) {
   const noPlanInput = root.querySelector<HTMLInputElement>("[data-letter-no-plan]");
   const attachSummaryInput = root.querySelector<HTMLInputElement>("[data-letter-attach-summary]");
 
+  const signingFields = root.querySelector<HTMLElement>("[data-signing-fields]");
+  const householdTips = document.querySelector<HTMLElement>("[data-household-tips]");
+  const readSigning = (): LetterSigning =>
+    root.querySelector<HTMLInputElement>("[data-letter-signing]:checked")?.value === "household" ? "household" : "group";
+
   const readKind = (): LetterKind =>
     root.querySelector<HTMLInputElement>("[data-letter-kind]:checked")?.value === "alderperson" ? "alderperson" : "management";
 
@@ -63,6 +69,7 @@ if (root && output) {
     const ward = Number(wardInput?.value);
     return buildBuildingLetter({
       kind: readKind(),
+      signing: readSigning(),
       managementLetterDate: managementDateInput?.value || undefined,
       noPlanReceived: Boolean(noPlanInput?.checked),
       attachSummary: Boolean(attachSummaryInput?.checked),
@@ -90,6 +97,13 @@ if (root && output) {
     });
     if (copyFields) {
       copyFields.hidden = alderperson;
+    }
+    // Only a letter to management can go out as one copy per household.
+    if (signingFields) {
+      signingFields.hidden = alderperson;
+    }
+    if (householdTips) {
+      householdTips.hidden = alderperson || readSigning() !== "household";
     }
     output.textContent = readLetter();
   };

@@ -3,7 +3,9 @@ import { formatRecordEventLabel, type RecordEvent } from "./recordEvents";
 import { deleteEvidenceRecord, listEvidenceRecords } from "./storage/evidence";
 import { listRecordEvents } from "./storage/recordEvents";
 import { listCanvasses } from "./storage/canvass";
+import { getNoticeContacts, noticeContactsKey } from "./storage/noticeContacts";
 import type { Canvass } from "./canvass";
+import type { NoticeContacts } from "./noticeContacts";
 import { fetchSubmissionRecord, hashBuildingId } from "./storage/submissions";
 import type { SubmissionRecord } from "./submissions";
 
@@ -21,6 +23,7 @@ export type BuildingExport = {
   notes: string[];
   records: BuildingExportRecord[];
   canvasses: Canvass[];
+  noticeContacts: NoticeContacts | null;
 };
 
 const exportNotes = [
@@ -51,6 +54,7 @@ export const collectBuildingExport = async (
     notes: exportNotes,
     records,
     canvasses: await listCanvasses(kv, building),
+    noticeContacts: await getNoticeContacts(kv, building),
   };
 };
 
@@ -158,6 +162,7 @@ export const wipeBuildingBatch = async (
   const left = await kv.list({ prefix: `bidx:${buildingHash}:`, limit: 1 });
   if (left.keys.length === 0) {
     extraDeleted = await deletePrefix(kv, `canvass:${buildingHash}:`);
+    await kv.delete(noticeContactsKey(buildingHash));
   }
   return { deleted: batch.length, otherDeleted: extraDeleted, remaining: left.keys.length > 0 };
 };

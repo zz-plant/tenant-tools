@@ -8,6 +8,7 @@ import {
   recordEventTypes,
   sortRecordEvents,
   summarizeFollowUpFacts,
+  takesDeliveryMethod,
   validateRecordEventInput,
   type RecordEvent,
 } from "../src/lib/recordEvents";
@@ -74,6 +75,23 @@ describe("record event helpers", () => {
       "Portal request marked complete, but not fixed (work order 12345)"
     );
     assert.equal(formatRecordEventLabel({ type: "entry_offered" }), "Resident offered entry for repair or treatment");
+  });
+
+  it("records how a notice was sent or came, and rejects email addresses there", () => {
+    assert.equal(formatRecordEventLabel({ type: "follow_up_sent", ref: "certified mail" }), "Follow-up notice sent (by certified mail)");
+    assert.equal(
+      formatRecordEventLabel({ type: "entry_notice_received", ref: "note on the door" }),
+      "Notice of entry from management received (by note on the door)"
+    );
+    assert.deepEqual(validateRecordEventInput({ type: "management_notice", date: "2026-10-01", ref: " email " }, today), {
+      ok: true,
+      data: { type: "management_notice", date: "2026-10-01", ref: "email" },
+    });
+    assert.equal(validateRecordEventInput({ type: "final_notice_sent", date: "2026-10-01", ref: "a@b.com" }, today).ok, false);
+    assert.deepEqual(
+      recordEventTypes.filter(takesDeliveryMethod),
+      ["follow_up_sent", "final_notice_sent", "management_notice", "entry_notice_received"]
+    );
   });
 
   it("uses literal, calm labels", () => {

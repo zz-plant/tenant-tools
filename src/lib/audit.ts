@@ -12,6 +12,7 @@ export type AuditEventAction =
   | "building.export"
   | "building.wipe"
   | "building.canvass.save"
+  | "building.contacts.save"
   | "evidence.upload"
   | "evidence.delete";
 

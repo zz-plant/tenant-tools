@@ -39,6 +39,10 @@ export const initialFormState = {
   trashChange: "",
   accessItem: "",
   damagedItem: "",
+  /** Optional lease quote. Kept in the notice only; never saved to the shared record. */
+  leaseSection: "",
+  leaseQuote: "",
+  leaseChecked: false,
   attachment: "",
   ticketDate: "",
   ticketNumber: "",
@@ -131,7 +135,24 @@ export const buildNoticeText = (state: FormState, issue: IssueOption | undefined
     values.TODAY = today;
   }
 
-  return fillTemplate(template, values);
+  return withLeaseQuote(fillTemplate(template, values), state);
+};
+
+/** Longest lease quote a notice carries. A clause, not a page. */
+export const leaseQuoteLimit = 300;
+
+/**
+ * Adds "My lease, section 7, says: "…"." before the end of the notice. Only when the resident filled
+ * both the section and the words and confirmed they come from the same part of the lease: a section
+ * number that does not match its words lets the other side dismiss the whole notice.
+ */
+export const withLeaseQuote = (text: string, state: Pick<FormState, "leaseSection" | "leaseQuote" | "leaseChecked">) => {
+  const section = state.leaseSection.trim().replace(/^(section|sec\.?|§)\s*/i, "");
+  const quote = state.leaseQuote.replace(/\s+/g, " ").trim().replace(/^["“]|["”]$/g, "").slice(0, leaseQuoteLimit);
+  if (!section || !quote || !state.leaseChecked) {
+    return text;
+  }
+  return `${text.replace(/\n+$/, "")}\nMy lease, section ${section}, says: "${quote}"\n\n`;
 };
 
 const dayMs = 1000 * 60 * 60 * 24;

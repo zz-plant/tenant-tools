@@ -127,3 +127,19 @@ describe("alderperson meeting letter", () => {
   });
 });
 
+
+describe("one copy per household", () => {
+  it("is written in the first person and leaves the name for the resident to add", () => {
+    const letter = buildBuildingLetter({ ...base, signing: "household" });
+    assert.ok(letter.includes(`I live at ${base.building}.`));
+    assert.ok(letter.includes("I request a written repair plan by"));
+    assert.ok(letter.trimEnd().endsWith("[YOUR NAME]\n[YOUR UNIT]"));
+    assert.ok(!letter.includes("signed this letter"));
+  });
+
+  it("is plain in Very simple English", () => {
+    const letter = buildBuildingLetter({ ...base, signing: "household", simple: true });
+    const body = letter.split("\n").filter((line) => !line.startsWith("[YOUR")).join("\n");
+    assert.deepEqual(lintVerySimpleEnglish(body).warnings, []);
+  });
+});

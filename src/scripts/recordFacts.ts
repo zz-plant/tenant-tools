@@ -1,11 +1,12 @@
+import { checkEntryNotice } from "../lib/entryNotice";
 import { checkFairNotice } from "../lib/fairNotice";
 import { addDays, formatDate, formatTimelineDate } from "../lib/dateUtils";
-import { isRecordEventType, recordEventDefinitions } from "../lib/recordEvents";
+import { isRecordEventType, recordEventDefinitions, takesDeliveryMethod } from "../lib/recordEvents";
 import type { NoticeTier } from "../data/rules";
 
 /*
  * "Add a dated fact" on the record page. Does nothing when the form is not on the page.
- * The Fair Notice check runs only in the browser. Its answers are never sent or saved.
+ * The Fair Notice and entry notice checks run only in the browser. Their answers are never sent or saved.
  */
 
 const root = document.querySelector<HTMLElement>("[data-record-facts]");
@@ -36,6 +37,11 @@ if (root && form) {
   const fairTier = form.querySelector<HTMLSelectElement>("[data-fair-tier]");
   const fairChangeDate = form.querySelector<HTMLInputElement>("[data-fair-change-date]");
   const fairResult = form.querySelector<HTMLElement>("[data-fair-result]");
+  const entryCheck = form.querySelector<HTMLElement>("[data-entry-notice-check]");
+  const entryNoticeTime = form.querySelector<HTMLInputElement>("[data-entry-notice-time]");
+  const entryDate = form.querySelector<HTMLInputElement>("[data-entry-date]");
+  const entryTime = form.querySelector<HTMLInputElement>("[data-entry-time]");
+  const entryResult = form.querySelector<HTMLElement>("[data-entry-result]");
   const submitButton = form.querySelector<HTMLButtonElement>("[data-fact-submit]");
   const status = form.querySelector<HTMLElement>("[data-fact-status]");
   const tiers = readTiers();
@@ -82,6 +88,47 @@ if (root && form) {
         "Ask legal aid or a tenant group what this means for you.";
   };
 
+  // "14:30" -> "2:30 PM"
+  const formatTime = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${hours < 12 ? "AM" : "PM"}`;
+  };
+
+  const updateEntryNotice = () => {
+    if (!entryResult) {
+      return;
+    }
+    const check = checkEntryNotice({
+      noticeDate: dateInput?.value ?? "",
+      noticeTime: entryNoticeTime?.value ?? "",
+      entryDate: entryDate?.value ?? "",
+      entryTime: entryTime?.value ?? "",
+    });
+    if (!check) {
+      entryResult.textContent = "Add the date the notice arrived and the date they plan to enter.";
+      return;
+    }
+    const given = check.hoursGiven === undefined ? `${check.daysGiven} days` : `${check.hoursGiven} hours`;
+    const lines: string[] = [];
+    if (check.result === "on_time") {
+      lines.push(`The notice gave ${given}. The rule asks for at least 2 days (48 hours).`);
+    } else if (check.result === "late") {
+      lines.push(`The notice gave ${given}. The rule asks for at least 2 days (48 hours).`);
+      if (check.latestOnTime) {
+        lines.push(
+          `To be on time, it had to arrive by ${formatTimelineDate(check.latestOnTime.date)} at ${formatTime(check.latestOnTime.time)}.`
+        );
+      }
+      lines.push("Keep the notice. You can ask management in writing for a new time.");
+    } else {
+      lines.push("The notice came 2 days before the entry date. Add both times to check the hours.");
+    }
+    if (check.outsideReasonableHours) {
+      lines.push("The planned time is outside 8 AM to 8 PM. The law treats 8 AM to 8 PM as reasonable.");
+    }
+    entryResult.textContent = lines.join(" ");
+  };
+
   const updateForType = () => {
     const type = typeSelect?.value ?? "";
     const definition = isRecordEventType(type) ? recordEventDefinitions[type] : null;
@@ -109,12 +156,24 @@ if (root && form) {
     if (refInput && !definition?.refLabel) {
       refInput.value = "";
     }
+    if (refInput) {
+      // "How you sent it" suggests email, mail, and so on. Number fields suggest nothing.
+      if (isRecordEventType(type) && takesDeliveryMethod(type)) {
+        refInput.setAttribute("list", "fact-delivery-options");
+      } else {
+        refInput.removeAttribute("list");
+      }
+    }
     if (afterRequestNote) {
       afterRequestNote.hidden = definition?.group !== "after_request";
     }
     if (fairCheck) {
       fairCheck.hidden = !fairNoticeTypes.has(type);
       updateFairNotice();
+    }
+    if (entryCheck) {
+      entryCheck.hidden = type !== "entry_notice_received";
+      updateEntryNotice();
     }
   };
 
@@ -133,6 +192,7 @@ if (root && form) {
   );
   [dateInput, fairChangeDate].forEach((input) => input?.addEventListener("input", updateFairNotice));
   fairTier?.addEventListener("change", updateFairNotice);
+  [dateInput, entryNoticeTime, entryDate, entryTime].forEach((input) => input?.addEventListener("input", updateEntryNotice));
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();

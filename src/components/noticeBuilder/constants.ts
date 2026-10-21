@@ -147,3 +147,9 @@ export const factualTagOptions: Partial<Record<keyof typeof fieldDefinitions, st
     "hot water not working",
   ],
 };
+
+/**
+ * Problems where a resident may think about paying less rent for a service they lost. The builder
+ * shows a short warning for these: paying less can lead to an eviction case (AGENTS.md §6.3).
+ */
+export const rentCreditIssues: ReadonlySet<string> = new Set(["parking", "city-work", "trash", "common"]);
