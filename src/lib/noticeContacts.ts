@@ -98,3 +98,9 @@ export const listNoticeContactLines = (contacts: NoticeContacts) =>
   noticeContactFields
     .filter((field) => contacts[field.key])
     .map((field) => ({ label: field.label.replace(/ \(business name\)$/, ""), value: contacts[field.key] as string }));
+
+/** A building's card as the notice builder shows it, beside the send buttons. */
+export type BuilderNoticeContacts = {
+  lines: { label: string; value: string }[];
+  updatedAt: string;
+};

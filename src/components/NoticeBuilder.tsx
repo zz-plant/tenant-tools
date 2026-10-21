@@ -54,6 +54,7 @@ import {
 } from "./noticeBuilder/logic";
 import { getFirstWrittenNoticeDate, getSubmissionTimelineEntries } from "../lib/submissionTimeline";
 import type { Stage } from "./noticeBuilder/types";
+import type { BuilderNoticeContacts } from "../lib/noticeContacts";
 
 
 const detailEntries = Object.entries(fieldDefinitions);
@@ -91,9 +92,15 @@ type NoticeBuilderProps = {
   buildingOptions?: BuildingOption[];
   /** Building ids the resident key cookie on this device unlocks. `"*"` means every building. */
   residentBuildings?: string[];
+  /** Saved notice contacts, only for buildings this device's key unlocks. */
+  noticeContacts?: Record<string, BuilderNoticeContacts>;
 };
 
-const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuildings = [] }: NoticeBuilderProps) => {
+const NoticeBuilder = ({
+  buildingOptions = defaultBuildingOptions,
+  residentBuildings = [],
+  noticeContacts = {},
+}: NoticeBuilderProps) => {
   const defaultBuilding = useMemo(() => {
     if (residentBuildings.includes("2400 W Wabansia")) return "2400 W Wabansia";
     if (buildingOptions.some((b) => b.id === "2400 W Wabansia")) return "2400 W Wabansia";
@@ -126,6 +133,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const [linkStatusMessage, setLinkStatusMessage] = useState("");
   const [shareChecks, setShareChecks] = useState({ names: false, units: false, contact: false });
   const [showOptionalSetup, setShowOptionalSetup] = useState(false);
+  // After the building and problem are chosen, they fold to one line so the send buttons are
+  // near the top. A keyboard choice does not fold the grid: arrow keys change the choice, and
+  // folding would take focus away. "Done" folds it.
+  const [foldBasics, setFoldBasics] = useState(false);
   // Copy, Email, and Text also save the notice, so residents do not need a separate save step.
   const [addToLedger, setAddToLedger] = useState(true);
   // Set when the builder was opened from a saved record ("Send a follow-up"). Saving then adds a
@@ -155,6 +166,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     });
     return () => window.cancelAnimationFrame(frame);
   }, [scrollTarget]);
+  // "Change" and "Done" swap the building and problem between one line and the full list. Focus
+  // moves with them, so keyboard and screen reader users do not lose their place.
+  const [focusTarget, setFocusTarget] = useState("");
+  useEffect(() => {
+    if (!focusTarget || typeof window === "undefined") {
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>(focusTarget)?.focus({ preventScroll: true });
+      setFocusTarget("");
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [focusTarget]);
   const { scheduleTimeout } = useTimedCallbacks();
   const stepProgress = Math.round((currentStep / steps.length) * 100);
   const currentStepInfo = steps[currentStep - 1];
@@ -171,6 +195,14 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   }, [formState.building, formState.issue]);
 
   const isStep1Complete = Boolean(formState.building && formState.issue);
+  const basicsFolded = isStep1Complete && foldBasics;
+  // A cleared form starts open again, so a later keyboard choice does not fold the list.
+  useEffect(() => {
+    if (!isStep1Complete) {
+      setFoldBasics(false);
+    }
+  }, [isStep1Complete]);
+  const sendTo = noticeContacts[formState.building] ?? null;
   const showLockedStepPlaceholder = !isStep1Complete;
   const stepsLocked = !isStep1Complete;
   const visibleBuilderSteps = useMemo(
@@ -353,6 +385,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
             unlockDate,
           });
           setSaveLabel("Add to the record");
+          setFoldBasics(true);
           setScrollTarget(".quick-notice-banner");
         })
         .catch(() => {
@@ -368,6 +401,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
         building: urlBuilding && buildingOptions.some((b) => b.id === urlBuilding) ? urlBuilding : prev.building,
         issue: urlIssue && issueOptions.some((opt) => opt.id === urlIssue) ? urlIssue : prev.issue,
       }));
+      if (urlIssue && issueOptions.some((opt) => opt.id === urlIssue)) {
+        setFoldBasics(true);
+      }
     }
   }, [buildingOptions]);
 
@@ -843,8 +879,35 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                   <div className="form-section">
                     <div className="form-section-header">
                       <h3>Building basics</h3>
-                      <p className="helper">Required first.</p>
+                      {!basicsFolded && <p className="helper">Required first.</p>}
                     </div>
+                    {basicsFolded ? (
+                      <div className="basics-summary" data-issue={formState.issue}>
+                        <span className="issue-icon" aria-hidden="true">{issueIcons[formState.issue]}</span>
+                        <p className="basics-summary-text">
+                          <strong>{formatIssueLabel(selectedIssue?.label || "")}</strong>
+                          <span>{formState.building}</span>
+                        </p>
+                        {recordContext ? (
+                          // A record's notice keeps the record's building and problem. A different
+                          // problem is a new notice.
+                          <a className="link-button" href="/#builder">Write a different notice</a>
+                        ) : (
+                          <button
+                            type="button"
+                            className="link-button"
+                            aria-label="Change the building or the problem"
+                            onClick={() => {
+                              setFoldBasics(false);
+                              setFocusTarget('.issue-option-card[aria-checked="true"]');
+                            }}
+                          >
+                            Change
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                    <>
                     <label>
                       Building
                       <SelectField
@@ -878,6 +941,13 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                           setFormState((prev) => ({ ...prev, issue: value }));
                           setScrollTarget(".quick-start-date");
                         }}
+                        onClick={(event: React.MouseEvent<HTMLElement>) => {
+                          // detail is 0 for a click from the keyboard. Only a tap or a mouse click folds.
+                          if (event.detail > 0 && (event.target as HTMLElement).closest(".issue-option-card")) {
+                            setFoldBasics(true);
+                            setFocusTarget(".basics-summary .link-button");
+                          }
+                        }}
                         required
                       >
                         {issueOptions.map((option) => (
@@ -895,6 +965,20 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         ))}
                       </RadioGroup.Root>
                     </div>
+                    {isStep1Complete && (
+                      <Button
+                        className="button button-secondary button-compact basics-done"
+                        type="button"
+                        onClick={() => {
+                          setFoldBasics(true);
+                          setFocusTarget(".basics-summary .link-button");
+                        }}
+                      >
+                        Done
+                      </Button>
+                    )}
+                    </>
+                    )}
 
                     {formState.issue === "heat" && (
                       <div className="helper-card" role="note" style={{ marginTop: "12px" }}>
@@ -960,6 +1044,45 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
 
                     {isNoticeReady && (
                       <div className="quick-notice-banner" role="region" aria-label="Quick notice actions">
+                        {/* The language comes before the send buttons, so the notice is in the right language when it is copied. */}
+                        <div className="fact-tags">
+                          <div className="fact-tag-row" role="group" aria-label="Notice language">
+                            <span className="helper" style={{ alignSelf: "center", marginRight: "4px" }}>Notice language:</span>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "en" && formState.simpleEnglish ? "fact-tag-included" : ""}`}
+                              aria-pressed={formState.language === "en" && formState.simpleEnglish}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "en", simpleEnglish: true }))}
+                            >
+                              Simple English
+                            </button>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "en" && !formState.simpleEnglish ? "fact-tag-included" : ""}`}
+                              aria-pressed={formState.language === "en" && !formState.simpleEnglish}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "en", simpleEnglish: false }))}
+                            >
+                              Standard English
+                            </button>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "es" ? "fact-tag-included" : ""}`}
+                              aria-pressed={formState.language === "es"}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "es", simpleEnglish: false }))}
+                            >
+                              Español
+                            </button>
+                            <button
+                              type="button"
+                              className={`fact-tag ${formState.language === "pl" ? "fact-tag-included" : ""}`}
+                              aria-pressed={formState.language === "pl"}
+                              onClick={() => setFormState((prev) => ({ ...prev, language: "pl", simpleEnglish: false }))}
+                            >
+                              Polski
+                            </button>
+                          </div>
+                        </div>
+                        <WithheldNoticeNote note={withheldNote} />
                         <div className="quick-notice-top-row">
                           <div className="quick-notice-info">
                             <span className="quick-notice-title">
@@ -1005,23 +1128,25 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                           </div>
                         </div>
 
+                        {sendTo && (
+                          <div className="send-to" role="note" aria-label="Where to send it">
+                            <p className="helper"><strong>Send it to</strong> (saved by a steward on {formatTimelineDate(sendTo.updatedAt)}. Check it against your lease.)</p>
+                            <ul className="send-to-list">
+                              {sendTo.lines.map((line) => (
+                                <li key={line.label}>
+                                  <span>{line.label}:</span> {line.value}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+
                         <details className="quick-notice-text">
                           <summary>See the notice</summary>
                           <pre className="output-notice">{noticeText}</pre>
                         </details>
-                        <p className="helper">
-                          Tenant Tools does not send anything. Email and Text open your own app with the notice filled
-                          in. Nothing goes out until you press send there.
-                        </p>
 
-                        {recordNote && <p className="helper" role="status">{recordNote}</p>}
-                        {recordContext && (
-                          <p className="helper">
-                            For the <a href={recordContext.url}>saved record</a>
-                            {recordContext.startDate ? ` that started ${formatTimelineDate(recordContext.startDate)}` : ""}. It
-                            uses the dates saved there.
-                          </p>
-                        )}
+                        {/* Saving comes right after the send buttons, so "I sent it" is on the same screen. */}
                         {hasSaveAccess && !recordContext && saveStatus !== "saved" && (
                           <label className="checkbox-label quick-save-option">
                             <input
@@ -1061,40 +1186,18 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                           <p className="submission-error" role="alert">{saveError}</p>
                         )}
 
-                        <div className="fact-tags">
-                          <div className="fact-tag-row">
-                            <span className="helper" style={{ alignSelf: "center", marginRight: "4px" }}>Style:</span>
-                            <button
-                              type="button"
-                              className={`fact-tag ${formState.language === "en" && formState.simpleEnglish ? "fact-tag-included" : ""}`}
-                              onClick={() => setFormState((prev) => ({ ...prev, language: "en", simpleEnglish: true }))}
-                            >
-                              Simple English
-                            </button>
-                            <button
-                              type="button"
-                              className={`fact-tag ${formState.language === "en" && !formState.simpleEnglish ? "fact-tag-included" : ""}`}
-                              onClick={() => setFormState((prev) => ({ ...prev, language: "en", simpleEnglish: false }))}
-                            >
-                              Standard English
-                            </button>
-                            <button
-                              type="button"
-                              className={`fact-tag ${formState.language === "es" ? "fact-tag-included" : ""}`}
-                              onClick={() => setFormState((prev) => ({ ...prev, language: "es", simpleEnglish: false }))}
-                            >
-                              Español
-                            </button>
-                            <button
-                              type="button"
-                              className={`fact-tag ${formState.language === "pl" ? "fact-tag-included" : ""}`}
-                              onClick={() => setFormState((prev) => ({ ...prev, language: "pl", simpleEnglish: false }))}
-                            >
-                              Polski
-                            </button>
-                          </div>
-                        </div>
-                        <WithheldNoticeNote note={withheldNote} />
+                        <p className="helper">
+                          Tenant Tools does not send anything. Email and Text open your own app with the notice filled
+                          in. Nothing goes out until you press send there.
+                        </p>
+                        {recordNote && <p className="helper" role="status">{recordNote}</p>}
+                        {recordContext && (
+                          <p className="helper">
+                            For the <a href={recordContext.url}>saved record</a>
+                            {recordContext.startDate ? ` that started ${formatTimelineDate(recordContext.startDate)}` : ""}. It
+                            uses the dates saved there.
+                          </p>
+                        )}
                       </div>
                     )}
 

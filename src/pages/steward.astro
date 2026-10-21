@@ -91,6 +91,10 @@ const buildings = isSteward ? listKnownBuildings(settingsJson, registry) : [];
                           <tr>
                             <th scope="row">
                               <a href={buildBuildingDashboardUrl({ buildingId: building })}>{building}</a>
+                              <span class="steward-building-links">
+                                <a href={`${buildBuildingDashboardUrl({ buildingId: building })}/contacts`}>Who to send notices to</a>
+                                <a href={`${buildBuildingDashboardUrl({ buildingId: building })}/canvass`}>Canvass tally</a>
+                              </span>
                             </th>
                             <td>
                               {issued

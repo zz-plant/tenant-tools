@@ -22,7 +22,7 @@ import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submiss
 import { buildIssuePatterns } from "../../lib/issuePatterns";
 import { formatIssueLabel } from "../../lib/noticeUtils";
 import { formatDate, formatTimelineDate } from "../../lib/dateUtils";
-import { buildBuildingDashboardUrl, buildSubmissionDetailsUrl } from "../../lib/navigation";
+import { buildBuildingDashboardUrl, buildGroupTools, buildSubmissionDetailsUrl } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 import AppHeader from "../../components/AppHeader.astro";
@@ -120,12 +120,7 @@ const nextLocked = grouped.open
 const issueCounts = issueOptions
   .map((opt) => ({ ...opt, count: submissions.filter((s) => s.issue === opt.id).length }))
   .filter((opt) => opt.count > 0 || issueFilter === opt.id);
-const groupTools = [
-  { href: `${clearFiltersUrl}/meeting`, label: "Meeting report", note: "One page for your next tenant meeting." },
-  { href: `${clearFiltersUrl}/letter`, label: "Joint letter", note: "One repair letter, signed with a household count." },
-  { href: `${clearFiltersUrl}/311`, label: "Group 311 day", note: "Plan a day when neighbors call 311 together." },
-  { href: `${clearFiltersUrl}/export`, label: "Printable summary", note: "Every record, for an inspector or legal aid." },
-];
+const groupTools = buildGroupTools(buildingId, isSteward);
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -184,6 +179,12 @@ const groupTools = [
             <a class="button" href={draftNoticeUrl}>Report a problem</a>
             <a class="button button-secondary" href="#records">Me too on a problem</a>
           </div>
+          {/* On phones the Group tools list is below every problem. These links reach the tools from the top. */}
+          <nav class="tool-chips" aria-label="Group tools">
+            {groupTools.map((tool) => (
+              <a class="fact-tag" href={tool.href}>{tool.short}</a>
+            ))}
+          </nav>
         </section>
       )}
 
@@ -401,16 +402,7 @@ const groupTools = [
             <>
               <h2 id="aside-title">Group tools</h2>
               <ul class="tool-list">
-                {[
-                  ...groupTools,
-                  ...(isSteward
-                    ? [
-                        { href: `${clearFiltersUrl}/canvass`, label: "Canvass tally", note: "Count doors knocked. Counts only." },
-                        { href: `${clearFiltersUrl}/contacts`, label: "Who to send notices to", note: "Owner, manager, and notice address." },
-                        { href: "/steward", label: "Steward tools", note: "Keys, exports, and emergency wipe." },
-                      ]
-                    : []),
-                ].map((tool) => (
+                {groupTools.map((tool) => (
                   <li>
                     <a href={tool.href}>
                       <span class="tool-name">{tool.label}</span>

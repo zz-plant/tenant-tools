@@ -138,6 +138,14 @@
   background: #f3f4f1;
   padding: 5px 8px;
   border-radius: var(--radius-sm);
+  text-decoration: none;
+}
+
+/* The badge opens the steward tools. */
+.app-badge-steward:hover,
+.app-badge-steward:focus-visible {
+  background: #ffffff;
+  text-decoration: underline;
 }
 
 .app-quick-exit {

@@ -8,6 +8,7 @@ import StreetSign from "../components/StreetSign.astro";
 import { getBuildingOptions } from "../data/buildings";
 import { getBuildingIdsForKey, parseBuildingKeys } from "../lib/access";
 import { RESIDENT_KEY_COOKIE } from "../lib/api/requestGuard";
+import { loadBuilderNoticeContacts } from "../lib/storage/noticeContacts";
 
 const env = Astro.locals.env ?? {};
 const buildingKeys = parseBuildingKeys(env.BUILDING_KEYS_JSON);
@@ -18,6 +19,12 @@ const hasResidentKey = residentBuildings.length > 0;
 // A device with a key opens its own building. Without one, the ledger link asks for the key.
 const ledgerBuildings = hasResidentKey ? residentBuildings.filter((id) => id !== "*") : [];
 const ledgerLinks = (ledgerBuildings.length > 0 ? ledgerBuildings : ["2400 W Wabansia"]).slice(0, 3);
+
+// "Send it to" in the builder: only for buildings this device's key unlocks.
+const noticeContacts =
+  env.SUBMISSIONS_KV && hasResidentKey
+    ? await loadBuilderNoticeContacts(env.SUBMISSIONS_KV, residentBuildings, buildingOptions.map((building) => building.id))
+    : {};
 ---
 
 <!DOCTYPE html>
@@ -69,6 +76,7 @@ const ledgerLinks = (ledgerBuildings.length > 0 ? ledgerBuildings : ["2400 W Wab
         client:load
         buildingOptions={buildingOptions}
         residentBuildings={residentBuildings}
+        noticeContacts={noticeContacts}
       />
     </main>
     <script is:inline>
