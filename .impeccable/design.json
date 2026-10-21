@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-21T00:00:00Z",
+  "generatedAt": "2026-10-21T12:00:00Z",
   "title": "Design System: Tenant Tools",
   "extensions": {
     "colorMeta": {
@@ -34,6 +34,38 @@
           "#c8a000",
           "#e9c859",
           "#ffed99"
+        ]
+      },
+      "street-green": {
+        "role": "tertiary",
+        "displayName": "Street Sign Green",
+        "canonical": "#0b6b3f",
+        "oklch": "oklch(46.6% 0.109 156)",
+        "tonalRamp": [
+          "#001500",
+          "#003209",
+          "#005026",
+          "#136f43",
+          "#3d9062",
+          "#61b382",
+          "#87d9a7",
+          "#aeffcd"
+        ]
+      },
+      "street-ink": {
+        "role": "tertiary",
+        "displayName": "Street Ink",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 90)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
         ]
       },
       "enamel-black": {
@@ -445,7 +477,8 @@
         "ink": "#121311"
       },
       "focus": "#8fa6ff",
-      "topBar": "#000000"
+      "topBar": "#000000",
+      "street": "unchanged: #0b6b3f blade, #ffffff ink"
     },
     "shadows": [
       {
@@ -462,6 +495,11 @@
         "name": "input-focus-halo",
         "value": "0 0 0 3px color-mix(in srgb, var(--color-focus) 25%, transparent)",
         "purpose": "Input focus, with a focus-blue border."
+      },
+      {
+        "name": "painted-drop-shade",
+        "value": "text-shadow: 0.045em 0.045em 0 var(--issue, var(--color-border-hover))",
+        "purpose": "Sign painter's drop shade on at most one heading per page (record h1, home h1). Lettering only; removed in print."
       }
     ],
     "rules": [
@@ -517,6 +555,10 @@
         "value": "720px"
       },
       {
+        "name": "skyline-narrow",
+        "value": "600px"
+      },
+      {
         "name": "phone",
         "value": "480px"
       }
@@ -556,6 +598,22 @@
       "css": ".ds-row { display: grid; grid-template-columns: 8px minmax(0,1fr) auto; column-gap: 14px; padding: 14px 0; border-top: 2px solid var(--color-border-strong, #151515); } .ds-row-bar { border-radius: 1px; background: var(--issue); } .ds-row h3 { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; margin: 0 0 4px; font-weight: 800; font-size: clamp(1.35rem, 3.6vw, 1.6rem); line-height: 1; } .ds-row p { margin: 0; font-size: 0.92rem; color: var(--color-text-secondary, #363833); } .ds-row-days { display: grid; justify-items: end; align-content: start; line-height: 1; } .ds-row-days b { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; font-size: clamp(2.6rem, 8vw, 3.4rem); font-weight: 900; line-height: 0.85; color: var(--color-text-primary, #151515); font-variant-numeric: tabular-nums; } .ds-row-days span { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.08em; color: var(--color-text-muted, #595c55); }"
     },
     {
+      "name": "Street Sign",
+      "kind": "custom",
+      "refersTo": "street-sign",
+      "description": "A building address as a Chicago street-name blade with the hundred-block on its own plate. Addresses only.",
+      "html": "<span class=\"ds-street\"><span class=\"ds-street-blade\">Wabansia<small>Ave</small></span><span class=\"ds-street-block\"><span>2400</span><span>W</span></span></span> <span class=\"ds-street ds-street-small\"><span class=\"ds-street-blade\">Wabansia<small>Ave</small></span><span class=\"ds-street-block\"><span>2400</span><span>W</span></span></span>",
+      "css": ".ds-street { display: inline-flex; align-items: stretch; gap: 0.12em; font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); font-weight: 900; line-height: 1; text-transform: uppercase; font-size: clamp(2.6rem, 9vw, 4.75rem); vertical-align: top; } .ds-street-blade, .ds-street-block { display: inline-flex; background: var(--color-street, #0b6b3f); color: var(--color-street-ink, #fff); border-radius: 0.14em; outline: max(2px, 0.04em) solid var(--color-street-ink, #fff); outline-offset: calc(max(2px, 0.04em) * -2.5); } .ds-street-blade { align-items: baseline; gap: 0.12em; padding: 0.16em 0.32em 0.1em; } .ds-street-blade small { font-size: 0.5em; font-weight: 800; margin-left: 0.25em; } .ds-street-block { flex-direction: column; justify-content: center; align-items: center; padding: 0.4em 0.55em; font-size: 0.38em; font-weight: 800; letter-spacing: 0.04em; line-height: 1.05; } .ds-street-small { font-size: 1.5rem; flex-wrap: nowrap; } .ds-street-small .ds-street-blade, .ds-street-small .ds-street-block { outline-width: 1.5px; outline-offset: -4px; } .ds-street-small .ds-street-blade { padding: 0.2em 0.4em 0.14em; } .ds-street-small .ds-street-block { flex-direction: row; gap: 0.25em; font-size: 0.6em; padding: 0 0.55em; }"
+    },
+    {
+      "name": "Stop Line",
+      "kind": "custom",
+      "refersTo": "stop-dot",
+      "description": "A problem's six steps as an 'L' line in its enamel: done, open, locked, later.",
+      "html": "<ol class=\"ds-line\" style=\"--line: var(--issue-heat, #d3261e)\"><li class=\"ds-stop is-done\"><span class=\"ds-dot\"></span><b>Started</b><span>Oct 12</span></li><li class=\"ds-stop is-done\"><span class=\"ds-dot\"></span><b>Notice</b><span>Oct 13</span></li><li class=\"ds-stop is-open\"><span class=\"ds-dot\"></span><b>Follow-up</b><span>Open now</span></li><li class=\"ds-stop is-locked\"><span class=\"ds-dot\"></span><b>Final</b><span>From Oct 27</span></li><li class=\"ds-stop is-later\"><span class=\"ds-dot\"></span><b>311</b><span>Later</span></li><li class=\"ds-stop is-later\"><span class=\"ds-dot\"></span><b>Fixed</b><span>Later</span></li></ol>",
+      "css": ".ds-line { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); max-width: 760px; } .ds-stop { position: relative; display: grid; justify-items: center; align-content: start; gap: 4px; text-align: center; min-width: 0; } .ds-stop + .ds-stop::before { content: ''; position: absolute; top: 8px; right: 50%; width: 100%; height: 10px; background: var(--color-surface-muted, #dcdfd8); z-index: 0; } .ds-stop.is-done + .ds-stop.is-done::before { background: var(--line); } .ds-dot { position: relative; z-index: 1; width: 26px; height: 26px; box-sizing: border-box; border-radius: 50%; background: var(--color-surface, #fff); border: 4px solid var(--color-surface-muted, #dcdfd8); } .ds-stop.is-done .ds-dot { border-color: var(--line); background: var(--line); } .ds-stop.is-open .ds-dot { border-color: var(--color-text-primary, #151515); border-width: 6px; } .ds-stop.is-locked .ds-dot { border-style: dashed; border-color: var(--color-border-hover, #8d9088); } .ds-stop b { white-space: nowrap; font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1; color: var(--color-text-primary, #151515); } .ds-stop span:last-child { font-size: 0.8rem; line-height: 1.2; color: var(--color-text-muted, #595c55); } .ds-stop.is-open span:last-child { color: var(--color-text-primary, #151515); font-weight: 700; } .ds-stop.is-later b, .ds-stop.is-locked b { color: var(--color-text-muted, #595c55); }"
+    },
+    {
       "name": "Issue Filter Chip",
       "kind": "chip",
       "refersTo": "fact-tag",
@@ -590,12 +648,14 @@
   ],
   "narrative": {
     "northStar": "Block Signage",
-    "overview": "**Creative North Star: \"Block Signage\"**\n\nThe building's problems read like the painted signs on a Chicago block: storefront and sign-painter lettering in big block words, flat enamel colour on a cool white wall, and one yellow sign that tells a resident what they can do next. A resident on a phone, often reading in a second language, should see their building's name in block capitals, read the one yellow sign, tap it, and leave.\n\nDensity is calm and columnar. Problems are rows, not cards: an issue-colour bar on the left, a block-letter title, plain-language facts, and a day count painted big on the right. Sections are separated by 2px black rules painted across the wall, never boxed. Night mode is the same signs painted on a dark board, not a different theme.\n\nThe world refuses the dark SaaS card grid and the cream-paper \"ledger\" look it replaced. Nothing glows, floats, or shines: no gradients, no glass, no offset shadows.",
+    "overview": "**Creative North Star: \"Block Signage\"**\n\nThe building's problems read like the painted signs on a Chicago block: storefront and sign-painter lettering in big block words, flat enamel colour on a cool white wall, and one yellow sign that tells a resident what they can do next. A resident on a phone, often reading in a second language, should see their building's name in block capitals, read the one yellow sign, tap it, and leave. The building's address hangs on a green street-name blade, and the block itself, two-flats, greystones, a courtyard building, a corner store, is drawn in one line at the foot of the page.\n\nDensity is calm and columnar. Problems are rows, not cards: an issue-colour bar on the left, a block-letter title, plain-language facts, and a day count painted big on the right. Sections are separated by 2px black rules painted across the wall, never boxed. Night mode is the same signs painted on a dark board, not a different theme.\n\nThe world refuses the dark SaaS card grid and the cream-paper \"ledger\" look it replaced. Nothing glows, floats, or shines: no gradients, no glass, no shadows on boxes. The one offset is a sign painter's drop shade under a single heading.",
     "keyCharacteristics": [
       "Big Shoulders block gothic in caps for headings, labels, buttons, and numerals; the phone's own sans for every sentence.",
       "Chrome yellow appears once per screen, on the one unlocked next step.",
       "One flat enamel hue per issue type, the same on every screen.",
       "2px black rules instead of card boxes; corners of 2 to 6px.",
+      "Building addresses on green Chicago street-name blades; green means an address, never a problem.",
+      "A problem's steps drawn as an 'L' stop line in its own enamel.",
       "One motion moment: the \"Me too\" count bump."
     ],
     "rules": [
@@ -607,6 +667,11 @@
       {
         "name": "The Neutral Warning Rule",
         "body": "Warnings use the Wall Shade board with a black rule and black text. Yellow belongs to the next step only.",
+        "section": "colors"
+      },
+      {
+        "name": "The Green Means Address Rule",
+        "body": "A green blade marks a building address and nothing else. It never stands for a problem type, a status, or an action. Pest Green is a different, lighter enamel, and success messages keep their own green.",
         "section": "colors"
       },
       {
@@ -626,7 +691,12 @@
       },
       {
         "name": "The Flat Paint Rule",
-        "body": "Surfaces at rest never have a shadow. No gradients, no glass, no backdrop blur, no hard offset shadows.",
+        "body": "Surfaces at rest never have a shadow. No gradients, no glass, no backdrop blur, and no hard offset shadow on any box, button, board, or panel. The one exception is lettering: the sign painter's drop shade, on at most one heading per page.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Honest Shade Rule",
+        "body": "The drop shade is a problem's colour only under that problem. Anywhere else it is neutral grey, so no colour suggests a problem that is not there.",
         "section": "elevation"
       },
       {
@@ -640,14 +710,18 @@
       "**Do** key every issue colour through `data-issue` so the hue matches across rows, filters, tiles, and plates.",
       "**Do** set h1 to h4, labels, buttons, and numerals in Big Shoulders caps; set every sentence in the system font.",
       "**Do** separate sections with a 2px Enamel Black rule and divide list items with 1px light rules.",
-      "**Do** keep corners between 2px and 6px and touch targets at least 48px (40px for compact buttons and tags).",
+      "**Do** keep corners between 2px and 6px, except street-sign blades, whose corners scale with their lettering, and keep touch targets at least 48px (40px for compact buttons and tags).",
+      "**Do** set a building address that names a page or links to a building as a street sign, with the hundred-block on its own plate.",
+      "**Do** draw a problem's steps as the six-stop line in its enamel, coloured only between reached stops.",
       "**Do** paint the same signs on Night Board in dark mode, using the lighter enamel steps from `base.css`.",
       "**Do** honour `prefers-reduced-motion` and keep print output black on white with the rules intact."
     ],
     "donts": [
       "**Don't** use yellow for warnings, highlights, badges, or decoration; warnings are a Wall Shade board with a black rule.",
       "**Don't** wrap content in four-sided cards or add resting shadows.",
-      "**Don't** use gradients, glass, backdrop blur, or hard offset shadows.",
+      "**Don't** use gradients, glass, or backdrop blur, and don't put a hard offset shadow on any box; the drop shade belongs to one heading's lettering per page.",
+      "**Don't** use street-sign green for a problem type, a status, or an action.",
+      "**Don't** add the City of Chicago star, a CTA logo, or any seal or mark that implies City affiliation.",
       "**Don't** set body sentences in Big Shoulders; it does not cover the languages the notices use.",
       "**Don't** add motion beyond the \"Me too\" count bump and short colour transitions.",
       "**Don't** introduce a new issue hue without adding it to the enamel set in `base.css` for both light and dark."

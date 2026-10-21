@@ -20,12 +20,14 @@ import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 import { reconcileReportCount } from "../../lib/domain/submissions";
 import { countReporterMarkers, fetchSubmissionRecord, saveSubmissionRecord } from "../../lib/storage/submissions";
 import { buildBuildingDashboardUrl } from "../../lib/navigation";
-import { buildFollowUpItems, daysOpen, nextStepButtonLabel, nextStepForRecord } from "../../lib/followUp";
+import { buildFollowUpItems, buildRecordLine, daysOpen, nextStepButtonLabel, nextStepForRecord } from "../../lib/followUp";
 import { formatIssueLabel } from "../../lib/noticeUtils";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 import AppHeader from "../../components/AppHeader.astro";
 import HelpResources from "../../components/HelpResources.astro";
+import StopLine from "../../components/StopLine.astro";
+import StreetSign from "../../components/StreetSign.astro";
 
 export const prerender = false;
 
@@ -100,6 +102,10 @@ const nextStep =
         buildFollowUpItems([submissionRecord], new Map([[submissionRecord.id, recordEvents]]), today)
       )
     : null;
+const recordLine =
+  submissionRecord && submissionRecord.status !== "archived" && !submissionRecord.mergedInto
+    ? buildRecordLine(submissionRecord, recordEvents, today)
+    : null;
 const dayCount = submissionRecord ? daysOpen(submissionRecord.startDate || submissionRecord.reportDate, today) : 0;
 const isOpen = submissionRecord?.status === "open";
 // One-tap choices for the facts residents add most. The full list stays in the menu.
@@ -163,9 +169,10 @@ const groupChatText = submissionRecord
             <header class="record-head" data-issue={submissionRecord.issue}>
               <span class="record-swatch" aria-hidden="true"></span>
               <div class="record-title">
-                <h1>{issueLabel}</h1>
+                <h1 class="painted">{issueLabel}</h1>
+                <StreetSign address={submissionRecord.building} size="small" />
                 <p class="record-meta">
-                  {submissionRecord.building}. Started {startDateLabel}. Me too: {reportCountLabel}.
+                  Started {startDateLabel}. Me too: {reportCountLabel}.
                   {submissionRecord.status !== "open" && ` ${submissionRecord.status === "resolved" ? "Resolved" : "Archived"}.`}
                 </p>
               </div>
@@ -176,6 +183,12 @@ const groupChatText = submissionRecord
                 </p>
               )}
             </header>
+
+            {recordLine && (
+              <div class="record-line" data-issue={submissionRecord.issue}>
+                <StopLine stops={recordLine} />
+              </div>
+            )}
 
             {mergedIntoUrl ? (
               <div class="merged-notice" role="note">

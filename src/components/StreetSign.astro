@@ -1,0 +1,36 @@
+---
+import { streetSignParts } from "../lib/streetSign";
+
+/*
+ * A building address set like a Chicago street sign: a green blade with the street name, and the
+ * hundred-block number on its own plate. A screen reader hears the address once, as written,
+ * from the visually hidden copy.
+ */
+export type Props = {
+  address: string;
+  /** "h1" for a page title; "span" inside links and smaller places. */
+  as?: "h1" | "span";
+  size?: "large" | "small";
+};
+
+const { address, as = "span", size = "large" } = Astro.props;
+const { street, block, direction, suffix } = streetSignParts(address);
+const Tag = as;
+---
+
+<Tag class={`street-sign street-sign-${size}`}>
+  <span class="visually-hidden">{address}</span>
+  <span class="street-sign-blade" aria-hidden="true">
+    {direction && <span class="street-sign-dir">{direction}</span>}
+    <span class="street-sign-name">
+      {street}
+      {suffix && <span class="street-sign-suffix">{suffix}</span>}
+    </span>
+  </span>
+  {block && (
+    <span class="street-sign-block" aria-hidden="true">
+      <span>{block}</span>
+      <span>{direction}</span>
+    </span>
+  )}
+</Tag>

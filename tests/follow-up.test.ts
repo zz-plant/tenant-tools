@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   buildFollowUpItems,
   buildMeetingReport,
+  buildRecordLine,
   countedNotices,
   daysOpen,
   followUpActionHref,
@@ -251,5 +252,27 @@ describe("daysOpen", () => {
     assert.equal(daysOpen("2026-10-11", today), 9);
     assert.equal(daysOpen("2026-10-25", today), 0);
     assert.equal(daysOpen("", today), 0);
+  });
+});
+
+describe("buildRecordLine", () => {
+  const states = (stops: ReturnType<typeof buildRecordLine>) => stops.map((stop) => `${stop.id}:${stop.state}`);
+
+  it("locks the follow-up until day 3", () => {
+    const stops = buildRecordLine(record({}), [], today);
+    assert.deepEqual(states(stops), ["start:done", "notice:done", "follow-up:locked", "final:later", "311:later", "fixed:later"]);
+    assert.equal(stops[2].date, "2026-10-21");
+  });
+
+  it("opens the final reminder and 311 together for an old heat problem", () => {
+    const heat = record({ issue: "heat", startDate: "2026-10-11", reportDate: "2026-10-11" });
+    const stops = buildRecordLine(heat, [event("1", "follow_up_sent", "2026-10-14")], today);
+    assert.deepEqual(states(stops), ["start:done", "notice:done", "follow-up:done", "final:open", "311:open", "fixed:later"]);
+  });
+
+  it("ends at fixed when a repair is logged", () => {
+    const stops = buildRecordLine(record({}), [event("1", "repair_completed", "2026-10-19")], today);
+    assert.equal(stops.at(-1)?.state, "done");
+    assert.equal(stops[2].state, "later");
   });
 });
