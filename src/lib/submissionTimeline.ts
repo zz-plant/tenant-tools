@@ -4,6 +4,8 @@ import { formatRecordEventLabel, type RecordEvent } from "./recordEvents";
 export type SubmissionTimelineEntry = {
   label: string;
   date: string;
+  /** A date counted from a rule, not something a resident reported. */
+  counted?: boolean;
 };
 
 type SubmissionTimelineInput = {
@@ -33,12 +35,13 @@ const reportDateLabelByStage: Record<SubmissionTimelineInput["stage"], string> =
 const pushTimelineEntry = (
   entries: SubmissionTimelineEntry[],
   date: string | undefined,
-  label: string
+  label: string,
+  counted = false
 ) => {
   if (!date) {
     return;
   }
-  entries.push({ label, date });
+  entries.push(counted ? { label, date, counted } : { label, date });
 };
 
 /** The first notice is the report itself at stage A. Later stages record it separately. */
@@ -59,7 +62,7 @@ export const getSubmissionTimelineEntries = (submission: SubmissionTimelineInput
 
   const milestone = getNoticeMilestone(submission.issue, getFirstWrittenNoticeDate(submission));
   if (milestone) {
-    pushTimelineEntry(entries, milestone.date, milestone.label);
+    pushTimelineEntry(entries, milestone.date, milestone.label, true);
   }
 
   (submission.events ?? []).forEach((event) => pushTimelineEntry(entries, event.date, formatRecordEventLabel(event)));

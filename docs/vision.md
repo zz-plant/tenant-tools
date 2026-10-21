@@ -1,8 +1,8 @@
-# Building Ledger — Vision
+# Tenant Tools — Vision
 
 **Shared issue tracking for tenants.**
 
-Building Ledger is a lightweight web app that helps residents log building issues, quietly coordinate with neighbors, and generate clear written notices that create timelines and records.
+Tenant Tools is a lightweight web app that helps residents log building issues, quietly coordinate with neighbors, and generate clear written notices that create timelines and records.
 
 It is designed for:
 - first-time renters
@@ -13,7 +13,7 @@ It is designed for:
 
 ## What this tool does
 
-Building Ledger helps residents:
+Tenant Tools helps residents:
 
 - Log building issues with minimal input (issue type + start date)
 - Add themselves to an issue without writing (“me too”)
@@ -30,7 +30,7 @@ The tool focuses on **facts, dates, repetition, and aggregation**.
 
 ## What this tool does *not* do
 
-By design, Building Ledger does **not**:
+By design, Tenant Tools does **not**:
 
 - Host discussions or comment threads
 - Allow long free-text complaints
@@ -110,7 +110,7 @@ Public mode is opt-in and constrained to reduce risk.
 
 ## Intended use
 
-Building Ledger is meant to:
+Tenant Tools is meant to:
 - reduce confusion
 - reduce isolation
 - reduce self-sabotage

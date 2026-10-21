@@ -29,11 +29,11 @@ const buildings = isSteward ? listKnownBuildings(settingsJson, registry) : [];
 <html lang="en">
   <head>
     <SeoHead
-      title="Steward tools | Building Ledger"
+      title="Steward tools | Tenant Tools"
       description="Private steward tools for building keys and data."
       canonicalPath="/steward"
       imagePath="/og/private-dashboard.png"
-      imageAlt="Building Ledger steward tools"
+      imageAlt="Tenant Tools steward tools"
       noindex={true}
     />
   </head>
@@ -67,7 +67,6 @@ const buildings = isSteward ? listKnownBuildings(settingsJson, registry) : [];
           <>
             <section class="panel" data-steward-tools>
               <div>
-                <p class="eyebrow">Steward tools</p>
                 <h1>Building keys</h1>
                 <p class="helper">Residents need the building key to see records. Issue a new key if the old one reached management or someone outside the building.</p>
                 <p class="helper">The old key stops working within about a minute. Residents with the old key must use the new one.</p>

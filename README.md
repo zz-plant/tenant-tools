@@ -1,12 +1,12 @@
-# Building Ledger
+# Tenant Tools
 
 **Shared issue tracking for residents.**
 
-Building Ledger is a privacy-first web app for tenant buildings. Residents can log repair issues, join existing issues with “me too,” and generate neutral notices without needing legal language.
+Tenant Tools is a privacy-first web app for tenant buildings. Residents can log repair issues, join existing issues with “me too,” and generate neutral notices without needing legal language.
 
 ## Product boundaries (non-negotiable)
 
-Building Ledger is intentionally limited.
+Tenant Tools is intentionally limited.
 
 - It is **not** a forum.
 - It is **not** legal advice.

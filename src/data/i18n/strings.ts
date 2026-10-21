@@ -9,7 +9,7 @@ export const rightsStrings = {
   "rights.section.reference": "Heat, deposits, and evictions",
   "rights.starting": "Starting {date}:",
   "help.title": "Where to get help",
-  "help.intro": "Information only. Not legal advice. Building Ledger does not share your data with these groups.",
+  "help.intro": "Information only. Not legal advice. Tenant Tools does not share your data with these groups.",
   "help.last_checked": "Last checked: {date}",
 } as const;
 

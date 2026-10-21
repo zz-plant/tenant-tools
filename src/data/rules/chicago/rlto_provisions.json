@@ -462,7 +462,7 @@
             "pro_text_introduced",
             "pro_page"
           ],
-          "app_impact": "Add a link to the registry search so residents can find where to send repair requests. Do not store owner names in Building Ledger."
+          "app_impact": "Add a link to the registry search so residents can find where to send repair requests. Do not store owner names in Tenant Tools."
         }
       ]
     },

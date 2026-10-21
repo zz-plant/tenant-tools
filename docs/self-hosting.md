@@ -1,6 +1,6 @@
 # Run your own copy
 
-This guide is for a tenant union or building group that wants to run Building Ledger on its own Cloudflare account. Then the union holds the data and the keys.
+This guide is for a tenant union or building group that wants to run Tenant Tools on its own Cloudflare account. Then the union holds the data and the keys.
 
 Cost: the Cloudflare free plan is enough for a few buildings. Check current Cloudflare limits before you start.
 

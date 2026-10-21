@@ -1,9 +1,9 @@
 ---
 name: building-ledger-agent
-description: Contributor and review guidance for Building Ledger with strict safety, privacy, and ESL-first copy requirements.
+description: Contributor and review guidance for Tenant Tools with strict safety, privacy, and ESL-first copy requirements.
 ---
 
-# Building Ledger Agent
+# Tenant Tools Agent
 
 Use this skill for implementation, review, or documentation updates in this repo.
 

@@ -31,18 +31,18 @@ const groupMessage = buildGroup311Message(items, today);
 <html lang="en">
   <head>
     <SeoHead
-      title="Group 311 day | Building Ledger"
+      title="Group 311 day | Tenant Tools"
       description="Private page to plan a group 311 day: scripts for each problem and requests logged."
       canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/311`}
       imagePath="/og/private-dashboard.png"
-      imageAlt="Building Ledger group 311 day"
+      imageAlt="Tenant Tools group 311 day"
       noindex={true}
     />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <AppHeader
-      title="Building Ledger"
+      title="Tenant Tools"
       subtitle={`Building: ${buildingId || "Not listed"}`}
       backHref={dashboardUrl}
       backLabel="Building dashboard"
@@ -64,7 +64,6 @@ const groupMessage = buildGroup311Message(items, today);
           <>
             <section class="panel" data-group311>
               <div>
-                <p class="eyebrow">Group 311 day</p>
                 <h1>Ask for inspections together</h1>
                 <p class="helper">Each resident can make their own 311 request. More requests put more reports on record with the City.</p>
                 <p class="helper">Call 311, or use 311.chicago.gov. Say what you saw and the dates. Do not guess.</p>

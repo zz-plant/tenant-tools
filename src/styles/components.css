@@ -13,30 +13,10 @@
   gap: 8px;
 }
 
-.step-header-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.step-header h1 {
-  font-size: clamp(1.3rem, 2vw, 1.65rem);
+.step-header h2 {
+  font-size: clamp(2rem, 4.4vw, 2.75rem);
   margin: 0;
-  letter-spacing: -0.02em;
-  color: var(--color-text-primary);
-  font-weight: 600;
-}
-
-.step-now-badge {
-  background: var(--color-surface-subtle);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 3px 10px;
-  font-size: 0.78rem;
-  font-weight: 500;
+  line-height: 0.9;
 }
 
 .step-meta {
@@ -60,26 +40,15 @@
 
 .step-progress-label {
   margin: 0;
-  font-weight: 500;
-  font-size: 0.84rem;
-  color: var(--color-text-secondary);
-}
-
-.step-progress-pill {
-  background: var(--color-surface-subtle);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 2px 8px;
-  font-size: 0.72rem;
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+  color: var(--color-text-primary);
 }
 
 .step-progress-track {
-  height: 3px;
-  border-radius: var(--radius-full);
-  background: var(--color-border);
+  height: 6px;
+  border-radius: 0;
+  background: var(--color-surface-muted);
   position: relative;
   overflow: hidden;
 }
@@ -91,7 +60,7 @@
   bottom: 0;
   background: var(--color-primary);
   border-radius: inherit;
-  transition: width var(--ease-standard);
+  transition: width 320ms var(--ease-out);
 }
 
 .step-privacy {
@@ -121,14 +90,14 @@
 
 .step-button {
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   background: var(--color-surface);
-  padding: 10px 12px;
+  color: var(--color-text-primary);
+  padding: 8px 10px;
   text-align: left;
   cursor: pointer;
   display: grid;
-  gap: 4px;
-  box-shadow: var(--shadow-xs);
+  gap: 2px;
   transition: border-color var(--ease-standard), background var(--ease-standard);
   position: relative;
   user-select: none;
@@ -144,14 +113,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: var(--radius-xs);
-  background: var(--color-surface-subtle);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: 0.68rem;
-  font-weight: 600;
+  background: var(--color-surface-muted);
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 900;
   flex-shrink: 0;
 }
 
@@ -161,29 +130,30 @@
 
 .step-button.active {
   border-color: var(--color-primary);
-  background: var(--color-surface);
-}
-
-.step-button.active .step-number-circle {
   background: var(--color-primary);
-  border-color: var(--color-primary);
   color: var(--color-primary-contrast);
 }
 
-.step-button.active .step-title {
-  color: var(--color-text-primary);
+.step-button.active .step-number-circle {
+  background: var(--color-primary-contrast);
+  color: var(--color-primary);
 }
 
+.step-button.active .step-title,
 .step-button.active .step-label {
-  color: var(--color-text-primary);
+  color: var(--color-primary-contrast);
 }
 
 .step-button.disabled,
 .step-button:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
   background: var(--color-surface-subtle);
-  border-color: var(--color-border);
+  border-color: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+.step-button:disabled .step-label {
+  color: var(--color-text-muted);
 }
 
 .step-button:focus-visible,
@@ -196,46 +166,35 @@
 }
 
 .step-title {
-  letter-spacing: 0.04em;
-  font-size: 0.7rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  font-size: 1.02rem;
   text-transform: uppercase;
-  color: var(--color-text-muted);
-  font-weight: 600;
+  color: inherit;
+  font-weight: 800;
+  line-height: 1;
 }
 
 .step-label {
   font-weight: 500;
-  font-size: 0.88rem;
-  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
   line-height: 1.25;
 }
 
 .step-requirement {
-  width: fit-content;
-  padding: 1px 6px;
-  border-radius: var(--radius-xs);
-  background: var(--color-surface-subtle);
-  color: var(--color-text-muted);
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
-.step-lock-note {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
-  font-weight: 400;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: inherit;
 }
 
 .step-controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid var(--color-border);
+  border-top: var(--rule);
 }
 
 /* ==========================================================================
@@ -247,12 +206,8 @@
 }
 
 .form-section {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  padding: 18px;
-  background: var(--color-surface);
   display: grid;
-  gap: 14px;
+  gap: 16px;
 }
 
 .form-section-header {
@@ -262,9 +217,7 @@
 
 .form-section-header h3 {
   margin: 0;
-  font-size: 0.98rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: 1.35rem;
 }
 
 .form-section-header .helper {
@@ -272,7 +225,7 @@
 }
 
 .helper {
-  font-size: 0.84rem;
+  font-size: 0.92rem;
   color: var(--color-text-muted);
   line-height: 1.45;
 }
@@ -286,7 +239,7 @@
   margin: 0;
   padding-left: 18px;
   color: var(--color-text-secondary);
-  font-size: 0.86rem;
+  font-size: 0.92rem;
   line-height: 1.55;
 }
 
@@ -300,63 +253,62 @@
 
 .issue-gallery h3 {
   margin: 0;
-  font-size: 0.92rem;
-  color: var(--color-text-primary);
-  font-weight: 500;
+  font-size: 1.35rem;
 }
 
+/* Each problem type is a painted tile in its own enamel colour. */
 .issue-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
 }
 
 .issue-option-card {
+  --issue: var(--issue-building);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
   background: var(--color-surface);
-  padding: 14px 10px 12px;
-  text-align: center;
+  padding: 10px;
+  text-align: left;
   display: grid;
-  gap: 8px;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
   align-items: center;
+  min-height: 64px;
   cursor: pointer;
-  box-shadow: var(--shadow-xs);
-  transition: border-color var(--ease-standard), background var(--ease-standard);
+  transition: border-color var(--ease-standard), background var(--ease-standard), color var(--ease-standard);
   user-select: none;
 }
 
 .issue-option-card:hover {
-  border-color: var(--color-border-strong);
-  background: var(--color-surface-subtle);
+  border-color: var(--issue);
 }
 
 .issue-option-card.active,
 .issue-option-card[data-state="checked"],
 .issue-option-card[data-checked],
 .issue-option-card[aria-checked="true"] {
-  border-color: var(--color-primary);
-  background: var(--color-surface);
-  box-shadow: 0 0 0 2px var(--color-primary);
+  border-color: var(--issue);
+  background: var(--issue);
+  color: var(--issue-ink);
 }
 
 .issue-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin: 0 auto;
-  background: var(--color-surface-subtle);
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  background: var(--issue);
+  color: var(--issue-ink);
 }
 
 .issue-option-card.active .issue-icon,
 .issue-option-card[data-checked] .issue-icon,
 .issue-option-card[aria-checked="true"] .issue-icon {
-  background: var(--color-surface-subtle);
-  border-color: var(--color-primary);
+  background: var(--issue-ink);
+  color: var(--issue);
 }
 
 .issue-icon svg {
@@ -366,18 +318,19 @@
 
 .issue-label {
   margin: 0;
-  font-size: 0.86rem;
-  color: var(--color-text-primary);
-  font-weight: 500;
-  line-height: 1.3;
+  font-size: 0.92rem;
+  color: inherit;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .issue-option-card.active .issue-label,
 .issue-option-card[data-checked] .issue-label,
 .issue-option-card[aria-checked="true"] .issue-label {
-  font-weight: 600;
-  color: var(--color-text-primary);
+  color: var(--issue-ink);
 }
+
+
 
 /* ==========================================================================
    QUICK NOTICE ACTION BANNER (FAST PATH)
@@ -385,14 +338,12 @@
 .quick-notice-banner {
   margin: 16px 0 8px;
   padding: 14px 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left: 3px solid var(--color-primary);
+  background: var(--color-surface-subtle);
+  border: 2px solid var(--color-border-strong);
   border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: var(--shadow-xs);
 }
 
 .quick-notice-top-row {
@@ -410,13 +361,15 @@
 }
 
 .quick-notice-title {
-  font-size: 0.88rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-transform: uppercase;
   color: var(--color-text-primary);
 }
 
 .quick-notice-subtitle {
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   color: var(--color-text-secondary);
 }
 
@@ -445,15 +398,9 @@
 .ledger-action-bar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: end;
   gap: 12px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-xs);
 }
 
 /* ==========================================================================
@@ -477,40 +424,49 @@
   gap: 6px;
 }
 
+/* Small painted tags: a 2px edge, block letters. Selected tags are filled in. */
 .fact-tag {
-  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  border: 2px solid var(--color-border-strong);
   background: var(--color-surface);
-  color: var(--color-text-secondary);
-  border-radius: var(--radius-xs);
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  font-weight: 500;
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
   cursor: pointer;
-  box-shadow: var(--shadow-xs);
-  transition: all var(--ease-standard);
+  transition: background var(--ease-standard), color var(--ease-standard);
 }
 
 .fact-tag:hover {
-  border-color: var(--color-border-strong);
-  color: var(--color-text-primary);
   background: var(--color-surface-subtle);
+  color: var(--color-text-primary);
 }
 
-.fact-tag-included {
+.fact-tag-included,
+.fact-tag[aria-current="true"] {
+  background: var(--color-primary);
   border-color: var(--color-primary);
-  background: var(--color-surface-subtle);
-  color: var(--color-text-primary);
-  font-weight: 600;
+  color: var(--color-primary-contrast);
+}
+
+.fact-tag-included:hover,
+.fact-tag[aria-current="true"]:hover {
+  background: var(--color-primary-hover);
+  color: var(--color-primary-contrast);
 }
 
 /* ==========================================================================
    PREVIEW PANEL & DRAFT NOTICE
    ========================================================================== */
 .preview-section {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  padding: 16px;
-  background: var(--color-surface);
   display: grid;
   gap: 12px;
 }
@@ -521,7 +477,7 @@
 
 .notice-status {
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border-strong);
   background: var(--color-surface-subtle);
   padding: 12px 14px;
   display: grid;
@@ -548,8 +504,10 @@
 
 .notice-status-title {
   margin: 0;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  text-transform: uppercase;
   color: var(--color-text-primary);
 }
 
@@ -562,9 +520,7 @@
 
 .output-header h2 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 1.6rem;
 }
 
 .output-actions {
@@ -593,8 +549,10 @@
 
 .notice-preview-title {
   margin: 0;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.15rem;
+  text-transform: uppercase;
   color: var(--color-text-primary);
 }
 
@@ -605,13 +563,12 @@
 }
 
 .notice-tag {
-  background: var(--color-surface-subtle);
-  color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-xs);
   padding: 2px 8px;
-  font-size: 0.72rem;
-  font-weight: 500;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .output {
@@ -631,7 +588,8 @@
   margin: 0;
   background: var(--color-surface);
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-hover);
+  border-top: var(--rule);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   line-height: 1.65;
   min-height: 200px;
@@ -658,8 +616,7 @@
 
 .summary-header h3 {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1.35rem;
 }
 
 .summary-grid {
@@ -669,27 +626,26 @@
 }
 
 .summary-card {
-  background: var(--color-surface-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  padding: 8px 12px;
+  border-top: 1px solid var(--color-border-hover);
+  padding: 8px 0;
   display: grid;
   gap: 2px;
 }
 
 .summary-label {
   margin: 0;
-  font-size: 0.72rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .summary-value {
   margin: 0;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 1rem;
   color: var(--color-text-primary);
   line-height: 1.3;
 }
@@ -747,8 +703,8 @@
    ========================================================================== */
 .locked-panel {
   border-radius: var(--radius-sm);
-  border: 1px dashed var(--color-border-strong);
-  background: var(--color-surface-subtle);
+  border: 2px dashed var(--color-border-hover);
+  background: transparent;
   padding: 20px;
   display: grid;
   gap: 4px;
@@ -759,7 +715,7 @@
 
 .locked-panel h3 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 1.3rem;
   color: var(--color-text-primary);
 }
 
@@ -802,72 +758,296 @@
 
 .status-group {
   display: grid;
-  gap: 10px;
+}
+
+.status-group[hidden] {
+  display: none;
 }
 
 .status-header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  padding-bottom: 4px;
+  margin-top: 18px;
+  padding-bottom: 6px;
+}
+
+.status-header h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   NEXT STEP: the one yellow sign on the building dashboard
+   ========================================================================== */
+.next-up {
+  display: grid;
+  gap: 10px;
+  max-width: 760px;
+}
+
+.next-sign {
+  background: var(--color-sign);
+  color: var(--color-sign-ink);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.next-sign h2 {
+  margin: 0;
+  color: var(--color-sign-ink);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 0.9;
+}
+
+.next-sign p {
+  margin: 0;
+  color: var(--color-sign-ink);
+  font-size: 1.02rem;
+  font-weight: 500;
+}
+
+.next-sign .button {
+  justify-self: start;
+  margin-top: 6px;
+  background: var(--color-sign-ink);
+  border-color: var(--color-sign-ink);
+  color: var(--color-sign);
+  font-size: 1.25rem;
+  min-height: 52px;
+}
+
+.next-sign .button:not(:disabled):hover {
+  background: #000000;
+  border-color: #000000;
+  color: #ffd21a;
+}
+
+.next-calm {
+  border-top: var(--rule);
+  padding-top: 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.next-calm h2 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.next-calm p {
+  margin: 0;
+}
+
+.next-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 520px;
+}
+
+/* ==========================================================================
+   PROBLEM ROWS: fixed columns, the oldest problem first
+   ========================================================================== */
+.board-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.board-head h2 {
+  margin: 0;
+}
+
+.board-head + .helper {
+  margin-top: -12px;
+}
+
+.board-count {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-text-primary);
+}
+
+.status-header .board-count {
+  font-size: 1.4rem;
+}
+
+.quick-filter-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 2px 6px;
+  margin: -6px 0 0;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.quick-filter-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.issue-filter::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 1px;
+  background: var(--issue);
+}
+
+.issue-filter[aria-current="true"] {
+  background: var(--issue);
+  border-color: var(--issue);
+  color: var(--issue-ink);
+}
+
+.issue-filter[aria-current="true"]::before {
+  background: var(--issue-ink);
+}
+
+.problem-row {
+  --issue: var(--issue-building);
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "swatch main days"
+    "swatch actions actions"
+    "swatch status status"
+    "swatch steward steward";
+  column-gap: 14px;
+  padding: 14px 0;
+  border-top: var(--rule);
+}
+
+.status-group > .problem-row:last-child {
   border-bottom: 1px solid var(--color-border);
 }
 
-.status-pill {
-  background: var(--color-surface-subtle);
+.problem-swatch {
+  grid-area: swatch;
+  border-radius: 1px;
+  background: var(--issue);
+}
+
+.problem-main {
+  grid-area: main;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.problem-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 3.6vw, 1.6rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.problem-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.problem-title a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.problem-meta {
+  margin: 0;
+  font-size: 0.92rem;
   color: var(--color-text-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xs);
-  padding: 2px 8px;
-  font-size: 0.72rem;
+}
+
+.problem-next {
+  margin: 0;
   font-weight: 600;
-  text-transform: capitalize;
-}
-
-.status-pill.open {
-  background: var(--color-warning-subtle);
-  color: var(--color-warning-text);
-  border-color: var(--color-warning-border);
-}
-
-.status-pill.resolved {
-  background: var(--color-success-subtle);
-  color: var(--color-success-text);
-  border-color: var(--color-success-border);
-}
-
-.status-pill.archived {
-  background: var(--color-surface-subtle);
+  font-size: 0.95rem;
   color: var(--color-text-muted);
 }
 
-.issue-card {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  padding: 16px;
+.problem-days {
+  grid-area: days;
+  margin: 0;
   display: grid;
-  gap: 10px;
-  box-shadow: var(--shadow-xs);
-  transition: border-color var(--ease-standard);
+  justify-items: end;
+  align-content: start;
+  line-height: 1;
+  min-width: 3.2rem;
 }
 
-.issue-card:hover {
-  border-color: var(--color-border-strong);
+.problem-days b {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 8vw, 3.4rem);
+  font-weight: 900;
+  line-height: 0.85;
+  color: var(--color-text-primary);
+}
+
+.problem-days span {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.problem-actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.problem-status {
+  grid-area: status;
+  margin: 6px 0 0;
+}
+
+.problem-status:empty {
+  display: none;
+}
+
+.problem-row .steward-row {
+  grid-area: steward;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-border-hover);
+}
+
+/* Older pages still list records as cards. */
+.issue-card {
+  border-top: var(--rule);
+  padding: 14px 0;
+  display: grid;
+  gap: 8px;
 }
 
 .issue-title {
   margin: 0;
-  font-weight: 600;
-  font-size: 0.98rem;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.3rem;
+  text-transform: uppercase;
   color: var(--color-text-primary);
 }
 
 .issue-meta {
   margin: 0;
-  color: var(--color-text-muted);
-  font-size: 0.84rem;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
   line-height: 1.45;
 }
 
@@ -876,6 +1056,89 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+}
+
+.status-pill {
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xs);
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   GROUP TOOLS LIST
+   ========================================================================== */
+.tool-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.tool-list li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+/* The whole row is the link, with an arrow, so it reads as tappable on a phone. */
+.tool-list a {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22px;
+  grid-template-areas:
+    "name arrow"
+    "note arrow";
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 2px;
+  padding: 12px 0;
+  text-decoration: none;
+  color: var(--color-text-primary);
+}
+
+.tool-name {
+  grid-area: name;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.tool-note {
+  grid-area: note;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+}
+
+.tool-arrow {
+  grid-area: arrow;
+  width: 22px;
+  height: 22px;
+  transition: transform 180ms var(--ease-out);
+}
+
+.tool-list a:hover .tool-name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+.tool-list a:hover .tool-arrow {
+  transform: translateX(3px);
+}
+
+@media (max-width: 480px) {
+  .next-sign {
+    margin-inline: calc(var(--layout-gutter-mobile) * -1);
+    border-radius: 0;
+    padding: 18px var(--layout-gutter-mobile) 20px;
+  }
+
+  .next-sign .button {
+    justify-self: stretch;
+  }
+
 }
 
 /* ==========================================================================
@@ -1004,8 +1267,8 @@ ul.rule-cards {
 }
 
 .rule-upcoming {
-  border-left: 3px solid var(--color-border);
-  padding-left: 10px;
+  border-top: 1px dashed var(--color-border-hover);
+  padding-top: 8px;
 }
 
 .rule-details,
@@ -1239,6 +1502,15 @@ ul.rule-cards {
   margin: 0;
 }
 
+.help-resources h3 {
+  font-size: 1.6rem;
+}
+
+.help-resources h4 {
+  font-size: 1.15rem;
+  margin-top: 14px;
+}
+
 .help-list {
   margin: 0;
   padding-left: 18px;
@@ -1361,8 +1633,8 @@ fieldset.facts-form {
 }
 
 .button-danger {
-  background: #9a2b2b;
-  border-color: #9a2b2b;
+  background: var(--color-danger);
+  border-color: var(--color-danger);
   color: #ffffff;
 }
 
@@ -1559,3 +1831,186 @@ a.fact-tag {
 .quick-notice-banner {
   scroll-margin-top: 120px;
 }
+
+/* ==========================================================================
+   RECORD PAGE: the problem's name painted big, then the next step, then the record
+   ========================================================================== */
+.record {
+  display: grid;
+  gap: 28px;
+}
+
+.record-head {
+  --issue: var(--issue-building);
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+}
+
+.record-swatch {
+  align-self: stretch;
+  border-radius: 1px;
+  background: var(--issue);
+}
+
+.record-title {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.record-title h1 {
+  margin: 0;
+  font-size: clamp(2.3rem, 7vw, 4.25rem);
+  line-height: 0.88;
+  overflow-wrap: anywhere;
+}
+
+.record-meta {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+
+/* The day count is painted on a plate in the problem's own colour. */
+.record-days {
+  grid-area: auto;
+  background: var(--issue);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px 10px;
+  justify-items: center;
+}
+
+.record-days b {
+  font-size: clamp(3.2rem, 10vw, 5rem);
+  color: var(--issue-ink);
+}
+
+.record-days span {
+  color: var(--issue-ink);
+  opacity: 0.85;
+}
+
+.record-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+.record-grid > .panel:first-child {
+  grid-column: 1 / -1;
+}
+
+.record-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0 20px;
+}
+
+.record-facts div {
+  border-top: 1px solid var(--color-border);
+  padding: 8px 0;
+  display: grid;
+  gap: 2px;
+}
+
+.record-facts dt {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.record-facts dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.merged-notice {
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.merged-notice p {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .record-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .record-head {
+    grid-template-columns: 8px minmax(0, 1fr);
+    column-gap: 14px;
+  }
+
+  .record-days {
+    grid-column: 2;
+    justify-self: start;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 14px;
+  }
+
+  .share-actions .button {
+    flex: 1 1 100%;
+  }
+}
+
+/* "Me too" landed: the count is briefly painted sign yellow. */
+@keyframes count-bump {
+  from {
+    background: var(--color-sign);
+    color: var(--color-sign-ink);
+  }
+}
+
+.count-bump {
+  border-radius: var(--radius-xs);
+  padding: 0 3px;
+  margin: 0 -3px;
+  animation: count-bump 1.4s var(--ease-out);
+}
+
+.timeline-note {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.timeline li.is-counted .timeline-date {
+  color: var(--color-text-muted);
+}
+
+/* Issue colours, keyed by issue id: builder tiles, dashboard rows, record pages.
+   Kept last so an issue colour wins over a component default. */
+[data-issue="heat"] { --issue: var(--issue-heat); }
+[data-issue="leak"] { --issue: var(--issue-leak); }
+[data-issue="pests"] { --issue: var(--issue-pests); }
+[data-issue="entry"] { --issue: var(--issue-entry); }
+[data-issue="common"] { --issue: var(--issue-common); }
+[data-issue="no-timeline"] { --issue: var(--issue-no-timeline); }
+[data-issue="building"] { --issue: var(--issue-building); }
+[data-issue="deposit"] { --issue: var(--issue-deposit); }
+[data-issue="lockout"] { --issue: var(--issue-lockout); }

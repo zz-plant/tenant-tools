@@ -1,47 +1,26 @@
-<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-  <title id="title">Building Ledger</title>
-  <desc id="desc">Private resident issue tracker and notice builder.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F5F6FB"/>
-      <stop offset="1" stop-color="#E8ECFF"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="164" y1="128" x2="1036" y2="498" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#3C5CCF"/>
-      <stop offset="1" stop-color="#4E7BFF"/>
-    </linearGradient>
-    <filter id="shadow" x="112" y="96" width="976" height="438" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feDropShadow dx="0" dy="14" stdDeviation="20" flood-color="#203074" flood-opacity="0.18"/>
-    </filter>
-  </defs>
-
-  <rect width="1200" height="630" fill="url(#bg)"/>
-  <circle cx="1088" cy="92" r="136" fill="#DDE5FF"/>
-  <circle cx="120" cy="546" r="102" fill="#DDE5FF"/>
-
-  <g filter="url(#shadow)">
-    <rect x="156" y="118" width="888" height="394" rx="28" fill="white"/>
-  </g>
-
-  <rect x="196" y="158" width="236" height="44" rx="22" fill="#E6ECFF"/>
-  <text x="314" y="186" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="700" fill="#2E468F">Building Ledger</text>
-
-  <text x="196" y="268" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="800" fill="#1A2554">Track building</text>
-  <text x="196" y="330" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="800" fill="#1A2554">issues with</text>
-  <text x="196" y="392" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="800" fill="#1A2554">short facts</text>
-
-  <text x="196" y="444" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="500" fill="#40518A">Private logs. Simple forms. Calm repair notices.</text>
-
-  <rect x="196" y="468" width="444" height="12" rx="6" fill="url(#accent)"/>
-
-  <g transform="translate(742 236)">
-    <rect width="248" height="176" rx="20" fill="#F5F8FF" stroke="#C7D4FF" stroke-width="2"/>
-    <rect x="22" y="22" width="126" height="16" rx="8" fill="#CBD8FF"/>
-    <rect x="22" y="52" width="188" height="12" rx="6" fill="#D9E3FF"/>
-    <rect x="22" y="74" width="196" height="12" rx="6" fill="#D9E3FF"/>
-    <rect x="22" y="104" width="104" height="34" rx="17" fill="#4367DF"/>
-    <text x="74" y="126" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="white">Start</text>
-    <circle cx="204" cy="121" r="22" fill="#E6EDFF"/>
-    <path d="M194 121L201 128L216 113" stroke="#4367DF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Tenant Tools</title>
+  <desc id="desc">Put it in writing. Act together. Calm notices, dated records, and a me-too count for neighbors.</desc>
+  <style>
+    @font-face { font-family: "Big Shoulders"; font-weight: 500 900; src: url("../fonts/big-shoulders-latin.woff2") format("woff2"); }
+    .d { font-family: "Big Shoulders", "Arial Narrow", sans-serif; text-transform: uppercase; }
+    .b { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  </style>
+  <rect width="1200" height="630" fill="#F3F4F1"/>
+  <rect width="1200" height="92" fill="#151515"/>
+  <rect x="64" y="24" width="44" height="44" rx="4" fill="#F3F4F1"/>
+  <path fill="#151515" d="M69.5 33h15.8v5.5h-5.2v20.5h-5.5V38.5h-5.1zM86.5 33h15.8v5.5h-5.2v20.5h-5.5V38.5h-5.1z"/>
+  <text class="d" x="128" y="61" font-size="38" font-weight="800" letter-spacing="1.5" fill="#F3F4F1">Tenant Tools</text>
+  <text class="d" x="64" y="236" font-size="118" font-weight="900" fill="#151515">Put it in writing.</text>
+  <text class="d" x="64" y="342" font-size="118" font-weight="900" fill="#151515">Act together.</text>
+  <text class="b" x="64" y="412" font-size="30" font-weight="500" fill="#363833">Calm notices. Dated records. Neighbors say “me too”.</text>
+  <rect x="64" y="462" width="340" height="4" fill="#151515"/>
+  <text class="d" x="64" y="516" font-size="38" font-weight="800" fill="#151515">Write a notice</text>
+  <text class="b" x="64" y="554" font-size="25" fill="#363833">Calm words. No legal terms.</text>
+  <rect x="432" y="462" width="340" height="4" fill="#151515"/>
+  <text class="d" x="432" y="516" font-size="38" font-weight="800" fill="#151515">Save the dates</text>
+  <text class="b" x="432" y="554" font-size="25" fill="#363833">A record of what happened.</text>
+  <rect x="800" y="462" width="340" height="4" fill="#151515"/>
+  <text class="d" x="800" y="516" font-size="38" font-weight="800" fill="#151515">Me too</text>
+  <text class="b" x="800" y="554" font-size="25" fill="#363833">Neighbors join without writing.</text>
 </svg>

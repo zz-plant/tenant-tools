@@ -1,0 +1,656 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-21T00:00:00Z",
+  "title": "Design System: Tenant Tools",
+  "extensions": {
+    "colorMeta": {
+      "sign-yellow": {
+        "role": "primary",
+        "displayName": "Chrome Sign Yellow",
+        "canonical": "#f2c200",
+        "oklch": "oklch(83.3% 0.170 91)",
+        "tonalRamp": [
+          "#1b0400",
+          "#3c1b00",
+          "#5f3600",
+          "#825400",
+          "#a77800",
+          "#ca9f00",
+          "#ebc75c",
+          "#ffec9b"
+        ]
+      },
+      "sign-yellow-hover": {
+        "role": "primary",
+        "displayName": "Sign Yellow Hover",
+        "canonical": "#ffd21a",
+        "oklch": "oklch(87.7% 0.176 93)",
+        "tonalRamp": [
+          "#1a0500",
+          "#3a1c00",
+          "#5d3700",
+          "#805500",
+          "#a57a00",
+          "#c8a000",
+          "#e9c859",
+          "#ffed99"
+        ]
+      },
+      "enamel-black": {
+        "role": "neutral",
+        "displayName": "Enamel Black",
+        "canonical": "#151515",
+        "oklch": "oklch(19.6% 0.000 90)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "wall": {
+        "role": "neutral",
+        "displayName": "White Wall",
+        "canonical": "#f3f4f1",
+        "oklch": "oklch(96.6% 0.004 122)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#242422",
+          "#3f403e",
+          "#5d5e5b",
+          "#80817e",
+          "#a4a5a2",
+          "#cacbc8",
+          "#eeefec"
+        ]
+      },
+      "board-white": {
+        "role": "neutral",
+        "displayName": "Board White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100.0% 0.000 90)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#242424",
+          "#404040",
+          "#5d5d5d",
+          "#808080",
+          "#a4a4a4",
+          "#cacaca",
+          "#eeeeee"
+        ]
+      },
+      "wall-shade": {
+        "role": "neutral",
+        "displayName": "Wall Shade",
+        "canonical": "#e9ebe6",
+        "oklch": "oklch(93.7% 0.007 124)",
+        "tonalRamp": [
+          "#0a0c09",
+          "#232521",
+          "#3f403c",
+          "#5d5e5a",
+          "#7f817c",
+          "#a3a5a1",
+          "#c9cbc6",
+          "#edefea"
+        ]
+      },
+      "wall-shadow": {
+        "role": "neutral",
+        "displayName": "Wall Shadow",
+        "canonical": "#dcdfd8",
+        "oklch": "oklch(89.9% 0.010 126)",
+        "tonalRamp": [
+          "#0a0c08",
+          "#232520",
+          "#3e413b",
+          "#5c5f59",
+          "#7f817b",
+          "#a3a69f",
+          "#c9ccc5",
+          "#edf0e9"
+        ]
+      },
+      "ink-secondary": {
+        "role": "neutral",
+        "displayName": "Ink Secondary",
+        "canonical": "#363833",
+        "oklch": "oklch(33.7% 0.009 125)",
+        "tonalRamp": [
+          "#0a0c08",
+          "#232520",
+          "#3f413b",
+          "#5c5f59",
+          "#7f817b",
+          "#a3a6a0",
+          "#c9ccc5",
+          "#edf0e9"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "#595c55",
+        "oklch": "oklch(47.0% 0.012 126)",
+        "tonalRamp": [
+          "#0a0c07",
+          "#23251f",
+          "#3e413a",
+          "#5c5f58",
+          "#7e827a",
+          "#a3a69e",
+          "#c8ccc4",
+          "#ecf0e8"
+        ]
+      },
+      "ink-disabled": {
+        "role": "neutral",
+        "displayName": "Ink Disabled",
+        "canonical": "#9a9d95",
+        "oklch": "oklch(69.1% 0.012 124)",
+        "tonalRamp": [
+          "#0a0c07",
+          "#23251f",
+          "#3e413a",
+          "#5c5f57",
+          "#7f817a",
+          "#a3a69e",
+          "#c9ccc3",
+          "#edf0e7"
+        ]
+      },
+      "rule-light": {
+        "role": "neutral",
+        "displayName": "Light Rule",
+        "canonical": "#c9ccc4",
+        "oklch": "oklch(84.1% 0.011 123)",
+        "tonalRamp": [
+          "#0a0c07",
+          "#23251f",
+          "#3e413a",
+          "#5c5f58",
+          "#7f817a",
+          "#a3a69e",
+          "#c9ccc4",
+          "#edf0e8"
+        ]
+      },
+      "rule-hover": {
+        "role": "neutral",
+        "displayName": "Hover Rule",
+        "canonical": "#8d9088",
+        "oklch": "oklch(64.8% 0.012 124)",
+        "tonalRamp": [
+          "#0a0c07",
+          "#23251f",
+          "#3e413a",
+          "#5c5f57",
+          "#7f817a",
+          "#a3a69e",
+          "#c9ccc3",
+          "#edf0e7"
+        ]
+      },
+      "focus-blue": {
+        "role": "neutral",
+        "displayName": "Focus Blue",
+        "canonical": "#1f3fa6",
+        "oklch": "oklch(41.5% 0.170 266)",
+        "tonalRamp": [
+          "#010036",
+          "#071862",
+          "#183491",
+          "#2f53bc",
+          "#4f78e4",
+          "#759fff",
+          "#a2c8ff",
+          "#cdeeff"
+        ]
+      },
+      "issue-heat": {
+        "role": "secondary",
+        "displayName": "Heat Red",
+        "canonical": "#d3261e",
+        "oklch": "oklch(56.0% 0.208 29)",
+        "tonalRamp": [
+          "#2e0000",
+          "#590000",
+          "#880000",
+          "#b60000",
+          "#e1372c",
+          "#ff6d5c",
+          "#ffa190",
+          "#ffcfc0"
+        ]
+      },
+      "issue-leak": {
+        "role": "secondary",
+        "displayName": "Ultramarine",
+        "canonical": "#1f3fa6",
+        "oklch": "oklch(41.5% 0.170 266)",
+        "tonalRamp": [
+          "#010036",
+          "#071862",
+          "#183491",
+          "#2f53bc",
+          "#4f78e4",
+          "#759fff",
+          "#a2c8ff",
+          "#cdeeff"
+        ]
+      },
+      "issue-pests": {
+        "role": "secondary",
+        "displayName": "Pest Green",
+        "canonical": "#1e8a4c",
+        "oklch": "oklch(56.0% 0.134 153)",
+        "tonalRamp": [
+          "#001400",
+          "#003103",
+          "#005118",
+          "#007236",
+          "#2f9658",
+          "#5bbc7c",
+          "#92e0a8",
+          "#c1ffd2"
+        ]
+      },
+      "issue-entry": {
+        "role": "secondary",
+        "displayName": "Entry Violet",
+        "canonical": "#6b3fa0",
+        "oklch": "oklch(46.9% 0.152 302)",
+        "tonalRamp": [
+          "#14002c",
+          "#300a53",
+          "#4f247d",
+          "#6e42a4",
+          "#9166cb",
+          "#b58df0",
+          "#d9b8ff",
+          "#fae0ff"
+        ]
+      },
+      "issue-common": {
+        "role": "secondary",
+        "displayName": "Common Teal",
+        "canonical": "#0f7c83",
+        "oklch": "oklch(53.5% 0.088 202)",
+        "tonalRamp": [
+          "#001217",
+          "#002e35",
+          "#004c53",
+          "#006c73",
+          "#2f9097",
+          "#59b5bc",
+          "#87dbe1",
+          "#b8fdff"
+        ]
+      },
+      "issue-slate": {
+        "role": "secondary",
+        "displayName": "Slate",
+        "canonical": "#55595f",
+        "oklch": "oklch(46.3% 0.011 258)",
+        "tonalRamp": [
+          "#080b10",
+          "#212429",
+          "#3c4046",
+          "#5a5e64",
+          "#7c8087",
+          "#a0a5ac",
+          "#c6cbd2",
+          "#eaeff6"
+        ]
+      },
+      "issue-lockout": {
+        "role": "secondary",
+        "displayName": "Lockout Plum",
+        "canonical": "#8a1c4a",
+        "oklch": "oklch(42.6% 0.149 1)",
+        "tonalRamp": [
+          "#250009",
+          "#4c0021",
+          "#750a3b",
+          "#9c2f59",
+          "#c5547b",
+          "#ec7b9f",
+          "#ffa9c6",
+          "#ffd4eb"
+        ]
+      },
+      "danger": {
+        "role": "status",
+        "displayName": "Danger Red",
+        "canonical": "#c21f18",
+        "oklch": "oklch(52.4% 0.197 29)",
+        "tonalRamp": [
+          "#2d0000",
+          "#570000",
+          "#850000",
+          "#b20002",
+          "#dd3f32",
+          "#ff7060",
+          "#ffa392",
+          "#ffd1c2"
+        ]
+      },
+      "success": {
+        "role": "status",
+        "displayName": "Success Green",
+        "canonical": "#1e7a44",
+        "oklch": "oklch(51.3% 0.119 153)",
+        "tonalRamp": [
+          "#001300",
+          "#003007",
+          "#00501d",
+          "#0d703b",
+          "#3e945d",
+          "#65ba80",
+          "#97deab",
+          "#c5ffd4"
+        ]
+      },
+      "night-board": {
+        "role": "neutral",
+        "displayName": "Night Board",
+        "canonical": "#121311",
+        "oklch": "oklch(18.5% 0.004 129)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#232422",
+          "#3f403e",
+          "#5d5e5b",
+          "#7f817e",
+          "#a4a5a2",
+          "#c9cbc8",
+          "#edefec"
+        ]
+      },
+      "night-panel": {
+        "role": "neutral",
+        "displayName": "Night Panel",
+        "canonical": "#1b1c1a",
+        "oklch": "oklch(22.5% 0.004 129)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#232422",
+          "#3f403e",
+          "#5d5e5c",
+          "#7f817e",
+          "#a4a5a2",
+          "#cacbc8",
+          "#edefec"
+        ]
+      },
+      "night-ink": {
+        "role": "neutral",
+        "displayName": "Night Ink",
+        "canonical": "#f3f4f1",
+        "oklch": "oklch(96.6% 0.004 122)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#242422",
+          "#3f403e",
+          "#5d5e5b",
+          "#80817e",
+          "#a4a5a2",
+          "#cacbc8",
+          "#eeefec"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Page name in block caps, such as the building address."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Next-step sign heading; panel headings at clamp(1.7rem, 3vw, 2.2rem)."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Problem-row titles, tool names, section sub-heads."
+      },
+      "numeral": {
+        "displayName": "Numeral",
+        "purpose": "DAY counts and board counts in block numerals, tabular."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, tags, timeline dates, disclosure summaries, top-bar items."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Every sentence in any language; the phone's own sans."
+      }
+    },
+    "darkMode": {
+      "strategy": "prefers-color-scheme; same signs on a dark board",
+      "issueHues": {
+        "heat": "#ff5a4e",
+        "leak": "#7d97ff",
+        "pests": "#4cc27f",
+        "entry": "#b48cf0",
+        "common": "#3cc2c9",
+        "slate": "#aab0b8",
+        "building": "#f3f4f1",
+        "lockout": "#f0709f",
+        "ink": "#121311"
+      },
+      "focus": "#8fa6ff",
+      "topBar": "#000000"
+    },
+    "shadows": [
+      {
+        "name": "floating-menu",
+        "value": "0 10px 24px -6px rgba(21, 21, 21, 0.18)",
+        "purpose": "Select popups only."
+      },
+      {
+        "name": "skip-link",
+        "value": "0 4px 12px -2px rgba(21, 21, 21, 0.14)",
+        "purpose": "Focused skip link."
+      },
+      {
+        "name": "input-focus-halo",
+        "value": "0 0 0 3px color-mix(in srgb, var(--color-focus) 25%, transparent)",
+        "purpose": "Input focus, with a focus-blue border."
+      }
+    ],
+    "rules": [
+      {
+        "name": "section-rule",
+        "value": "2px solid var(--color-border-strong)",
+        "purpose": "Opens each section, panel, problem row, and the timeline."
+      },
+      {
+        "name": "item-divider",
+        "value": "1px solid var(--color-border)",
+        "purpose": "Between list and timeline items."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Easing for all transitions and the count bump."
+      },
+      {
+        "name": "ease-standard",
+        "value": "160ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Colour and border state transitions."
+      },
+      {
+        "name": "count-bump",
+        "value": "1.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "The one motion moment: the Me too count is painted sign yellow and fades back."
+      },
+      {
+        "name": "disclosure-chevron",
+        "value": "200ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Helper-card chevron rotation."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms",
+        "purpose": "All animation and transition durations under prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "desktop-max",
+        "value": "1180px"
+      },
+      {
+        "name": "tablet",
+        "value": "900px"
+      },
+      {
+        "name": "small-tablet",
+        "value": "720px"
+      },
+      {
+        "name": "phone",
+        "value": "480px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default action: enamel black sign button with block caps.",
+      "html": "<button class=\"ds-btn\">Report a problem</button>",
+      "css": ".ds-btn { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; font-weight: 800; font-size: 1.12rem; letter-spacing: 0.04em; line-height: 1.05; min-height: 48px; padding: 8px 18px; border: 2px solid var(--color-primary, #151515); border-radius: var(--radius-sm, 3px); background: var(--color-primary, #151515); color: var(--color-primary-contrast, #fff); cursor: pointer; transition: background 160ms cubic-bezier(0.16,1,0.3,1), transform 120ms cubic-bezier(0.16,1,0.3,1); } .ds-btn:hover { background: var(--color-primary-hover, #2b2b2b); border-color: var(--color-primary-hover, #2b2b2b); } .ds-btn:active { background: var(--color-primary-active, #000); transform: translateY(1px); } .ds-btn:focus-visible { outline: 3px solid var(--color-focus, #1f3fa6); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Second action beside a primary, such as Me too.",
+      "html": "<button class=\"ds-btn-secondary\">Me too</button>",
+      "css": ".ds-btn-secondary { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; font-weight: 800; font-size: 1.12rem; letter-spacing: 0.04em; line-height: 1.05; min-height: 48px; padding: 8px 18px; border: 2px solid var(--color-border-strong, #151515); border-radius: var(--radius-sm, 3px); background: var(--color-surface, #fff); color: var(--color-text-primary, #151515); cursor: pointer; transition: background 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-secondary:hover { background: var(--color-surface-subtle, #e9ebe6); } .ds-btn-secondary:active { background: var(--color-surface-muted, #dcdfd8); transform: translateY(1px); } .ds-btn-secondary:focus-visible { outline: 3px solid var(--color-focus, #1f3fa6); outline-offset: 2px; }"
+    },
+    {
+      "name": "Next-Step Sign",
+      "kind": "custom",
+      "refersTo": "next-sign",
+      "description": "The one chrome yellow board: the step a resident can take now.",
+      "html": "<div class=\"ds-next-sign\"><h2>Add my 311 number</h2><p>This issue qualifies for a 311 inspection. No 311 request is logged.</p><button>Add my 311 number</button></div>",
+      "css": ".ds-next-sign { background: var(--color-sign, #f2c200); color: var(--color-sign-ink, #151515); border-radius: var(--radius-lg, 4px); padding: 18px 20px 20px; display: grid; gap: 8px; } .ds-next-sign h2 { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; margin: 0; font-weight: 800; font-size: clamp(2rem, 6vw, 3rem); line-height: 0.9; } .ds-next-sign p { margin: 0; font-size: 1.02rem; font-weight: 500; } .ds-next-sign button { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; justify-self: start; margin-top: 6px; min-height: 52px; padding: 8px 18px; font-weight: 800; font-size: 1.25rem; letter-spacing: 0.04em; background: var(--color-sign-ink, #151515); color: var(--color-sign, #f2c200); border: 2px solid var(--color-sign-ink, #151515); border-radius: var(--radius-sm, 3px); cursor: pointer; } .ds-next-sign button:hover { background: #000; color: #ffd21a; } .ds-next-sign button:focus-visible { outline: 3px solid var(--color-focus, #1f3fa6); outline-offset: 2px; }"
+    },
+    {
+      "name": "Problem Row",
+      "kind": "custom",
+      "refersTo": "problem-row",
+      "description": "One open problem: enamel bar, block-caps title, facts, day count in block numerals.",
+      "html": "<article class=\"ds-row\" style=\"--issue: var(--issue-heat, #d3261e)\"><span class=\"ds-row-bar\"></span><div><h3>Heat not working</h3><p>Started Oct 12, 2026. Me too: 5</p></div><p class=\"ds-row-days\"><b>9</b><span>Days</span></p></article>",
+      "css": ".ds-row { display: grid; grid-template-columns: 8px minmax(0,1fr) auto; column-gap: 14px; padding: 14px 0; border-top: 2px solid var(--color-border-strong, #151515); } .ds-row-bar { border-radius: 1px; background: var(--issue); } .ds-row h3 { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; margin: 0 0 4px; font-weight: 800; font-size: clamp(1.35rem, 3.6vw, 1.6rem); line-height: 1; } .ds-row p { margin: 0; font-size: 0.92rem; color: var(--color-text-secondary, #363833); } .ds-row-days { display: grid; justify-items: end; align-content: start; line-height: 1; } .ds-row-days b { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; font-size: clamp(2.6rem, 8vw, 3.4rem); font-weight: 900; line-height: 0.85; color: var(--color-text-primary, #151515); font-variant-numeric: tabular-nums; } .ds-row-days span { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.08em; color: var(--color-text-muted, #595c55); }"
+    },
+    {
+      "name": "Issue Filter Chip",
+      "kind": "chip",
+      "refersTo": "fact-tag",
+      "description": "Painted tag with the issue's enamel square; selected fills with the enamel.",
+      "html": "<button class=\"ds-chip\" style=\"--issue: var(--issue-leak, #1f3fa6)\">Water leak (1)</button> <button class=\"ds-chip\" aria-current=\"true\" style=\"--issue: var(--issue-heat, #d3261e)\">Heat (1)</button>",
+      "css": ".ds-chip { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; display: inline-flex; align-items: center; min-height: 40px; padding: 4px 12px; border: 2px solid var(--color-border-strong, #151515); border-radius: var(--radius-sm, 3px); background: var(--color-surface, #fff); color: var(--color-text-primary, #151515); font-size: 1.02rem; font-weight: 700; letter-spacing: 0.03em; cursor: pointer; } .ds-chip::before { content: ''; width: 10px; height: 10px; margin-right: 8px; border-radius: 1px; background: var(--issue); } .ds-chip:hover { background: var(--color-surface-subtle, #e9ebe6); } .ds-chip[aria-current='true'] { background: var(--issue); border-color: var(--issue); color: var(--issue-ink, #fff); } .ds-chip[aria-current='true']::before { background: var(--issue-ink, #fff); } .ds-chip:focus-visible { outline: 3px solid var(--color-focus, #1f3fa6); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Form field: 2px edge, system font, blue focus.",
+      "html": "<label class=\"ds-label\">Date<input class=\"ds-input\" type=\"date\" value=\"2026-10-21\"></label>",
+      "css": ".ds-label { display: grid; gap: 6px; font-weight: 600; font-size: 0.95rem; color: var(--color-text-primary, #151515); } .ds-input { min-height: 48px; padding: 10px 12px; font: inherit; font-size: 1rem; border: 2px solid var(--color-border-hover, #8d9088); border-radius: var(--radius-sm, 3px); background: var(--color-surface, #fff); color: var(--color-text-primary, #151515); transition: border-color 160ms, box-shadow 160ms; } .ds-input:hover { border-color: var(--color-border-strong, #151515); } .ds-input:focus { outline: none; border-color: var(--color-focus, #1f3fa6); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-focus, #1f3fa6) 25%, transparent); }"
+    },
+    {
+      "name": "Top Bar",
+      "kind": "nav",
+      "refersTo": "top-bar",
+      "description": "Black sign bar with the name in block caps and an always-visible Quick exit.",
+      "html": "<header class=\"ds-bar\"><span class=\"ds-bar-name\">Tenant Tools<small>Resident access</small></span><a class=\"ds-bar-exit\" href=\"#\">Quick exit</a></header>",
+      "css": ".ds-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; background: #151515; color: #f3f4f1; } .ds-bar-name { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; display: flex; flex-direction: column; font-weight: 800; font-size: 1.2rem; letter-spacing: 0.04em; line-height: 1; } .ds-bar-name small { font-family: inherit; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-transform: none; letter-spacing: 0; font-size: 0.75rem; font-weight: 400; color: #b9bcb4; margin-top: 3px; } .ds-bar-exit { font-family: var(--font-display, 'Big Shoulders', 'Arial Narrow', sans-serif); text-transform: uppercase; display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: var(--radius-sm, 3px); background: #f3f4f1; color: #151515; font-size: 1.05rem; font-weight: 800; letter-spacing: 0.05em; text-decoration: none; } .ds-bar-exit:hover, .ds-bar-exit:focus-visible { background: #fff; } .ds-bar-exit:focus-visible { outline: 3px solid #8fa6ff; outline-offset: 2px; }"
+    },
+    {
+      "name": "Issue Tile",
+      "kind": "card",
+      "refersTo": "issue-option-card",
+      "description": "Notice-builder choice with a 40px enamel icon tile; selected fills with the enamel.",
+      "html": "<button class=\"ds-tile\" style=\"--issue: var(--issue-leak, #1f3fa6)\"><span class=\"ds-tile-icon\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3c3 4.2 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 3-6.8 6-11z\"/><path d=\"M9.5 15a2.5 2.5 0 0 0 2.5 2.5\"/></svg></span><span>Water leak</span></button>",
+      "css": ".ds-tile { display: grid; grid-template-columns: 40px minmax(0,1fr); gap: 10px; align-items: center; min-height: 64px; min-width: 220px; padding: 10px; text-align: left; font: inherit; font-size: 0.92rem; font-weight: 600; border: 2px solid var(--color-border, #c9ccc4); border-radius: var(--radius-sm, 3px); background: var(--color-surface, #fff); color: var(--color-text-primary, #151515); cursor: pointer; transition: border-color 160ms, background 160ms, color 160ms; } .ds-tile:hover { border-color: var(--issue); } .ds-tile:focus-visible { outline: 3px solid var(--color-focus, #1f3fa6); outline-offset: 2px; } .ds-tile-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--radius-sm, 3px); background: var(--issue); color: var(--issue-ink, #fff); } .ds-tile-icon svg { width: 26px; height: 26px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Block Signage",
+    "overview": "**Creative North Star: \"Block Signage\"**\n\nThe building's problems read like the painted signs on a Chicago block: storefront and sign-painter lettering in big block words, flat enamel colour on a cool white wall, and one yellow sign that tells a resident what they can do next. A resident on a phone, often reading in a second language, should see their building's name in block capitals, read the one yellow sign, tap it, and leave.\n\nDensity is calm and columnar. Problems are rows, not cards: an issue-colour bar on the left, a block-letter title, plain-language facts, and a day count painted big on the right. Sections are separated by 2px black rules painted across the wall, never boxed. Night mode is the same signs painted on a dark board, not a different theme.\n\nThe world refuses the dark SaaS card grid and the cream-paper \"ledger\" look it replaced. Nothing glows, floats, or shines: no gradients, no glass, no offset shadows.",
+    "keyCharacteristics": [
+      "Big Shoulders block gothic in caps for headings, labels, buttons, and numerals; the phone's own sans for every sentence.",
+      "Chrome yellow appears once per screen, on the one unlocked next step.",
+      "One flat enamel hue per issue type, the same on every screen.",
+      "2px black rules instead of card boxes; corners of 2 to 6px.",
+      "One motion moment: the \"Me too\" count bump."
+    ],
+    "rules": [
+      {
+        "name": "The One Yellow Sign Rule",
+        "body": "Chrome yellow marks the one next step a resident can take now. It is never decoration, never a highlight, and never a warning. The single other use is the \"Me too\" count flash, which confirms the resident's own action and fades within 1.4s.",
+        "section": "colors"
+      },
+      {
+        "name": "The Neutral Warning Rule",
+        "body": "Warnings use the Wall Shade board with a black rule and black text. Yellow belongs to the next step only.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Hue Per Problem Rule",
+        "body": "An issue type's enamel is the same on every screen and in every mode's lightness step. Never pick an issue colour per page, and never give two issue types the same hue except the slate pair.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two Voices Rule",
+        "body": "Big Shoulders sets h1 to h4, labels, buttons, and numerals, always in caps. It never sets a sentence. Anything a resident reads as a sentence, in any language, is the system font.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lined-Up Numbers Rule",
+        "body": "Dates, counts, and table cells use tabular figures so they line up in columns.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Paint Rule",
+        "body": "Surfaces at rest never have a shadow. No gradients, no glass, no backdrop blur, no hard offset shadows.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Rule Not Box Rule",
+        "body": "Group content under a 2px black top rule. Do not draw a four-sided card around it.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "**Do** give each screen at most one Chrome Sign Yellow board, and only for a step the resident can take now.",
+      "**Do** key every issue colour through `data-issue` so the hue matches across rows, filters, tiles, and plates.",
+      "**Do** set h1 to h4, labels, buttons, and numerals in Big Shoulders caps; set every sentence in the system font.",
+      "**Do** separate sections with a 2px Enamel Black rule and divide list items with 1px light rules.",
+      "**Do** keep corners between 2px and 6px and touch targets at least 48px (40px for compact buttons and tags).",
+      "**Do** paint the same signs on Night Board in dark mode, using the lighter enamel steps from `base.css`.",
+      "**Do** honour `prefers-reduced-motion` and keep print output black on white with the rules intact."
+    ],
+    "donts": [
+      "**Don't** use yellow for warnings, highlights, badges, or decoration; warnings are a Wall Shade board with a black rule.",
+      "**Don't** wrap content in four-sided cards or add resting shadows.",
+      "**Don't** use gradients, glass, backdrop blur, or hard offset shadows.",
+      "**Don't** set body sentences in Big Shoulders; it does not cover the languages the notices use.",
+      "**Don't** add motion beyond the \"Me too\" count bump and short colour transitions.",
+      "**Don't** introduce a new issue hue without adding it to the enamel set in `base.css` for both light and dark."
+    ]
+  }
+}

@@ -218,7 +218,7 @@ const RecordPanel = ({
           <details className="helper-card">
             <summary>Where to get help</summary>
             <div className="helper-card-body help-resources">
-              <p>Building Ledger does not share your data with these groups.</p>
+              <p>Tenant Tools does not share your data with these groups.</p>
               {helpResourceGroups.map((group) => (
                 <div key={group.id} className="help-group">
                   <h4>{group.title}</h4>

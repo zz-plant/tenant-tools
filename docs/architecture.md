@@ -1,6 +1,6 @@
 # Architecture
 
-This document explains how Building Ledger is organized today, where safety checks happen, and which boundaries contributors must keep intact.
+This document explains how Tenant Tools is organized today, where safety checks happen, and which boundaries contributors must keep intact.
 
 ## Runtime and stack
 
