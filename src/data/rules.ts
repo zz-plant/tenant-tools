@@ -280,6 +280,16 @@ export const getFairNoticeRule = (onDate: string = todayIso()) => {
   };
 };
 
+/** The landlord entry rule in effect on `onDate`, with the section and sources to cite. */
+export const getEntryNoticeRule = (onDate: string = todayIso()) => {
+  const provision = rltoProvisionPack.provisions.find((entry) => entry.id === "entry_notice");
+  const version = provision ? selectVersionInEffect(provision, onDate) : undefined;
+  if (!version) {
+    return null;
+  }
+  return { section: version.section, sources: resolveSources(rltoProvisionPack, [version]) };
+};
+
 /** Every RLTO provision in effect or passed on `onDate`, for the printable rights page. */
 export const getAllProvisionCards = (onDate: string = todayIso()): RuleCard[] =>
   rltoProvisionPack.provisions.map((provision) => buildProvisionCard(rltoProvisionPack, provision, onDate)).filter(isCard);

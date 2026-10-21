@@ -4,6 +4,9 @@
 
 ### Added
 
+- Dated facts for notices from management: "Notice of entry from management received" and "Notice from management received". Each can say how the notice came (email, rent portal, mail, a note on the door, and so on).
+- "Did the notice give 2 days?" on the record page, for entry notices. Add when the notice arrived and when they plan to enter, and it compares them with RLTO 5-12-050 (48 hours, entry between 8 AM and 8 PM). It runs in the browser only. Nothing in it is saved.
+- "Follow-up notice sent" and "Final reminder sent" can say how you sent them, for example "Follow-up notice sent (by certified mail)".
 - Joint letter: "Each household sends its own copy of the same letter". The letter is written as "I", ends with [YOUR NAME] and [YOUR UNIT] for each resident to fill in their own email, and the page says not to add other residents' names or copy the whole group. Then each household has sent its own written notice, and no list of names and units goes to management in one message.
 - "Your lease" in the notice builder: copy a section number and its exact words. The notice adds "My lease, section 7, says: "…"" only after you check that both come from the same part of the lease. A wrong section number lets the other side dismiss a whole notice. The quote stays in the notice and is never saved to the shared record.
 - For lost services (parking, City work, trash, common areas), the builder says: paying less rent can lead to an eviction case; talk to a tenant group or legal aid first.

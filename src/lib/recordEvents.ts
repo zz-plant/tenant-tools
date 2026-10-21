@@ -3,8 +3,8 @@ import { getSensitiveContentMessages, isValidDateString, sanitizeLimitedText } f
 /*
  * Dated facts a resident adds to a saved record after the first notice: management replies,
  * portal requests closed without a repair, offers of entry, city inspections, and changes that
- * came after a repair request. Each fact is a type from a fixed list, a date, and for two types
- * a short reference number. There is no free text.
+ * came after a repair request. Each fact is a type from a fixed list, a date, and for some types
+ * a short reference: a work order or 311 number, or how a notice was sent. There is no free text.
  */
 
 export const recordEventTypes = [
@@ -12,10 +12,12 @@ export const recordEventTypes = [
   "final_notice_sent",
   "reply_due",
   "management_replied",
+  "management_notice",
   "repair_date_promised",
   "repair_visit_missed",
   "portal_marked_complete",
   "entry_offered",
+  "entry_notice_received",
   "inspection_done",
   "request_311_filed",
   "ward_office_asked",
@@ -46,8 +48,20 @@ type RecordEventDefinition = {
 };
 
 export const recordEventDefinitions: Record<RecordEventType, RecordEventDefinition> = {
-  follow_up_sent: { label: "Follow-up notice sent", group: "follow_up", dateLabel: "Date sent" },
-  final_notice_sent: { label: "Final reminder sent", group: "follow_up", dateLabel: "Date sent" },
+  follow_up_sent: {
+    label: "Follow-up notice sent",
+    group: "follow_up",
+    dateLabel: "Date sent",
+    refLabel: "How you sent it (optional)",
+    refPrefix: "by",
+  },
+  final_notice_sent: {
+    label: "Final reminder sent",
+    group: "follow_up",
+    dateLabel: "Date sent",
+    refLabel: "How you sent it (optional)",
+    refPrefix: "by",
+  },
   reply_due: {
     label: "Reply requested by",
     group: "follow_up",
@@ -55,6 +69,13 @@ export const recordEventDefinitions: Record<RecordEventType, RecordEventDefiniti
     allowsFuture: true,
   },
   management_replied: { label: "Management replied", group: "follow_up", dateLabel: "Date of the reply" },
+  management_notice: {
+    label: "Notice from management received",
+    group: "follow_up",
+    dateLabel: "Date the notice arrived",
+    refLabel: "How it came (optional)",
+    refPrefix: "by",
+  },
   repair_date_promised: {
     label: "Repair date promised",
     group: "follow_up",
@@ -77,6 +98,13 @@ export const recordEventDefinitions: Record<RecordEventType, RecordEventDefiniti
     label: "Resident offered entry for repair or treatment",
     group: "access",
     dateLabel: "Date entry was offered",
+  },
+  entry_notice_received: {
+    label: "Notice of entry from management received",
+    group: "access",
+    dateLabel: "Date the notice arrived",
+    refLabel: "How it came (optional)",
+    refPrefix: "by",
   },
   inspection_done: {
     label: "City inspection happened",
@@ -125,6 +153,20 @@ export const recordEventDefinitions: Record<RecordEventType, RecordEventDefiniti
     dateLabel: "Date the notice arrived",
   },
 };
+
+/** Suggestions for "How you sent it" and "How it came". Residents can type something else. */
+export const deliveryMethodSuggestions = [
+  "email",
+  "rent portal",
+  "mail",
+  "certified mail",
+  "in person",
+  "text message",
+  "note on the door",
+] as const;
+
+/** True when the fact's reference says how a notice was sent, not a number. */
+export const takesDeliveryMethod = (type: RecordEventType) => recordEventDefinitions[type].refPrefix === "by";
 
 export const recordEventGroups: Array<{ id: RecordEventGroup; label: string }> = [
   { id: "follow_up", label: "Management follow-up" },
@@ -248,7 +290,9 @@ const followUpSummaryLabels: Partial<Record<RecordEventType, string>> = {
   portal_marked_complete: "Marked complete, not fixed",
   repair_visit_missed: "Missed repair visits",
   entry_offered: "Entry offered",
+  entry_notice_received: "Entry notices received",
   management_replied: "Management replies",
+  management_notice: "Notices from management",
   inspection_done: "City inspections",
   request_311_filed: "311 requests",
   ward_office_asked: "Ward office asked",
