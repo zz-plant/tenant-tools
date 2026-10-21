@@ -138,6 +138,21 @@ const portfolio = firstRecord?.portfolio ?? "other";
                   </label>
                 </fieldset>
 
+                <fieldset class="facts-form" data-signing-fields>
+                  <legend>How to send it</legend>
+                  <label class="checkbox-label">
+                    <input type="radio" name="signing" value="group" data-letter-signing checked />
+                    One letter from the group, with the number of households
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="radio" name="signing" value="household" data-letter-signing />
+                    Each household sends its own copy of the same letter
+                  </label>
+                  <p class="helper">
+                    With one copy per household, each household sends its own written notice, and no list of names goes to management.
+                  </p>
+                </fieldset>
+
                 <fieldset class="facts-form">
                   <legend>Problems to include</legend>
                   {openIssues.length === 0 ? (
@@ -228,6 +243,14 @@ const portfolio = firstRecord?.portfolio ?? "other";
               </p>
               <p class="helper no-print" data-letter-status role="status" aria-live="polite"></p>
               <p class="helper no-print">Before you send: remove names and unit numbers. Keep a copy and the date you sent it.</p>
+              <div class="helper-card no-print" hidden data-household-tips>
+                <p><strong>Sending your own copy</strong></p>
+                <ul class="submission-detail-list">
+                  <li>Copy the letter. Add your name and unit in your own email, where it says [YOUR NAME] and [YOUR UNIT].</li>
+                  <li>Send it from your own email or by mail. Keep the date you sent it.</li>
+                  <li>Do not add other residents' names or emails. Do not copy the whole group on one email.</li>
+                </ul>
+              </div>
               <a class="button button-secondary no-print" href={dashboardUrl}>Back to building dashboard</a>
             </section>
           </>

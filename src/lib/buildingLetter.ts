@@ -27,8 +27,16 @@ export type LetterCopyRecipient = keyof typeof letterCopyRecipients;
 /** "management": joint repair-plan request. "alderperson": meeting request to the ward office. */
 export type LetterKind = "management" | "alderperson";
 
+/**
+ * "group": one letter signed with a household count. "household": the same text, which each household
+ * sends on its own with its own name. Then no list of names and units goes to management in one
+ * message, and each household has sent its own written notice.
+ */
+export type LetterSigning = "group" | "household";
+
 export type BuildingLetterInput = {
   kind?: LetterKind;
+  signing?: LetterSigning;
   building: string;
   /** `YYYY-MM-DD` */
   today: string;
@@ -148,7 +156,65 @@ const buildAlderpersonLetter = ({
 export const buildBuildingLetter = (input: BuildingLetterInput) =>
   input.kind === "alderperson" ? buildAlderpersonLetter(input) : buildManagementLetter(input);
 
-const buildManagementLetter = ({
+const buildManagementLetter = (input: BuildingLetterInput) =>
+  input.signing === "household" ? buildHouseholdLetter(input) : buildGroupLetter(input);
+
+/** One household's copy of the shared letter. The resident adds their own name in their own email. */
+const buildHouseholdLetter = ({ building, today, issues, households, replyBy, copyTo, ward, simple }: BuildingLetterInput) => {
+  const address = building.trim() || "[ADDRESS]";
+  const replyDate = formatDay(replyBy) || "[REPLY DATE]";
+  const showHouseholds = Number.isFinite(households) && households >= minCountShown;
+  const problemLines = issues.length > 0 ? issues.map((issue) => issueLine(issue, simple)) : ["- [PROBLEM]"];
+  const copies = copyLines(copyTo, ward);
+
+  const lines = simple
+    ? [
+        `Date: ${formatDay(today)}`,
+        "",
+        `I live at ${address}.`,
+        showHouseholds ? `${Math.floor(households)} households are sending this same letter.` : null,
+        "These problems are not fixed:",
+        ...problemLines,
+        "",
+        `Please send me a written repair plan by ${replyDate}.`,
+        "For each problem, please write:",
+        "- what you will fix",
+        "- the start date",
+        "- the end date",
+        copies.length > 0 ? "" : null,
+        copies.length > 0 ? "Copies sent to:" : null,
+        ...copies,
+        "",
+        "[YOUR NAME]",
+        "[YOUR UNIT]",
+      ]
+    : [
+        `Date: ${formatDay(today)}`,
+        "To: Building management and owner",
+        "",
+        `I live at ${address}.`,
+        showHouseholds ? `Residents of ${Math.floor(households)} households are each sending this same letter.` : null,
+        "",
+        "These problems are not fixed:",
+        ...problemLines,
+        "",
+        `I request a written repair plan by ${replyDate}.`,
+        "For each problem, the plan should list:",
+        "- the repair work",
+        "- the date the work will start",
+        "- the date the work will be finished",
+        copies.length > 0 ? "" : null,
+        copies.length > 0 ? "Copies of this letter were sent to:" : null,
+        ...copies,
+        "",
+        "[YOUR NAME]",
+        "[YOUR UNIT]",
+      ];
+
+  return lines.filter((line): line is string => line !== null).join("\n");
+};
+
+const buildGroupLetter = ({
   building,
   today,
   issues,

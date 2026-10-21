@@ -4,6 +4,7 @@
 
 ### Added
 
+- Joint letter: "Each household sends its own copy of the same letter". The letter is written as "I", ends with [YOUR NAME] and [YOUR UNIT] for each resident to fill in their own email, and the page says not to add other residents' names or copy the whole group. Then each household has sent its own written notice, and no list of names and units goes to management in one message.
 - "Your lease" in the notice builder: copy a section number and its exact words. The notice adds "My lease, section 7, says: "…"" only after you check that both come from the same part of the lease. A wrong section number lets the other side dismiss a whole notice. The quote stays in the notice and is never saved to the shared record.
 - For lost services (parking, City work, trash, common areas), the builder says: paying less rent can lead to an eviction case; talk to a tenant group or legal aid first.
 - Five problem types: "City work blocks part of the building", "Paid parking I cannot use", "Trash or recycling changed or not working", "Doors, fobs, or locks not working", and "Damage from building work". Each has a first notice, a follow-up, and a final reminder, in Standard and Very simple English. The notices ask for a written answer or a credit; they never say rent will be held back.
