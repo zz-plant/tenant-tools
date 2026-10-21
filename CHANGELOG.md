@@ -4,6 +4,12 @@
 
 ### Added
 
+- "Send it to" in the notice builder: the owner, the property manager, the portal, and the address for written notices that a steward saved, right under Copy, Email, and Text. It shows only on a device with the building key.
+- A row of group tool links near the top of the building dashboard on phones. Before, Group tools were below every problem, about 2 screens down (3 screens for stewards). Stewards also see Canvass, Who to send notices to, and Steward tools in the row.
+- "Your rights" (the short printable guide) is in Group tools, and each record page links to it.
+- Record page: "Add a photo", "Tell your neighbors", and "Print" on the first screen go straight to those parts of the page. "Upload photo" was almost 3 screens down.
+- The steward page links each building's "Who to send notices to" and "Canvass tally". The "Steward" badge in the header opens the steward page.
+- Joint letter: "See the letter" goes straight to the letter.
 - "Who to send notices to": a steward notes the owner, the property manager, the rent or repair portal, and the address for written notices (RLTO 5-12-090). Residents with the building key see it on the dashboard and on the joint letter page. Business names and mailing addresses only: email addresses and phone numbers are rejected. It is in the steward export and is removed by the emergency wipe.
 - Dated facts for notices from management: "Notice of entry from management received" and "Notice from management received". Each can say how the notice came (email, rent portal, mail, a note on the door, and so on).
 - "Did the notice give 2 days?" on the record page, for entry notices. Add when the notice arrived and when they plan to enter, and it compares them with RLTO 5-12-050 (48 hours, entry between 8 AM and 8 PM). It runs in the browser only. Nothing in it is saved.
@@ -17,6 +23,11 @@
 
 ### Changed
 
+- Notice builder: after you tap a problem, the building and the problem fold to one line with "Change". The start date, Copy, Email, and Text are then on the same screen. A choice made with the keyboard does not fold the list, because arrow keys change the choice. "Done" folds it.
+- Notice builder: the notice language (Simple English, Standard English, Español, Polski) comes before Copy, Email, and Text, so the notice is in the right language when you copy it.
+- Notice builder: "I sent it" (from a record) and "When you send, also save it" come right after the send buttons. From a record, "I sent it" is on the first screen.
+- Group 311 day: the group chat message and its Copy button come first. What to say to 311 comes after.
+- Joint letter: Copy, Print, and Save come before the letter text.
 - Notice builder on phones: the preview, save, and record panels show on step 4 only. Step 1 went from about 8,000 to 3,400 pixels tall. Step 1 can show the notice text ("See the notice"), and step 4 shows it once, not twice.
 - The builder says that Tenant Tools sends nothing. Email and Text open your own app, and nothing goes out until you press send there.
 - Before you save, the timeline says "Notice sent, if you send it today", not "Notice sent".
@@ -32,6 +43,10 @@
 ### Fixed
 
 - Next-step dates in the notice builder showed the day before (a start date of Oct 21 showed a reminder on Oct 20), and Google Calendar reminders were set a day early.
+
+### Security
+
+- The offline copy of the home page is saved without cookies, so it never holds a resident's building or the notice contacts. Offline copies saved by the old version are deleted.
 
 ## 1.11.0 - 2026-10-21
 
