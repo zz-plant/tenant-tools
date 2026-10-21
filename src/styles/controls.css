@@ -7,7 +7,7 @@
   padding: 8px 18px;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.12rem;
+  font-size: var(--text-md);
   letter-spacing: 0.04em;
   line-height: 1.05;
   text-transform: uppercase;
@@ -73,7 +73,7 @@
 
 .button-compact {
   padding: 6px 12px;
-  font-size: 0.98rem;
+  font-size: var(--text-base);
   min-height: 40px;
 }
 
@@ -82,7 +82,7 @@
   background: none;
   color: var(--color-text-primary);
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   cursor: pointer;
   padding: 0;
   display: inline-flex;
@@ -114,14 +114,14 @@ label {
   display: grid;
   gap: 6px;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   color: var(--color-text-primary);
 }
 
 .label-optional {
   color: var(--color-text-muted);
   font-weight: 400;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
 }
 
 .input,
@@ -129,7 +129,7 @@ label {
   border-radius: var(--radius-sm);
   border: 2px solid var(--color-border-hover);
   padding: 10px 12px;
-  font-size: 1rem;
+  font-size: var(--text-base);
   line-height: 1.4;
   font-family: inherit;
   background-color: var(--color-surface);
@@ -170,7 +170,7 @@ label {
    ========================================================================== */
 .select-icon {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
 }
 
 .select-positioner {
@@ -201,7 +201,7 @@ label {
   padding: 8px 10px;
   border-radius: var(--radius-xs);
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
   transition: background var(--ease-standard);
 }
@@ -217,7 +217,7 @@ label {
 
 .select-item-indicator {
   color: var(--color-primary);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 /* ==========================================================================
@@ -236,7 +236,7 @@ label {
   gap: 10px;
   min-height: 36px;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   color: var(--color-text-primary);
   cursor: pointer;
   user-select: none;
@@ -266,7 +266,7 @@ label {
 
 .checkbox-indicator {
   color: var(--color-primary-contrast);
-  font-size: 0.72rem;
+  font-size: var(--text-xs);
   font-weight: 700;
 }
 
@@ -314,7 +314,7 @@ label {
 
 .stage-selector legend {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   color: var(--color-text-primary);
 }
 
@@ -390,7 +390,7 @@ label {
 .preset-title {
   margin: 0 0 2px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: var(--text-base);
   color: var(--color-text-primary);
 }
 
@@ -406,7 +406,7 @@ label {
 
 .submission-block h3 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: var(--text-lg);
 }
 
 .submission-actions {
@@ -422,7 +422,7 @@ label {
   background: var(--color-success-subtle);
   border: 1px solid var(--color-success-border);
   color: var(--color-success-text);
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.45;
 }
 
@@ -439,7 +439,7 @@ label {
   background: var(--color-danger-subtle);
   border: 1px solid var(--color-danger-border);
   color: var(--color-danger-text);
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
 }
 
 .submission-details {
@@ -452,7 +452,7 @@ label {
   margin: 0;
   padding-left: 18px;
   color: var(--color-text-secondary);
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.55;
 }
 
@@ -495,7 +495,7 @@ label {
 
 .similar-issue-card h3 {
   margin: 0 0 2px;
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   color: var(--color-text-primary);
 }
 
@@ -521,7 +521,7 @@ label {
 .similar-issue-title {
   margin: 0 0 2px;
   font-weight: 600;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
 }
 
@@ -535,13 +535,13 @@ label {
   margin: 0;
   color: var(--color-success-text);
   font-weight: 500;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .similar-issue-error {
   margin: 0;
   color: var(--color-danger-text);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .similar-issue-footer {
@@ -581,7 +581,7 @@ label {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.15rem;
+  font-size: var(--text-md);
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--color-text-primary);
@@ -591,7 +591,7 @@ label {
 .timeline-label {
   margin: 0;
   color: var(--color-text-primary);
-  font-size: 0.98rem;
+  font-size: var(--text-base);
 }
 
 /* ==========================================================================
@@ -612,7 +612,7 @@ label {
   list-style: none;
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 1.12rem;
+  font-size: var(--text-md);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   color: var(--color-text-primary);
@@ -651,7 +651,7 @@ label {
   gap: 8px;
   padding-top: 10px;
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
+  font-size: var(--text-base);
   line-height: 1.5;
 }
 
@@ -666,7 +666,7 @@ label {
   padding: 5px 10px;
   color: var(--color-warning-text);
   font-weight: 500;
-  font-size: 0.82rem;
+  font-size: var(--text-xs);
   display: inline-block;
 }
 
@@ -698,7 +698,7 @@ label {
 .next-step-title {
   margin: 0 0 2px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
 }
 
@@ -740,7 +740,7 @@ label {
 .impact-count {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 3rem;
+  font-size: var(--text-3xl);
   font-weight: 900;
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
@@ -750,13 +750,13 @@ label {
 .impact-label {
   margin: 0;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   color: var(--color-text-primary);
 }
 
 .impact-hint {
   margin: 2px 0 0;
-  font-size: 0.8rem;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
@@ -791,7 +791,7 @@ label {
   padding-left: 18px;
   color: var(--color-text-secondary);
   line-height: 1.5;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
 }
 
 /* ==========================================================================
@@ -801,7 +801,7 @@ label {
   display: grid;
   gap: 6px;
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-sm);
   padding: 16px 0 8px;
   border-top: var(--rule);
   margin-top: 12px;
