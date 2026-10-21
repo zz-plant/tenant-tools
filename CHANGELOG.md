@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.11.0 - 2026-10-21
+
+### Added
+
+- The ward office as a later step. Two weeks after a 311 request, if the final reminder went out and no repair is logged, the record's next step is "Ask the ward office for a meeting". It opens the joint letter page with the meeting request to the Office of the Alderperson already chosen. The office is named, never a person.
+
+### Fixed
+
+- After a final reminder was sent, a passed RLTO date still offered "Send the final reminder" again, ahead of 311. It no longer does.
+
 ## 1.10.0 - 2026-10-21
 
 ### Changed
