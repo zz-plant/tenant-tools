@@ -53,10 +53,13 @@ describe("getSubmissionTimelineEntries", () => {
       startDate: "2026-09-28",
       reportDate: "2026-10-01",
     });
+    // A rule date is marked as counted, so the record page does not show it as a reported event.
     assert.deepEqual(stageA.at(-1), {
       label: "14 days after first written notice (RLTO 5-12-110)",
       date: "2026-10-15",
+      counted: true,
     });
+    assert.equal(stageA[0].counted, undefined);
 
     const stageB = getSubmissionTimelineEntries({
       stage: "B",

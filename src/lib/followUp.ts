@@ -119,6 +119,58 @@ export const followUpActionHref = (item: FollowUpItem) =>
     ? buildRecordFactUrl(item.recordId, item.action.fact)
     : buildRecordNoticeUrl(item.recordId);
 
+/**
+ * The one next step for an open record, for its dashboard row and the dashboard's next-step sign.
+ * A "Needs follow-up" item comes first (a missing reply, a missed repair date, 311). Otherwise it is
+ * the next notice, or the date it unlocks. After the final reminder the step is "done": the
+ * follow-up items carry the next normal step from there.
+ */
+export type RecordNextStep = {
+  label: string;
+  href: string;
+  state: "ready" | "locked" | "done";
+  /** What the button opens: the notice builder, a dated fact on the record, or the record itself. */
+  opens: "notice" | "fact" | "record";
+  note?: string;
+};
+
+export const nextStepForRecord = (
+  record: SubmissionRecord,
+  events: RecordEvent[],
+  today: string,
+  followUpItems: FollowUpItem[]
+): RecordNextStep => {
+  const item = followUpItems.find((entry) => entry.recordId === record.id);
+  if (item) {
+    return {
+      label: item.action.label,
+      href: followUpActionHref(item),
+      state: "ready",
+      opens: item.action.kind,
+      note: item.message,
+    };
+  }
+  const recordHref = `/submissions/${encodeURIComponent(record.id)}`;
+  const start = record.startDate || record.reportDate || today;
+  if (countedNotices({ ...record, startDate: start }, events).finalDate) {
+    return { label: "Final reminder sent", href: recordHref, state: "done", opens: "record" };
+  }
+  const next = nextNoticeStage(record, events, today);
+  if (next.unlockDate) {
+    const step = next.stage === "A" ? "Follow-up" : "Final reminder";
+    return { label: `${step} from ${formatTimelineDate(next.unlockDate)}`, href: recordHref, state: "locked", opens: "record" };
+  }
+  return { label: noticeStageActionLabels[next.stage], href: buildRecordNoticeUrl(record.id), state: "ready", opens: "notice" };
+};
+
+/** Button text for a ready step: a fact step names its action ("Add my 311 number"), as on its row. */
+export const nextStepButtonLabel = (step: RecordNextStep) =>
+  step.opens === "notice" ? "Open the notice" : step.opens === "fact" ? step.label : "Open the record";
+
+/** Whole days from the start date to today. Never negative. */
+export const daysOpen = (startDate: string, today: string) =>
+  startDate ? Math.max(0, daysBetween(startDate, today)) : 0;
+
 /** Same day the notice builder unlocks the final reminder; after it, a 311 inspection is the next normal step. */
 export const inspectionQualifyingDays = 6;
 

@@ -4,8 +4,10 @@ import {
   buildFollowUpItems,
   buildMeetingReport,
   countedNotices,
+  daysOpen,
   followUpActionHref,
   nextNoticeStage,
+  nextStepForRecord,
   summarizeWins,
 } from "../src/lib/followUp";
 import type { RecordEvent } from "../src/lib/recordEvents";
@@ -211,5 +213,43 @@ describe("follow-up actions", () => {
     assert.deepEqual(byKind.rlto_period_passed.action, { kind: "notice", stage: "B", label: "Send a follow-up" });
     assert.equal(followUpActionHref(byKind.rlto_period_passed), "/?record=a#builder");
     items.forEach((item) => assert.ok(lintVerySimpleEnglish(item.action.label).ok, item.action.label));
+  });
+});
+
+describe("nextStepForRecord", () => {
+  it("shows when the follow-up unlocks while it is still locked", () => {
+    const step = nextStepForRecord(record({}), [], today, []);
+    assert.equal(step.state, "locked");
+    assert.equal(step.label, "Follow-up from Oct 21, 2026");
+    assert.equal(step.href, "/submissions/r1");
+  });
+
+  it("opens the follow-up notice once it unlocks", () => {
+    const step = nextStepForRecord(record({ startDate: "2026-10-14", reportDate: "2026-10-14" }), [], today, []);
+    assert.deepEqual(step, { label: "Send a follow-up", href: "/?record=r1#builder", state: "ready", opens: "notice" });
+  });
+
+  it("puts a needs-follow-up item first", () => {
+    const records = [record({ issue: "other", startDate: "2026-10-01", reportDate: "2026-10-01" })];
+    const events = new Map([["r1", [event("1", "reply_due", "2026-10-19")]]]);
+    const items = buildFollowUpItems(records, events, today);
+    const step = nextStepForRecord(records[0], events.get("r1") ?? [], today, items);
+    assert.equal(step.label, "Log a reply");
+    assert.equal(step.state, "ready");
+    assert.equal(step.note, "Reply was due Oct 19, 2026. No reply is logged.");
+  });
+
+  it("is not ready after the final reminder was sent", () => {
+    const sent = [event("1", "follow_up_sent", "2026-10-05"), event("2", "final_notice_sent", "2026-10-09")];
+    const step = nextStepForRecord(record({ issue: "other", startDate: "2026-10-01", reportDate: "2026-10-01" }), sent, today, []);
+    assert.deepEqual(step, { label: "Final reminder sent", href: "/submissions/r1", state: "done", opens: "record" });
+  });
+});
+
+describe("daysOpen", () => {
+  it("counts whole days and never goes below zero", () => {
+    assert.equal(daysOpen("2026-10-11", today), 9);
+    assert.equal(daysOpen("2026-10-25", today), 0);
+    assert.equal(daysOpen("", today), 0);
   });
 });

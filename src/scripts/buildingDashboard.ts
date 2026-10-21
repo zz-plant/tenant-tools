@@ -11,6 +11,10 @@ const updateReportCount = (id: string, nextCount: number) => {
   const countEl = document.querySelector(`[data-report-count="${id}"]`);
   if (countEl) {
     countEl.textContent = formatResidentReportCount(nextCount);
+    // Restart the short highlight so the resident sees which count changed.
+    countEl.classList.remove("count-bump");
+    void (countEl as HTMLElement).offsetWidth;
+    countEl.classList.add("count-bump");
   }
 };
 
@@ -28,15 +32,11 @@ const updateStatusCounts = () => {
 
     const cards = group.querySelectorAll("[data-current-status][data-submission-id]").length;
 
-    const groupCounter = group.querySelector(`[data-status-count="${status}"]`) as HTMLElement | null;
+    const groupCounter = document.querySelector(`[data-status-count="${status}"]`) as HTMLElement | null;
     if (groupCounter) {
       groupCounter.textContent = formatResidentReportCount(cards);
     }
 
-    const summaryCounter = document.querySelector(`[data-summary-count="${status}"]`) as HTMLElement | null;
-    if (summaryCounter) {
-      summaryCounter.textContent = formatResidentReportCount(cards);
-    }
   });
 };
 
@@ -59,6 +59,7 @@ const moveCardToStatusGroup = (id: string, nextStatus: SubmissionStatus) => {
     targetGroup.appendChild(card);
   }
 
+  targetGroup.hidden = false;
   card.dataset.currentStatus = nextStatus;
   updateStatusCounts();
 };
@@ -90,7 +91,7 @@ document.querySelectorAll("[data-report-button]").forEach((button) => {
           ? "You already added your report on this device."
           : "Your report was added. No personal details were saved."
       );
-      button.textContent = "✓ Reported";
+      button.textContent = "Report added";
       button.setAttribute("disabled", "true");
     } catch (error) {
       setReportStatus(id, error instanceof Error ? error.message : "We could not add your report.", true);
@@ -151,7 +152,7 @@ document.querySelectorAll("[data-status-save]").forEach((button) => {
     } catch (error) {
       if (note) {
         note.textContent = error instanceof Error ? error.message : "We could not update the status.";
-        note.style.color = "#9a2b2b";
+        note.style.color = "var(--color-danger)";
       }
     } finally {
       button.removeAttribute("disabled");

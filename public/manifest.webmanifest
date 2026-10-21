@@ -1,13 +1,13 @@
 {
-  "name": "Building Ledger • 2400 W Wabansia",
-  "short_name": "Building Ledger",
+  "name": "Tenant Tools",
+  "short_name": "Tenant Tools",
   "description": "Resident repair issue tracker and neutral notice builder for tenants.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#fafafa",
-  "theme_color": "#18181b",
+  "background_color": "#f3f4f1",
+  "theme_color": "#151515",
   "icons": [
     {
       "src": "/icon-192.png",

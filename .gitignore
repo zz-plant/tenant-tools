@@ -4,3 +4,9 @@ dist/
 .dev.vars
 .env
 .wrangler/
+
+# Impeccable working files (decision sketches, review captures). Surface briefs and DESIGN.md stay tracked.
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/questions/
+.impeccable/build/

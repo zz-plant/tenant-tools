@@ -1,9 +1,9 @@
 ---
 name: building-ledger-copy-review
-description: ESL-first copy review workflow for Building Ledger UI text, notice templates, and contributor docs.
+description: ESL-first copy review workflow for Tenant Tools UI text, notice templates, and contributor docs.
 ---
 
-# Building Ledger Copy Review
+# Tenant Tools Copy Review
 
 Use this skill when a change adds or edits user-facing copy, templates, labels, errors, or guidance text.
 

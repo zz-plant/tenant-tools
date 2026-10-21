@@ -18,3 +18,16 @@ export const issueOptions = [
 ] as const satisfies IssueOption[];
 
 export type IssueId = (typeof issueOptions)[number]["id"];
+
+/** Short names for tight places such as filter tags. Records and notices keep the full label. */
+export const issueShortLabels: Record<string, string> = {
+  heat: "Heat",
+  leak: "Water leak",
+  pests: "Pests",
+  entry: "Entry",
+  common: "Elevator / common areas",
+  "no-timeline": "No repair date",
+  building: "Building-wide",
+  deposit: "Deposit",
+  lockout: "Lockout",
+};

@@ -49,18 +49,18 @@ const ticketLabel = (row: BuildingReportRow) =>
 <html lang="en">
   <head>
     <SeoHead
-      title="Building summary | Building Ledger"
+      title="Building summary | Tenant Tools"
       description="Private printable summary of resident-reported building issues."
       canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/export`}
       imagePath="/og/private-dashboard.png"
-      imageAlt="Building Ledger private summary preview"
+      imageAlt="Tenant Tools private summary preview"
       noindex={true}
     />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <AppHeader
-      title="Building Ledger"
+      title="Tenant Tools"
       subtitle={`Building: ${buildingId || "Not listed"}`}
       backHref={dashboardUrl}
       backLabel="Building dashboard"
@@ -81,7 +81,6 @@ const ticketLabel = (row: BuildingReportRow) =>
         ) : (
           <section class="panel report-sheet">
             <header class="report-header">
-              <p class="eyebrow">Building ledger</p>
               <h1>Building issue summary</h1>
               <p><strong>Building:</strong> {report.building}</p>
               <p><strong>Date:</strong> {report.generatedOn}</p>

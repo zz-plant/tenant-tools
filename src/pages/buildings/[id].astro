@@ -1,16 +1,24 @@
 ---
 import "../../styles/global.css";
-import { issueOptions } from "../../data/noticeData";
+import { issueOptions, issueShortLabels } from "../../data/noticeData";
 import { isAccessKeyValid, isBuildingAccessValid } from "../../lib/access";
 import { RESIDENT_KEY_COOKIE, STEWARD_KEY_COOKIE } from "../../lib/api/requestGuard";
 import { formatResidentReportCount, type BuildingSubmission } from "../../lib/buildingDashboard";
 import { loadBuildingDetail } from "../../lib/buildingDetail";
-import { buildFollowUpItems, followUpActionHref, summarizeWins } from "../../lib/followUp";
+import {
+  buildFollowUpItems,
+  daysOpen,
+  nextStepButtonLabel,
+  nextStepForRecord,
+  summarizeWins,
+  type RecordNextStep,
+} from "../../lib/followUp";
 import { describeCanvass } from "../../lib/canvass";
 import { listCanvasses } from "../../lib/storage/canvass";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
 import { buildIssuePatterns } from "../../lib/issuePatterns";
-import { formatDate } from "../../lib/dateUtils";
+import { formatIssueLabel } from "../../lib/noticeUtils";
+import { formatDate, formatTimelineDate } from "../../lib/dateUtils";
 import { buildBuildingDashboardUrl, buildSubmissionDetailsUrl } from "../../lib/navigation";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
@@ -35,29 +43,11 @@ const statusIds: SubmissionStatus[] = ["open", "resolved", "archived"];
 
 const issueFilterRaw = url.searchParams.get("issue") || "all";
 const issueFilter = issueIds.has(issueFilterRaw) ? issueFilterRaw : "all";
-const statusFilterRaw = url.searchParams.get("status") || "all";
-const statusFilter = statusIds.includes(statusFilterRaw as SubmissionStatus) ? statusFilterRaw : "all";
-const hasFilters = issueFilter !== "all" || statusFilter !== "all";
 const statusLabels = submissionStatusLabels;
 
 const clearFiltersUrl = buildBuildingDashboardUrl({ buildingId });
-const buildFilterUrl = (nextIssue: string, nextStatus: string) => {
-  const params = new URLSearchParams();
-  if (nextIssue !== "all") {
-    params.set("issue", nextIssue);
-  }
-  if (nextStatus !== "all") {
-    params.set("status", nextStatus);
-  }
-  const query = params.toString();
-  return `${clearFiltersUrl}${query ? `?${query}` : ""}`;
-};
-const clearIssueUrl = buildFilterUrl("all", statusFilter);
-const clearStatusUrl = buildFilterUrl(issueFilter, "all");
-const activeIssueLabel = issueFilter === "all"
-  ? ""
-  : (issueOptions.find((issue) => issue.id === issueFilter)?.label ?? issueFilter);
-const activeStatusLabel = statusFilter === "all" ? "" : statusLabels[statusFilter as SubmissionStatus];
+const buildFilterUrl = (nextIssue: string) =>
+  nextIssue === "all" ? clearFiltersUrl : `${clearFiltersUrl}?issue=${encodeURIComponent(nextIssue)}`;
 
 const today = formatDate(new Date());
 // Archived records are left out of the full reads: they are not followed up, and wins are logged on open or resolved records.
@@ -70,7 +60,6 @@ const latestCanvass = detail && kv ? (await listCanvasses(kv, buildingId))[0] ??
 
 const filtered = submissions
   .filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter))
-  .filter((record) => (statusFilter === "all" ? true : record.status === statusFilter))
   .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 
 const maxVisible = 60;
@@ -92,64 +81,101 @@ const mergeTargetsFor = (record: BuildingSubmission) =>
     (candidate) => candidate.id !== record.id && candidate.issue === record.issue && !candidate.mergedInto
   );
 
-const totalVisible = visibleSubmissions.length;
 const patterns = buildIssuePatterns(submissions, today);
 const totalFiltered = filtered.length;
-// The follow-up list stays short so the records below it are easy to reach. The meeting report has all of them.
-const followUpShown = followUpItems.slice(0, 5);
 const draftNoticeUrl = `/?building=${encodeURIComponent(buildingId)}#builder`;
+
+// Each open row shows its days open and its one next step. The oldest problem is listed first.
+const recordById = new Map((detail?.records ?? []).map((record) => [record.id, record]));
+const nextStepFor = (summary: BuildingSubmission): RecordNextStep | null => {
+  const record = recordById.get(summary.id);
+  if (!record || summary.status !== "open" || summary.mergedInto) {
+    return null;
+  }
+  return nextStepForRecord(record, detail?.eventsByRecord.get(record.id) ?? [], today, followUpItems);
+};
+grouped.open.sort((left, right) => daysOpen(right.startDate, today) - daysOpen(left.startDate, today));
+
+// The sign shows one step a resident can take now: the oldest open problem with a step that is ready.
+const signRecord = grouped.open
+  .filter((record) => !record.mergedInto)
+  .map((record) => ({ record, step: nextStepFor(record) }))
+  .find((entry) => entry.step?.state === "ready");
+const nextLocked = grouped.open
+  .map((record) => ({ record, step: nextStepFor(record) }))
+  .find((entry) => entry.step?.state === "locked");
+const issueCounts = issueOptions
+  .map((opt) => ({ ...opt, count: submissions.filter((s) => s.issue === opt.id).length }))
+  .filter((opt) => opt.count > 0 || issueFilter === opt.id);
+const groupTools = [
+  { href: `${clearFiltersUrl}/meeting`, label: "Meeting report", note: "One page for your next tenant meeting." },
+  { href: `${clearFiltersUrl}/letter`, label: "Joint letter", note: "One repair letter, signed with a household count." },
+  { href: `${clearFiltersUrl}/311`, label: "Group 311 day", note: "Plan a day when neighbors call 311 together." },
+  { href: `${clearFiltersUrl}/export`, label: "Printable summary", note: "Every record, for an inspector or legal aid." },
+];
 ---
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <SeoHead
-      title="Building dashboard | Building Ledger"
+      title="Building dashboard | Tenant Tools"
       description="Private building dashboard for resident issue summaries."
       canonicalPath={`/buildings/${encodeURIComponent(buildingId)}`}
       imagePath="/og/private-dashboard.png"
-      imageAlt="Building Ledger private resident dashboard preview"
+      imageAlt="Tenant Tools private resident dashboard preview"
       noindex={true}
     />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <AppHeader
-      title="Building Ledger"
-      subtitle={`Building: ${buildingId || "Not listed"}`}
+      title="Tenant Tools"
+      subtitle={hasAccess ? "Resident access" : "Residents only"}
       backHref="/"
-      backLabel="Notice builder"
+      backLabel="Home"
       statusBadge={hasAccess ? "Verified resident access" : "Access key needed"}
       isSteward={isSteward}
     />
     <div class="page">
       <header class="hero hero-single">
         <div class="hero-main">
-          <p class="eyebrow">Building ledger</p>
-          <h1>Resident records</h1>
-          {hasAccess ? (
-            <>
-              <div class="hero-actions">
-                <a class="button" href={draftNoticeUrl}>＋ Report a problem</a>
-                <a class="button button-secondary" href="#records">Me too on a problem</a>
-              </div>
-              <nav class="fact-tag-row dashboard-tools" aria-label="Group tools">
-                <a class="fact-tag" href={`${clearFiltersUrl}/311`}>Group 311 day</a>
-                <a class="fact-tag" href={`${clearFiltersUrl}/meeting`}>Meeting report</a>
-                <a class="fact-tag" href={`${clearFiltersUrl}/letter`}>Joint letter</a>
-                <a class="fact-tag" href={`${clearFiltersUrl}/export`}>Printable summary</a>
-                {isSteward && <a class="fact-tag" href={`${clearFiltersUrl}/canvass`}>Canvass tally</a>}
-                {isSteward && <a class="fact-tag" href="/steward">Steward tools</a>}
-              </nav>
-              <p class="helper">Keep it short. No names or unit numbers. Photos stay private.</p>
-            </>
-          ) : (
-            <p class="tagline">Residents only. Open the link from your building group, or enter the key.</p>
-          )}
+          <h1>{buildingId || "Building ledger"}</h1>
+          {!hasAccess && <p class="tagline">Residents only. Open the link from your building group, or enter the key.</p>}
         </div>
       </header>
 
+      {hasAccess && kv && (
+        <section class="next-up" aria-labelledby="next-up-title">
+          {signRecord?.step ? (
+            <div class="next-sign">
+              <h2 id="next-up-title">{signRecord.step.label}</h2>
+              <p>
+                {formatIssueLabel(signRecord.record.issueLabel)}. Day {daysOpen(signRecord.record.startDate, today)}.{" "}
+                {signRecord.step.note ?? "The dates from the record are filled in for you."}
+              </p>
+              <a class="button" href={signRecord.step.href}>{nextStepButtonLabel(signRecord.step)}</a>
+            </div>
+          ) : (
+            <div class="next-calm">
+              <h2 id="next-up-title">Nothing to send today</h2>
+              <p>
+                {nextLocked?.step
+                  ? `${nextLocked.record.issueLabel}: ${nextLocked.step.label}.`
+                  : grouped.open.length > 0
+                    ? "Add a dated fact on a record when something changes."
+                    : "No open problems are saved for this building."}
+              </p>
+            </div>
+          )}
+          <div class="next-actions">
+            <a class="button" href={draftNoticeUrl}>Report a problem</a>
+            <a class="button button-secondary" href="#records">Me too on a problem</a>
+          </div>
+        </section>
+      )}
+
       <main class="layout" id="main">
-        <section class="panel panel-highlight dashboard-grid">
+        <section class="panel dashboard-grid" id="records" aria-labelledby="records-title">
           {!hasAccess ? (
             <AccessKeyPanel
               title="Key required"
@@ -169,213 +195,154 @@ const draftNoticeUrl = `/?building=${encodeURIComponent(buildingId)}#builder`;
             </div>
           ) : (
             <>
-              {followUpItems.length > 0 && (
-                <details class="helper-card follow-up" open>
-                  <summary>Needs follow-up ({followUpItems.length})</summary>
-                  <div class="helper-card-body">
-                    <ul class="fact-list follow-up-list">
-                      {followUpShown.map((item) => (
-                        <li>
-                          <a href={buildSubmissionDetailsUrl({ submissionId: item.recordId })}>{item.issueLabel}</a>: {item.message}{" "}
-                          <a class="fact-tag follow-up-action" href={followUpActionHref(item)}>{item.action.label}</a>
-                        </li>
-                      ))}
-                    </ul>
-                    {followUpItems.length > followUpShown.length && (
-                      <p class="helper">
-                        {followUpItems.length - followUpShown.length} more in the <a href={`${clearFiltersUrl}/meeting`}>meeting report</a>.
-                      </p>
-                    )}
-                    <p class="helper">Information only. The next normal step depends on your building. Ask a tenant group or legal aid if you are not sure.</p>
-                  </div>
-                </details>
-              )}
-
-              <div class="ledger-action-bar" id="records">
-                <div>
-                  <h2 style="margin: 0; font-size: 1.15rem;">Recent records</h2>
-                  <p class="helper" style="margin: 0;">Showing {totalVisible} of {totalFiltered} records. Small counts are hidden for privacy.</p>
-                </div>
-                <a class="button" href={draftNoticeUrl}>＋ Report a problem</a>
+              <div class="board-head">
+                <h2 id="records-title">Open problems</h2>
+                <p class="board-count tabular" data-status-count="open">{formatResidentReportCount(grouped.open.length)}</p>
               </div>
+              <p class="helper">Tap “Me too” if you have the same problem. No names are saved.</p>
 
-              <nav class="quick-filter-bar" aria-label="Filter issues by category">
-                <a
-                  href={buildFilterUrl("all", statusFilter)}
-                  class={`fact-tag ${issueFilter === "all" ? "fact-tag-included" : ""}`}
-                >
-                  All issues ({submissions.length})
-                </a>
-                {issueOptions.map((opt) => {
-                  const count = submissions.filter((s) => s.issue === opt.id).length;
-                  if (count === 0 && issueFilter !== opt.id) return null;
-                  return (
+              {issueCounts.length > 1 && (
+                <nav class="quick-filter-bar" aria-label="Show one problem type">
+                  <a href={buildFilterUrl("all")} class="fact-tag" aria-current={issueFilter === "all" ? "true" : undefined}>
+                    All ({submissions.length})
+                  </a>
+                  {issueCounts.map((opt) => (
                     <a
-                      href={buildFilterUrl(opt.id, statusFilter)}
-                      class={`fact-tag ${issueFilter === opt.id ? "fact-tag-included" : ""}`}
+                      href={buildFilterUrl(opt.id)}
+                      class="fact-tag issue-filter"
+                      data-issue={opt.id}
+                      aria-current={issueFilter === opt.id ? "true" : undefined}
                     >
-                      {opt.label} ({count})
+                      {issueShortLabels[opt.id] ?? formatIssueLabel(opt.label)} ({opt.count})
                     </a>
-                  );
-                })}
-              </nav>
-
-              {hasFilters && (
-                <div class="tag-row" style="margin-bottom: 12px;">
-                  {issueFilter !== "all" && (
-                    <span>
-                      Filtered by issue: {activeIssueLabel}.{" "}
-                      <a href={clearIssueUrl}>Clear issue filter</a>
-                    </span>
-                  )}
-                  {statusFilter !== "all" && (
-                    <span>
-                      Filtered by status: {activeStatusLabel}.{" "}
-                      <a href={clearStatusUrl}>Clear status filter</a>
-                    </span>
-                  )}
-                </div>
+                  ))}
+                </nav>
               )}
 
-              {totalFiltered === 0 ? (
-                <p class="helper">No records match these filters.</p>
-              ) : (
-                statusIds.map((status) => (
-                  <section class="status-group" data-status-group={status}>
+              {statusIds.map((status) => (
+                <section
+                  class="status-group"
+                  data-status-group={status}
+                  hidden={status !== "open" && grouped[status].length === 0}
+                >
+                  {status !== "open" && (
                     <div class="status-header">
                       <h3>{statusLabels[status]}</h3>
-                      <span class="status-pill" data-status-count={status}>{formatResidentReportCount(grouped[status].length)}</span>
+                      <span class="board-count tabular" data-status-count={status}>{formatResidentReportCount(grouped[status].length)}</span>
                     </div>
-                    {grouped[status].length === 0 ? (
-                      <p class="helper">No records in this status.</p>
-                    ) : (
-                      grouped[status].map((record) => (
-                        <article class="issue-card" data-submission-id={record.id} data-current-status={record.status}>
-                          <div>
-                            <p class="issue-title">{record.issueLabel}</p>
-                            <p class="issue-meta">
-                              Started {record.startDate || "Date not listed"}. Reports:{" "}
-                              <span data-report-count={record.id} title="Small counts are hidden for privacy">{formatResidentReportCount(record.reportCount)}</span>.
-                            </p>
-                            <p class="issue-meta">
-                              Last update saved on {record.reportDate || record.createdAt || "Date not listed"}.
-                            </p>
-                          </div>
-                          <div class="issue-actions">
-                            {record.mergedInto ? (
-                              <p class="helper">Merged into another record.</p>
-                            ) : (
+                  )}
+                  {status === "open" && grouped.open.length === 0 && (
+                    <p class="helper">{totalFiltered === 0 && issueFilter !== "all" ? "No problems of this type." : "No open problems."}</p>
+                  )}
+                  {grouped[status].map((record) => {
+                    const step = nextStepFor(record);
+                    const recordUrl = buildSubmissionDetailsUrl({ submissionId: record.id });
+                    return (
+                      <article
+                        class="problem-row"
+                        data-issue={record.issue}
+                        data-submission-id={record.id}
+                        data-current-status={record.status}
+                      >
+                        <span class="problem-swatch" aria-hidden="true"></span>
+                        <div class="problem-main">
+                          <h3 class="problem-title"><a href={recordUrl}>{formatIssueLabel(record.issueLabel)}</a></h3>
+                          <p class="problem-meta">
+                            Started {record.startDate ? formatTimelineDate(record.startDate) : "date not listed"}.{" "}
+                            Me too: <span data-report-count={record.id} title="Small counts are hidden for privacy">{formatResidentReportCount(record.reportCount)}</span>
+                          </p>
+                          {step && step.state !== "ready" && <p class="problem-next">{step.label}</p>}
+                          {record.mergedInto && <p class="problem-next">Merged into another record.</p>}
+                        </div>
+                        {status === "open" && (
+                          <p class="problem-days" aria-label={`${daysOpen(record.startDate, today)} days open`}>
+                            <b class="tabular">{daysOpen(record.startDate, today)}</b>
+                            <span>{daysOpen(record.startDate, today) === 1 ? "day" : "days"}</span>
+                          </p>
+                        )}
+                        <div class="problem-actions">
+                          {!record.mergedInto && (
+                            <button
+                              class="button button-secondary button-compact"
+                              type="button"
+                              data-report-button
+                              data-submission-id={record.id}
+                              data-default-label="Me too"
+                            >
+                              Me too
+                            </button>
+                          )}
+                          {step?.state === "ready" ? (
+                            <a class="button button-compact" href={step.href}>{step.label}</a>
+                          ) : (
+                            <a class="button button-secondary button-compact" href={recordUrl}>Open record</a>
+                          )}
+                        </div>
+                        <p class="helper problem-status" data-report-status={record.id} role="status" aria-live="polite"></p>
+                        {isSteward && !record.mergedInto && (
+                          <div class="steward-row">
+                            <label class="steward-inline">
+                              <span>Update status</span>
+                              <select class="input" data-status-select data-submission-id={record.id}>
+                                {statusIds.map((option) => (
+                                  <option value={option} selected={record.status === option}>
+                                    {statusLabels[option]}
+                                  </option>
+                                ))}
+                              </select>
                               <button
                                 class="button button-compact"
                                 type="button"
-                                data-report-button
+                                data-status-save
                                 data-submission-id={record.id}
-                                data-default-label="Me too"
+                                data-default-label="Save"
                               >
-                                Me too
+                                Save
                               </button>
-                            )}
-                            <a
-                              class="button button-secondary button-compact"
-                              href={buildSubmissionDetailsUrl({ submissionId: record.id })}
-                            >
-                              View details
-                            </a>
-                          </div>
-                          <p class="helper" data-report-status={record.id} role="status" aria-live="polite"></p>
-                          {isSteward && !record.mergedInto && (
-                            <div class="steward-row">
+                            </label>
+                            <p class="helper" data-status-note={record.id} role="status" aria-live="polite"></p>
+                            <p class="helper">Use this only after residents confirm the issue is fixed.</p>
+                            {mergeTargetsFor(record).length > 0 && (
                               <label class="steward-inline">
-                                <span>Update status</span>
-                                <select
-                                  class="input"
-                                  data-status-select
-                                  data-submission-id={record.id}
-                                >
-                                  {statusIds.map((option) => (
-                                    <option value={option} selected={record.status === option}>
-                                      {statusLabels[option]}
+                                <span>Duplicate of</span>
+                                <select class="input" data-merge-select data-submission-id={record.id}>
+                                  <option value="">Choose the main record</option>
+                                  {mergeTargetsFor(record).map((target) => (
+                                    <option value={target.id}>
+                                      Started {target.startDate || "date not listed"} ({statusLabels[target.status]})
                                     </option>
                                   ))}
                                 </select>
                                 <button
-                                  class="button button-compact"
+                                  class="button button-compact button-secondary"
                                   type="button"
-                                  data-status-save
+                                  data-merge-save
                                   data-submission-id={record.id}
-                                  data-default-label="Save"
                                 >
-                                  Save
+                                  Merge
                                 </button>
                               </label>
-                              <p class="helper" data-status-note={record.id} role="status" aria-live="polite"></p>
-                              <p class="helper">Use this only after residents confirm the issue is fixed.</p>
-                              {mergeTargetsFor(record).length > 0 && (
-                                <label class="steward-inline">
-                                  <span>Duplicate of</span>
-                                  <select class="input" data-merge-select data-submission-id={record.id}>
-                                    <option value="">Choose the main record</option>
-                                    {mergeTargetsFor(record).map((target) => (
-                                      <option value={target.id}>
-                                        Started {target.startDate || "date not listed"} ({statusLabels[target.status]})
-                                      </option>
-                                    ))}
-                                  </select>
-                                  <button
-                                    class="button button-compact button-secondary"
-                                    type="button"
-                                    data-merge-save
-                                    data-submission-id={record.id}
-                                  >
-                                    Merge
-                                  </button>
-                                </label>
-                              )}
-                              <p class="helper" data-merge-note={record.id} role="status" aria-live="polite"></p>
-                            </div>
-                          )}
-                        </article>
-                      ))
-                    )}
-                  </section>
-                ))
-              )}
+                            )}
+                            <p class="helper" data-merge-note={record.id} role="status" aria-live="polite"></p>
+                          </div>
+                        )}
+                      </article>
+                    );
+                  })}
+                </section>
+              ))}
 
-              <h2 class="dashboard-overview-title">Overview</h2>
-              <div class="summary-grid">
-                <div class="summary-card">
-                  <p class="summary-label">Total (filtered)</p>
-                  <p class="summary-value">{totalFiltered}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Visible now</p>
-                  <p class="summary-value">{totalVisible}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Open</p>
-                  <p class="summary-value" data-summary-count="open">{formatResidentReportCount(grouped.open.length)}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">{statusLabels.resolved}</p>
-                  <p class="summary-value" data-summary-count="resolved">{formatResidentReportCount(grouped.resolved.length)}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Archived</p>
-                  <p class="summary-value" data-summary-count="archived">{formatResidentReportCount(grouped.archived.length)}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Wins logged</p>
-                  <p class="summary-value">{wins.total}</p>
-                </div>
-              </div>
-              {latestCanvass && (
-                <p class="helper"><strong>Latest canvass:</strong> {describeCanvass(latestCanvass)}</p>
+              {filtered.length > visibleSubmissions.length && (
+                <p class="helper">Showing the newest {visibleSubmissions.length} of {filtered.length} records. The printable summary has all of them.</p>
               )}
+              <p class="helper">
+                Wins logged: {wins.total}. Small counts show as &lt;3 to protect residents. Counts are resident-reported and not verified.
+              </p>
               {patterns.rows.length > 0 && (
                 <details class="helper-card patterns">
-                  <summary>Patterns: records started each month</summary>
+                  <summary>Records started each month</summary>
                   <div class="helper-card-body">
-                    <p class="helper">Last 6 months, by issue type. A problem that comes back shows in many months.</p>
+                    <p class="helper">Last 6 months, by problem type. A problem that comes back shows in many months.</p>
                     <div class="table-scroll">
                       <table class="report-table">
                         <thead>
@@ -402,80 +369,54 @@ const draftNoticeUrl = `/?building=${encodeURIComponent(buildingId)}#builder`;
                   </div>
                 </details>
               )}
-
             </>
           )}
         </section>
 
-        <aside class="panel sidebar-panel">
+        <aside class="panel sidebar-panel" aria-labelledby="aside-title">
           {!hasAccess ? (
             <>
-              <div>
-                <h2>Why this is private</h2>
-                <p class="helper">Building keys keep resident issue records resident-only.</p>
-              </div>
-              <div class="export-block">
-                <h3>Safety notes</h3>
-                <ul class="submission-detail-list">
-                  <li>This page never shows names or unit numbers.</li>
-                  <li>Evidence files stay private.</li>
-                  <li>Keys reduce scraping and retaliation risk.</li>
-                </ul>
-              </div>
+              <h2 id="aside-title">Why this is private</h2>
+              <ul class="submission-detail-list">
+                <li>This page never shows names or unit numbers.</li>
+                <li>Photos stay private.</li>
+                <li>Keys keep landlords and strangers out.</li>
+              </ul>
             </>
           ) : (
             <>
-              <div>
-                <h2>Filters</h2>
-                <p class="helper">Filter by issue type or status.</p>
-              </div>
-              <form class="filter-grid" method="get">
-                                <label>
-                  <span>Issue type</span>
-                  <select class="input" name="issue">
-                    <option value="all" selected={issueFilter === "all"}>All issues</option>
-                    {issueOptions.map((issue) => (
-                      <option value={issue.id} selected={issueFilter === issue.id}>
-                        {issue.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  <span>Status</span>
-                  <select class="input" name="status">
-                    <option value="all" selected={statusFilter === "all"}>All statuses</option>
-                    {statusIds.map((status) => (
-                      <option value={status} selected={statusFilter === status}>
-                        {statusLabels[status]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button class="button" type="submit">Apply filters</button>
-                {hasFilters && (
-                  <a class="button button-secondary" href={clearFiltersUrl}>
-                    Clear filters
-                  </a>
-                )}
-              </form>
-              <div class="export-block">
-                <h3>Notes</h3>
-                <ul class="submission-detail-list">
-                  <li>Use “Me too” to add your report without writing.</li>
-                  <li>Stewards can update status for clear records.</li>
-                  <li>Stewards can merge duplicate records. Reports move to the main record.</li>
-                  <li>Counts are resident-reported and not verified.</li>
-                  <li>Small counts are hidden to protect resident privacy.</li>
-                </ul>
-              </div>
+              <h2 id="aside-title">Group tools</h2>
+              <ul class="tool-list">
+                {[
+                  ...groupTools,
+                  ...(isSteward
+                    ? [
+                        { href: `${clearFiltersUrl}/canvass`, label: "Canvass tally", note: "Count doors knocked. Counts only." },
+                        { href: "/steward", label: "Steward tools", note: "Keys, exports, and emergency wipe." },
+                      ]
+                    : []),
+                ].map((tool) => (
+                  <li>
+                    <a href={tool.href}>
+                      <span class="tool-name">{tool.label}</span>
+                      <span class="tool-note">{tool.note}</span>
+                      <svg class="tool-arrow" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                        <path d="M4 10h11M11 5l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="square" />
+                      </svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              {latestCanvass && (
+                <p class="helper"><strong>Latest canvass:</strong> {describeCanvass(latestCanvass)}</p>
+              )}
             </>
           )}
         </aside>
       </main>
 
       <footer class="site-footer">
-        <p>Safety first: this dashboard does not show names, unit numbers, or evidence files.</p>
+        <p>This page does not show names, unit numbers, or photos.</p>
         {hasAccess && (
           <p><a href="?forget=1">Forget key on this device</a>. Use this on a shared phone.</p>
         )}

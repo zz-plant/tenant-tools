@@ -34,18 +34,18 @@ const report = detail
 <html lang="en">
   <head>
     <SeoHead
-      title="Meeting report | Building Ledger"
+      title="Meeting report | Tenant Tools"
       description="Private one-page building report for a tenant meeting."
       canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/meeting`}
       imagePath="/og/private-dashboard.png"
-      imageAlt="Building Ledger private meeting report"
+      imageAlt="Tenant Tools private meeting report"
       noindex={true}
     />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <AppHeader
-      title="Building Ledger"
+      title="Tenant Tools"
       subtitle={`Building: ${buildingId || "Not listed"}`}
       backHref={dashboardUrl}
       backLabel="Building dashboard"
@@ -66,7 +66,6 @@ const report = detail
         ) : (
           <section class="panel report-sheet">
             <header class="report-header">
-              <p class="eyebrow">Building ledger</p>
               <h1>Meeting report</h1>
               <p><strong>Building:</strong> {report.building}</p>
               <p><strong>Date:</strong> {formatTimelineDate(report.today)}</p>

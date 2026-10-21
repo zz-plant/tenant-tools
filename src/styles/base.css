@@ -1,10 +1,39 @@
+@font-face {
+  font-family: "Big Shoulders";
+  font-style: normal;
+  font-weight: 500 900;
+  font-display: swap;
+  src: url("/fonts/big-shoulders-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Big Shoulders";
+  font-style: normal;
+  font-weight: 500 900;
+  font-display: swap;
+  src: url("/fonts/big-shoulders-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329,
+    U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/*
+ * Block Signage: the painted signs on the block. A white wall, enamel black, flat enamel colours
+ * (one per issue type), and chrome yellow kept for the one next step a resident can take.
+ * Big Shoulders (a Chicago sign gothic) sets headings, labels, buttons, and counts. Body text
+ * stays the phone's own font, which covers every language the notices use.
+ */
 :root {
   color-scheme: light dark;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.55;
   background-color: var(--color-canvas);
   color: var(--color-text-primary);
+
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Big Shoulders", "Arial Narrow", "Roboto Condensed", sans-serif;
 
   /* Safe Area insets */
   --safe-area-top: env(safe-area-inset-top, 0px);
@@ -13,64 +42,79 @@
   --safe-area-left: env(safe-area-inset-left, 0px);
 
   /* Layout dimensions */
-  --layout-max-width: 1200px;
+  --layout-max-width: 1180px;
   --layout-gutter-desktop: clamp(24px, 4vw, 40px);
   --layout-gutter-tablet: 20px;
-  --layout-gutter-mobile: 14px;
+  --layout-gutter-mobile: 16px;
   --grid-min-xs: 120px;
   --grid-min-sm: 140px;
   --grid-min-md: 180px;
   --grid-min-lg: 220px;
   --grid-min-xl: 260px;
 
-  /* Color system - Warm architectural paper (restful on eyes, non-glare) */
-  --color-canvas: #fbfaf8;
+  /* Wall and enamel */
+  --color-canvas: #f3f4f1;
   --color-surface: #ffffff;
-  --color-surface-subtle: #f4f3ef;
-  --color-surface-muted: #eae8e1;
+  --color-surface-subtle: #e9ebe6;
+  --color-surface-muted: #dcdfd8;
   --color-surface-card: #ffffff;
 
-  --color-text-primary: #1f1e1d;
-  --color-text-secondary: #595551;
-  --color-text-muted: #79756f;
-  --color-text-disabled: #a8a49d;
+  --color-text-primary: #151515;
+  --color-text-secondary: #363833;
+  --color-text-muted: #595c55;
+  --color-text-disabled: #9a9d95;
 
-  --color-border: #e7e5de;
-  --color-border-subtle: #f0eee8;
-  --color-border-hover: #d5d2c8;
-  --color-border-strong: #a6a195;
+  --color-border: #c9ccc4;
+  --color-border-subtle: #dfe1dc;
+  --color-border-hover: #8d9088;
+  --color-border-strong: #151515;
+  --rule: 2px solid var(--color-border-strong);
 
-  /* Accent: Warm ink / charcoal */
-  --color-primary: #1f1e1d;
-  --color-primary-hover: #2f2e2c;
-  --color-primary-active: #141312;
-  --color-primary-subtle: #f4f3ef;
-  --color-primary-border: #d5d2c8;
+  --color-primary: #151515;
+  --color-primary-hover: #2b2b2b;
+  --color-primary-active: #000000;
+  --color-primary-subtle: #e9ebe6;
+  --color-primary-border: #151515;
   --color-primary-contrast: #ffffff;
 
-  /* Focus indicator */
-  --color-focus: #1f1e1d;
+  /* The next-step sign. Never decoration. */
+  --color-sign: #f2c200;
+  --color-sign-ink: #151515;
 
-  /* Semantic status colors - muted, non-alarming earth tones */
-  --color-success: #286341;
-  --color-success-subtle: #f2f7f4;
-  --color-success-border: #c5e1d1;
-  --color-success-text: #1e4b31;
+  --color-focus: #1f3fa6;
 
-  --color-warning: #925712;
-  --color-warning-subtle: #fcf7ed;
-  --color-warning-border: #f3ddaf;
-  --color-warning-text: #744309;
+  --color-success: #1e7a44;
+  --color-success-subtle: #e3f1e8;
+  --color-success-border: #1e7a44;
+  --color-success-text: #145631;
 
-  --color-danger: #9e3432;
-  --color-danger-subtle: #fbf3f2;
-  --color-danger-border: #f1cbc9;
-  --color-danger-text: #7a2523;
+  --color-warning: #151515;
+  /* Warnings use a neutral board and a black rule. Yellow belongs to the next step only. */
+  --color-warning-subtle: #e9ebe6;
+  --color-warning-border: #151515;
+  --color-warning-text: #151515;
 
-  --color-info: #2a5d7c;
-  --color-info-subtle: #f1f6f9;
-  --color-info-border: #c4dbe8;
-  --color-info-text: #1c455d;
+  --color-danger: #c21f18;
+  --color-danger-subtle: #fbe5e3;
+  --color-danger-border: #c21f18;
+  --color-danger-text: #8f1610;
+
+  --color-info: #1f3fa6;
+  --color-info-subtle: #e4e9f8;
+  --color-info-border: #1f3fa6;
+  --color-info-text: #172f7d;
+
+  /* One enamel colour per issue type, the same on every screen. */
+  --issue-heat: #d3261e;
+  --issue-leak: #1f3fa6;
+  --issue-pests: #1e8a4c;
+  --issue-entry: #6b3fa0;
+  --issue-common: #0f7c83;
+  --issue-no-timeline: #55595f;
+  --issue-building: #151515;
+  --issue-deposit: #55595f;
+  --issue-lockout: #8a1c4a;
+  --issue-ink: #ffffff;
 
   /* Legacy token aliases for backward compatibility */
   --surface-white: var(--color-surface);
@@ -79,82 +123,91 @@
   --text-muted: var(--color-text-muted);
   --border-soft: var(--color-border);
 
-  /* Elevation: Ultra-soft, minimal elevation */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
-  --shadow-md: 0 3px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
-  --shadow-lg: 0 8px 16px -4px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 16px 24px -6px rgba(0, 0, 0, 0.07);
+  /* Paint sits flat on the wall. Only floating things (the sticky bar, menus) lift. */
+  --shadow-xs: none;
+  --shadow-sm: 0 1px 2px rgba(21, 21, 21, 0.08);
+  --shadow-md: 0 4px 12px -2px rgba(21, 21, 21, 0.14);
+  --shadow-lg: 0 10px 24px -6px rgba(21, 21, 21, 0.18);
+  --shadow-xl: 0 18px 36px -10px rgba(21, 21, 21, 0.22);
   --shadow-soft: var(--shadow-sm);
   --shadow-lifted: var(--shadow-md);
 
-  /* Radii: Clean, subtle geometric rounding */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  /* Sign boards have nearly square corners. */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
   --radius-full: 9999px;
 
   /* Motion */
-  --ease-standard: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: 160ms var(--ease-out);
 }
 
+/* Night: the same signs painted on a dark board. */
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Night reading palette - deep matte charcoal, no halation/astigmatism glare */
-    --color-canvas: #121214;
-    --color-surface: #1a1a1e;
-    --color-surface-subtle: #222227;
-    --color-surface-muted: #2c2c34;
-    --color-surface-card: #1a1a1e;
+    --color-canvas: #121311;
+    --color-surface: #1b1c1a;
+    --color-surface-subtle: #242622;
+    --color-surface-muted: #30332e;
+    --color-surface-card: #1b1c1a;
 
-    --color-text-primary: #ededef;
-    --color-text-secondary: #a4a4af;
-    --color-text-muted: #767682;
-    --color-text-disabled: #4f4f5a;
+    --color-text-primary: #f3f4f1;
+    --color-text-secondary: #d2d5cd;
+    --color-text-muted: #a4a89e;
+    --color-text-disabled: #61655c;
 
-    --color-border: #2b2b33;
-    --color-border-subtle: #202026;
-    --color-border-hover: #3e3e4a;
-    --color-border-strong: #545464;
+    --color-border: #3b3e38;
+    --color-border-subtle: #2c2e2a;
+    --color-border-hover: #6b6f66;
+    --color-border-strong: #f3f4f1;
 
-    /* Accent in dark mode: soft parchment/silver */
-    --color-primary: #e8e8ea;
+    --color-primary: #f3f4f1;
     --color-primary-hover: #ffffff;
-    --color-primary-active: #d4d4d8;
-    --color-primary-subtle: #24242c;
-    --color-primary-border: #3e3e4a;
-    --color-primary-contrast: #121214;
+    --color-primary-active: #d9dcd5;
+    --color-primary-subtle: #242622;
+    --color-primary-border: #f3f4f1;
+    --color-primary-contrast: #121311;
 
-    --color-focus: #e8e8ea;
+    --color-focus: #8fa6ff;
 
-    /* Semantic status colors in dark mode: calm, readable, lower saturation */
-    --color-success: #85dba5;
-    --color-success-subtle: #13251a;
-    --color-success-border: #234c34;
-    --color-success-text: #85dba5;
+    --color-success: #5ccf8b;
+    --color-success-subtle: #12261a;
+    --color-success-border: #5ccf8b;
+    --color-success-text: #8ee0ae;
 
-    --color-warning: #f0bd6d;
-    --color-warning-subtle: #271e11;
-    --color-warning-border: #523e1b;
-    --color-warning-text: #f0bd6d;
+    --color-warning: #f3f4f1;
+    --color-warning-subtle: #242622;
+    --color-warning-border: #f3f4f1;
+    --color-warning-text: #f3f4f1;
 
-    --color-danger: #f18f8f;
-    --color-danger-subtle: #291515;
-    --color-danger-border: #592525;
-    --color-danger-text: #f18f8f;
+    --color-danger: #ff6b5f;
+    --color-danger-subtle: #2c1311;
+    --color-danger-border: #ff6b5f;
+    --color-danger-text: #ff9a90;
 
-    --color-info: #83c1e7;
-    --color-info-subtle: #13202b;
-    --color-info-border: #223f54;
-    --color-info-text: #83c1e7;
+    --color-info: #8fa6ff;
+    --color-info-subtle: #151c33;
+    --color-info-border: #8fa6ff;
+    --color-info-text: #b5c4ff;
 
-    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
-    --shadow-md: 0 3px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-    --shadow-lg: 0 8px 16px -4px rgba(0, 0, 0, 0.45);
-    --shadow-xl: 0 16px 24px -6px rgba(0, 0, 0, 0.55);
+    --issue-heat: #ff5a4e;
+    --issue-leak: #7d97ff;
+    --issue-pests: #4cc27f;
+    --issue-entry: #b48cf0;
+    --issue-common: #3cc2c9;
+    --issue-no-timeline: #aab0b8;
+    --issue-building: #f3f4f1;
+    --issue-deposit: #aab0b8;
+    --issue-lockout: #f0709f;
+    --issue-ink: #121311;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 24px -6px rgba(0, 0, 0, 0.55);
+    --shadow-xl: 0 18px 36px -10px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -201,31 +254,72 @@ body {
 }
 
 ::selection {
-  background: rgba(120, 120, 120, 0.25);
-  color: var(--color-text-primary);
+  background: var(--color-focus);
+  color: #ffffff;
 }
 
-/* Typography base refinements */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+html {
+  scrollbar-color: var(--color-border-hover) var(--color-canvas);
+  accent-color: var(--color-primary);
+  caret-color: var(--color-focus);
+}
+
+/* Headings are painted in block letters. Big words, few of them. */
 h1, h2, h3, h4, h5, h6 {
   color: var(--color-text-primary);
-  letter-spacing: -0.02em;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.005em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  text-transform: uppercase;
+}
+
+h1 {
+  font-weight: 900;
 }
 
 p {
   color: var(--color-text-secondary);
   line-height: 1.6;
-  max-width: 72ch;
+  max-width: 68ch;
 }
 
 a {
   color: var(--color-text-primary);
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 2px;
   text-underline-offset: 3px;
+  text-decoration-color: var(--color-border-hover);
 }
 
 a:hover {
   color: var(--color-primary-hover);
+  text-decoration-color: currentColor;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+/* Counts and dates line up in columns. */
+time,
+td,
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,6 @@
 # Translations: how review works
 
-Building Ledger shows a translation to residents only after a fluent community reviewer checks it (AGENTS.md §14). Machine or draft translations are never shown to residents.
+Tenant Tools shows a translation to residents only after a fluent community reviewer checks it (AGENTS.md §14). Machine or draft translations are never shown to residents.
 
 ## What can be translated
 

@@ -33,18 +33,18 @@ const exactTallies = (tallies: (typeof canvasses)[number]["tallies"]) =>
 <html lang="en">
   <head>
     <SeoHead
-      title="Canvass tally | Building Ledger"
+      title="Canvass tally | Tenant Tools"
       description="Private steward tool to count households with each problem during door-knocking."
       canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/canvass`}
       imagePath="/og/private-dashboard.png"
-      imageAlt="Building Ledger canvass tally"
+      imageAlt="Tenant Tools canvass tally"
       noindex={true}
     />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <AppHeader
-      title="Building Ledger"
+      title="Tenant Tools"
       subtitle={`Canvass: ${buildingId || "Not listed"}`}
       backHref={dashboardUrl}
       backLabel="Building dashboard"
@@ -69,7 +69,6 @@ const exactTallies = (tallies: (typeof canvasses)[number]["tallies"]) =>
           <>
             <section class="panel" data-canvass data-building={buildingId}>
               <div>
-                <p class="eyebrow">Canvass tally</p>
                 <h1>Count problems door to door</h1>
                 <p class="helper">Tap + for each household that has the problem. Count households, not people.</p>
                 <p class="helper">Do not write unit numbers or names anywhere. Only the counts are saved.</p>

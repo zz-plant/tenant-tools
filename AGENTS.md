@@ -1,4 +1,4 @@
-# AGENTS.md — Building Ledger
+# AGENTS.md — Tenant Tools
 
 This file defines how AI agents (and humans using AI) should work in this repo:
 - what you are allowed to do
@@ -14,7 +14,7 @@ If you are an agent: treat this file as **binding**.
 
 ## 0) Project Summary (for agents)
 
-**Building Ledger** is a lightweight web app that helps residents:
+**Tenant Tools** is a lightweight web app that helps residents:
 - log building issues with minimal input
 - add “me too” participation without writing
 - upload evidence (privately) attached to issues

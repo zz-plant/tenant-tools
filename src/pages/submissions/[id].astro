@@ -20,7 +20,7 @@ import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
 import { reconcileReportCount } from "../../lib/domain/submissions";
 import { countReporterMarkers, fetchSubmissionRecord, saveSubmissionRecord } from "../../lib/storage/submissions";
 import { buildBuildingDashboardUrl } from "../../lib/navigation";
-import { buildRecordNoticeUrl, nextNoticeStage, noticeStageActionLabels } from "../../lib/followUp";
+import { buildFollowUpItems, daysOpen, nextStepButtonLabel, nextStepForRecord } from "../../lib/followUp";
 import { formatIssueLabel } from "../../lib/noticeUtils";
 import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
@@ -71,8 +71,8 @@ const detailEntries = submissionRecord ? Object.entries(submissionRecord.issueDe
 const zoneLabel = zoneOptions.find((option) => option.id === submissionRecord?.zone)?.label || "Not listed";
 const portfolioLabel =
   portfolioOptions.find((option) => option.id === submissionRecord?.portfolio)?.label || "Not listed";
-const startDateLabel = submissionRecord?.startDate || "Not listed";
-const reportDateLabel = submissionRecord?.reportDate || "Not listed";
+const startDateLabel = submissionRecord?.startDate ? formatTimelineDate(submissionRecord.startDate) : "Not listed";
+const reportDateLabel = submissionRecord?.reportDate ? formatTimelineDate(submissionRecord.reportDate) : "Not listed";
 const reportCountLabel =
   typeof submissionRecord?.reportCount === "number"
     ? formatResidentReportCount(submissionRecord.reportCount)
@@ -89,14 +89,19 @@ const timelineEntries = submissionRecord
   ? getSubmissionTimelineEntries({ ...submissionRecord, events: recordEvents })
   : [];
 const fairNoticeRule = getFairNoticeRule(today);
-// "Send a follow-up" opens the builder filled in from this record. Saving there adds a dated fact here.
-const nextNotice = submissionRecord ? nextNoticeStage(submissionRecord, recordEvents, today) : null;
-const nextNoticeUrl = submissionRecord ? buildRecordNoticeUrl(submissionRecord.id) : "";
-const nextNoticeLockNote = nextNotice?.unlockDate
-  ? nextNotice.stage === "A"
-    ? `A follow-up unlocks on ${formatTimelineDate(nextNotice.unlockDate)}.`
-    : `The final reminder unlocks on ${formatTimelineDate(nextNotice.unlockDate)}.`
-  : "";
+// The same next step as this record's row on the building page: a follow-up item first, then the next notice.
+// A notice step opens the builder filled in from this record. Saving there adds a dated fact here.
+const nextStep =
+  submissionRecord && submissionRecord.status === "open" && !submissionRecord.mergedInto
+    ? nextStepForRecord(
+        submissionRecord,
+        recordEvents,
+        today,
+        buildFollowUpItems([submissionRecord], new Map([[submissionRecord.id, recordEvents]]), today)
+      )
+    : null;
+const dayCount = submissionRecord ? daysOpen(submissionRecord.startDate || submissionRecord.reportDate, today) : 0;
+const isOpen = submissionRecord?.status === "open";
 // One-tap choices for the facts residents add most. The full list stays in the menu.
 const quickFactTypes = ["management_replied", "repair_date_promised", "repair_completed", "request_311_filed"] as const;
 const factTypesByGroup = recordEventGroups.map((group) => ({
@@ -118,36 +123,28 @@ const groupChatText = submissionRecord
 <html lang="en">
   <head>
     <SeoHead
-      title="Record summary | Building Ledger"
+      title="Record summary | Tenant Tools"
       description="Private resident record summary with timeline and factual details."
       canonicalPath={`/submissions/${encodeURIComponent(id ?? "")}`}
       imagePath="/og/private-record.png"
-      imageAlt="Building Ledger private issue record summary preview"
+      imageAlt="Tenant Tools private issue record summary preview"
       noindex={true}
     />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <AppHeader
-      title="Building Ledger"
-      subtitle={submissionRecord?.building ? `Record for ${submissionRecord.building}` : "Issue Record"}
+      title="Tenant Tools"
+      subtitle={submissionRecord?.building ? submissionRecord.building : "Issue record"}
       backHref={dashboardUrl || "/"}
-      backLabel={dashboardUrl ? "Building dashboard" : "Notice builder"}
+      backLabel={dashboardUrl ? "Building" : "Home"}
       statusBadge={hasAccess ? "Verified access" : "Access key needed"}
       isSteward={isSteward}
     />
     <div class="page">
-      <header class="hero">
-        <div class="hero-main">
-          <p class="eyebrow">Shared ledger record</p>
-          <h1>Issue record</h1>
-          <p class="tagline">This permalink shows the saved issue record.</p>
-        </div>
-      </header>
-
-      <main class="layout" id="main">
-        <section class="panel panel-highlight preview-panel">
-          {!hasAccess ? (
+      <main class="record" id="main">
+        {!hasAccess ? (
+          <section class="panel">
             <AccessKeyPanel
               title="Access key required"
               helperLines={[
@@ -160,102 +157,91 @@ const groupChatText = submissionRecord
               errorMessage={hasAccessAttempt ? "Key does not match this record." : ""}
               backLabel="Back to notice builder"
             />
-          ) : submissionRecord ? (
-            <>
-              <div class="summary-grid">
-                <div class="summary-card">
-                  <p class="summary-label">Building</p>
-                  <p class="summary-value">{submissionRecord.building}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Portfolio</p>
-                  <p class="summary-value">{portfolioLabel}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Issue</p>
-                  <p class="summary-value">{issueLabel}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Zone</p>
-                  <p class="summary-value">{zoneLabel}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Stage</p>
-                  <p class="summary-value">{stageLabel}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Start date</p>
-                  <p class="summary-value">{startDateLabel}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Report date</p>
-                  <p class="summary-value">{reportDateLabel}</p>
-                </div>
-                <div class="summary-card">
-                  <p class="summary-label">Reports</p>
-                  <p class="summary-value">{reportCountLabel}</p>
-                </div>
+          </section>
+        ) : submissionRecord ? (
+          <>
+            <header class="record-head" data-issue={submissionRecord.issue}>
+              <span class="record-swatch" aria-hidden="true"></span>
+              <div class="record-title">
+                <h1>{issueLabel}</h1>
+                <p class="record-meta">
+                  {submissionRecord.building}. Started {startDateLabel}. Me too: {reportCountLabel}.
+                  {submissionRecord.status !== "open" && ` ${submissionRecord.status === "resolved" ? "Resolved" : "Archived"}.`}
+                </p>
               </div>
-              {mergedIntoUrl ? (
-                <div class="merged-notice" role="note">
-                  <p>This record is a duplicate. A steward merged it into the main record.</p>
-                  <a class="button" href={mergedIntoUrl}>Open the main record</a>
-                </div>
-              ) : (
-                <>
-                  <div class="issue-actions">
-                    <button class="button" type="button" data-me-too data-submission-id={id}>Me too</button>
-                    <a class="button button-secondary" href={nextNoticeUrl} data-next-notice>
-                      {nextNotice ? noticeStageActionLabels[nextNotice.stage] : "Send a follow-up"}
+              {isOpen && (
+                <p class="problem-days record-days" aria-label={`${dayCount} days open`}>
+                  <b class="tabular">{dayCount}</b>
+                  <span>{dayCount === 1 ? "day" : "days"} open</span>
+                </p>
+              )}
+            </header>
+
+            {mergedIntoUrl ? (
+              <div class="merged-notice" role="note">
+                <p>This record is a duplicate. A steward merged it into the main record.</p>
+                <a class="button" href={mergedIntoUrl}>Open the main record</a>
+              </div>
+            ) : (
+              <section class="next-up" aria-label="Next step">
+                {nextStep?.state === "ready" ? (
+                  <div class="next-sign">
+                    <h2>{nextStep.label}</h2>
+                    <p>{nextStep.note ?? "The dates from this record are filled in for you."}</p>
+                    <a class="button" href={nextStep.href} data-next-notice={nextStep.opens === "notice" ? "" : undefined}>
+                      {nextStepButtonLabel(nextStep)}
                     </a>
                   </div>
-                  {nextNoticeLockNote && <p class="helper">{nextNoticeLockNote}</p>}
-                  <p class="helper" data-me-too-status role="status" aria-live="polite">
-                    Tap “Me too” if you have this problem. No personal details are saved.
-                  </p>
-                </>
-              )}
-              <p class="helper">Review this summary before sharing. Small report counts may be hidden for privacy.</p>
-              <p class="helper">Resident-reported. Not verified.</p>
-              <button class="button button-secondary no-print" type="button" data-print>Print or save as PDF</button>
-              {dashboardUrl && (
-                <a class="button button-secondary" href={dashboardUrl}>
-                  Back to building dashboard
-                </a>
-              )}
-
-              <div class="export-block">
-                <div>
-                  <h3>Issue timeline</h3>
-                  <p class="helper">Read-only record of key dates.</p>
+                ) : nextStep ? (
+                  <div class="next-calm">
+                    <h2>{nextStep.label}</h2>
+                    <p>Add a dated fact below when something changes.</p>
+                  </div>
+                ) : null}
+                <div class="next-actions">
+                  <button class="button button-secondary" type="button" data-me-too data-submission-id={id}>Me too</button>
+                  <a class="button button-secondary" href="#facts">Add a dated fact</a>
                 </div>
+                <p class="helper" data-me-too-status role="status" aria-live="polite">
+                  Tap “Me too” if you have this problem. No personal details are saved.
+                </p>
+              </section>
+            )}
+
+            <div class="record-grid">
+              <section class="panel" aria-labelledby="timeline-title">
+                <h2 id="timeline-title">What happened</h2>
                 {timelineEntries.length > 0 ? (
                   <ul class="timeline">
                     {timelineEntries.map((entry) => (
-                      <li>
+                      <li class={entry.counted ? "is-counted" : undefined}>
                         <p class="timeline-date">{formatTimelineDate(entry.date)}</p>
-                        <p class="timeline-label">{entry.label}</p>
+                        <p class="timeline-label">
+                          {entry.label}
+                          {entry.counted && <span class="timeline-note">Counted from the rule. Not a reported event.</span>}
+                        </p>
                       </li>
                     ))}
                   </ul>
                 ) : (
                   <p class="helper">No timeline dates were saved.</p>
                 )}
-              </div>
+                <p class="helper">Dates are resident-reported and not verified.</p>
+              </section>
 
               {!mergedIntoUrl && (
-                <div
-                  class="export-block no-print"
+                <section
+                  class="panel no-print"
                   id="facts"
+                  aria-labelledby="facts-title"
                   data-record-facts
                   data-submission-id={id}
                   data-today={today}
                   data-fair-notice-tiers={JSON.stringify(fairNoticeRule?.tiers ?? [])}
                 >
                   <div>
-                    <h3>Add a dated fact</h3>
-                    <p class="helper">Add what happened after your notice. Choose from the list. Dates only. No names.</p>
-                    <p class="helper">Residents with the building key can see these facts.</p>
+                    <h2 id="facts-title">Add a dated fact</h2>
+                    <p class="helper">What happened after your notice. Dates only. No names. Residents with the building key can see these facts.</p>
                   </div>
                   <div class="fact-tag-row quick-facts" role="group" aria-label="Common facts">
                     {quickFactTypes.map((type) => (
@@ -344,46 +330,20 @@ const groupChatText = submissionRecord
                       </ul>
                     </div>
                   )}
-                </div>
+                </section>
               )}
 
-
-
-              <div class="export-block share-checklist" id="share-checklist">
-                <div>
-                  <h3>Before you share</h3>
-                  <p class="helper">Check all items before you copy the link.</p>
-                </div>
-                <label class="checkbox-label">
-                  <input type="checkbox" class="share-check" />
-                  I removed names.
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" class="share-check" />
-                  I removed unit numbers.
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" class="share-check" />
-                  I removed phone numbers and email addresses.
-                </label>
-                <button class="button" type="button" data-share-chat data-share-text={groupChatText} disabled title="Complete all checks to share">Share in group chat</button>
-                <button class="button button-secondary" type="button" data-copy-link disabled title="Complete all checks to copy the link">Copy this record link</button>
-                <p class="helper">The shared message has the issue type, start date, and link. It does not include the key.</p>
-                <p class="helper">Share only with residents who have the key.</p>
-                <p class="helper" data-share-status role="status" aria-live="polite">Complete all checks to copy the link.</p>
-              </div>
-
-              <div
-                class="export-block"
+              <section
+                class="panel"
                 id="evidence"
+                aria-labelledby="evidence-title"
                 data-evidence={evidenceEnabled ? "" : undefined}
                 data-submission-id={id}
                 data-is-steward={isSteward ? "true" : "false"}
               >
                 <div>
-                  <h3>Private evidence</h3>
-                  <p class="helper">Photos are private. Only residents with the key can see them.</p>
-                  <p class="helper">Photos on file: <span data-evidence-count>{evidenceCount}</span></p>
+                  <h2 id="evidence-title">Private photos</h2>
+                  <p class="helper">Only residents with the key can see them. Photos on file: <span data-evidence-count>{evidenceCount}</span></p>
                 </div>
                 {!evidenceEnabled ? (
                   <p class="helper">Photo upload is not set up for this site yet.</p>
@@ -411,60 +371,82 @@ const groupChatText = submissionRecord
                     )}
                   </>
                 )}
-              </div>
+              </section>
 
-              <div class="export-block">
+              <section class="panel share-checklist no-print" id="share-checklist" aria-labelledby="share-title">
                 <div>
-                  <h3>Details saved</h3>
-                  <p class="helper">Short factual details only. Photos are in the private evidence section.</p>
+                  <h2 id="share-title">Tell your neighbors</h2>
+                  <p class="helper">Check all items before you share. The message has the problem, the start date, and the link. It does not include the key.</p>
                 </div>
-                {(submissionRecord.ticketDate || submissionRecord.ticketNumber) && (
-                  <ul class="submission-detail-list detail-grid">
-                    {submissionRecord.ticketDate && (
-                      <li>
-                        <strong>311 ticket date:</strong> {submissionRecord.ticketDate}
-                      </li>
-                    )}
-                    {submissionRecord.ticketNumber && (
-                      <li>
-                        <strong>311 ticket number:</strong> {submissionRecord.ticketNumber}.{" "}
-                        <a class="no-print" href="https://311.chicago.gov/s/" target="_blank" rel="noreferrer">Check a 311 request</a>
-                      </li>
-                    )}
-                  </ul>
-                )}
-                {detailEntries.length > 0 ? (
-                  <ul class="submission-detail-list detail-grid">
-                    {detailEntries.map(([key, value]) => {
-                      const label = fieldDefinitions[key as keyof typeof fieldDefinitions]?.label || key;
-                      return (
-                        <li>
-                          <strong>{label}:</strong> {value}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                ) : submissionRecord.ticketDate || submissionRecord.ticketNumber ? null : (
-                  <p class="helper">No details were saved.</p>
-                )}
-              </div>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="share-check" />
+                  I removed names.
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="share-check" />
+                  I removed unit numbers.
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="share-check" />
+                  I removed phone numbers and email addresses.
+                </label>
+                <div class="share-actions">
+                  <button class="button" type="button" data-share-chat data-share-text={groupChatText} disabled title="Complete all checks to share">Share in group chat</button>
+                  <button class="button button-secondary" type="button" data-copy-link disabled title="Complete all checks to copy the link">Copy this record link</button>
+                </div>
+                <p class="helper" data-share-status role="status" aria-live="polite">Complete all checks to copy the link.</p>
+                <p class="helper">Share only with residents who have the key.</p>
+              </section>
 
-              <div class="export-block no-print">
+              <section class="panel" aria-labelledby="details-title">
+                <h2 id="details-title">Details saved</h2>
+                <dl class="record-facts">
+                  <div><dt>Building</dt><dd>{submissionRecord.building}</dd></div>
+                  <div><dt>Where</dt><dd>{zoneLabel}</dd></div>
+                  <div><dt>Management</dt><dd>{portfolioLabel}</dd></div>
+                  <div><dt>Notice saved</dt><dd>{stageLabel}</dd></div>
+                  <div><dt>Start date</dt><dd>{startDateLabel}</dd></div>
+                  <div><dt>Report date</dt><dd>{reportDateLabel}</dd></div>
+                  {submissionRecord.ticketDate && <div><dt>311 ticket date</dt><dd>{formatTimelineDate(submissionRecord.ticketDate)}</dd></div>}
+                  {submissionRecord.ticketNumber && (
+                    <div>
+                      <dt>311 ticket number</dt>
+                      <dd>
+                        {submissionRecord.ticketNumber}.{" "}
+                        <a class="no-print" href="https://311.chicago.gov/s/" target="_blank" rel="noreferrer">Check a 311 request</a>
+                      </dd>
+                    </div>
+                  )}
+                  {detailEntries.map(([key, value]) => (
+                    <div>
+                      <dt>{fieldDefinitions[key as keyof typeof fieldDefinitions]?.label || key}</dt>
+                      <dd>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <p class="helper">Small report counts are hidden for privacy.</p>
+                <div class="share-actions no-print">
+                  <button class="button button-secondary" type="button" data-print>Print or save as PDF</button>
+                  {dashboardUrl && <a class="button button-secondary" href={dashboardUrl}>Back to building</a>}
+                </div>
+              </section>
+
+              <section class="panel no-print">
                 <HelpResources />
-              </div>
-            </>
-          ) : (
-            <div>
-              <h2>We could not find this record.</h2>
-              <p class="helper">Check the link, or confirm you used the correct building key.</p>
-              <a class="button" href="/">Back to builder</a>
+              </section>
             </div>
-          )}
-        </section>
+          </>
+        ) : (
+          <section class="panel">
+            <h2>We could not find this record.</h2>
+            <p class="helper">Check the link, or confirm you used the correct building key.</p>
+            <a class="button" href="/">Back to builder</a>
+          </section>
+        )}
       </main>
 
       <footer class="site-footer">
-        <p>Safety first: review this summary before sharing.</p>
+        <p>Review this record before you share it.</p>
         {hasAccess && (
           <p><a href="?forget=1">Forget key on this device</a>. Use this on a shared phone.</p>
         )}

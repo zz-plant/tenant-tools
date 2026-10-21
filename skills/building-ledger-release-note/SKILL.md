@@ -1,9 +1,9 @@
 ---
 name: building-ledger-release-note
-description: Generate policy-aligned PR summary and changelog text for Building Ledger changes with required scope, security, and test sections.
+description: Generate policy-aligned PR summary and changelog text for Tenant Tools changes with required scope, security, and test sections.
 ---
 
-# Building Ledger Release Note
+# Tenant Tools Release Note
 
 Use this skill when preparing:
 

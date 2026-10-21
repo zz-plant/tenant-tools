@@ -1,9 +1,9 @@
 ---
 name: building-ledger-security-review
-description: Security and privacy review workflow for Building Ledger changes that touch access, evidence, export, notice, or visibility controls.
+description: Security and privacy review workflow for Tenant Tools changes that touch access, evidence, export, notice, or visibility controls.
 ---
 
-# Building Ledger Security Review
+# Tenant Tools Security Review
 
 Use this skill when a change touches any sensitive flow:
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.9.0 - 2026-10-21
+
+### Changed
+
+- New name: Tenant Tools. "Building Ledger" named only the record. The tool also helps neighbors act together: "Me too", meetings, letters, and 311 days. New app icon and link previews.
+- New look: block letters (Big Shoulders, a Chicago sign typeface, served from this site), flat colours on a white wall, and one colour for each problem type, the same on every page. Night mode uses the same colours on a dark board.
+- Building page: one yellow sign at the top shows the one step you can take now, with its button. Each open problem shows how many days it has been open, its "Me too" count, and its next step, or the date that step unlocks. The oldest problem is first. Group tools (meeting report, joint letter, 311 day, printable summary) have their own list.
+- Building page: removed the second "Report a problem" button, the filter form (the type buttons do the same job), the overview boxes, and the empty "Archived" section.
+- Record page: the problem's name and days open come first, then the next notice, "Me too", and "Add a dated fact". The eight small boxes at the top moved to "Details saved" at the bottom.
+- Home: a shorter start. One heading ("Put it in writing. Act together."), one line, "Write a notice", and a button for your own building when this device has its key.
+- Notice builder: one progress line instead of three, and problem types as coloured tiles with simple drawn icons. "Back" shows from step 2.
+- Bigger buttons, inputs, and checkboxes for phones.
+
 ## 1.8.1 - 2026-10-20
 
 ### Changed

@@ -154,7 +154,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const { scheduleTimeout } = useTimedCallbacks();
   const stepProgress = Math.round((currentStep / steps.length) * 100);
   const currentStepInfo = steps[currentStep - 1];
-  const progressPillLabel = stepProgress < 100 ? `${stepProgress}%` : "Done";
 
   const missingBasics = useMemo(() => {
     const missing: string[] = [];
@@ -791,8 +790,6 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
               currentStep={currentStep}
               totalSteps={steps.length}
               stepProgress={stepProgress}
-              progressPillLabel={progressPillLabel}
-              stepsLocked={stepsLocked}
               currentStepLabel={currentStepInfo.label}
             />
             <Tabs.Root
@@ -828,15 +825,12 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         <span className="step-title">{step.title}</span>
                       </div>
                       <span className="step-label">{step.label}</span>
-                      <span className="step-requirement">{step.requirement}</span>
-                      {isLocked && <span className="step-lock-note">Locked</span>}
+                      {step.requirement === "Optional" && <span className="step-requirement">Optional</span>}
                     </Tabs.Tab>
                   );
                 })}
               </Tabs.List>
-              {stepsLocked && <p className="helper">Complete step 1 to unlock steps 2 to 4.</p>}
-              <p className="helper">Use Next to continue. You can go back any time.</p>
-              <p className="helper mobile-step-hint">Use step buttons above on mobile.</p>
+              {stepsLocked && <p className="helper">Choose a building and a problem to open the next steps.</p>}
               {/* Enter in a field must not submit this form. A submit reloads the page and loses the draft. */}
               <form className="form-grid" onSubmit={(event) => event.preventDefault()}>
                 <Tabs.Panel value="1">
@@ -885,6 +879,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             key={option.id}
                             render={<div />}
                             className={`issue-option-card ${formState.issue === option.id ? "active" : ""}`}
+                            data-issue={option.id}
                             value={option.id}
                             aria-label={formatIssueLabel(option.label)}
                           >
@@ -1426,14 +1421,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
             </Tabs.Root>
 
             <div className="step-controls">
-              <Button
-                className="button button-secondary"
-                type="button"
-                onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
-                disabled={currentStep === 1}
-              >
-                Back
-              </Button>
+              {currentStep > 1 && (
+                <Button
+                  className="button button-secondary"
+                  type="button"
+                  onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+                >
+                  Back
+                </Button>
+              )}
               <Button
                 className="button"
                 type="button"

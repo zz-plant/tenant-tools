@@ -78,18 +78,18 @@ const portfolio = firstRecord?.portfolio ?? "other";
 <html lang="en">
   <head>
     <SeoHead
-      title="Joint letter | Building Ledger"
+      title="Joint letter | Tenant Tools"
       description="Private tool to write a joint repair plan letter from residents."
       canonicalPath={`/buildings/${encodeURIComponent(buildingId)}/letter`}
       imagePath="/og/private-dashboard.png"
-      imageAlt="Building Ledger private joint letter preview"
+      imageAlt="Tenant Tools private joint letter preview"
       noindex={true}
     />
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to main content</a>
     <AppHeader
-      title="Building Ledger"
+      title="Tenant Tools"
       subtitle={`Building: ${buildingId || "Not listed"}`}
       backHref={dashboardUrl}
       backLabel="Building dashboard"
@@ -118,7 +118,6 @@ const portfolio = firstRecord?.portfolio ?? "other";
               data-issues={JSON.stringify(openIssues)}
             >
               <div>
-                <p class="eyebrow">Joint letter</p>
                 <h1>Write a joint letter</h1>
                 <p class="helper">One letter from many households. It lists open problems. No names.</p>
                 <p class="helper">Information only. Not legal advice.</p>

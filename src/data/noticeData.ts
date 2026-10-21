@@ -1,4 +1,4 @@
-export { issueOptions } from "./notice/issueOptions";
+export { issueOptions, issueShortLabels } from "./notice/issueOptions";
 export type { IssueId } from "./notice/issueOptions";
 export { zoneOptions, issue311Guidance } from "./notice/guidance";
 export type { ZoneId } from "./notice/guidance";
