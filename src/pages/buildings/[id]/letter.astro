@@ -24,7 +24,7 @@ import AppHeader from "../../../components/AppHeader.astro";
 export const prerender = false;
 
 const { id } = Astro.params;
-const env = Astro.locals.runtime?.env ?? {};
+const env = Astro.locals.env ?? {};
 const kv = env.SUBMISSIONS_KV;
 const buildingId = decodeURIComponent(id ?? "");
 const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? null;

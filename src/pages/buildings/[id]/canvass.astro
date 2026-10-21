@@ -13,7 +13,7 @@ import AppHeader from "../../../components/AppHeader.astro";
 export const prerender = false;
 
 const { id } = Astro.params;
-const env = Astro.locals.runtime?.env ?? {};
+const env = Astro.locals.env ?? {};
 const kv = env.SUBMISSIONS_KV;
 const buildingId = decodeURIComponent(id ?? "");
 const stewardKey = Astro.cookies.get(STEWARD_KEY_COOKIE)?.value ?? null;

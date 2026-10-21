@@ -29,12 +29,10 @@ describe("audit event logging", () => {
   it("writes an audit event for each write operation", async () => {
     const kv = createMockKv();
     const locals = {
-      runtime: {
-        env: {
-          SUBMISSIONS_KV: kv,
-          BUILDING_KEYS_JSON,
-          STEWARD_KEY: "steward-secret",
-        },
+      env: {
+        SUBMISSIONS_KV: kv,
+        BUILDING_KEYS_JSON,
+        STEWARD_KEY: "steward-secret",
       },
     };
 
@@ -91,12 +89,10 @@ describe("audit event logging", () => {
   it("records rejected audit events for blocked writes", async () => {
     const kv = createMockKv();
     const locals = {
-      runtime: {
-        env: {
-          SUBMISSIONS_KV: kv,
-          BUILDING_KEYS_JSON,
-          STEWARD_KEY: "steward-secret",
-        },
+      env: {
+        SUBMISSIONS_KV: kv,
+        BUILDING_KEYS_JSON,
+        STEWARD_KEY: "steward-secret",
       },
     };
 

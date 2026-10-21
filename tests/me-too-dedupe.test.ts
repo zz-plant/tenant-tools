@@ -42,7 +42,7 @@ const createMockKv = () => {
 
 const setup = async () => {
   const kv = createMockKv();
-  const locals = { runtime: { env: { SUBMISSIONS_KV: kv, BUILDING_KEYS_JSON } } };
+  const locals = { env: { SUBMISSIONS_KV: kv, BUILDING_KEYS_JSON } };
   const response = await createSubmission({
     request: new Request("http://localhost/api/submissions", {
       method: "POST",

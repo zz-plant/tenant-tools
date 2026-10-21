@@ -11,7 +11,7 @@ import AppHeader from "../components/AppHeader.astro";
 
 export const prerender = false;
 
-const env = Astro.locals.runtime?.env ?? {};
+const env = Astro.locals.env ?? {};
 const kv = env.SUBMISSIONS_KV;
 const stewardKey = Astro.cookies.get(STEWARD_KEY_COOKIE)?.value ?? null;
 const isSteward = isAccessKeyValid(stewardKey, env.STEWARD_KEY);

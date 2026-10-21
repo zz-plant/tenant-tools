@@ -7,7 +7,7 @@ import { getBuildingOptions } from "../data/buildings";
 import { getBuildingIdsForKey, parseBuildingKeys } from "../lib/access";
 import { RESIDENT_KEY_COOKIE } from "../lib/api/requestGuard";
 
-const env = Astro.locals.runtime?.env ?? {};
+const env = Astro.locals.env ?? {};
 const buildingKeys = parseBuildingKeys(env.BUILDING_KEYS_JSON);
 const buildingOptions = getBuildingOptions(buildingKeys);
 // Only building ids reach the client. The key itself stays in the httpOnly cookie.

@@ -20,7 +20,7 @@ const setup = async (options: { withEvidence?: boolean } = {}) => {
     env.EVIDENCE_BUCKET = bucket;
     env.EVIDENCE_SIGNING_KEY = "signing-secret";
   }
-  const locals = { runtime: { env } };
+  const locals = { env };
   let ip = 0;
   const nextIp = () => `7.7.${Math.floor(ip / 250)}.${ip++ % 250}`;
 

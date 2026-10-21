@@ -19,14 +19,14 @@ import AppHeader from "../../components/AppHeader.astro";
 export const prerender = false;
 
 const { id } = Astro.params;
-const kv = Astro.locals.runtime?.env?.SUBMISSIONS_KV;
+const kv = Astro.locals.env?.SUBMISSIONS_KV;
 const url = new URL(Astro.request.url);
 const accessKey = Astro.cookies.get(RESIDENT_KEY_COOKIE)?.value ?? url.searchParams.get("key");
 const stewardKey = Astro.cookies.get(STEWARD_KEY_COOKIE)?.value ?? url.searchParams.get("stewardKey");
-const requiredStewardKey = Astro.locals.runtime?.env?.STEWARD_KEY;
+const requiredStewardKey = Astro.locals.env?.STEWARD_KEY;
 const buildingId = decodeURIComponent(id ?? "");
 
-const hasAccess = isBuildingAccessValid(buildingId, accessKey, Astro.locals.runtime?.env ?? {});
+const hasAccess = isBuildingAccessValid(buildingId, accessKey, Astro.locals.env ?? {});
 const hasAccessAttempt = Boolean(accessKey && accessKey.trim());
 const isSteward = isAccessKeyValid(stewardKey, requiredStewardKey);
 
