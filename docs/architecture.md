@@ -167,14 +167,14 @@ Catalogs in `src/data/i18n/catalog.<lang>.json` store each string with `status` 
 
 ## Cloudflare setup
 
-`wrangler.jsonc` is the source of truth. CI checks it with tests (`tests/cloudflare-setup.test.ts`).
+`wrangler.jsonc` is the source of truth. The tests check it (`tests/cloudflare-setup.test.ts`).
 
 - **Dashboard variables are kept.** `keep_vars` is on, so a deploy does not delete variables set in the Cloudflare dashboard, such as `BUILDING_KEYS_JSON`.
 - **One address.** `workers_dev` and `preview_urls` are off. The Worker is served only at the custom domain.
 - **Rate limits.** Write routes declare a limit per minute. `requestGuard` uses the Rate Limiting binding `RATE_LIMIT_<limit>_PER_MINUTE` for that limit, keyed by route, IP, and session. Counts stay at each Cloudflare location and use no KV writes. A limit with no binding (the 10-minute evidence upload limit, and tests) uses the KV counter in `src/lib/rateLimit.ts`. If the binding fails, the request is allowed. If the KV counter cannot be saved (KV allows one write per second to a key), the request gets a 429 with `Retry-After: 1`, so a burst cannot skip the limit.
 - **Headers.** Middleware adds HSTS, `nosniff`, no framing (`X-Frame-Options: DENY`, `frame-ancestors 'none'`), `Referrer-Policy: same-origin`, and a `Permissions-Policy` with no camera, microphone, or location. A route's own header wins (evidence responses keep their sandbox CSP). Static files in `dist/` are served by Cloudflare without the Worker and do not get these headers.
 - **Logs.** Workers Logs is on, with invocation logs off, because request URLs can hold keys. Middleware writes one JSON line for a failed request: route pattern (such as `/buildings/[id]`), method, status, and a short error. No URL, no address, no key.
-- **Deploys.** The `deploy` job in `.github/workflows/ci.yml` runs `wrangler deploy` on `main` after the checks pass. It needs the `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` repository secrets and the `SITE_URL` variable. `SITE_URL` is read at build time.
+- **Deploys.** Cloudflare Workers Builds runs typecheck, tests, and the build on each push to `main`, then `wrangler deploy`. A failed check stops the deploy. GitHub Actions (`.github/workflows/ci.yml`) runs the same checks on pull requests only. `SITE_URL` is read at build time.
 
 ## Environment variables
 

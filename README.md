@@ -121,7 +121,6 @@ Use one of the following local-only options:
 
 - `.dev.vars` (recommended for Cloudflare-style local runs)
 - `.env` for local shell/session loading
-- Wrangler environment config for deploy environments
 
 Do not commit files that contain real keys.
 
@@ -152,16 +151,16 @@ Photo upload is off until both of these are set. Without them, the record page s
   wrangler secret put EVIDENCE_SIGNING_KEY
   ```
 
-Local run with KV and R2 simulated:
+Local run with KV and R2 simulated (bindings come from `wrangler.jsonc`):
 
 ```bash
 bun run build
-npx wrangler pages dev dist --kv SUBMISSIONS_KV --r2 EVIDENCE_BUCKET --compatibility-flags nodejs_compat
+npx wrangler dev
 ```
 
 ### SEO and sitemap
 
-- `SITE_URL` — preferred full site origin used to build canonical URLs and sitemap entries (example: `https://app.example.org`). If unset, build tooling may fall back to deploy URL environment variables and will log a warning.
+- `SITE_URL` — full site origin used for canonical URLs, link previews, and sitemap entries (example: `https://app.example.org`). Read at build time. If unset, links point to `https://galina.kanav.net`.
 
 Example `BUILDING_KEYS_JSON`:
 
