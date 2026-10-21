@@ -126,6 +126,8 @@ const noticeContacts = hasAccess && kv ? await getNoticeContacts(kv, buildingId)
                 <h1>Write a joint letter</h1>
                 <p class="helper">One letter from many households. It lists open problems. No names.</p>
                 <p class="helper">Information only. Not legal advice.</p>
+                <p class="helper">The letter below is ready to use. You can change the choices first.</p>
+                <p><a class="fact-tag" href="#letter-preview">See the letter</a></p>
               </div>
 
               <form class="facts-form" data-letter-form>
@@ -233,14 +235,14 @@ const noticeContacts = hasAccess && kv ? await getNoticeContacts(kv, buildingId)
               </form>
             </section>
 
-            <section class="panel report-sheet">
+            <section class="panel report-sheet" id="letter-preview">
               <h2 class="no-print">Letter preview</h2>
-              <pre class="output output-summary letter-output" data-letter-output></pre>
               <div class="no-print report-actions">
                 <button class="button" type="button" data-letter-copy-text>Copy letter</button>
                 <button class="button button-secondary" type="button" data-print>Print or save as PDF</button>
                 <button class="button button-secondary" type="button" data-letter-save>Save to building ledger</button>
               </div>
+              <pre class="output output-summary letter-output" data-letter-output></pre>
               <p class="helper no-print">
                 Saving adds a "Building-wide message" record with the reply date on its timeline. Then you can add the reply when it comes.
               </p>

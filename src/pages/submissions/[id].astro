@@ -220,6 +220,12 @@ const groupChatText = submissionRecord
                 <p class="helper" data-me-too-status role="status" aria-live="polite">
                   Tap “Me too” if you have this problem too. Only the count goes up. No one can see who tapped.
                 </p>
+                {/* Photos, sharing, and printing are far down on a phone. These go straight to them. */}
+                <nav class="record-jumps no-print" aria-label="More on this record">
+                  {evidenceEnabled && <a class="fact-tag" href="#evidence">Add a photo</a>}
+                  <a class="fact-tag" href="#share-checklist">Tell your neighbors</a>
+                  <button class="fact-tag" type="button" data-print>Print</button>
+                </nav>
               </section>
             )}
 
@@ -480,6 +486,7 @@ const groupChatText = submissionRecord
               </section>
 
               <section class="panel no-print">
+                <p><a href="/rights">Your rights in Chicago: a short printable guide</a></p>
                 <HelpResources />
               </section>
             </div>
@@ -627,7 +634,7 @@ const groupChatText = submissionRecord
         }
       };
 
-      document.querySelector('[data-print]')?.addEventListener('click', () => window.print());
+      document.querySelectorAll('[data-print]').forEach((button) => button.addEventListener('click', () => window.print()));
       checks.forEach((item) => item.addEventListener('change', refreshShareStatus));
       if (shareButton instanceof HTMLButtonElement) {
         shareButton.addEventListener('click', shareToGroupChat);

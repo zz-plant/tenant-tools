@@ -68,6 +68,18 @@ const groupMessage = buildGroup311Message(items, today);
                 <p class="helper">Each resident can make their own 311 request. More requests put more reports on record with the City.</p>
                 <p class="helper">Call 311, or use 311.chicago.gov. Say what you saw and the dates. Do not guess.</p>
               </div>
+            </section>
+            {/* The message comes first: it is what the organizer copies. The call scripts follow. */}
+            <section class="panel">
+              <h2>Message for the group chat</h2>
+              <p class="helper">It has no address, no key, and no link. Check it before you send it.</p>
+              <div class="report-actions">
+                <button class="button" type="button" data-copy-text={groupMessage}>Copy message</button>
+              </div>
+              <p class="helper" data-copy-status role="status" aria-live="polite"></p>
+              <pre class="output output-summary letter-output">{groupMessage}</pre>
+            </section>
+            <section class="panel" aria-label="What to say to 311">
               {items.length === 0 ? (
                 <p class="helper">No open problems here have a 311 category yet.</p>
               ) : (
@@ -88,15 +100,6 @@ const groupMessage = buildGroup311Message(items, today);
                   ))}
                 </ul>
               )}
-            </section>
-            <section class="panel">
-              <h2>Message for the group chat</h2>
-              <p class="helper">It has no address, no key, and no link. Check it before you send it.</p>
-              <pre class="output output-summary letter-output">{groupMessage}</pre>
-              <div class="report-actions">
-                <button class="button" type="button" data-copy-text={groupMessage}>Copy message</button>
-              </div>
-              <p class="helper" data-copy-status role="status" aria-live="polite"></p>
             </section>
           </>
         )}
