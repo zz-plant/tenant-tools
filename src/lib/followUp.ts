@@ -13,18 +13,20 @@ import type { SubmissionRecord } from "./submissions";
  * Messages are calm and literal (AGENTS.md §6.2): "qualifies for a 311 inspection", not "escalate".
  */
 
-export type FollowUpKind = "reply_overdue" | "promise_missed" | "rlto_period_passed" | "qualifies_311";
+export type FollowUpKind = "reply_overdue" | "promise_missed" | "rlto_period_passed" | "qualifies_311" | "ward_office";
 
 /** Notice stages, as in the notice builder: A first notice, B follow-up, C final reminder. */
 export type NoticeStage = "A" | "B" | "C";
 
-/** One tap from a follow-up item: add a dated fact on the record, or send the next notice. */
+/** One tap from a follow-up item: add a dated fact, send the next notice, or open a group letter. */
 export type FollowUpAction =
   | { kind: "fact"; fact: RecordEventType; label: string }
-  | { kind: "notice"; stage: NoticeStage; label: string };
+  | { kind: "notice"; stage: NoticeStage; label: string }
+  | { kind: "letter"; letter: "alderperson"; label: string };
 
 export type FollowUpItem = {
   recordId: string;
+  building: string;
   issueLabel: string;
   kind: FollowUpKind;
   date: string;
@@ -114,10 +116,16 @@ export const buildRecordNoticeUrl = (recordId: string) => `/?record=${encodeURIC
 export const buildRecordFactUrl = (recordId: string, fact: RecordEventType) =>
   `/submissions/${encodeURIComponent(recordId)}?fact=${fact}#facts`;
 
+/** Joint letter page with the meeting request to the ward office already chosen. */
+export const buildWardOfficeLetterUrl = (building: string) =>
+  `/buildings/${encodeURIComponent(building)}/letter?kind=alderperson`;
+
 export const followUpActionHref = (item: FollowUpItem) =>
   item.action.kind === "fact"
     ? buildRecordFactUrl(item.recordId, item.action.fact)
-    : buildRecordNoticeUrl(item.recordId);
+    : item.action.kind === "letter"
+      ? buildWardOfficeLetterUrl(item.building)
+      : buildRecordNoticeUrl(item.recordId);
 
 /**
  * The one next step for an open record, for its dashboard row and the dashboard's next-step sign.
@@ -129,8 +137,8 @@ export type RecordNextStep = {
   label: string;
   href: string;
   state: "ready" | "locked" | "done";
-  /** What the button opens: the notice builder, a dated fact on the record, or the record itself. */
-  opens: "notice" | "fact" | "record";
+  /** What the button opens: the notice builder, a dated fact, a group letter, or the record itself. */
+  opens: "notice" | "fact" | "letter" | "record";
   note?: string;
 };
 
@@ -165,7 +173,11 @@ export const nextStepForRecord = (
 
 /** Button text for a ready step: a fact step names its action ("Add my 311 number"), as on its row. */
 export const nextStepButtonLabel = (step: RecordNextStep) =>
-  step.opens === "notice" ? "Open the notice" : step.opens === "fact" ? step.label : "Open the record";
+  step.opens === "notice"
+    ? "Open the notice"
+    : step.opens === "fact" || step.opens === "letter"
+      ? step.label
+      : "Open the record";
 
 /** Whole days from the start date to today. Never negative. */
 export const daysOpen = (startDate: string, today: string) =>
@@ -173,6 +185,13 @@ export const daysOpen = (startDate: string, today: string) =>
 
 /** Same day the notice builder unlocks the final reminder; after it, a 311 inspection is the next normal step. */
 export const inspectionQualifyingDays = 6;
+
+/**
+ * Days after a 311 request before the dashboard suggests asking the ward office for a meeting.
+ * Two weeks gives the City time to schedule an inspection first. It is a waiting rule for this app,
+ * not a legal deadline. The suggestion names the office ("Office of the Alderperson"), never a person.
+ */
+export const wardOfficeWaitDays = 14;
 
 const dayMs = 24 * 60 * 60 * 1000;
 const daysBetween = (start: string, end: string) =>
@@ -197,7 +216,7 @@ export const buildFollowUpItems = (
       const events = eventsByRecord.get(record.id) ?? [];
       const issueLabel = labelOf(record);
       const push = (kind: FollowUpKind, date: string, message: string, action: FollowUpAction) =>
-        items.push({ recordId: record.id, issueLabel, kind, date, message, action });
+        items.push({ recordId: record.id, building: record.building, issueLabel, kind, date, message, action });
 
       const replyDue = latestOfType(events, "reply_due");
       const sentOn = record.reportDate || record.startDate;
@@ -228,8 +247,10 @@ export const buildFollowUpItems = (
         });
       }
 
+      // After the final reminder there is no next notice to offer; 311 and the ward office carry on from there.
+      const finalSent = countedNotices({ ...record, startDate: record.startDate || record.reportDate }, events).finalDate;
       const milestone = getNoticeMilestone(record.issue, getFirstWrittenNoticeDate(record));
-      if (milestone && milestone.date < today) {
+      if (milestone && milestone.date < today && !finalSent) {
         const next = nextNoticeStage(record, events, today);
         push("rlto_period_passed", milestone.date, `${milestone.label}: ${formatTimelineDate(milestone.date)}. Talk to legal aid about next steps.`, {
           kind: "notice",
@@ -251,6 +272,24 @@ export const buildFollowUpItems = (
           fact: "request_311_filed",
           label: "Add my 311 number",
         });
+      }
+
+      // The ward office comes last: after the final reminder, after 311, and only while nothing is fixed.
+      const dates311 = [
+        record.ticketDate,
+        ...events.filter((event) => event.type === "request_311_filed" || event.type === "inspection_done").map((event) => event.date),
+      ].filter((date): date is string => Boolean(date));
+      const latest311 = dates311.sort().at(-1);
+      if (finalSent && latest311 && !hasType(events, winEventTypes)) {
+        const unlocks = addDaysIso(latest311, wardOfficeWaitDays);
+        if (today >= unlocks) {
+          push(
+            "ward_office",
+            unlocks,
+            `311 was asked on ${formatTimelineDate(latest311)}. No repair is logged. You can ask the ward office for a meeting.`,
+            { kind: "letter", letter: "alderperson", label: "Ask the ward office for a meeting" }
+          );
+        }
       }
     });
   return items.sort((a, b) => a.date.localeCompare(b.date) || a.issueLabel.localeCompare(b.issueLabel));

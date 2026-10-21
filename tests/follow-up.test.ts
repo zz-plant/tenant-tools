@@ -4,10 +4,12 @@ import {
   buildFollowUpItems,
   buildMeetingReport,
   buildRecordLine,
+  buildWardOfficeLetterUrl,
   countedNotices,
   daysOpen,
   followUpActionHref,
   nextNoticeStage,
+  nextStepButtonLabel,
   nextStepForRecord,
   summarizeWins,
 } from "../src/lib/followUp";
@@ -274,5 +276,57 @@ describe("buildRecordLine", () => {
     const stops = buildRecordLine(record({}), [event("1", "repair_completed", "2026-10-19")], today);
     assert.equal(stops.at(-1)?.state, "done");
     assert.equal(stops[2].state, "later");
+  });
+});
+
+describe("ward office step", () => {
+  // Started Sep 20; follow-up Sep 24; final reminder Sep 28; 311 asked Oct 1. Today is Oct 20.
+  const base = record({ id: "w", issue: "heat", startDate: "2026-09-20", reportDate: "2026-09-20" });
+  const sent = [event("1", "follow_up_sent", "2026-09-24"), event("2", "final_notice_sent", "2026-09-28")];
+  const asked = event("3", "request_311_filed", "2026-10-01", "SR26-001");
+  const wardItems = (events: RecordEvent[], day = today, rec = base) =>
+    buildFollowUpItems([rec], new Map([["w", events]]), day).filter((item) => item.kind === "ward_office");
+
+  it("suggests the ward office two weeks after 311, once the final reminder went out", () => {
+    const [item] = wardItems([...sent, asked]);
+    assert.ok(item);
+    assert.equal(item.message, "311 was asked on Oct 1, 2026. No repair is logged. You can ask the ward office for a meeting.");
+    assert.equal(followUpActionHref(item), "/buildings/2400%20W%20Wabansia/letter?kind=alderperson");
+    assert.deepEqual(lintVerySimpleEnglish(item.message).warnings, []);
+  });
+
+  it("waits until 14 days after the latest 311 date", () => {
+    assert.equal(wardItems([...sent, asked], "2026-10-14").length, 0);
+    assert.equal(wardItems([...sent, asked], "2026-10-15").length, 1);
+    assert.equal(wardItems([...sent, asked, event("4", "inspection_done", "2026-10-10")]).length, 0);
+  });
+
+  it("needs both the final reminder and a 311 request", () => {
+    assert.equal(wardItems([asked]).length, 0);
+    assert.equal(wardItems(sent).length, 0);
+  });
+
+  it("stops once a repair is logged", () => {
+    assert.equal(wardItems([...sent, asked, event("5", "repair_completed", "2026-10-18")]).length, 0);
+  });
+
+  it("is the record's next step, with a button that names the action", () => {
+    const events = [...sent, asked];
+    const items = buildFollowUpItems([base], new Map([["w", events]]), today).filter((item) => item.kind === "ward_office");
+    const step = nextStepForRecord(base, events, today, items);
+    assert.equal(step.label, "Ask the ward office for a meeting");
+    assert.equal(step.opens, "letter");
+    assert.equal(nextStepButtonLabel(step), "Ask the ward office for a meeting");
+    assert.equal(step.href, buildWardOfficeLetterUrl("2400 W Wabansia"));
+  });
+});
+
+describe("after the final reminder", () => {
+  it("does not offer the final reminder again for a passed RLTO date", () => {
+    const heat = record({ id: "f", issue: "heat", startDate: "2026-09-20", reportDate: "2026-09-20" });
+    const events = [event("1", "follow_up_sent", "2026-09-24"), event("2", "final_notice_sent", "2026-09-28")];
+    const items = buildFollowUpItems([heat], new Map([["f", events]]), today);
+    assert.ok(!items.some((item) => item.kind === "rlto_period_passed"));
+    assert.ok(!items.some((item) => item.action.label === "Send the final reminder"));
   });
 });
