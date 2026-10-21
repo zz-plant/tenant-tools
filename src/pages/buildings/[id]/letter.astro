@@ -17,6 +17,8 @@ import { formatResidentReportCount } from "../../../lib/reportCount";
 import { fetchSubmissionRecord } from "../../../lib/storage/submissions";
 import { listCanvasses } from "../../../lib/storage/canvass";
 import { latestCanvassCount } from "../../../lib/canvass";
+import { listNoticeContactLines } from "../../../lib/noticeContacts";
+import { getNoticeContacts } from "../../../lib/storage/noticeContacts";
 import SeoHead from "../../../components/SeoHead.astro";
 import AccessKeyPanel from "../../../components/AccessKeyPanel.astro";
 import AppHeader from "../../../components/AppHeader.astro";
@@ -74,6 +76,7 @@ const openIssues: LetterIssue[] = openSummaries
 // The ledger record for the letter uses the building's portfolio. Read one full record to find it.
 const firstRecord = kv && summaries[0] ? await fetchSubmissionRecord(kv, summaries[0].id) : null;
 const portfolio = firstRecord?.portfolio ?? "other";
+const noticeContacts = hasAccess && kv ? await getNoticeContacts(kv, buildingId) : null;
 ---
 
 <!DOCTYPE html>
@@ -243,6 +246,20 @@ const portfolio = firstRecord?.portfolio ?? "other";
               </p>
               <p class="helper no-print" data-letter-status role="status" aria-live="polite"></p>
               <p class="helper no-print">Before you send: remove names and unit numbers. Keep a copy and the date you sent it.</p>
+              {noticeContacts && (
+                <div class="helper-card no-print">
+                  <p><strong>Send it to</strong></p>
+                  <dl class="record-facts">
+                    {listNoticeContactLines(noticeContacts).map((line) => (
+                      <div>
+                        <dt>{line.label}</dt>
+                        <dd>{line.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p class="helper">Saved by a steward on {formatTimelineDate(noticeContacts.updatedAt)}. Check it against your lease.</p>
+                </div>
+              )}
               <div class="helper-card no-print" hidden data-household-tips>
                 <p><strong>Sending your own copy</strong></p>
                 <ul class="submission-detail-list">

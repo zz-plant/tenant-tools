@@ -16,6 +16,8 @@ import {
 } from "../../lib/followUp";
 import { describeCanvass } from "../../lib/canvass";
 import { listCanvasses } from "../../lib/storage/canvass";
+import { listNoticeContactLines } from "../../lib/noticeContacts";
+import { getNoticeContacts } from "../../lib/storage/noticeContacts";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
 import { buildIssuePatterns } from "../../lib/issuePatterns";
 import { formatIssueLabel } from "../../lib/noticeUtils";
@@ -61,6 +63,7 @@ const submissions: BuildingSubmission[] = detail?.summaries ?? [];
 const followUpItems = detail ? buildFollowUpItems(detail.records, detail.eventsByRecord, today) : [];
 const wins = detail ? summarizeWins(detail.records, detail.eventsByRecord) : { total: 0, afterLetter: 0, after311: 0 };
 const latestCanvass = detail && kv ? (await listCanvasses(kv, buildingId))[0] ?? null : null;
+const noticeContacts = detail && kv ? await getNoticeContacts(kv, buildingId) : null;
 
 const filtered = submissions
   .filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter))
@@ -403,6 +406,7 @@ const groupTools = [
                   ...(isSteward
                     ? [
                         { href: `${clearFiltersUrl}/canvass`, label: "Canvass tally", note: "Count doors knocked. Counts only." },
+                        { href: `${clearFiltersUrl}/contacts`, label: "Who to send notices to", note: "Owner, manager, and notice address." },
                         { href: "/steward", label: "Steward tools", note: "Keys, exports, and emergency wipe." },
                       ]
                     : []),
@@ -420,6 +424,20 @@ const groupTools = [
               </ul>
               {latestCanvass && (
                 <p class="helper"><strong>Latest canvass:</strong> {describeCanvass(latestCanvass)}</p>
+              )}
+              {noticeContacts && (
+                <div class="helper-card">
+                  <p><strong>Send written notices to</strong></p>
+                  <dl class="record-facts">
+                    {listNoticeContactLines(noticeContacts).map((line) => (
+                      <div>
+                        <dt>{line.label}</dt>
+                        <dd>{line.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p class="helper">Saved by a steward on {formatTimelineDate(noticeContacts.updatedAt)}. Check it against your lease.</p>
+                </div>
               )}
             </>
           )}
