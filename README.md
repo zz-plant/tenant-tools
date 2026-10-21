@@ -89,7 +89,7 @@ bun run preview
 
 ### Deploy
 
-Production (`galina.kanav.net`) deploys from Cloudflare Workers Builds. Each push to `main` runs typecheck, tests, and the build, then `wrangler deploy`. A failed check stops the deploy. Build logs are in the Cloudflare dashboard under the Worker's **Deployments** tab, and the result shows as a check on the commit in GitHub.
+Production (`tenants.kanav.net`) deploys from Cloudflare Workers Builds. Each push to `main` runs typecheck, tests, and the build, then `wrangler deploy`. A failed check stops the deploy. Build logs are in the Cloudflare dashboard under the Worker's **Deployments** tab, and the result shows as a check on the commit in GitHub.
 
 To deploy by hand, for example when Workers Builds is down:
 
@@ -155,7 +155,7 @@ Photo upload is off until both of these are set. Without them, the record page s
 
 ### SEO and sitemap
 
-- `SITE_URL` — full site origin used for canonical URLs, link previews, and sitemap entries (example: `https://app.example.org`). Read at build time. If unset, links point to `https://galina.kanav.net`.
+- `SITE_URL` — full site origin used for canonical URLs, link previews, and sitemap entries (example: `https://app.example.org`). Read at build time. If unset, links point to `https://tenants.kanav.net`.
 
 Example `BUILDING_KEYS_JSON`:
 

@@ -38,7 +38,8 @@ Never turn on public access for the R2 bucket.
 ## 3. Edit `wrangler.jsonc`
 
 - `name`: a name for your Worker, such as `our-union-ledger`.
-- `routes`: replace `galina.kanav.net` with your own domain. Your domain must be on Cloudflare.
+- `routes`: replace `tenants.kanav.net` with your own domain, and remove the `galina.kanav.net` entry. Your domain must be on Cloudflare.
+- `src/lib/canonicalHost.ts`: empty the `legacyHosts` list. It only redirects this project's old address.
 - No domain? Remove `routes` and set `"workers_dev": true`. Cloudflare then gives you a `*.workers.dev` address.
 - `kv_namespaces[0].id`: the id from step 2.
 - `ratelimits`: each `namespace_id` must be unique in your Cloudflare account. If another Worker in your account already uses 47104 to 47160, change these numbers.
@@ -63,7 +64,7 @@ npx wrangler secret put EVIDENCE_SIGNING_KEY
 
 You do not need to set building keys here. Stewards issue them on the site (step 6). If you already use `BUILDING_KEYS_JSON`, it keeps working. A key issued on the site replaces the settings key for that building.
 
-`SITE_URL` is your full address, such as `https://ledger.example.org`. It is used for page links, link previews, and the sitemap. It is read when the site is built, not in the Cloudflare dashboard. Set it every time you build (step 5). Without it, links point to `galina.kanav.net`.
+`SITE_URL` is your full address, such as `https://ledger.example.org`. It is used for page links, link previews, and the sitemap. It is read when the site is built, not in the Cloudflare dashboard. Set it every time you build (step 5). Without it, links point to `tenants.kanav.net`.
 
 ## 5. Deploy
 
