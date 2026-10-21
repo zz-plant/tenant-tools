@@ -25,6 +25,7 @@ import { formatDate, formatTimelineDate, getCurrentTime } from "../lib/dateUtils
 import { formatIssueLabel, getVisibleUnlockableSteps } from "../lib/noticeUtils";
 import { detectSensitiveContent } from "../lib/validation";
 import {
+  rentCreditIssues,
   evidenceSafetySummary,
   exportAudienceOptions,
   exportStatusOptions,
@@ -40,6 +41,7 @@ import {
   buildGuidanceScript,
   buildNextSteps,
   buildNoticeText,
+  leaseQuoteLimit,
   chooseNoticeTemplate,
   collectIssueDetails,
   collectRuleCards,
@@ -1312,6 +1314,53 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                               )
                             ) : (
                               <p className="helper">No extra facts are needed for this issue.</p>
+                            )}
+                          </div>
+                          <div className="form-section">
+                            <div className="form-section-header">
+                              <h3>Your lease</h3>
+                              <p className="helper">
+                                Optional. To quote your lease, copy the section number and its exact words. Check that both come from the same part of the lease.
+                              </p>
+                            </div>
+                            <label>
+                              Section number
+                              <input
+                                className="input"
+                                type="text"
+                                inputMode="text"
+                                maxLength={12}
+                                value={formState.leaseSection}
+                                onChange={(event) => setFormState((prev) => ({ ...prev, leaseSection: event.target.value }))}
+                                placeholder="7"
+                              />
+                            </label>
+                            <label>
+                              The exact words
+                              <textarea
+                                className="input"
+                                rows={3}
+                                maxLength={leaseQuoteLimit}
+                                value={formState.leaseQuote}
+                                onChange={(event) => setFormState((prev) => ({ ...prev, leaseQuote: event.target.value }))}
+                                placeholder="Copy one or two sentences from your lease."
+                              />
+                            </label>
+                            <label className="checkbox-label">
+                              <input
+                                type="checkbox"
+                                checked={formState.leaseChecked}
+                                onChange={(event) => setFormState((prev) => ({ ...prev, leaseChecked: event.target.checked }))}
+                              />
+                              The section number and the words come from the same part of my lease.
+                            </label>
+                            {formState.leaseSection.trim() && formState.leaseQuote.trim() && !formState.leaseChecked && (
+                              <p className="helper" role="status">The quote goes into the notice after you check the box.</p>
+                            )}
+                            {rentCreditIssues.has(formState.issue) && (
+                              <p className="helper-card helper-note" role="note">
+                                Paying less rent can lead to an eviction case. Talk to a tenant group or legal aid before you pay less.
+                              </p>
                             )}
                           </div>
                           {issueFields.filter((fieldKey) => fieldKey === "attachment").length > 0 && (
