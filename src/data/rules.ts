@@ -287,7 +287,12 @@ export const getProvisionInEffect = (provisionId: string, onDate: string = today
   if (!version) {
     return null;
   }
-  return { section: version.section, summary: version.summary, sources: resolveSources(rltoProvisionPack, [version]) };
+  return {
+    section: version.section,
+    summary: version.summary,
+    details: version.details,
+    sources: resolveSources(rltoProvisionPack, [version]),
+  };
 };
 
 /** The landlord entry rule in effect on `onDate`. */

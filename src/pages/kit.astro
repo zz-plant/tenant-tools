@@ -1,5 +1,7 @@
 ---
 import "../styles/global.css";
+import { getProvisionInEffect } from "../data/rules";
+import { formatDate } from "../lib/dateUtils";
 import { qrSvg } from "../lib/qr";
 import SeoHead from "../components/SeoHead.astro";
 import AppHeader from "../components/AppHeader.astro";
@@ -12,6 +14,8 @@ export const prerender = false;
 const isLocalHost = ["localhost", "127.0.0.1"].includes(Astro.url.hostname);
 const rightsUrl = `${isLocalHost ? Astro.url.origin : `https://${Astro.url.host}`}/rights`;
 const rightsQr = qrSvg(rightsUrl);
+// Fear of retaliation is the first reason neighbors stay away. The kit says what the law protects.
+const retaliationRule = getProvisionInEffect("retaliation", formatDate(new Date()));
 ---
 
 <!DOCTYPE html>
@@ -33,7 +37,7 @@ const rightsQr = qrSvg(rightsUrl);
         <section class="panel report-sheet kit-sheet">
           <div class="no-print">
             <h1>Start a building group</h1>
-            <p class="helper">A flyer to print, a checklist for the first meeting, and the steps that follow. Information only. Not legal advice.</p>
+            <p class="helper">Print the flyer. Hold one meeting. Then keep a shared record of the problems and the dates. Information only. Not legal advice.</p>
             <div class="report-actions">
               <button class="button" type="button" data-print>Print the flyer and checklist</button>
               <a class="button button-secondary" href="/rights">Short guide to tenant rules</a>
@@ -41,7 +45,45 @@ const rightsQr = qrSvg(rightsUrl);
             <p class="helper">Before you post flyers, talk with neighbors you trust about safety. You can hand flyers to neighbors instead of posting them.</p>
           </div>
 
+          <div class="kit-cards no-print">
+            <section class="helper-card kit-card">
+              <h2>Before you start</h2>
+              <ul class="submission-detail-list">
+                <li>You do not need the app for the first meeting. The flyer and the checklist work on paper.</li>
+                <li>
+                  To keep a shared record, your building needs to be on Tenant Tools. Open the
+                  <a href="/#builder">notice builder</a> and look at the building list.
+                </li>
+                <li>
+                  Not on the list? Ask the person who shared Tenant Tools with you. A steward adds the building and gives your
+                  group a building key. Share the key in person, not in a public post.
+                </li>
+              </ul>
+            </section>
+
+            {retaliationRule && (
+              <section class="helper-card kit-card">
+                <h2>Organizing is protected</h2>
+                <p>{retaliationRule.summary}</p>
+                <ul class="submission-detail-list">
+                  {retaliationRule.details.map((detail) => <li>{detail}</li>)}
+                  <li>If something changes after you ask for repairs or join the group, write down the date. Talk to legal aid or a tenant union.</li>
+                </ul>
+                <p class="rule-meta">
+                  Rule: {retaliationRule.section}.{" "}
+                  {retaliationRule.sources.map((source, index) => (
+                    <>
+                      {index > 0 && " · "}
+                      <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                    </>
+                  ))}
+                </p>
+              </section>
+            )}
+          </div>
+
           <article class="kit-flyer">
+            <p class="kit-flyer-band">Tenant meeting</p>
             <h2 class="kit-flyer-title">Problems in our building?</h2>
             <p class="kit-flyer-lead">Neighbors can work on them together.</p>
             <ul class="kit-flyer-list">
@@ -49,12 +91,17 @@ const rightsQr = qrSvg(rightsUrl);
               <li>One letter from many households is harder to ignore than one call.</li>
               <li>We keep a shared record with dates. No names are needed.</li>
             </ul>
-            <div class="kit-flyer-meeting">
-              <p><strong>Meeting</strong></p>
-              <p>Date: ______________________</p>
-              <p>Time: ______________________</p>
-              <p>Place: _____________________</p>
-            </div>
+            <dl class="kit-flyer-meeting">
+              <div><dt>Date</dt><dd></dd></div>
+              <div><dt>Time</dt><dd></dd></div>
+              <div><dt>Place</dt><dd></dd></div>
+            </dl>
+            <ul class="kit-flyer-expect">
+              <li>Come and listen. You do not have to speak or sign anything.</li>
+              <li>Free. Run by neighbors, not by management.</li>
+              <li>Bring a list of problems in your home, with dates if you have them.</li>
+              <li>Chicago law protects tenants who ask for repairs or join a tenant group.</li>
+            </ul>
             <div class="kit-flyer-qr">
               <div class="kit-qr" role="img" aria-label={`QR code for ${rightsUrl}`} set:html={rightsQr} />
               <div>
@@ -71,19 +118,20 @@ const rightsQr = qrSvg(rightsUrl);
               <li>Meet in a place that feels safe. Not the management office.</li>
               <li>Use a paper sign-in sheet only if people agree. Keep it with the group. Do not put it in the app.</li>
               <li>Go around the room. Each person names the problems they have. Write the problem, not the unit.</li>
-              <li>Add each problem to the building ledger. Neighbors with the same problem tap "Me too".</li>
+              <li>Add each problem to the building record, or write it down to add later. Neighbors with the same problem tap "Me too".</li>
               <li>Choose one to three problems to start with.</li>
               <li>Write the joint letter together. Count the households that sign. The letter shows only the number.</li>
               <li>Choose a reply date. Plan the next meeting for soon after that date.</li>
-              <li>Choose one or two stewards. They keep the building key and can issue a new key if it leaks.</li>
-              <li>Talk about safety: no names or unit numbers in the group chat, and what to say if management asks about the group.</li>
+              <li>Choose one or two people to keep the building key. They share it in person and ask for a new key if it leaks.</li>
+              <li>Agree on safety: no names or unit numbers in the group chat. If management asks about the group, you do not have to answer. You can say: "Neighbors are meeting about repairs."</li>
+              <li>Before everyone leaves, say the date of the next meeting.</li>
             </ol>
           </article>
 
           <article class="kit-steps no-print">
             <h2>After the first meeting</h2>
             <ol>
-              <li><strong>Record:</strong> add problems and dates to the building ledger. Add dated facts as things happen.</li>
+              <li><strong>Record:</strong> add problems and dates to the building record. Add dated facts as things happen.</li>
               <li><strong>Ask together:</strong> send the joint letter from the building dashboard.</li>
               <li><strong>Follow up:</strong> check "Needs follow-up" on the dashboard. Add replies and missed dates.</li>
               <li><strong>Inspections:</strong> plan a group 311 day for problems that qualify.</li>

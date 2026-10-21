@@ -57,6 +57,8 @@ import type { Stage } from "./noticeBuilder/types";
 
 
 const detailEntries = Object.entries(fieldDefinitions);
+/** Timeline labels for the notice being written. Before it is saved, they are a preview. */
+const sentLabels = new Set(["Notice sent", "Follow-up sent", "Final reminder sent"]);
 
 const languageOptions = [
   { id: "en", label: "English" },
@@ -117,7 +119,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const [saveWarnings, setSaveWarnings] = useState<string[]>([]);
   const [submissionUrl, setSubmissionUrl] = useState("");
   const [linkCopyLabel, setLinkCopyLabel] = useState("Copy resident link");
-  const [repeatLabel, setRepeatLabel] = useState("Repeat with today's date");
+  const [repeatLabel, setRepeatLabel] = useState("Copy again with today's date");
   const [exportAudience, setExportAudience] = useState<ExportAudience>("inspector");
   const [noticeStatusMessage, setNoticeStatusMessage] = useState("");
   const [exportStatusMessage, setExportStatusMessage] = useState("");
@@ -211,14 +213,9 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   const saveDisabledMessage = !formState.building || !formState.issue
     ? "Choose a building and issue to enable saving."
     : !hasSaveAccess
-      ? "Add the resident key to enable saving."
+      ? "Add the building key to save."
       : "";
   const canCopyPermalink = shareChecks.names && shareChecks.units && shareChecks.contact;
-  const saveReadinessLabel = canSaveLedger
-    ? "Ready to save"
-    : hasSaveAccess
-      ? "Choose a building and issue to save"
-      : "Resident key missing";
 
   const renderDetailField = (fieldKey: IssueFieldKey) => (
     <DetailField
@@ -660,7 +657,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     setExportStatusMessage("");
     setLinkStatusMessage("");
     setShareChecks({ names: false, units: false, contact: false });
-    setRepeatLabel("Repeat with today's date");
+    setRepeatLabel("Copy again with today's date");
     setExportAudience("inspector");
     setAddToLedger(true);
     setSavedFingerprint("");
@@ -685,7 +682,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
     setFormState(nextState);
     setRepeatLabel("Copied with today's date");
     setNoticeStatusMessage("Notice copied with today's date.");
-    scheduleTimeout("repeat-label", () => setRepeatLabel("Repeat with today's date"), 1600);
+    scheduleTimeout("repeat-label", () => setRepeatLabel("Copy again with today's date"), 1600);
     scheduleTimeout("notice-status", () => setNoticeStatusMessage(""), 2000);
   };
 
@@ -699,16 +696,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   };
 
   const summaryItems = [
-    { label: "Building", value: formState.building || "Select a building" },
-    { label: "Portfolio", value: selectedPortfolio?.label || "Not listed" },
-    { label: "Issue", value: selectedIssue?.label || "Select an issue" },
-    { label: "Zone", value: selectedZone?.label || "Not listed" },
-    { label: "Stage", value: stageLabel },
-    { label: "Export status", value: selectedExportStatus.label },
-    { label: "Language", value: formState.language.toUpperCase() },
-    { label: "Start date", value: formState.startDate || "Add a start date" },
-    { label: "Today", value: formState.today || "Add today's date" },
-    { label: "Plain language", value: formState.simpleEnglish ? "On" : "Off" },
+    { label: "Building", value: formState.building || "Choose a building" },
+    { label: "Problem", value: selectedIssue ? formatIssueLabel(selectedIssue.label) : "Choose a problem" },
+    { label: "Notice", value: stageLabel },
+    { label: "Started", value: formState.startDate ? formatTimelineDate(formState.startDate) : "Add a start date" },
   ];
   // The language the notice is in, which is English when the chosen language is not reviewed.
   const noticeLanguageLabel =
@@ -751,7 +742,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
   }, [detailSummaryItems, formState.attachment, formState.building, formState.issueDescription, formState.location]);
 
   const savedMetaItems = [
-    selectedPortfolio?.label ? { label: "Portfolio", value: selectedPortfolio.label } : null,
+    selectedPortfolio?.label ? { label: "Management company", value: selectedPortfolio.label } : null,
     selectedZone?.label ? { label: "Zone", value: selectedZone.label } : null,
     formState.ticketDate ? { label: "311 ticket date", value: formState.ticketDate } : null,
     formState.ticketNumber ? { label: "311 ticket number", value: formState.ticketNumber } : null,
@@ -775,6 +766,19 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
       formState.ticketDate,
       formState.today,
     ]
+  );
+
+  // Before saving, the builder's timeline is a preview. The notice has not gone out yet.
+  const previewTimelineEntries = useMemo(
+    () =>
+      saveStatus === "saved"
+        ? timelineEntries
+        : timelineEntries.map((entry) =>
+            entry.date === formState.today && sentLabels.has(entry.label)
+              ? { ...entry, label: `${entry.label}, if you send it today` }
+              : entry
+          ),
+    [formState.today, saveStatus, timelineEntries]
   );
 
   const issueGuidance = getIssueGuidance(formState.issue);
@@ -1001,6 +1005,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                           </div>
                         </div>
 
+                        <details className="quick-notice-text">
+                          <summary>See the notice</summary>
+                          <pre className="output-notice">{noticeText}</pre>
+                        </details>
+                        <p className="helper">
+                          Tenant Tools does not send anything. Email and Text open your own app with the notice filled
+                          in. Nothing goes out until you press send there.
+                        </p>
+
                         {recordNote && <p className="helper" role="status">{recordNote}</p>}
                         {recordContext && (
                           <p className="helper">
@@ -1016,7 +1029,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                               checked={addToLedger}
                               onChange={(event) => setAddToLedger(event.currentTarget.checked)}
                             />
-                            When you send, also save it to the building ledger. No names are saved.
+                            When you send, also save it to your building's record. Neighbors with the building key can see the problem and the dates, never your name.
                           </label>
                         )}
                         {recordLockNote && saveStatus !== "saved" && <p className="helper">{recordLockNote}</p>}
@@ -1039,8 +1052,8 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                             {recordContext
                               ? `Added “${recordFactLabel}” to the record.`
                               : changedSinceSave
-                                ? "You changed the notice after it was saved. The ledger keeps the first version."
-                                : "Saved to the building ledger."}{" "}
+                                ? "You changed the notice after it was saved. The record keeps the first version."
+                                : "Saved to your building's record."}{" "}
                             <a href={submissionUrl}>Open the record</a>
                           </p>
                         )}
@@ -1389,7 +1402,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     <div className="form-section">
                       <div className="form-section-header">
                         <h3>Review and send notice</h3>
-                        <p className="helper">Your notice text is ready. Copy and send it to your landlord or property management.</p>
+                        <p className="helper">Your notice is ready. Read it once, then send it to your landlord or property management.</p>
                       </div>
 
                       <div className="summary-grid">
@@ -1403,7 +1416,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         </div>
                         <div className="summary-card">
                           <p className="summary-label">Start date</p>
-                          <p className="summary-value">{formState.startDate || "Today"}</p>
+                          <p className="summary-value">{formState.startDate ? formatTimelineDate(formState.startDate) : "Today"}</p>
                         </div>
                         <div className="summary-card">
                           <p className="summary-label">Days open</p>
@@ -1460,7 +1473,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
 
                       <div className="helper-card">
                         <p className="helper">
-                          <strong>Next step:</strong> Send this notice by email, text message, or resident portal. Keep a screenshot of your message and the date you sent it.
+                          <strong>Next step:</strong> Send this notice yourself, by email, text message, or the resident portal. Tenant Tools does not send it. Keep a screenshot of your message and the date you sent it.
                         </p>
                       </div>
                     </div>
@@ -1504,20 +1517,22 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                   ? recordContext
                     ? "Added to the record."
                     : changedSinceSave
-                      ? "Saved before your changes. The ledger keeps the first version."
-                      : "Saved to the building ledger."
+                      ? "Saved before your changes. The record keeps the first version."
+                      : "Saved to your building's record."
                   : recordContext
                     ? recordFactType
                       ? "After you send it, tap “I sent it” to add it to the record."
                       : recordLockNote || "Nothing is added to the record for this notice."
                     : addToLedger && canSaveLedger
-                      ? "Copy, Email, or Text also saves it."
-                      : `Save status: ${saveReadinessLabel}. You can save in step 4.`}
+                      ? "Copy, Email, or Text also saves it to your building's record."
+                      : hasSaveAccess
+                        ? "Saving to your building's record is optional. You can save in step 4."
+                        : "You can send the notice now. Saving it to your building's record is optional and needs the building key from a neighbor or steward."}
               </p>
             )}
           </section>
-          <aside className={`panel panel-highlight preview-panel${!canShowAfterBasics ? " preview-panel-mobile-hidden" : ""}`} id="preview">
-            <div className="output-header">
+          <aside className={`panel panel-highlight preview-panel${!canShowAfterBasics || currentStep < 4 ? " preview-panel-mobile-hidden" : ""}`} id="preview">
+            <div className="output-header preview-duplicate">
               <h2>Generated notice</h2>
               {canShowAfterBasics && (
                 <div className="output-actions">
@@ -1558,15 +1573,15 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
             ) : (
               <>
                 {copyDisabledReason && <p className="helper action-hint">{copyDisabledReason}</p>}
-                <p className="helper" role="status" aria-live="polite">
+                <p className="helper preview-duplicate" role="status" aria-live="polite">
                   {noticeStatusMessage}
                 </p>
-                <section className="preview-section">
+                <section className="preview-section preview-duplicate">
                   <div className={`notice-status ${isNoticeReady ? "ready" : "needs"}`}>
                     <p className="notice-status-title">{noticeReadinessTitle}</p>
                   </div>
                 </section>
-          <section className="preview-section">
+          <section className="preview-section preview-duplicate">
             <div className="summary-header">
               <h3>Notice summary</h3>
             </div>
@@ -1579,7 +1594,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
               ))}
             </div>
           </section>
-          <section className="preview-section">
+          <section className="preview-section preview-duplicate">
             <div className="notice-preview">
               <div className="notice-preview-header">
                 <div>
@@ -1601,10 +1616,11 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                 <p className="helper">Finish step 1 for save/export.</p>
               ) : (
                 <>
+                  <details className="helper-card share-summary">
+                  <summary>Share a summary with an inspector or legal aid (optional)</summary>
                   <div className="export-header">
                     <div>
-                      <h3>Share with inspector or aid</h3>
-                      <p className="helper">Sharing result: {selectedAudience.description}</p>
+                      <p className="helper">Pick who it is for. {selectedAudience.description}</p>
                     </div>
                     <div className="export-actions">
                       <Button className="button button-secondary" type="button" onClick={handleSummaryCopy}>
@@ -1661,22 +1677,30 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     ))}
                   </RadioGroup.Root>
                   <pre className="output output-summary">{exportSummary}</pre>
+                  </details>
                   <div className="submission-block">
                     <div>
-                      <h3>Save in resident ledger</h3>
+                      <h3>Save to your building's record (optional)</h3>
+                      <p className="helper">
+                        Saving lets neighbors with the building key see this problem and tap “Me too”. It does not send
+                        anything to management. Your name is never saved.
+                      </p>
                       {hasResidentSession ? (
                         <ResidentSessionNote />
                       ) : (
                         <>
-                          <p className="helper">Use the resident key from your organizer. Keep this key private.</p>
+                          <p className="helper">
+                            Paste the building key from a neighbor or steward. No key? You can still send the notice. Keep
+                            the key private.
+                          </p>
                           <label>
-                            Resident key
+                            Building key
                             <Input
                               className="input"
                               type="password"
                               value={buildingKey}
                               onChange={handleBuildingKeyInput}
-                              placeholder="Paste resident key"
+                              placeholder="Paste the building key"
                               autoComplete="off"
                               spellCheck={false}
                             />
@@ -1688,7 +1712,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                       ) : null}
                     </div>
                     <div className="share-checklist-inline" aria-label="Privacy checks before sharing">
-                      <p className="helper">Before saving or sharing, confirm all checks.</p>
+                      <p className="helper">Read the notice once more. Check each box before you share the record link.</p>
                       <label className="checkbox-label">
                         <Checkbox.Root
                           checked={shareChecks.names}
@@ -1720,7 +1744,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                         I removed phone numbers and email addresses.
                       </label>
                       <p className="helper" role="status" aria-live="polite">
-                        {canCopyPermalink ? "Checklist complete. You can copy the link." : "Complete all checks to copy the link."}
+                        {canCopyPermalink ? "All checked. You can copy the record link." : "Check all three boxes to copy the record link."}
                       </p>
                     </div>
                     <div className="submission-actions">
@@ -1739,7 +1763,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                           onClick={handleCopyLink}
                           disabled={!canCopyPermalink}
                           aria-disabled={!canCopyPermalink}
-                          title={canCopyPermalink ? "Copy permalink" : "Complete all checks to copy the link"}
+                          title={canCopyPermalink ? "Copy the record link" : "Check all three boxes to copy the record link"}
                           aria-describedby={!canCopyPermalink ? "copy-link-requirements" : undefined}
                         >
                           {linkCopyLabel}
@@ -1747,21 +1771,21 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                       )}
                     </div>
                     {submissionUrl && !canCopyPermalink && (
-                      <p className="helper" id="copy-link-requirements" role="status" aria-live="polite">Complete all checks below to copy the link.</p>
+                      <p className="helper" id="copy-link-requirements" role="status" aria-live="polite">Check all three boxes above to copy the record link.</p>
                     )}
                     {saveStatus === "saved" && submissionUrl && (
                       <p className="submission-note" role="status" aria-live="polite">
-                        Saved. Your permalink: <a href={submissionUrl}>{submissionUrl}</a>. This link does not include a resident key. Open it, then enter your building key.
+                        Saved. Record link: <a href={submissionUrl}>{submissionUrl}</a>. The link does not include the building key, so it is safe to keep. Whoever opens it needs the key to see the record.
                       </p>
                     )}
                     {saveStatus === "error" && (
                       <p className="submission-error" role="alert">
-                        {saveError || "We could not save this record."}
+                        {saveError || "The record was not saved. Your notice is still here. Copy it, send it, and try saving again later."}
                       </p>
                     )}
                     {saveStatus === "saved" && saveWarnings.length > 0 && (
                       <div className="export-block" role="status" aria-live="polite">
-                        <p className="helper">Please review these safety warnings before sharing.</p>
+                        <p className="helper">Saved. Check these before you share the record link:</p>
                         <ul className="helper-list">
                           {saveWarnings.map((warning) => (
                             <li key={warning}>{warning}</li>
@@ -1787,7 +1811,7 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
                     )}
                     {(detailSummaryItems.length > 0 || savedMetaItems.length > 0) && (
                       <div className="submission-details">
-                        <p className="helper">Saved record details:</p>
+                        <p className="helper">Also saved with the record:</p>
                         <ul>
                           {savedMetaItems.map((item) => (
                             <li key={item.label}>
@@ -1838,10 +1862,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
 
         <RecordPanel
           canShowAfterBasics={canShowAfterBasics}
+          hideOnPhone={currentStep < 4}
           onGoToStep1={() => setCurrentStep(1)}
-          timelineEntries={timelineEntries}
+          timelineEntries={previewTimelineEntries}
           visibleNextSteps={visibleNextSteps}
-          daysOpen={daysOpen}
           impactCount={impactCount}
           issueGuidance={issueGuidance}
           guidanceScript={guidanceScript}
@@ -1849,7 +1873,10 @@ const NoticeBuilder = ({ buildingOptions = defaultBuildingOptions, residentBuild
         />
 
       <footer className="site-footer">
-        <p>Safety first: evidence is optional. Public views hide personal details.</p>
+        <p>
+          Nothing here is public. Saved records are seen only by residents with your building's key. Names, emails, and
+          phone numbers are never saved.
+        </p>
       </footer>
     </div>
   );

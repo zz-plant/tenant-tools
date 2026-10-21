@@ -1465,10 +1465,6 @@ ul.rule-cards {
     width: 100%;
   }
 
-  .preview-panel-mobile-hidden,
-  .record-panel-mobile-hidden {
-    display: none;
-  }
 }
 
 @media (max-width: 480px) {
@@ -1704,8 +1700,70 @@ fieldset.facts-form {
   font-size: var(--text-base);
 }
 
-.kit-flyer-meeting p {
-  margin: 4px 0;
+.kit-cards {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.kit-card h2 {
+  margin: 0 0 8px;
+}
+
+.kit-card p {
+  margin: 0 0 8px;
+}
+
+/* A black notice band across the top of the flyer, like a sign on a lobby door. */
+.kit-flyer-band {
+  max-width: none;
+  margin: -24px -24px 4px;
+  padding: 10px 24px;
+  background: var(--color-ink-deep);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.kit-flyer-meeting {
+  margin: 4px 0 0;
+  display: grid;
+  gap: 10px;
+}
+
+.kit-flyer-meeting div {
+  display: grid;
+  grid-template-columns: 5.5em 1fr;
+  align-items: end;
+  gap: 8px;
+}
+
+.kit-flyer-meeting dt {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* A write-in line. */
+.kit-flyer-meeting dd {
+  margin: 0;
+  min-height: 1.8em;
+  border-bottom: 2px solid var(--color-text-primary);
+}
+
+.kit-flyer-expect {
+  margin: 0;
+  padding: 12px 14px 12px 32px;
+  border: 1px solid var(--color-border-hover);
+  display: grid;
+  gap: 4px;
   font-size: var(--text-base);
 }
 
@@ -1760,8 +1818,22 @@ fieldset.facts-form {
   }
 
   .kit-flyer-list,
-  .kit-flyer-meeting p {
+  .kit-flyer-expect,
+  .kit-flyer-meeting dt {
     font-size: 14pt !important;
+  }
+
+  .kit-flyer-band {
+    max-width: none !important;
+    margin: -24px -24px 4px !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    font-size: 16pt !important;
+  }
+
+  .kit-flyer-meeting dd {
+    min-height: 1.2cm;
+    border-bottom: 1.5pt solid #000000 !important;
   }
 
   .kit-qr {
@@ -2341,3 +2413,28 @@ a.fact-tag {
 [data-issue="damage"] { --issue: var(--issue-damage); }
 [data-issue="deposit"] { --issue: var(--issue-deposit); }
 [data-issue="lockout"] { --issue: var(--issue-lockout); }
+
+/* One column (phones, small tablets): the preview and record panels show on the last step only,
+   so the steps above stay short. Step 1 has its own copy, email, and text buttons, and step 4 shows
+   the notice, so the preview's own copy of them is hidden. */
+@media (max-width: 900px) {
+  .preview-panel-mobile-hidden,
+  .record-panel-mobile-hidden,
+  .preview-panel .preview-duplicate {
+    display: none;
+  }
+}
+
+.quick-notice-text summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.quick-notice-text .output-notice {
+  margin-top: 8px;
+  white-space: pre-wrap;
+}
+
+.share-summary > summary {
+  font-weight: 600;
+}
