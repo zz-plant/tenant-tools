@@ -3,7 +3,7 @@ import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 
-const site = process.env.SITE_URL?.trim() || "https://galina.kanav.net";
+const site = process.env.SITE_URL?.trim() || "https://tenants.kanav.net";
 
 export default defineConfig({
   site,

@@ -60,6 +60,8 @@
   --color-surface-card: #ffffff;
 
   --color-text-primary: #151515;
+  /* Pure black: pressed buttons, the night top bar, and print. */
+  --color-ink-deep: #000000;
   --color-text-secondary: #363833;
   --color-text-muted: #595c55;
   --color-text-disabled: #9a9d95;
@@ -72,10 +74,14 @@
 
   --color-primary: #151515;
   --color-primary-hover: #2b2b2b;
-  --color-primary-active: #000000;
+  --color-primary-active: var(--color-ink-deep);
   --color-primary-subtle: #e9ebe6;
   --color-primary-border: #151515;
   --color-primary-contrast: #ffffff;
+
+  /* The black top bar is the same in light and dark: muted ink and the "verified" dot. */
+  --color-bar-ink-muted: #b9bcb4;
+  --color-bar-ok: #4cc27f;
 
   /* Chicago street-sign green: building addresses only. */
   --color-street: #0b6b3f;
@@ -148,6 +154,25 @@
   --radius-lg: 4px;
   --radius-xl: 6px;
   --radius-full: 9999px;
+
+  /* Type scale. Small steps for body text, labels, and buttons; named fluid sizes for big lettering. */
+  --text-xs: 0.8rem;
+  --text-sm: 0.9rem;
+  --text-base: 1rem;
+  --text-md: 1.12rem;
+  --text-lg: 1.3rem;
+  --text-xl: 1.6rem;
+  --text-2xl: 2rem;
+  --text-3xl: 3rem;
+  --text-title: clamp(1.35rem, 3.6vw, 1.6rem);
+  --text-subhead: clamp(1.6rem, 3.6vw, 2.2rem);
+  --text-headline: clamp(2rem, 6vw, 3rem);
+  --text-numeral: clamp(2.6rem, 8vw, 3.4rem);
+  --text-display: clamp(2.6rem, 7vw, 4.75rem);
+  /* Long page titles, such as a problem's full name on its record page. */
+  --text-display-sm: clamp(2.3rem, 7vw, 4.25rem);
+  --text-numeral-lg: clamp(3.2rem, 10vw, 5rem);
+  --text-hero: clamp(2.8rem, 8vw, 5.5rem);
 
   /* Motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -253,7 +278,7 @@ body {
   background: var(--color-surface);
   color: var(--color-text-primary);
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   text-decoration: none;
   box-shadow: var(--shadow-md);
   border: 1px solid var(--color-border);
