@@ -1,0 +1,55 @@
+---
+import type { LineMap, LineMapStopKey } from "../lib/lineMap";
+
+/*
+ * Every open problem's steps on one map, with shared step columns. A column with an open step is a
+ * link that lists the problems that can take that step now. Each line is in its problem's colour.
+ */
+export type Props = {
+  map: LineMap;
+  activeStop: LineMapStopKey | null;
+  stopHref: (key: LineMapStopKey) => string;
+  recordHref: (id: string) => string;
+};
+
+const { map, activeStop, stopHref, recordHref } = Astro.props;
+const activeIndex = map.columns.findIndex((column) => column.key === activeStop);
+---
+
+<section class="line-map" aria-labelledby="line-map-title">
+  <h3 id="line-map-title">Where each problem is</h3>
+  <p class="helper">Each line is one open problem. Tap a step to list the problems that can take it now.</p>
+  <nav class="line-map-head" aria-label="Show problems that can take one step now">
+    {map.columns.map((column) =>
+      column.hasOpen ? (
+        <a class="line-map-stop" href={stopHref(column.key)} aria-current={column.key === activeStop ? "true" : undefined}>
+          <span>{column.label}</span>
+          <span class="line-map-open">Open</span>
+        </a>
+      ) : (
+        <span class="line-map-stop">{column.label}</span>
+      )
+    )}
+  </nav>
+  <ol class="line-map-lines">
+    {map.lines.map((line) => (
+      <li class="line-map-line" data-issue={line.issue}>
+        <p class="line-map-name">
+          <a href={recordHref(line.id)}>{line.label}</a>
+          <span class="line-map-days"><b class="tabular">{line.daysOpen}</b> {line.daysOpen === 1 ? "day" : "days"}</span>
+        </p>
+        <p class="visually-hidden">{line.summary}</p>
+        <ol class="stop-line stop-line-map" aria-hidden="true">
+          {line.line.map((stop, index) => (
+            <li class:list={["stop", `is-${stop.state}`, { "is-picked": index === activeIndex }]}>
+              <span class="stop-dot"></span>
+            </li>
+          ))}
+        </ol>
+      </li>
+    ))}
+  </ol>
+  {map.more > 0 && (
+    <p class="helper">{map.more === 1 ? "1 more open problem is" : `${map.more} more open problems are`} in the list below.</p>
+  )}
+</section>

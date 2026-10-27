@@ -18,11 +18,24 @@ export type PatternInput = {
 
 export type PatternMonth = { key: string; label: string };
 
+/**
+ * How dark a month's cell is painted on the time map: none, under 3, 3 to 5, 6 or more. The cell
+ * also shows its count, so colour is never the only signal.
+ */
+export type PatternLevel = "none" | "few" | "some" | "many";
+
+export const patternLevel = (count: number): PatternLevel =>
+  count <= 0 ? "none" : count < 3 ? "few" : count < 6 ? "some" : "many";
+
 export type PatternRow = {
   issue: string;
   issueLabel: string;
   /** Formatted counts, one per month, oldest month first. */
   counts: string[];
+  /** Paint level per month, in the same order. */
+  levels: PatternLevel[];
+  /** Months with at least one record started. */
+  activeMonths: number;
   total: string;
   open: string;
   totalCount: number;
@@ -70,6 +83,8 @@ export const buildIssuePatterns = (records: PatternInput[], today: string, month
         issue,
         issueLabel: entry.label,
         counts: months.map((month) => formatResidentReportCount(entry.perMonth.get(month.key) ?? 0)),
+        levels: months.map((month) => patternLevel(entry.perMonth.get(month.key) ?? 0)),
+        activeMonths: months.filter((month) => (entry.perMonth.get(month.key) ?? 0) > 0).length,
         total: formatResidentReportCount(totalCount),
         open: formatResidentReportCount(entry.open),
         totalCount,
@@ -79,3 +94,25 @@ export const buildIssuePatterns = (records: PatternInput[], today: string, month
 
   return { months, rows };
 };
+
+/** A problem type is listed as coming back when it started in at least this many of the months shown. */
+export const repeatMonthsMinimum = 3;
+
+/**
+ * Plain facts for the time map, such as "Water leak: started in 5 of the last 6 months." No
+ * counts, no trend words ("getting worse"), and no blame. Most months first, at most `max` lines.
+ */
+export const repeatPatternLines = (
+  rows: Pick<PatternRow, "issue" | "activeMonths">[],
+  monthCount: number,
+  labelFor: (issue: string) => string,
+  max = 3
+) =>
+  rows
+    .filter((row) => row.activeMonths >= repeatMonthsMinimum)
+    .sort((left, right) => right.activeMonths - left.activeMonths)
+    .slice(0, max)
+    .map((row) => ({
+      issue: row.issue,
+      text: `${labelFor(row.issue)}: started in ${row.activeMonths} of the last ${monthCount} months.`,
+    }));

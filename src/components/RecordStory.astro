@@ -1,0 +1,53 @@
+---
+import type { RecordStoryItem } from "../lib/recordStory";
+import { formatTimelineDate } from "../lib/dateUtils";
+
+/*
+ * A record's steps and dated facts on one line, in the problem's colour (set by data-issue on a
+ * parent). Round dots are steps, small squares are facts. Steps still to come are at the end.
+ */
+export type Props = { items: RecordStoryItem[] };
+
+const { items } = Astro.props;
+const when = (item: RecordStoryItem) =>
+  item.state === "done"
+    ? item.date
+      ? formatTimelineDate(item.date)
+      : "Done"
+    : item.state === "open"
+      ? "Open now"
+      : item.state === "locked" && item.date
+        ? `From ${formatTimelineDate(item.date)}`
+        : "Later";
+---
+
+<ol class="record-story">
+  {items.map((item) => (
+    <li
+      class:list={[
+        "story-item",
+        `is-${item.state}`,
+        { "joins-next": item.joinsNext, "is-counted": item.counted },
+      ]}
+    >
+      <span class="story-mark" aria-hidden="true"></span>
+      {item.kind === "stop" ? (
+        <div class="story-body">
+          <p class="story-head">
+            <span class="story-stop"><span class="visually-hidden">Step: </span>{item.label}</span>
+            <span class="story-when">{when(item)}</span>
+          </p>
+          {item.note && <p class="story-note">{item.note}</p>}
+        </div>
+      ) : (
+        <div class="story-body story-fact">
+          <p class="story-date">{formatTimelineDate(item.date ?? "")}</p>
+          <p class="story-label">
+            {item.label}
+            {item.counted && <span class="timeline-note">Counted from the rule. Not a reported event.</span>}
+          </p>
+        </div>
+      )}
+    </li>
+  ))}
+</ol>

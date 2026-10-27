@@ -432,6 +432,27 @@ export const isInHeatSeason = (onDate: string = todayIso()) => {
   return monthDay >= season.start || monthDay <= season.end;
 };
 
+/**
+ * The part of a month (`YYYY-MM`) that is heat season, as percentages of the month from its start:
+ * September is about 47 to 100. Null when no day of the month is in heat season.
+ */
+export const heatSeasonSpanInMonth = (monthKey: string): { from: number; to: number } | null => {
+  const [year, month] = monthKey.split("-").map(Number);
+  if (!year || !month) {
+    return null;
+  }
+  const days = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const inSeason = Array.from({ length: days }, (_, index) =>
+    isInHeatSeason(`${monthKey}-${String(index + 1).padStart(2, "0")}`)
+  );
+  const first = inSeason.indexOf(true);
+  if (first < 0) {
+    return null;
+  }
+  const last = inSeason.lastIndexOf(true);
+  return { from: Math.round((first / days) * 1000) / 10, to: Math.round(((last + 1) / days) * 1000) / 10 };
+};
+
 const buildHeatSeasonLabel = (localizer: CardLocalizer) =>
   heatPeriod?.heat_season
     ? ref(localizer, "ref.heat.season_range", {
