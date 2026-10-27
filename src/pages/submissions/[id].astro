@@ -17,7 +17,8 @@ import {
   recordEventTypes,
 } from "../../lib/recordEvents";
 import { listRecordEvents } from "../../lib/storage/recordEvents";
-import { getSubmissionTimelineEntries } from "../../lib/submissionTimeline";
+import { getSubmissionTimelineEntries, getTaggedTimelineEntries } from "../../lib/submissionTimeline";
+import { buildRecordStory } from "../../lib/recordStory";
 import { reconcileReportCount } from "../../lib/domain/submissions";
 import { countReporterMarkers, fetchSubmissionRecord, saveSubmissionRecord } from "../../lib/storage/submissions";
 import { buildBuildingDashboardUrl } from "../../lib/navigation";
@@ -27,6 +28,7 @@ import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 import AppHeader from "../../components/AppHeader.astro";
 import HelpResources from "../../components/HelpResources.astro";
+import RecordStory from "../../components/RecordStory.astro";
 import StopLine from "../../components/StopLine.astro";
 import StreetSign from "../../components/StreetSign.astro";
 
@@ -107,6 +109,11 @@ const nextStep =
 const recordLine =
   submissionRecord && submissionRecord.status !== "archived" && !submissionRecord.mergedInto
     ? buildRecordLine(submissionRecord, recordEvents, today)
+    : null;
+// The same steps, with each dated fact placed between them in date order, so the record reads as one story.
+const recordStory =
+  submissionRecord && recordLine
+    ? buildRecordStory(recordLine, getTaggedTimelineEntries({ ...submissionRecord, events: recordEvents }), today)
     : null;
 const dayCount = submissionRecord ? daysOpen(submissionRecord.startDate || submissionRecord.reportDate, today) : 0;
 const isOpen = submissionRecord?.status === "open";
@@ -231,8 +238,15 @@ const groupChatText = submissionRecord
 
             <div class="record-grid">
               <section class="panel" aria-labelledby="timeline-title">
-                <h2 id="timeline-title">What happened</h2>
-                {timelineEntries.length > 0 ? (
+                <h2 id="timeline-title">{recordStory ? "Steps and facts" : "What happened"}</h2>
+                {recordStory && submissionRecord ? (
+                  <>
+                    <p class="helper">Round dots are steps. Small squares are facts added to this record.</p>
+                    <div data-issue={submissionRecord.issue}>
+                      <RecordStory items={recordStory} />
+                    </div>
+                  </>
+                ) : timelineEntries.length > 0 ? (
                   <ul class="timeline">
                     {timelineEntries.map((entry) => (
                       <li class={entry.counted ? "is-counted" : undefined}>

@@ -19,7 +19,9 @@ import { listCanvasses } from "../../lib/storage/canvass";
 import { listNoticeContactLines } from "../../lib/noticeContacts";
 import { getNoticeContacts } from "../../lib/storage/noticeContacts";
 import { submissionStatusLabels, type SubmissionStatus } from "../../lib/submissions";
+import { buildAreaMap } from "../../lib/areaMap";
 import { buildIssuePatterns } from "../../lib/issuePatterns";
+import { buildLineMap, isLineMapStopKey, isOpenAtStop, lineMapMinLines, lineMapStops } from "../../lib/lineMap";
 import { formatIssueLabel } from "../../lib/noticeUtils";
 import { formatDate, formatTimelineDate } from "../../lib/dateUtils";
 import { buildBuildingDashboardUrl, buildGroupTools, buildSubmissionDetailsUrl } from "../../lib/navigation";
@@ -27,6 +29,9 @@ import SeoHead from "../../components/SeoHead.astro";
 import AccessKeyPanel from "../../components/AccessKeyPanel.astro";
 import AppHeader from "../../components/AppHeader.astro";
 import BlockSkyline from "../../components/BlockSkyline.astro";
+import LineMap from "../../components/LineMap.astro";
+import TimeMap from "../../components/TimeMap.astro";
+import AreaMap from "../../components/AreaMap.astro";
 import StopLine from "../../components/StopLine.astro";
 import StreetSign from "../../components/StreetSign.astro";
 
@@ -51,9 +56,26 @@ const issueFilterRaw = url.searchParams.get("issue") || "all";
 const issueFilter = issueIds.has(issueFilterRaw) ? issueFilterRaw : "all";
 const statusLabels = submissionStatusLabels;
 
+// ?stop= lists the problems that can take one step now, from the line map. Started and Fixed are never open.
+const stopFilterRaw = url.searchParams.get("stop");
+const stopFilter =
+  isLineMapStopKey(stopFilterRaw) && stopFilterRaw !== "start" && stopFilterRaw !== "fixed" ? stopFilterRaw : null;
+
 const clearFiltersUrl = buildBuildingDashboardUrl({ buildingId });
 const buildFilterUrl = (nextIssue: string) =>
   nextIssue === "all" ? clearFiltersUrl : `${clearFiltersUrl}?issue=${encodeURIComponent(nextIssue)}`;
+// A step link keeps the problem type filter. A problem type link clears the step.
+const buildStopFilterUrl = (nextStop: string | null) => {
+  const params = new URLSearchParams();
+  if (issueFilter !== "all") {
+    params.set("issue", issueFilter);
+  }
+  if (nextStop) {
+    params.set("stop", nextStop);
+  }
+  const query = params.toString();
+  return query ? `${clearFiltersUrl}?${query}` : clearFiltersUrl;
+};
 
 const today = formatDate(new Date());
 // Archived records are left out of the full reads: they are not followed up, and wins are logged on open or resolved records.
@@ -65,8 +87,24 @@ const wins = detail ? summarizeWins(detail.records, detail.eventsByRecord) : { t
 const latestCanvass = detail && kv ? (await listCanvasses(kv, buildingId))[0] ?? null : null;
 const noticeContacts = detail && kv ? await getNoticeContacts(kv, buildingId) : null;
 
-const filtered = submissions
-  .filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter))
+// Full records by id, for each open row's step line and next step.
+const recordById = new Map((detail?.records ?? []).map((record) => [record.id, record]));
+const lineFor = (summary: BuildingSubmission) => {
+  const record = recordById.get(summary.id);
+  return record && summary.status === "open" && !summary.mergedInto
+    ? buildRecordLine(record, detail?.eventsByRecord.get(record.id) ?? [], today)
+    : null;
+};
+
+const issueFiltered = submissions.filter((record) => (issueFilter === "all" ? true : record.issue === issueFilter));
+const filtered = issueFiltered
+  .filter((record) => {
+    if (!stopFilter) {
+      return true;
+    }
+    const line = lineFor(record);
+    return Boolean(line && isOpenAtStop(line, stopFilter));
+  })
   .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 
 const maxVisible = 60;
@@ -89,23 +127,18 @@ const mergeTargetsFor = (record: BuildingSubmission) =>
   );
 
 const patterns = buildIssuePatterns(submissions, today);
+// Whole building, open records only. Hidden until 3 open records list an area (see areaMap.ts).
+const areaMap = detail ? buildAreaMap(detail.records) : null;
 const totalFiltered = filtered.length;
 const draftNoticeUrl = `/?building=${encodeURIComponent(buildingId)}#builder`;
 
 // Each open row shows its days open and its one next step. The oldest problem is listed first.
-const recordById = new Map((detail?.records ?? []).map((record) => [record.id, record]));
 const nextStepFor = (summary: BuildingSubmission): RecordNextStep | null => {
   const record = recordById.get(summary.id);
   if (!record || summary.status !== "open" || summary.mergedInto) {
     return null;
   }
   return nextStepForRecord(record, detail?.eventsByRecord.get(record.id) ?? [], today, followUpItems);
-};
-const lineFor = (summary: BuildingSubmission) => {
-  const record = recordById.get(summary.id);
-  return record && summary.status === "open" && !summary.mergedInto
-    ? buildRecordLine(record, detail?.eventsByRecord.get(record.id) ?? [], today)
-    : null;
 };
 grouped.open.sort((left, right) => daysOpen(right.startDate, today) - daysOpen(left.startDate, today));
 
@@ -121,6 +154,22 @@ const issueCounts = issueOptions
   .map((opt) => ({ ...opt, count: submissions.filter((s) => s.issue === opt.id).length }))
   .filter((opt) => opt.count > 0 || issueFilter === opt.id);
 const groupTools = buildGroupTools(buildingId, isSteward);
+
+// The line map shows the open problems of the chosen type, oldest first, whatever step is chosen.
+const lineMapRows = issueFiltered
+  .filter((record) => record.status === "open" && !record.mergedInto)
+  .map((record) => ({ record, line: lineFor(record) }))
+  .filter((entry): entry is { record: BuildingSubmission; line: NonNullable<ReturnType<typeof lineFor>> } => Boolean(entry.line))
+  .sort((left, right) => daysOpen(right.record.startDate, today) - daysOpen(left.record.startDate, today))
+  .map(({ record, line }) => ({
+    id: record.id,
+    issue: record.issue,
+    label: issueShortLabels[record.issue] ?? formatIssueLabel(record.issueLabel),
+    daysOpen: daysOpen(record.startDate, today),
+    line,
+  }));
+const lineMap = lineMapRows.length >= lineMapMinLines || stopFilter ? buildLineMap(lineMapRows) : null;
+const stopFilterLabel = stopFilter ? lineMapStops.find((stop) => stop.key === stopFilter)?.label : "";
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -233,6 +282,22 @@ const groupTools = buildGroupTools(buildingId, isSteward);
                 </nav>
               )}
 
+              {lineMap && (
+                <LineMap
+                  map={lineMap}
+                  activeStop={stopFilter}
+                  stopHref={(key) => buildStopFilterUrl(key === stopFilter ? null : key)}
+                  recordHref={(recordId) => buildSubmissionDetailsUrl({ submissionId: recordId })}
+                />
+              )}
+
+              {stopFilter && (
+                <p class="helper stop-filter-note" role="status">
+                  Showing the problems that can take this step now: {stopFilterLabel}.{" "}
+                  <a href={buildStopFilterUrl(null)}>Show all problems</a>
+                </p>
+              )}
+
               {statusIds.map((status) => (
                 <section
                   class="status-group"
@@ -246,7 +311,13 @@ const groupTools = buildGroupTools(buildingId, isSteward);
                     </div>
                   )}
                   {status === "open" && grouped.open.length === 0 && (
-                    <p class="helper">{totalFiltered === 0 && issueFilter !== "all" ? "No problems of this type." : "No open problems."}</p>
+                    <p class="helper">
+                      {stopFilter
+                        ? "No problems can take this step now."
+                        : totalFiltered === 0 && issueFilter !== "all"
+                          ? "No problems of this type."
+                          : "No open problems."}
+                    </p>
                   )}
                   {grouped[status].map((record) => {
                     const step = nextStepFor(record);
@@ -353,37 +424,8 @@ const groupTools = buildGroupTools(buildingId, isSteward);
               <p class="helper">
                 Wins logged: {wins.total}. Small counts show as &lt;3 to protect residents. Counts are resident-reported and not verified.
               </p>
-              {patterns.rows.length > 0 && (
-                <details class="helper-card patterns">
-                  <summary>Records started each month</summary>
-                  <div class="helper-card-body">
-                    <p class="helper">Last 6 months, by problem type. A problem that comes back shows in many months.</p>
-                    <div class="table-scroll">
-                      <table class="report-table">
-                        <thead>
-                          <tr>
-                            <th scope="col">Issue</th>
-                            {patterns.months.map((month) => <th scope="col">{month.label}</th>)}
-                            <th scope="col">Total</th>
-                            <th scope="col">Open now</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {patterns.rows.map((row) => (
-                            <tr>
-                              <th scope="row">{row.issueLabel}</th>
-                              {row.counts.map((count) => <td>{count}</td>)}
-                              <td>{row.total}</td>
-                              <td>{row.open}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                    <p class="helper">Counts under 3 show as &lt;3 to protect residents. Merged duplicates are not counted.</p>
-                  </div>
-                </details>
-              )}
+              {patterns.rows.length > 0 && <TimeMap months={patterns.months} rows={patterns.rows} />}
+              {areaMap?.show && <AreaMap map={areaMap} issueHref={buildFilterUrl} />}
             </>
           )}
         </section>

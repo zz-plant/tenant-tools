@@ -1648,11 +1648,6 @@ fieldset.facts-form {
   overflow-x: auto;
 }
 
-.patterns .report-table th[scope="row"] {
-  font-weight: 500;
-  background: transparent;
-}
-
 .rights-sheet,
 .rights-section {
   display: grid;
@@ -2414,6 +2409,690 @@ a.fact-tag {
 @media (max-width: 480px) {
   .stop-line:not(.stop-line-compact) .stop-label {
     font-size: var(--text-sm);
+  }
+}
+
+/* ==========================================================================
+   LINE MAP: every open problem's steps on one map, with shared step columns
+   ========================================================================== */
+.line-map {
+  display: grid;
+  gap: 10px;
+  max-width: 760px;
+  border-top: var(--rule);
+  padding-top: 12px;
+}
+
+.line-map h3 {
+  margin: 0;
+}
+
+.line-map .helper {
+  margin: 0;
+}
+
+.line-map-head {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.line-map-stop {
+  min-height: 48px;
+  min-width: 0;
+  box-sizing: border-box;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  padding: 4px 2px;
+  text-align: center;
+  overflow-wrap: anywhere;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+a.line-map-stop {
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: background-color 160ms var(--ease-out);
+}
+
+a.line-map-stop:hover {
+  background: var(--color-primary-subtle);
+}
+
+a.line-map-stop[aria-current="true"] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-contrast);
+}
+
+.line-map-open {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.line-map-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.line-map-line {
+  display: grid;
+  gap: 6px;
+}
+
+.line-map-name {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.line-map-name a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  text-decoration: none;
+}
+
+.line-map-name a:hover {
+  text-decoration: underline;
+}
+
+.line-map-name a::before {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  background: var(--issue);
+}
+
+.line-map-days {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.line-map-days b {
+  font-size: var(--text-lg);
+  font-weight: 900;
+  color: var(--color-text-primary);
+}
+
+.stop-line-map .stop {
+  padding: 3px 0;
+}
+
+.stop-line-map .stop + .stop::before {
+  top: 9px;
+  height: 6px;
+}
+
+.stop-line-map .stop-dot {
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border-width: 3px;
+}
+
+.stop-line-map .stop.is-open .stop-dot {
+  border-width: 5px;
+}
+
+/* The step column chosen above is shaded down the map. */
+.stop-line-map .stop.is-picked {
+  background: var(--color-primary-subtle);
+}
+
+/* On phones a column is about 50px wide. "Follow-up" breaks after its hyphen instead of running out of its box. */
+@media (max-width: 480px) {
+  .line-map-stop {
+    padding: 4px 0;
+    font-size: var(--text-xs);
+    letter-spacing: 0;
+  }
+}
+
+/* ==========================================================================
+   TIME MAP: problems started each month, painted in the problem's colour
+   ========================================================================== */
+.time-map {
+  --level-few: 20%;
+  --level-some: 50%;
+  display: grid;
+  gap: 10px;
+  border-top: var(--rule);
+  padding-top: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Night enamels are light. Lighter mixes keep night ink readable on every hue. */
+  .time-map {
+    --level-few: 18%;
+    --level-some: 36%;
+  }
+}
+
+.time-map h3 {
+  margin: 0;
+}
+
+.time-map .helper {
+  margin: 0;
+}
+
+.time-map-table {
+  border-collapse: separate;
+  border-spacing: 3px;
+  margin: 0 -3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-map-table th,
+.time-map-table td {
+  padding: 0;
+}
+
+.time-map-table thead th {
+  padding-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--color-text-primary);
+}
+
+.time-map-table thead th:first-child {
+  text-align: left;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.time-map-table tbody th {
+  min-width: 6rem;
+  padding-right: 8px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.time-map-issue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.time-map-issue::before {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  background: var(--issue);
+}
+
+.time-map-table tbody td {
+  min-width: 34px;
+  height: 40px;
+  border-radius: var(--radius-xs);
+  text-align: center;
+  vertical-align: middle;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 800;
+}
+
+.time-map .level-none {
+  background: var(--color-surface);
+  outline: 1px solid var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-text-muted);
+}
+
+.time-map-table td.level-none {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.time-map .level-few {
+  background: color-mix(in srgb, var(--issue, var(--color-text-primary)) var(--level-few), var(--color-surface));
+  color: var(--color-text-primary);
+}
+
+.time-map .level-some {
+  background: color-mix(in srgb, var(--issue, var(--color-text-primary)) var(--level-some), var(--color-surface));
+  color: var(--color-text-primary);
+}
+
+.time-map .level-many {
+  background: var(--issue, var(--color-text-primary));
+  color: var(--issue-ink);
+}
+
+.time-map-season td {
+  height: 16px;
+  vertical-align: middle;
+}
+
+.time-map-season td:first-child {
+  padding-right: 8px;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.season-track {
+  position: relative;
+  display: block;
+  height: 6px;
+  background: var(--color-surface-muted);
+}
+
+.season-band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--color-text-primary);
+}
+
+.time-map-key {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.time-map-key > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.key-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-xs);
+}
+
+.key-season {
+  height: 6px;
+  background: var(--color-text-primary);
+}
+
+.time-map-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.time-map-lines li {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  column-gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.time-map-lines li::before {
+  content: "";
+  border-radius: 1px;
+  background: var(--issue);
+}
+
+@media print {
+  .time-map-table td,
+  .season-band,
+  .key-swatch {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* ==========================================================================
+   AREA MAP: open problems by area of the building. No floors, units together
+   ========================================================================== */
+.area-map {
+  display: grid;
+  gap: 10px;
+  border-top: var(--rule);
+  padding-top: 12px;
+}
+
+.area-map h3 {
+  margin: 0;
+}
+
+.area-map .helper {
+  margin: 0;
+}
+
+.area-map-drawing {
+  display: block;
+  width: 100%;
+  max-width: 358px;
+  height: auto;
+  color: var(--color-text-primary);
+}
+
+.area-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.area-door {
+  fill: var(--color-surface);
+}
+
+.area-fill {
+  fill: var(--color-surface-muted);
+  stroke: none;
+}
+
+.area-dashed {
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.area-marker {
+  fill: currentColor;
+}
+
+.area-marker-text,
+.area-letter {
+  font-family: var(--font-display);
+  font-weight: 900;
+}
+
+.area-marker-text {
+  fill: var(--color-surface);
+  font-size: 16px;
+}
+
+.area-map-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+.area-map-list > li {
+  display: grid;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.area-map-name {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.area-letter {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  color: var(--color-surface);
+  font-size: var(--text-base);
+}
+
+.area-map-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.area-map-items b {
+  margin-left: 4px;
+  font-weight: 900;
+}
+
+.area-map-list > li.area-map-unlisted {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+
+.area-map-unlisted span:first-child {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   RECORD STORY: a record's steps and dated facts on one line, top to bottom
+   ========================================================================== */
+.record-story {
+  --line: var(--issue, var(--color-text-primary));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  max-width: 68ch;
+}
+
+.story-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  column-gap: 14px;
+  padding-bottom: 16px;
+}
+
+.story-item:last-child {
+  padding-bottom: 0;
+}
+
+/* The line runs from this item's mark down to the next one. It is drawn in the line's colour between
+   two reached items: a done step, or a fact dated today or earlier. */
+.story-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  top: 13px;
+  bottom: -13px;
+  width: 8px;
+  background: var(--color-surface-muted);
+  z-index: 0;
+}
+
+.story-item.joins-next::after {
+  background: var(--line);
+}
+
+.story-mark {
+  position: relative;
+  z-index: 1;
+  justify-self: center;
+  box-sizing: border-box;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 4px solid var(--color-surface-muted);
+}
+
+.story-item.is-done .story-mark {
+  border-color: var(--line);
+  background: var(--line);
+}
+
+.story-item.is-open .story-mark {
+  border-color: var(--color-text-primary);
+  border-width: 6px;
+}
+
+.story-item.is-locked .story-mark {
+  border-style: dashed;
+  border-color: var(--color-border-hover);
+}
+
+/* A fact is a small square on the line, with a gap cut around it. */
+.story-item.is-fact .story-mark {
+  width: 14px;
+  height: 14px;
+  margin-top: 3px;
+  border-radius: var(--radius-xs);
+  border: 3px solid var(--color-surface);
+  background: var(--color-text-primary);
+  box-sizing: content-box;
+}
+
+.story-item.is-fact.is-counted .story-mark {
+  background: var(--color-surface);
+  outline: 2px solid var(--color-text-muted);
+  outline-offset: -5px;
+}
+
+.story-body {
+  min-width: 0;
+  padding-top: 2px;
+}
+
+.story-head {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.story-stop {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.story-when {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-primary);
+}
+
+.story-item.is-later .story-stop,
+.story-item.is-later .story-when,
+.story-item.is-locked .story-stop,
+.story-item.is-locked .story-when {
+  color: var(--color-text-muted);
+}
+
+.story-note {
+  margin: 4px 0 0;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+
+.story-fact {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+}
+
+.story-date {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.story-label {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+}
+
+@media (max-width: 480px) {
+  .story-fact {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
+@media print {
+  .story-mark,
+  .story-item::after {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 

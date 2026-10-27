@@ -1,0 +1,77 @@
+---
+import { issueShortLabels } from "../data/noticeData";
+import { heatSeasonSpanInMonth } from "../data/rules";
+import { repeatPatternLines, type PatternMonth, type PatternRow } from "../lib/issuePatterns";
+import { formatIssueLabel } from "../lib/noticeUtils";
+
+/*
+ * When problems start: records started each month, by problem type, painted in the problem's
+ * colour. Every cell shows its count, so colour is never the only signal. Counts under 3 show as
+ * <3, and there are no row totals, so a total cannot undo a "<3". A heat season band sits over the
+ * months when a heat problem is listed.
+ */
+export type Props = { months: PatternMonth[]; rows: PatternRow[] };
+
+const { months, rows } = Astro.props;
+const labelFor = (issue: string) =>
+  issueShortLabels[issue] ?? formatIssueLabel(rows.find((row) => row.issue === issue)?.issueLabel ?? issue);
+const showSeason = rows.some((row) => row.issue === "heat");
+const seasons = months.map((month) => heatSeasonSpanInMonth(month.key));
+const lines = repeatPatternLines(rows, months.length, labelFor);
+const shortMonth = (label: string) => label.split(" ")[0];
+---
+
+<section class="time-map" aria-labelledby="time-map-title">
+  <h3 id="time-map-title">When problems start</h3>
+  <p class="helper">Problems started each month, last {months.length} months. Counts under 3 show as &lt;3. Merged duplicates are not counted.</p>
+  <div class="table-scroll">
+    <table class="time-map-table">
+      <caption class="visually-hidden">Problems started each month, by problem type</caption>
+      <thead>
+        <tr>
+          <th scope="col">Problem</th>
+          {months.map((month) => (
+            <th scope="col">
+              <span aria-hidden="true">{shortMonth(month.label)}</span>
+              <span class="visually-hidden">{month.label}</span>
+            </th>
+          ))}
+        </tr>
+        {showSeason && (
+          <tr class="time-map-season" aria-hidden="true">
+            <td>Heat season</td>
+            {seasons.map((span) => (
+              <td>
+                <span class="season-track">
+                  {span && <span class="season-band" style={`left: ${span.from}%; width: ${span.to - span.from}%`}></span>}
+                </span>
+              </td>
+            ))}
+          </tr>
+        )}
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr data-issue={row.issue}>
+            <th scope="row"><span class="time-map-issue">{labelFor(row.issue)}</span></th>
+            {row.counts.map((count, index) => (
+              <td class={`level-${row.levels[index]}`}>{count}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p class="time-map-key" aria-hidden="true">
+    <span><span class="key-swatch level-none"></span>None</span>
+    <span><span class="key-swatch level-few"></span>Under 3</span>
+    <span><span class="key-swatch level-some"></span>3 to 5</span>
+    <span><span class="key-swatch level-many"></span>6 or more</span>
+    {showSeason && <span><span class="key-swatch key-season"></span>Heat season (Chicago heat rule)</span>}
+  </p>
+  {lines.length > 0 && (
+    <ul class="time-map-lines">
+      {lines.map((line) => <li data-issue={line.issue}>{line.text}</li>)}
+    </ul>
+  )}
+</section>
