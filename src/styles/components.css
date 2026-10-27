@@ -2463,11 +2463,17 @@ a.line-map-stop {
   background: var(--color-surface);
   color: var(--color-text-primary);
   text-decoration: none;
-  transition: background-color 160ms var(--ease-out);
+  transition: background var(--ease-standard), border-color var(--ease-standard), color var(--ease-standard),
+    transform 120ms var(--ease-out);
 }
 
 a.line-map-stop:hover {
   background: var(--color-primary-subtle);
+}
+
+/* Pressed: the sign nudges down 1px, like the buttons. */
+a.line-map-stop:active {
+  transform: translateY(1px);
 }
 
 a.line-map-stop[aria-current="true"] {
@@ -2487,23 +2493,37 @@ a.line-map-stop[aria-current="true"] {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  gap: 4px;
 }
 
+/* The whole line, name and dots, is one link to its record: a bigger target than the name alone. */
 .line-map-line {
   display: grid;
   gap: 6px;
+  margin: 0 -8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: background var(--ease-standard);
+}
+
+.line-map-line:hover {
+  background: var(--color-surface-subtle);
+}
+
+.line-map-line:hover .line-map-label {
+  text-decoration: underline;
 }
 
 .line-map-name {
-  margin: 0;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
 }
 
-.line-map-name a {
+.line-map-label {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -2514,15 +2534,10 @@ a.line-map-stop[aria-current="true"] {
   line-height: 1.05;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: var(--color-text-primary);
-  text-decoration: none;
+  text-underline-offset: 3px;
 }
 
-.line-map-name a:hover {
-  text-decoration: underline;
-}
-
-.line-map-name a::before {
+.line-map-label::before {
   content: "";
   flex: none;
   width: 10px;
@@ -2549,6 +2564,7 @@ a.line-map-stop[aria-current="true"] {
 
 .stop-line-map .stop {
   padding: 3px 0;
+  transition: background var(--ease-standard);
 }
 
 .stop-line-map .stop + .stop::before {
@@ -2567,8 +2583,13 @@ a.line-map-stop[aria-current="true"] {
   border-width: 5px;
 }
 
-/* The step column chosen above is shaded down the map. */
-.stop-line-map .stop.is-picked {
+/* The step column chosen above is shaded down the map. Pointing at a step, or tabbing to it,
+   shades its column the same way first, so you can see which dots it will list. */
+.stop-line-map .stop.is-picked,
+.line-map:has(a.line-map-stop:nth-child(2):is(:hover, :focus-visible)) .stop-line-map .stop:nth-child(2),
+.line-map:has(a.line-map-stop:nth-child(3):is(:hover, :focus-visible)) .stop-line-map .stop:nth-child(3),
+.line-map:has(a.line-map-stop:nth-child(4):is(:hover, :focus-visible)) .stop-line-map .stop:nth-child(4),
+.line-map:has(a.line-map-stop:nth-child(5):is(:hover, :focus-visible)) .stop-line-map .stop:nth-child(5) {
   background: var(--color-primary-subtle);
 }
 
@@ -2656,6 +2677,16 @@ a.line-map-stop[aria-current="true"] {
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--color-text-primary);
+}
+
+a.time-map-issue {
+  min-height: 40px;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+
+a.time-map-issue:hover {
+  text-decoration: underline;
 }
 
 .time-map-issue::before {
@@ -2827,6 +2858,22 @@ a.line-map-stop[aria-current="true"] {
   fill: var(--color-surface);
 }
 
+.area-pane {
+  fill: transparent;
+}
+
+/* Pointing at an area in the list, or tabbing into it, shades the same area in the drawing. */
+.area-map-drawing [class*="area-zone-"] {
+  transition: fill var(--ease-standard);
+}
+
+.area-map:has(li[data-zone="unit_interior"]:is(:hover, :focus-within)) .area-zone-unit_interior,
+.area-map:has(li[data-zone="hallway"]:is(:hover, :focus-within)) .area-zone-hallway,
+.area-map:has(li[data-zone="entry"]:is(:hover, :focus-within)) .area-zone-entry,
+.area-map:has(li[data-zone="common_area"]:is(:hover, :focus-within)) .area-zone-common_area {
+  fill: var(--color-border-hover);
+}
+
 .area-fill {
   fill: var(--color-surface-muted);
   stroke: none;
@@ -2865,6 +2912,12 @@ a.line-map-stop[aria-current="true"] {
   gap: 8px;
   padding: 10px 0;
   border-top: 1px solid var(--color-border);
+  transition: background var(--ease-standard);
+}
+
+.area-map-list > li[data-zone]:hover,
+.area-map-list > li[data-zone]:focus-within {
+  background: var(--color-surface-subtle);
 }
 
 .area-map-name {
@@ -3086,6 +3139,10 @@ a.line-map-stop[aria-current="true"] {
     grid-template-columns: minmax(0, 1fr);
     gap: 2px;
   }
+}
+
+.story-add {
+  margin: 4px 0 0;
 }
 
 @media print {

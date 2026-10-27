@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.12.1 - 2026-10-27
+
+### Changed
+
+- Tapping a step on the line map, a problem type, or "Show all problems" now opens the page at the map or the list, not at the top of the page.
+- Each line on the line map is one link to its record, name and dots together. Pointing at a step, or tabbing to it, shades its column so you can see which problems it will list.
+- On the time map, each problem type's name links to the list of that type.
+- On the area map, pointing at an area in the list shades the same area in the drawing.
+- Record page: "Add a dated fact" right under "Steps and facts".
+- Pages cross-fade in 160ms when you move around the site, and the top bar stays still. It is off when your device asks for less motion, and browsers without this feature change pages as before.
+
+### Fixed
+
+- Jumping to a part of a page (for example "Add a dated fact" or "Add a photo") no longer hides its heading under the top bar.
+
 ## 1.12.0 - 2026-10-27
 
 ### Added

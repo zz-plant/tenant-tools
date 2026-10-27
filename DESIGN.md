@@ -209,7 +209,7 @@ The world refuses the dark SaaS card grid and the cream-paper "ledger" look it r
 - 2px black rules instead of card boxes; corners of 2 to 6px.
 - Building addresses on green Chicago street-name blades; green means an address, never a problem.
 - A problem's steps drawn as an 'L' stop line in its own enamel.
-- One motion moment: the "Me too" count bump.
+- One motion moment: the "Me too" count bump. Pages cross-fade in 160ms under a still top bar.
 
 ## Colors
 
@@ -391,7 +391,12 @@ A 2px-bordered option with a 40px icon tile in the issue's enamel. Icons are 24p
 Timeline entries are a two-column grid: block-caps dates (6.5rem column, tabular) and plain-language labels, with a 2px rule above the first entry and 1px rules between the rest. Disclosures (helper cards) use a block-caps summary with a CSS chevron drawn in a 2.5px stroke that rotates when open (200ms).
 
 ### Motion
-One motion moment. When "Me too" lands, the count is painted sign yellow for an instant and fades back over 1.4s (`cubic-bezier(0.16, 1, 0.3, 1)`). Other state changes are 160ms colour transitions. Under `prefers-reduced-motion`, animations and transitions are cut to near zero.
+One motion moment. When "Me too" lands, the count is painted sign yellow for an instant and fades back over 1.4s (`cubic-bezier(0.16, 1, 0.3, 1)`). Other state changes are 160ms colour transitions. Pressed signs and buttons nudge down 1px.
+- **Between pages:** a 160ms cross-fade with the same curve (cross-document view transitions). The top bar is held still, so only the page under it fades. Nothing slides, scales, or moves.
+- **Previews:** pointing at a line-map step, or tabbing to it, shades its column down the map. Pointing at an area in the area map's list shades that area in the drawing. Both are colour changes only.
+- **Jumps:** filter links end at what they filter (`#records`, `#line-map`), and every in-page jump stops below the sticky top bar.
+
+Under `prefers-reduced-motion`, animations and transitions are cut to near zero, and the page cross-fade is off.
 
 ## Do's and Don'ts
 
