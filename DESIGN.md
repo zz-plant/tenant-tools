@@ -352,6 +352,18 @@ A problem's steps drawn as an 'L' line with six stops: Started, Notice, Follow-u
 - **Full** (record page): 10px track, 26px dots, a block-caps stop name that never wraps, and a short date or state below in the body font.
 - **Compact** (dashboard rows): 4px track and 12px dots, hidden from screen readers, followed by the written count "N of 6 steps" in block caps.
 
+### Line Map
+Every open problem's stop line on one map on the building dashboard, with six shared step columns, oldest problem first, up to 8 lines. Each line is in its enamel, with the issue's square and the day count above it. A column with an open step is a bordered sign button ("FINAL" over "OPEN") that lists the problems that can take that step now; the chosen column fills Enamel Black and is shaded down the map in Wall Shade. No yellow on the map: the next-step sign stays the one yellow board.
+
+### Record Story
+A record's stop line stood on end, with its dated facts in date order between the stops: 26px stop dots as on the full line, and 14px black squares for facts (hollow for a date counted from a rule). The track is the enamel between two reached items and grey after. Steps still to come close the line.
+
+### Time Map
+Problems started each month, by issue type, as a table of painted cells: white with a light rule for none, the enamel mixed at 20% for under 3, 50% for 3 to 5 (18% and 36% at night), and full enamel with issue ink for 6 or more. Every cell keeps its count. A black heat season band runs over the months when a heat problem is listed. No row totals.
+
+### Area Map
+One building elevation drawn in 2px lines like the Block Skyline, with lettered markers: A inside units (both sides, one group), B hallways and stairs, C entry, D common areas below the ground line. The list under it holds the counts as issue chips. No floors, no area totals, and it is not printed.
+
 ### Block Skyline
 One 2px line drawing of a Chicago block in the text colour: a two-flat, a greystone three-flat, a courtyard building, a worker's cottage, and a corner store, standing on one ground line. It sits at the foot of the home intro and above the building-page footer. Phones get a drawing that ends after the courtyard building, so no building is cut in half. Decorative, hidden from screen readers, and left out of print.
 

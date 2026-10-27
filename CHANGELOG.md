@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## 1.12.0 - 2026-10-27
 
 ### Added
+
+- Record page: "Steps and facts". Each dated fact sits on the problem's line, between the steps, in date order. The steps still to come are at the end. This replaces the separate "What happened" list, so you do not have to match dates between two lists. A step shows the fact it stands for once, for example "Follow-up notice sent (by text)".
+- Building dashboard: "Where each problem is". Every open problem's steps on one map, with the same step columns for all of them. Tap a step, for example "Final", to list the problems that can take that step now. The map shows up to 8 problems. The rest stay in the list.
+- Building dashboard: "Where in the building". Open problems by area: inside units (all units counted together), hallways and stairs, entry or lobby, and common areas. It shows no floors and no units. Counts are reports with "Me too", counts under 3 show as <3, and there are no area totals. It shows only when at least 3 open records list an area, and it is left out when the page is printed.
 
 - "Send it to" in the notice builder: the owner, the property manager, the portal, and the address for written notices that a steward saved, right under Copy, Email, and Text. It shows only on a device with the building key.
 - A row of group tool links near the top of the building dashboard on phones. Before, Group tools were below every problem, about 2 screens down (3 screens for stewards). Stewards also see Canvass, Who to send notices to, and Steward tools in the row.
@@ -23,6 +27,7 @@
 
 ### Changed
 
+- Building dashboard: "Records started each month" is now "When problems start", shown on the page instead of folded away. Each month is painted in the problem's colour and still shows its count. A heat season band shows when a heat problem is listed. Lines such as "Water leak: started in 5 of the last 6 months." name problems that come back. The Total and Open now columns are gone, so a total cannot show what a "<3" hides.
 - Notice builder: after you tap a problem, the building and the problem fold to one line with "Change". The start date, Copy, Email, and Text are then on the same screen. A choice made with the keyboard does not fold the list, because arrow keys change the choice. "Done" folds it.
 - Notice builder: the notice language (Simple English, Standard English, Español, Polski) comes before Copy, Email, and Text, so the notice is in the right language when you copy it.
 - Notice builder: "I sent it" (from a record) and "When you send, also save it" come right after the send buttons. From a record, "I sent it" is on the first screen.
