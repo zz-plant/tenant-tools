@@ -812,6 +812,15 @@ label {
   color: var(--color-text-muted);
 }
 
+/* "Forget key on this device" matters on a shared phone. Its tap area is taller than the line. */
+.site-footer .footer-action {
+  display: inline-block;
+  padding-block: 12px;
+  margin-block: -12px;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
 /* ==========================================================================
    MOBILE MEDIA QUERIES
    ========================================================================== */

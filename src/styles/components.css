@@ -1023,7 +1023,11 @@
   text-transform: uppercase;
 }
 
+/* The title link is taller than its letters, so it is easier to tap. The row does not move. */
 .problem-title a {
+  display: inline-block;
+  padding-block: 8px;
+  margin-block: -8px;
   color: inherit;
   text-decoration: none;
 }
@@ -1586,10 +1590,45 @@ ul.rule-cards {
   font-size: var(--text-sm);
 }
 
+.help-list li {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
 .help-list a {
   color: var(--color-text-primary);
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+/* A resource name is a taller tap area than its line, without moving the list. */
+.help-list li > a:not(.help-call) {
+  padding-block: 9px;
+  margin-block: -9px;
+}
+
+/* A phone number is a full-size sign button, so it is easy to tap to call. */
+.help-list a.help-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  transition: background var(--ease-standard);
+}
+
+.help-list a.help-call:hover {
+  background: var(--color-surface-subtle);
 }
 
 .help-description {
@@ -1947,7 +1986,7 @@ a.fact-tag {
 .follow-up-action {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
+  min-height: 40px;
   padding: 6px 12px;
   font-size: var(--text-sm);
 }
