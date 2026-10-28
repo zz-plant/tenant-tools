@@ -10,9 +10,14 @@ import { formatIssueLabel } from "../lib/noticeUtils";
  * <3, and there are no row totals, so a total cannot undo a "<3". A heat season band sits over the
  * months when a heat problem is listed.
  */
-export type Props = { months: PatternMonth[]; rows: PatternRow[] };
+export type Props = {
+  months: PatternMonth[];
+  rows: PatternRow[];
+  /** Each problem type's name links to the list filtered to that type. */
+  issueHref?: (issue: string) => string;
+};
 
-const { months, rows } = Astro.props;
+const { months, rows, issueHref } = Astro.props;
 const labelFor = (issue: string) =>
   issueShortLabels[issue] ?? formatIssueLabel(rows.find((row) => row.issue === issue)?.issueLabel ?? issue);
 const showSeason = rows.some((row) => row.issue === "heat");
@@ -53,7 +58,13 @@ const shortMonth = (label: string) => label.split(" ")[0];
       <tbody>
         {rows.map((row) => (
           <tr data-issue={row.issue}>
-            <th scope="row"><span class="time-map-issue">{labelFor(row.issue)}</span></th>
+            <th scope="row">
+              {issueHref ? (
+                <a class="time-map-issue" href={issueHref(row.issue)}>{labelFor(row.issue)}</a>
+              ) : (
+                <span class="time-map-issue">{labelFor(row.issue)}</span>
+              )}
+            </th>
             {row.counts.map((count, index) => (
               <td class={`level-${row.levels[index]}`}>{count}</td>
             ))}

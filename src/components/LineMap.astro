@@ -3,7 +3,8 @@ import type { LineMap, LineMapStopKey } from "../lib/lineMap";
 
 /*
  * Every open problem's steps on one map, with shared step columns. A column with an open step is a
- * link that lists the problems that can take that step now. Each line is in its problem's colour.
+ * link that lists the problems that can take that step now. Each line is in its problem's colour,
+ * and the whole line is one link to its record.
  */
 export type Props = {
   map: LineMap;
@@ -16,7 +17,7 @@ const { map, activeStop, stopHref, recordHref } = Astro.props;
 const activeIndex = map.columns.findIndex((column) => column.key === activeStop);
 ---
 
-<section class="line-map" aria-labelledby="line-map-title">
+<section class="line-map" id="line-map" aria-labelledby="line-map-title">
   <h3 id="line-map-title">Where each problem is</h3>
   <p class="helper">Each line is one open problem. Tap a step to list the problems that can take it now.</p>
   <nav class="line-map-head" aria-label="Show problems that can take one step now">
@@ -33,19 +34,21 @@ const activeIndex = map.columns.findIndex((column) => column.key === activeStop)
   </nav>
   <ol class="line-map-lines">
     {map.lines.map((line) => (
-      <li class="line-map-line" data-issue={line.issue}>
-        <p class="line-map-name">
-          <a href={recordHref(line.id)}>{line.label}</a>
-          <span class="line-map-days"><b class="tabular">{line.daysOpen}</b> {line.daysOpen === 1 ? "day" : "days"}</span>
-        </p>
-        <p class="visually-hidden">{line.summary}</p>
-        <ol class="stop-line stop-line-map" aria-hidden="true">
-          {line.line.map((stop, index) => (
-            <li class:list={["stop", `is-${stop.state}`, { "is-picked": index === activeIndex }]}>
-              <span class="stop-dot"></span>
-            </li>
-          ))}
-        </ol>
+      <li data-issue={line.issue}>
+        <a class="line-map-line" href={recordHref(line.id)}>
+          <span class="line-map-name">
+            <span class="line-map-label">{line.label}</span>
+            <span class="line-map-days"><b class="tabular">{line.daysOpen}</b> {line.daysOpen === 1 ? "day" : "days"}</span>
+          </span>
+          <span class="visually-hidden">{line.summary}</span>
+          <ol class="stop-line stop-line-map" aria-hidden="true">
+            {line.line.map((stop, index) => (
+              <li class:list={["stop", `is-${stop.state}`, { "is-picked": index === activeIndex }]}>
+                <span class="stop-dot"></span>
+              </li>
+            ))}
+          </ol>
+        </a>
       </li>
     ))}
   </ol>

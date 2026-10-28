@@ -62,8 +62,10 @@ const stopFilter =
   isLineMapStopKey(stopFilterRaw) && stopFilterRaw !== "start" && stopFilterRaw !== "fixed" ? stopFilterRaw : null;
 
 const clearFiltersUrl = buildBuildingDashboardUrl({ buildingId });
+// Filter links end at the list (#records) or the line map (#line-map), so the page does not
+// reload at the top and make you scroll back to what you tapped.
 const buildFilterUrl = (nextIssue: string) =>
-  nextIssue === "all" ? clearFiltersUrl : `${clearFiltersUrl}?issue=${encodeURIComponent(nextIssue)}`;
+  `${nextIssue === "all" ? clearFiltersUrl : `${clearFiltersUrl}?issue=${encodeURIComponent(nextIssue)}`}#records`;
 // A step link keeps the problem type filter. A problem type link clears the step.
 const buildStopFilterUrl = (nextStop: string | null) => {
   const params = new URLSearchParams();
@@ -74,7 +76,9 @@ const buildStopFilterUrl = (nextStop: string | null) => {
     params.set("stop", nextStop);
   }
   const query = params.toString();
-  return query ? `${clearFiltersUrl}?${query}` : clearFiltersUrl;
+  // Clearing the step goes back to the map only when the map still shows without a step.
+  const target = nextStop || lineMapRows.length >= lineMapMinLines ? "#line-map" : "#records";
+  return `${query ? `${clearFiltersUrl}?${query}` : clearFiltersUrl}${target}`;
 };
 
 const today = formatDate(new Date());
@@ -424,7 +428,7 @@ const stopFilterLabel = stopFilter ? lineMapStops.find((stop) => stop.key === st
               <p class="helper">
                 Wins logged: {wins.total}. Small counts show as &lt;3 to protect residents. Counts are resident-reported and not verified.
               </p>
-              {patterns.rows.length > 0 && <TimeMap months={patterns.months} rows={patterns.rows} />}
+              {patterns.rows.length > 0 && <TimeMap months={patterns.months} rows={patterns.rows} issueHref={buildFilterUrl} />}
               {areaMap?.show && <AreaMap map={areaMap} issueHref={buildFilterUrl} />}
             </>
           )}

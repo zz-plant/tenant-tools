@@ -6,6 +6,7 @@ import type { AreaMap } from "../lib/areaMap";
  * Where in the building open problems are. The drawing is one building with four areas: A inside
  * units (both sides, counted together), B hallways and stairs, C the entry, D common areas. It
  * shows no floors. The list under it is the real content; the drawing is hidden from screen readers.
+ * Pointing at an area in the list, or tabbing into it, shades that area in the drawing.
  */
 export type Props = { map: AreaMap; issueHref: (issue: string) => string };
 
@@ -26,12 +27,12 @@ const markers = [
   <svg class="area-map-drawing" viewBox="0 0 358 302" aria-hidden="true" focusable="false">
     <rect class="area-line" x="28" y="16" width="302" height="14" />
     <rect class="area-line" x="40" y="29" width="278" height="212" />
-    <rect class="area-fill" x="150" y="30" width="58" height="210" />
+    <rect class="area-fill area-zone-hallway" x="150" y="30" width="58" height="210" />
     <path class="area-line" d="M150 30V240M208 30V240" />
-    {windows.map((pane) => <rect class="area-line" x={pane.x} y={pane.y} width="30" height="34" />)}
-    <path class="area-line area-door" d="M164 240V186H194V240" />
+    {windows.map((pane) => <rect class="area-line area-pane area-zone-unit_interior" x={pane.x} y={pane.y} width="30" height="34" />)}
+    <path class="area-line area-door area-zone-entry" d="M164 240V186H194V240" />
     <path class="area-line" d="M0 241H358" />
-    <path class="area-fill area-dashed" d="M40 242V300H318V242" />
+    <path class="area-fill area-dashed area-zone-common_area" d="M40 242V300H318V242" />
     {markers.map((marker) => (
       <g>
         <circle class="area-marker" cx={marker.x} cy={marker.y} r="13" />
@@ -41,7 +42,7 @@ const markers = [
   </svg>
   <ul class="area-map-list">
     {map.areas.map((area) => (
-      <li>
+      <li data-zone={area.zone}>
         <p class="area-map-name"><span class="area-letter" aria-hidden="true">{area.letter}</span>{area.label}</p>
         {area.items.length > 0 ? (
           <ul class="area-map-items">
