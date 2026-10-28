@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.12.2 - 2026-10-28
+
+### Changed
+
+- Building dashboard: "Me too on a problem" now goes straight to the list of open problems. Before, it stopped above the filters and the line map, and the first problem was at the bottom edge of a phone screen.
+- Building dashboard: a problem that is on the line map no longer repeats its small step line in the list.
+- Help lists (record page, rights guide, starter kit): each phone number is a large "call" button you can tap. Before, numbers were small text links next to the name.
+- Bigger tap areas on phones: the back arrow in the top bar (44px), problem names on the dashboard, help links, the one-tap facts on a record ("Management replied" and the others), and "Forget key on this device".
+
 ## 1.12.1 - 2026-10-27
 
 ### Changed

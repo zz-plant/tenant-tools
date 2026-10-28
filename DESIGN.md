@@ -383,9 +383,12 @@ A 2px-bordered option with a 40px icon tile in the issue's enamel. Icons are 24p
 - **Disabled:** Wall Shade fill, muted text.
 
 ### Navigation
-- **Top bar:** an Enamel Black sign bar (pure black in dark mode, with a 1px rule). Brand mark is a light 30px tile with the double-T glyph; the name is in block caps at 1.2rem with a small sub-line. A back link and badges use tracked caps. "Quick exit" is always visible: a light 3px-radius plate with black block caps, 40px tall.
+- **Top bar:** an Enamel Black sign bar (pure black in dark mode, with a 1px rule). Brand mark is a light 30px tile with the double-T glyph; the name is in block caps at 1.2rem with a small sub-line. A back link and badges use tracked caps. "Quick exit" is always visible: a light 3px-radius plate with black block caps, 40px tall. On phones the back link is the arrow alone, in a 44px square.
 - **Building links:** on the home page each saved building is a small street sign with a right arrow that nudges 3px on hover.
 - **Tool list:** each row is the whole link, a 1.3rem block-caps name, a one-line note, and a right arrow, separated by 1px rules.
+
+### Help Lists
+Each help resource is its name (a plain link), one plain sentence, and, when it has one, its phone number as a sign button: 2px black edge, a 16px line phone glyph, the number in block figures, 44px tall. Tapping it calls. In print it stays a bordered number.
 
 ### Timeline and Disclosures
 Timeline entries are a two-column grid: block-caps dates (6.5rem column, tabular) and plain-language labels, with a 2px rule above the first entry and 1px rules between the rest. Disclosures (helper cards) use a block-caps summary with a CSS chevron drawn in a 2.5px stroke that rotates when open (200ms).

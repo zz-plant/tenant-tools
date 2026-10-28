@@ -504,6 +504,18 @@
     white-space: nowrap;
   }
 
+  /* On phones the back link is the arrow alone. It keeps a full 44px target. */
+  .app-back-link {
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .app-back-link svg {
+    width: 20px;
+    height: 20px;
+  }
+
   .page {
     padding: 16px var(--layout-gutter-mobile) calc(32px + var(--safe-area-bottom));
     gap: 20px;

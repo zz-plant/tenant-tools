@@ -173,6 +173,7 @@ const lineMapRows = issueFiltered
     line,
   }));
 const lineMap = lineMapRows.length >= lineMapMinLines || stopFilter ? buildLineMap(lineMapRows) : null;
+const onLineMap = new Set((lineMap?.lines ?? []).map((line) => line.id));
 const stopFilterLabel = stopFilter ? lineMapStops.find((stop) => stop.key === stopFilter)?.label : "";
 ---
 <!DOCTYPE html>
@@ -230,7 +231,7 @@ const stopFilterLabel = stopFilter ? lineMapStops.find((stop) => stop.key === st
           )}
           <div class="next-actions">
             <a class="button" href={draftNoticeUrl}>Report a problem</a>
-            <a class="button button-secondary" href="#records">Me too on a problem</a>
+            <a class="button button-secondary" href="#open-list">Me too on a problem</a>
           </div>
           {/* On phones the Group tools list is below every problem. These links reach the tools from the top. */}
           <nav class="tool-chips" aria-label="Group tools">
@@ -305,6 +306,7 @@ const stopFilterLabel = stopFilter ? lineMapStops.find((stop) => stop.key === st
               {statusIds.map((status) => (
                 <section
                   class="status-group"
+                  id={status === "open" ? "open-list" : undefined}
                   data-status-group={status}
                   hidden={status !== "open" && grouped[status].length === 0}
                 >
@@ -340,7 +342,8 @@ const stopFilterLabel = stopFilter ? lineMapStops.find((stop) => stop.key === st
                             Started {record.startDate ? formatTimelineDate(record.startDate) : "date not listed"}.{" "}
                             Me too: <span data-report-count={record.id} title="Small counts are hidden for privacy">{formatResidentReportCount(record.reportCount)}</span>
                           </p>
-                          {lineFor(record) && <StopLine stops={lineFor(record) ?? []} compact />}
+                          {/* A problem already drawn on the line map above does not repeat its small line here. */}
+                          {lineFor(record) && !onLineMap.has(record.id) && <StopLine stops={lineFor(record) ?? []} compact />}
                           {step && step.state !== "ready" && <p class="problem-next">{step.label}</p>}
                           {record.mergedInto && <p class="problem-next">Merged into another record.</p>}
                         </div>
@@ -486,7 +489,7 @@ const stopFilterLabel = stopFilter ? lineMapStops.find((stop) => stop.key === st
       <footer class="site-footer">
         <p>This page does not show names, unit numbers, or photos.</p>
         {hasAccess && (
-          <p><a href="?forget=1">Forget key on this device</a>. Use this on a shared phone.</p>
+          <p><a class="footer-action" href="?forget=1">Forget key on this device</a>. Use this on a shared phone.</p>
         )}
       </footer>
     </div>
