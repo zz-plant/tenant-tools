@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "deploy": "bun run build && wrangler deploy",
+    "deploy": "bun run check && wrangler deploy",
     "preview": "astro preview",
     "test": "node --test --import tsx tests/*.test.ts",
     "typecheck": "astro check && tsc --noEmit",
-    "translations": "tsx scripts/translations.ts"
+    "translations": "tsx scripts/translations.ts",
+    "check": "bun run typecheck && bun run test && bun run build",
+    "deploy:dry-run": "bun run check && wrangler deploy --dry-run"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.1",
